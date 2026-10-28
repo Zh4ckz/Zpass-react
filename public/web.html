@@ -3,48 +3,125 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <meta name="theme-color" content="#f5f7fb">
-  <title>Z Pass Sohbet</title>
+  <meta name="theme-color" content="#72b27b">
+  <title>Z Pass Web</title>
   <link rel="icon" type="image/png" href="/resources/assets/app-logo/zpass.png">
-  <link rel="stylesheet" href="/css/web-chat.css?v=3">
+  <link rel="stylesheet" href="/css/web-chat.css?v=5">
 </head>
-<body>
+<body class="telegram-theme">
+
+  <!-- Floating Theme Toggle Button -->
+  <button id="theme-toggle" class="theme-toggle" type="button" title="Temayı değiştir" aria-label="Temayı değiştir">
+    <span id="theme-icon">🌙</span>
+  </button>
+
   <main id="auth-view" class="auth-view">
-    <section class="auth-card">
-      <div class="brand-mark">Z</div>
-      <p class="eyebrow">Z PASS MESAJLAŞMA</p>
-      <h1>Özel sohbetler.<br>Tüm cihazlarında.</h1>
-      <p class="muted">Z Pass hesabınla giriş yap. Mevcut uçtan uca şifreleme anahtarını kullanmak için bu tarayıcıyı telefonunla eşleştir.</p>
-      <button id="google-signin" class="button button-google" type="button"><span class="google-g">G</span> Google ile devam et</button>
-      <button id="qr-login-open" class="button button-qr" type="button"><span aria-hidden="true">▦</span> Telefonla QR kodu tara</button>
-      <div class="divider"><span>veya e-posta / telefon kullan</span></div>
-      <form id="email-form" class="auth-form">
-        <label>E-posta veya telefon numarası<input id="login-identifier" type="text" autocomplete="username" inputmode="email" placeholder="E-posta veya +15551234567" required></label>
-        <label id="password-label">Şifre<input id="password" type="password" autocomplete="current-password" minlength="6" required></label>
-        <label id="phone-code-label" hidden>SMS doğrulama kodu<input id="phone-code" type="text" inputmode="numeric" autocomplete="one-time-code" maxlength="6" pattern="[0-9]{6}" placeholder="6 haneli kod"></label>
-        <button id="email-submit" class="button button-primary" type="submit">Giriş yap</button>
-        <button id="phone-cancel" class="text-button" type="button" hidden>Telefon girişini iptal et</button>
-      </form>
-      <div id="recaptcha-container"></div>
-      <p class="privacy-note">Telefon numaranı ülke koduyla yaz (ör. +1…). Telefon girişinde SMS doğrulaması gerekir.</p>
-      <a class="text-button" href="/apps.html#android">Hesabın yok mu? Android uygulamasını indir</a>
-      <p id="auth-status" class="status" role="status"></p>
-      <small class="privacy-note">Mesajların uçtan uca şifrelenir. Özel sohbet anahtarın yalnızca telefonundan bu tarayıcıyı onayladığında aktarılır.</small>
+    <section class="telegram-card">
+
+      <!-- VIEW 1: LOG IN BY QR CODE (DEFAULT VIEW) -->
+      <div id="view-qr" class="auth-subview">
+        <div class="qr-container">
+          <div class="qr-frame">
+            <canvas id="web-login-qr" width="220" height="220" aria-label="Süreli Z Pass web giriş QR kodu"></canvas>
+            <div class="qr-logo-badge">Z</div>
+            <div id="qr-loading" class="qr-loading">Güvenli QR kod hazırlanıyor…</div>
+          </div>
+        </div>
+
+        <h1 class="card-title">Log in by QR Code</h1>
+        <p class="card-subtitle">Scan with Z Pass app on your phone</p>
+
+        <ol class="qr-steps">
+          <li><span class="step-num">1</span> <span>Open <b>Z Pass</b> on your phone</span></li>
+          <li><span class="step-num">2</span> <span>Go to <b>Settings &gt; Devices &gt; Add Device</b></span></li>
+          <li><span class="step-num">3</span> <span>Point your phone at this screen to confirm login</span></li>
+        </ol>
+
+        <p id="qr-login-status" class="status-msg" role="status">Kod hazırlanıyor…</p>
+        <p class="qr-expiry-text">Kodun geçerliliği: <strong id="qr-login-countdown">--:--</strong></p>
+        <button id="qr-login-retry" class="button button-primary tg-btn-submit" type="button" hidden>Yeni QR Kodu Oluştur</button>
+
+        <div class="action-links">
+          <button id="switch-to-phone" class="tg-link-button" type="button">LOG IN BY PHONE NUMBER OR EMAIL <span aria-hidden="true">›</span></button>
+          <button id="switch-to-passkey-from-qr" class="tg-link-button" type="button">LOG IN BY PASSKEY <span aria-hidden="true">›</span></button>
+        </div>
+      </div>
+
+      <!-- VIEW 2: LOG IN BY PHONE / EMAIL -->
+      <div id="view-phone" class="auth-subview" hidden>
+        <div class="brand-avatar-badge">
+          <span>Z</span>
+        </div>
+
+        <h1 class="card-title">Sign in to Z Pass</h1>
+        <p class="card-subtitle">Please confirm your country code and enter your phone number or email.</p>
+
+        <form id="email-form" class="tg-auth-form">
+          <div class="form-group">
+            <label class="tg-label" for="country-select">Country</label>
+            <select id="country-select" class="tg-input tg-select">
+              <option value="+90">Turkey (+90)</option>
+              <option value="+1">United States (+1)</option>
+              <option value="+44">United Kingdom (+44)</option>
+              <option value="+49">Germany (+49)</option>
+              <option value="+33">France (+33)</option>
+              <option value="+963">Syria (+963)</option>
+              <option value="+964">Iraq (+964)</option>
+              <option value="+966">Saudi Arabia (+966)</option>
+              <option value="+971">UAE (+971)</option>
+            </select>
+          </div>
+
+          <div class="form-group">
+            <label class="tg-label" for="login-identifier">Phone Number or Email</label>
+            <input id="login-identifier" class="tg-input" type="text" autocomplete="username" placeholder="E-posta veya +905551234567" required>
+          </div>
+
+          <div class="form-group" id="password-group">
+            <label class="tg-label" for="password">Password</label>
+            <input id="password" class="tg-input" type="password" autocomplete="current-password" minlength="6" placeholder="Şifreniz" required>
+          </div>
+
+          <div class="form-group" id="phone-code-group" hidden>
+            <label class="tg-label" for="phone-code">SMS Doğrulama Kodu</label>
+            <input id="phone-code" class="tg-input" type="text" inputmode="numeric" placeholder="6 haneli kod" maxlength="6">
+          </div>
+
+          <button id="email-submit" class="button button-primary tg-btn-submit" type="submit">NEXT</button>
+          <button id="phone-cancel" class="tg-link-button" type="button" hidden>CANCEL PHONE LOGIN</button>
+        </form>
+
+        <div id="recaptcha-container"></div>
+        <p id="auth-status" class="status-msg" role="status"></p>
+
+        <div class="action-links">
+          <button id="switch-to-qr" class="tg-link-button" type="button">LOG IN BY QR CODE <span aria-hidden="true">›</span></button>
+          <button id="switch-to-passkey-from-phone" class="tg-link-button" type="button">LOG IN BY PASSKEY <span aria-hidden="true">›</span></button>
+        </div>
+      </div>
+
+      <!-- VIEW 3: LOG IN BY PASSKEY -->
+      <div id="view-passkey" class="auth-subview" hidden>
+        <div class="brand-avatar-badge passkey-badge">
+          <span>🔑</span>
+        </div>
+
+        <h1 class="card-title">Log in by Passkey</h1>
+        <p class="card-subtitle">Use your device biometric or hardware security key to sign in.</p>
+
+        <button id="passkey-login-btn" class="button button-primary tg-btn-submit" type="button">CONTINUE WITH PASSKEY</button>
+        <p id="passkey-status" class="status-msg" role="status"></p>
+
+        <div class="action-links">
+          <button id="switch-to-qr-from-passkey" class="tg-link-button" type="button">LOG IN BY QR CODE <span aria-hidden="true">›</span></button>
+          <button id="switch-to-phone-from-passkey" class="tg-link-button" type="button">LOG IN BY PHONE NUMBER OR EMAIL <span aria-hidden="true">›</span></button>
+        </div>
+      </div>
+
     </section>
   </main>
 
-  <dialog id="qr-login-dialog" class="modal qr-login-modal">
-    <form method="dialog"><button class="modal-close" aria-label="Kapat">×</button></form>
-    <p class="eyebrow">Z PASS GÜVENLİ GİRİŞ</p>
-    <h2>Telefonunla giriş yap</h2>
-    <p class="muted">Z Pass uygulamasında QR tarayıcıyı aç ve kodu tara. Telefonunda bu web girişi için ayrıca onay istenecek.</p>
-    <div class="qr-frame"><canvas id="web-login-qr" width="256" height="256" aria-label="Süreli Z Pass web giriş QR kodu"></canvas><div id="qr-loading" class="qr-loading">Güvenli kod hazırlanıyor…</div></div>
-    <p id="qr-login-status" class="status" role="status">Kod hazırlanıyor…</p>
-    <p class="qr-expiry">Kodun geçerliliği: <strong id="qr-login-countdown">--:--</strong></p>
-    <button id="qr-login-retry" class="button button-primary" type="button" hidden>Yeni QR kodu oluştur</button>
-    <small class="privacy-note">Sadece senin başlattığın QR isteğini onayla. QR kodu tek kullanımlıdır ve iki dakika içinde geçersiz olur.</small>
-  </dialog>
-
+  <!-- SETUP / APP DOWNLOAD VIEW -->
   <main id="setup-view" class="setup-view" hidden>
     <section class="setup-card">
       <div class="brand-mark">Z</div><p class="eyebrow">Z PASS ANDROID</p>
@@ -54,6 +131,7 @@
     </section>
   </main>
 
+  <!-- MAIN CHAT APPLICATION -->
   <main id="chat-app" class="chat-app" hidden>
     <aside class="sidebar">
       <header class="side-head"><div class="brand-small">Z</div><div><b>Z Pass</b><small>Güvenli mesajlaşma</small></div><button id="signout" class="icon-button" title="Çıkış yap" aria-label="Çıkış yap">↗</button></header>
@@ -90,6 +168,6 @@
   </dialog>
   <div id="toast" class="toast" role="status"></div>
   <script src="/js/vendor/qrcode-generator.js"></script>
-  <script type="module" src="/js/web-chat.mjs?v=4"></script>
+  <script type="module" src="/js/web-chat.mjs?v=5"></script>
 </body>
 </html>
