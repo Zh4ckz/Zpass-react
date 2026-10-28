@@ -22,10 +22,10 @@ body.telegram-theme {
   align-items: center;
   justify-content: center;
   background-color: var(--bg-color);
-  background-image:
-    radial-gradient(circle at 50% 50%, rgba(255, 255, 255, 0.15) 0%, transparent 80%),
-    url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='80' height='80' viewBox='0 0 80 80'%3E%3Cg fill='%23ffffff' fill-opacity='0.12'%3E%3Cpath d='M14 16c2 0 4-2 4-4s-2-4-4-4-4 2-4 4 2 4 4 4zm44 0c2 0 4-2 4-4s-2-4-4-4-4 2-4 4 2 4 4 4zM14 60c2 0 4-2 4-4s-2-4-4-4-4 2-4 4 2 4 4 4zm44 0c2 0 4-2 4-4s-2-4-4-4-4 2-4 4 2 4 4 4z'/%3E%3C/g%3E%3C/svg%3E");
-  background-size: cover, 160px 160px;
+  background-image: url("/img/pattern-9.svg");
+  background-repeat: repeat;
+  background-position: center;
+  background-size: 480px auto;
   color: var(--text-primary);
   transition: background-color 0.3s ease;
 }
@@ -38,9 +38,10 @@ body.dark-theme {
   --input-bg: #242f3d;
   --input-border: #384656;
   background-color: var(--bg-color);
-  background-image:
-    radial-gradient(circle at 50% 50%, rgba(51, 144, 236, 0.1) 0%, transparent 80%),
-    url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='80' height='80' viewBox='0 0 80 80'%3E%3Cg fill='%23ffffff' fill-opacity='0.05'%3E%3Cpath d='M14 16c2 0 4-2 4-4s-2-4-4-4-4 2-4 4 2 4 4 4zm44 0c2 0 4-2 4-4s-2-4-4-4-4 2-4 4 2 4 4 4zM14 60c2 0 4-2 4-4s-2-4-4-4-4 2-4 4 2 4 4 4zm44 0c2 0 4-2 4-4s-2-4-4-4-4 2-4 4 2 4 4 4z'/%3E%3C/g%3E%3C/svg%3E");
+  background-image: url("/img/pattern-9.svg");
+  background-repeat: repeat;
+  background-position: center;
+  background-size: 480px auto;
   color: var(--text-primary);
 }
 
