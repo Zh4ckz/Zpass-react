@@ -1,18 +1,62 @@
 import { initializeApp, getApps } from 'https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js';
 import { getAuth, onAuthStateChanged, GoogleAuthProvider, signInWithPopup, signInWithEmailAndPassword, signInWithPhoneNumber, RecaptchaVerifier, signOut, getAdditionalUserInfo, deleteUser } from 'https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js';
 import { getFirestore, doc, getDoc, getDocs, setDoc, addDoc, collection, query, where, orderBy, limitToLast, onSnapshot, updateDoc, deleteDoc, serverTimestamp } from 'https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js';
+import { getFunctions, httpsCallable } from 'https://www.gstatic.com/firebasejs/10.12.2/firebase-functions.js';
+import { signInWithCustomToken } from 'https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js';
 import { firebaseConfig } from './firebase-config.mjs';
 
 const app = getApps()[0] || initializeApp(firebaseConfig);
 const auth = getAuth(app), db = getFirestore(app);
+const functions = getFunctions(app, 'us-central1');
+const createWebQrLogin = httpsCallable(functions, 'createWebQrLogin');
+const pollWebQrLogin = httpsCallable(functions, 'pollWebQrLogin');
+const completeWebQrLogin = httpsCallable(functions, 'completeWebQrLogin');
 const $ = id => document.getElementById(id);
 const authView = $('auth-view'), setupView = $('setup-view'), chatApp = $('chat-app');
 const enc = new TextEncoder(), dec = new TextDecoder();
 let me = null, profile = null, currentPeer = null, currentChatId = null;
 let chatsStop = null, messagesStop = null, peerStop = null, typingStop = null;
 let searchTimer = null, typingTimer = null, pairStop = null, pairRef = null, pairExpiry = null, toastTimer = null, presenceTimer = null;
+let qrPollTimer = null, qrCountdownTimer = null, qrLoginRequest = null, qrPolling = false, browserSessionStop = null;
 let browserIdentity = null, messages = [];
 const profileCache = new Map();
+
+function randomSecret(){const bytes=crypto.getRandomValues(new Uint8Array(32));return Array.from(bytes,b=>b.toString(16).padStart(2,'0')).join('')}
+function qrLoginStatus(message,error=false){const node=$('qr-login-status');node.textContent=message;node.style.color=error?'#bb4a54':'#27835f'}
+function stopQrLogin(){clearInterval(qrPollTimer);clearInterval(qrCountdownTimer);qrPollTimer=null;qrCountdownTimer=null;qrLoginRequest=null;qrPolling=false}
+function drawLoginQr(value){const qr=globalThis.qrcode(0,'M');qr.addData(value);qr.make();const canvas=$('web-login-qr'),ctx=canvas.getContext('2d'),count=qr.getModuleCount(),quiet=4,unit=canvas.width/(count+quiet*2);ctx.fillStyle='#fff';ctx.fillRect(0,0,canvas.width,canvas.height);ctx.fillStyle='#111827';for(let row=0;row<count;row++)for(let col=0;col<count;col++)if(qr.isDark(row,col))ctx.fillRect(Math.round((col+quiet)*unit),Math.round((row+quiet)*unit),Math.ceil(unit),Math.ceil(unit));$('qr-loading').hidden=true}
+async function startWebQrLogin(){
+  stopQrLogin();$('qr-login-retry').hidden=true;$('qr-loading').hidden=false;$('web-login-qr').getContext('2d').clearRect(0,0,256,256);$('qr-login-countdown').textContent='--:--';qrLoginStatus('Güvenli kod hazırlanıyor…');
+  try{
+    const qrSecret=randomSecret(),pollSecret=randomSecret();
+    const created=await createWebQrLogin({qrSecret,pollSecret,deviceName:`Web tarayıcısı · ${navigator.platform||'Web'}`});
+    const data=created.data,expiresAt=Number(data.expiresAt);
+    if(!data.requestId||!Number.isFinite(expiresAt))throw Error('Sunucu geçerli bir QR isteği oluşturmadı.');
+    qrLoginRequest={requestId:data.requestId,qrSecret,pollSecret,expiresAt};
+    const payload=new URL('zpass://web-login');payload.searchParams.set('requestId',data.requestId);payload.searchParams.set('secret',qrSecret);
+    drawLoginQr(payload.toString());qrLoginStatus('Z Pass uygulamasından tara; telefonda web girişini onayla.');
+    const updateCountdown=()=>{const remain=Math.max(0,expiresAt-Date.now());$('qr-login-countdown').textContent=`${String(Math.floor(remain/60000)).padStart(2,'0')}:${String(Math.floor(remain%60000/1000)).padStart(2,'0')}`;if(remain<=0){stopQrLogin();$('qr-loading').hidden=true;$('qr-login-retry').hidden=false;qrLoginStatus('QR kodunun süresi doldu. Yeni bir kod oluştur.',true)}};
+    updateCountdown();qrCountdownTimer=setInterval(updateCountdown,500);
+    qrPollTimer=setInterval(async()=>{
+      if(qrPolling||!qrLoginRequest)return;qrPolling=true;
+      try{const result=await pollWebQrLogin({requestId:data.requestId,pollSecret}),state=result.data;
+        if(state.status==='expired'||state.status==='cancelled'){stopQrLogin();$('qr-login-retry').hidden=false;qrLoginStatus('Bu QR isteği sona erdi. Yeni kod oluştur.',true);return}
+        if(state.status==='approved'&&state.customToken){stopQrLogin();qrLoginStatus('Telefon onayladı. Güvenli oturum açılıyor…');await signInWithCustomToken(auth,state.customToken);await completeWebQrLogin({requestId:data.requestId,pollSecret});$('qr-login-dialog').close()}
+      }catch(error){if(error?.code==='functions/unauthenticated'||error?.code==='functions/permission-denied'){stopQrLogin();$('qr-login-retry').hidden=false;qrLoginStatus('QR isteği doğrulanamadı. Yeni bir kod oluştur.',true)}else qrLoginStatus('Sunucuya bağlanılamıyor. Bağlantı yeniden denenecek.',true)}
+      finally{qrPolling=false}
+    },1800);
+  }catch(error){stopQrLogin();$('qr-loading').hidden=true;$('qr-login-retry').hidden=false;qrLoginStatus(error?.message||'QR kod oluşturulamadı. Firebase Functions dağıtımını kontrol et.',true)}
+}
+
+async function registerBrowserSession(user){
+  const key=`zpass-web-session:${user.uid}`;let id=sessionStorage.getItem(key);if(!id){id=crypto.randomUUID();sessionStorage.setItem(key,id)}
+  const ref=doc(db,'users',user.uid,'devices',id),existing=await getDoc(ref);
+  if(existing.get('revoked')===true){sessionStorage.removeItem(key);await signOut(auth);throw Error('Bu web oturumu telefondan sonlandırıldı. Yeniden QR ile giriş yap.')}
+  const session={deviceId:id,ownerUid:user.uid,deviceName:`Web tarayıcısı · ${navigator.platform||'Web'}`,platform:'WEB',appVersion:'Z Pass Web',lastSeenAt:serverTimestamp(),acceptVoiceCalls:true,acceptVideoCalls:true,revoked:false};
+  await setDoc(ref,session,{merge:true});
+  browserSessionStop?.();browserSessionStop=onSnapshot(ref,snap=>{if(snap.get('revoked')===true){browserSessionStop?.();browserSessionStop=null;signOut(auth).catch(()=>{});sessionStorage.removeItem(key)}});
+  setDoc(doc(db,'users',user.uid,'sessionDirectory',id),{deviceId:id,ownerUid:user.uid,deviceName:session.deviceName,platform:'WEB',appVersion:'Z Pass Web',lastSeenAt:serverTimestamp(),revoked:false},{merge:true}).catch(()=>{});
+}
 
 function toast(text) { const el=$('toast');el.textContent=text;el.classList.add('show');clearTimeout(toastTimer);toastTimer=setTimeout(()=>el.classList.remove('show'),2600); }
 function setStatus(id,text,error=true){$(id).textContent=text;$(id).style.color=error?'#bb4a54':'#27835f';}
@@ -87,16 +131,19 @@ $('email-form').onsubmit=async e=>{e.preventDefault();const identifier=$('login-
   setStatus('auth-status','Güvenlik doğrulaması hazırlanıyor…',false);phoneRecaptcha?.clear();phoneRecaptcha=new RecaptchaVerifier(auth,'recaptcha-container',{size:'invisible'});setStatus('auth-status','SMS doğrulama kodu gönderiliyor…',false);phoneConfirmation=await signInWithPhoneNumber(auth,phone,phoneRecaptcha);$('login-identifier').disabled=true;$('password-label').hidden=true;$('phone-code-label').hidden=false;$('phone-cancel').hidden=false;$('phone-code').focus();$('email-submit').textContent='Kodu doğrula';setStatus('auth-status','SMS kodu gönderildi. Telefonundaki 6 haneli kodu gir.',false);
 }catch(error){if(phoneConfirmation){phoneConfirmation=null;phoneRecaptcha?.clear();phoneRecaptcha=null}setStatus('auth-status',authError(error))}};
 $('google-signin').onclick=async()=>{try{setStatus('auth-status','Google girişi açılıyor…',false);const result=await signInWithPopup(auth,new GoogleAuthProvider());if(getAdditionalUserInfo(result)?.isNewUser){try{await deleteUser(result.user)}finally{await signOut(auth).catch(()=>{})}setStatus('auth-status','Yeni hesap webde oluşturulamaz. APK’yı indirip hesabını uygulamada oluştur.')}}catch(e){setStatus('auth-status',authError(e))}};
+$('qr-login-open').onclick=()=>{if(!$('qr-login-dialog').open)$('qr-login-dialog').showModal();startWebQrLogin()};
+$('qr-login-retry').onclick=startWebQrLogin;
+$('qr-login-dialog').addEventListener('close',stopQrLogin);
 $('signout').onclick=()=>signOut(auth);
 $('pair-device').onclick=()=>{$('pair-dialog').showModal();$('pair-start').disabled=false;setStatus('pair-status','Şifreli sohbetleri açmak için telefonunda bu tarayıcıyı onayla.',false)};
 $('pair-start').onclick=phonePair;
 $('pair-dialog').addEventListener('close',()=>{pairStop?.();pairStop=null;clearTimeout(pairExpiry);if(pairRef){deleteDoc(pairRef).catch(()=>{});pairRef=null}});
 
 onAuthStateChanged(auth,async user=>{
-  me=user||null;profile=null;browserIdentity=null;stopLive();
+  me=user||null;profile=null;browserIdentity=null;stopLive();browserSessionStop?.();browserSessionStop=null;
   if(!user){authView.hidden=false;setupView.hidden=true;chatApp.hidden=true;return}
-  authView.hidden=true;chatApp.hidden=true;setupView.hidden=true;
-  try{const snap=await getDoc(doc(db,'chat_profiles',user.uid));profile=snap.exists()?{uid:user.uid,...snap.data()}:null;
+  authView.hidden=true;chatApp.hidden=true;setupView.hidden=true;$('qr-login-dialog').close();
+  try{await registerBrowserSession(user);const snap=await getDoc(doc(db,'chat_profiles',user.uid));profile=snap.exists()?{uid:user.uid,...snap.data()}:null;
     if(!profile?.username){setupView.hidden=false;return}
     browserIdentity=await loadIdentity(user.uid);
     if(!browserIdentity){chatApp.hidden=false;$('pair-dialog').showModal();$('pair-start').disabled=false;setStatus('pair-status','Şifreli sohbetleri okuyup göndermek için bu tarayıcıyı telefonunla eşleştir.',false);return}

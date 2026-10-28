@@ -5,17 +5,12 @@ const admin = require("firebase-admin");
 const Stripe = require("stripe");
 const { onRequest } = require("firebase-functions/v2/https");
 
-// 1. Önce .env dosyasını yüklüyoruz ki değişkenler hafızaya gelsin:
-require("dotenv").config({ path: "C:\\Users\\rezan\\Desktop\\Bots\\Payment-bot\\.env" });
-
-// --- YEREL (LOCAL) BAĞLANTI İÇİN YETKİ DOSYASI ---
-const serviceAccount = require("./zpasss-firebase-adminsdk-fbsvc-34a346f615.json");
-
-admin.initializeApp({
-  credential: admin.credential.cert(serviceAccount)
-});
+// Firebase supplies Application Default Credentials in deployed Functions.
+if (!admin.apps.length) admin.initializeApp();
 
 const db = admin.firestore();
+
+Object.assign(exports, require('./web-qr-login'));
 
 // 2. Şimdi değişkenleri güvenle okuyabiliriz:
 const STRIPE_SECRET_KEY = process.env.STRIPE_SECRET_KEY || "";

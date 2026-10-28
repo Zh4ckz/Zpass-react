@@ -6,7 +6,7 @@
   <meta name="theme-color" content="#f5f7fb">
   <title>Z Pass Sohbet</title>
   <link rel="icon" type="image/png" href="/resources/assets/app-logo/zpass.png">
-  <link rel="stylesheet" href="/css/web-chat.css?v=2">
+  <link rel="stylesheet" href="/css/web-chat.css?v=3">
 </head>
 <body>
   <main id="auth-view" class="auth-view">
@@ -16,6 +16,7 @@
       <h1>Özel sohbetler.<br>Tüm cihazlarında.</h1>
       <p class="muted">Z Pass hesabınla giriş yap. Mevcut uçtan uca şifreleme anahtarını kullanmak için bu tarayıcıyı telefonunla eşleştir.</p>
       <button id="google-signin" class="button button-google" type="button"><span class="google-g">G</span> Google ile devam et</button>
+      <button id="qr-login-open" class="button button-qr" type="button"><span aria-hidden="true">▦</span> Telefonla QR kodu tara</button>
       <div class="divider"><span>veya e-posta / telefon kullan</span></div>
       <form id="email-form" class="auth-form">
         <label>E-posta veya telefon numarası<input id="login-identifier" type="text" autocomplete="username" inputmode="email" placeholder="E-posta veya +15551234567" required></label>
@@ -31,6 +32,18 @@
       <small class="privacy-note">Mesajların uçtan uca şifrelenir. Özel sohbet anahtarın yalnızca telefonundan bu tarayıcıyı onayladığında aktarılır.</small>
     </section>
   </main>
+
+  <dialog id="qr-login-dialog" class="modal qr-login-modal">
+    <form method="dialog"><button class="modal-close" aria-label="Kapat">×</button></form>
+    <p class="eyebrow">Z PASS GÜVENLİ GİRİŞ</p>
+    <h2>Telefonunla giriş yap</h2>
+    <p class="muted">Z Pass uygulamasında QR tarayıcıyı aç ve kodu tara. Telefonunda bu web girişi için ayrıca onay istenecek.</p>
+    <div class="qr-frame"><canvas id="web-login-qr" width="256" height="256" aria-label="Süreli Z Pass web giriş QR kodu"></canvas><div id="qr-loading" class="qr-loading">Güvenli kod hazırlanıyor…</div></div>
+    <p id="qr-login-status" class="status" role="status">Kod hazırlanıyor…</p>
+    <p class="qr-expiry">Kodun geçerliliği: <strong id="qr-login-countdown">--:--</strong></p>
+    <button id="qr-login-retry" class="button button-primary" type="button" hidden>Yeni QR kodu oluştur</button>
+    <small class="privacy-note">Sadece senin başlattığın QR isteğini onayla. QR kodu tek kullanımlıdır ve iki dakika içinde geçersiz olur.</small>
+  </dialog>
 
   <main id="setup-view" class="setup-view" hidden>
     <section class="setup-card">
@@ -76,6 +89,7 @@
     <button id="accept-call" class="button button-primary" hidden>Aramayı yanıtla</button>
   </dialog>
   <div id="toast" class="toast" role="status"></div>
-  <script type="module" src="/js/web-chat.mjs?v=3"></script>
+  <script src="/js/vendor/qrcode-generator.js"></script>
+  <script type="module" src="/js/web-chat.mjs?v=4"></script>
 </body>
 </html>
