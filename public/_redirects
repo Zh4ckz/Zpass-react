@@ -1,0 +1,2 @@
+/login /web.html 200
+/login/* /web.html 200
