@@ -1,0 +1,1316 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
+  <meta name="theme-color" content="#010101">
+  <link rel="icon" type="image/png" href="images/zpass.png?v=3">
+  <title>Z Pass · Ultra Secure Checkout</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      color-scheme: dark;
+      --bg: #010101;
+      --panel-bg: rgba(254, 254, 254, 0.03);
+      --panel-border: rgba(254, 254, 254, 0.08);
+      --panel-border-hover: rgba(82,99,122, 0.5);
+      --text-main: #FEFEFE;
+      --text-muted: #A6B3C4;
+      --accent-gradient: linear-gradient(135deg, #7084A0 0%, #7084A0 100%);
+      --accent-orange: #7084A0;
+      --accent-orange-light: #7084A0;
+      --accent-green: #7084A0;
+      --radius-lg: 24px;
+      --radius-md: 16px;
+      --radius-sm: 10px;
+    }
+
+    * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Plus Jakarta Sans', system-ui, sans-serif; -webkit-tap-highlight-color: transparent; }
+
+    body {
+      min-height: 100vh;
+      background: var(--bg);
+      background-image:
+        radial-gradient(circle at 15% 15%, rgba(82,99,122, 0.14) 0%, transparent 40%),
+        radial-gradient(circle at 85% 85%, rgba(82,99,122, 0.12) 0%, transparent 40%);
+      color: var(--text-main);
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      padding: 24px 16px;
+      -webkit-font-smoothing: antialiased;
+    }
+    body.auth-checking main, body.auth-checking .mobile-pay-bar { visibility: hidden; }
+
+    main {
+      width: 100%;
+      max-width: 1100px;
+      display: grid;
+      grid-template-columns: 1.25fr 0.75fr;
+      gap: 24px;
+    }
+
+    .glass-panel {
+      background: var(--panel-bg);
+      backdrop-filter: blur(24px);
+      -webkit-backdrop-filter: blur(24px);
+      border: 1px solid var(--panel-border);
+      border-radius: var(--radius-lg);
+      padding: 28px;
+      box-shadow: 0 24px 48px rgba(1, 1, 1, 0.5);
+    }
+
+    /* Top Header & Social Row */
+    .header-top {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 12px;
+      margin-bottom: 12px;
+    }
+
+    .eyebrow {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      font-size: 13px;
+      font-weight: 800;
+      letter-spacing: 0.12em;
+      text-transform: uppercase;
+      color: var(--accent-orange-light);
+      background: rgba(82,99,122, 0.15);
+      padding: 6px 14px;
+      border-radius: 99px;
+      border: 1px solid rgba(82,99,122, 0.3);
+      white-space: nowrap;
+    }
+
+    .social-links-top {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+
+    .social-icon-btn {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      width: 42px;
+      height: 42px;
+      border-radius: 50%;
+      background: rgba(254, 254, 254, 0.06);
+      border: 1px solid var(--panel-border);
+      color: var(--text-main);
+      text-decoration: none;
+      transition: all 0.2s ease;
+    }
+
+    .social-icon-btn:hover {
+      background: rgba(82,99,122, 0.2);
+      border-color: var(--accent-orange);
+      transform: translateY(-2px);
+    }
+
+    .social-icon-btn svg { width: 18px; height: 18px; fill: currentColor; }
+
+    h1 { font-size: 30px; font-weight: 800; letter-spacing: -0.02em; margin: 8px 0 4px; }
+    p.subtitle { color: var(--text-muted); font-size: 15px; margin-bottom: 20px; }
+
+    /* Billing Switch */
+    .billing-toggle {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      background: rgba(254, 254, 254, 0.04);
+      border: 1px solid var(--panel-border);
+      padding: 4px;
+      border-radius: var(--radius-md);
+      margin-bottom: 16px;
+    }
+
+    .billing-toggle button {
+      background: transparent;
+      border: 0;
+      color: var(--text-muted);
+      padding: 12px 16px;
+      font-size: 15px;
+      font-weight: 700;
+      border-radius: var(--radius-sm);
+      cursor: pointer;
+      transition: all 0.2s ease;
+    }
+
+    .billing-toggle button.active {
+      background: rgba(254, 254, 254, 0.12);
+      color: #fff;
+      box-shadow: 0 4px 12px rgba(1, 1, 1, 0.2);
+    }
+
+    .billing-toggle em {
+      font-style: normal;
+      color: var(--accent-green);
+      font-size: 11px;
+      margin-left: 6px;
+      background: rgba(82,99,122, 0.2);
+      padding: 2px 6px;
+      border-radius: 6px;
+    }
+
+    /* Plan Cards Grid */
+    .plans-list { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; margin-bottom: 18px; }
+
+    .plan-card {
+      border: 2px solid var(--panel-border);
+      border-radius: var(--radius-md);
+      padding: 16px;
+      background: rgba(254, 254, 254, 0.02);
+      cursor: pointer;
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+      transition: all 0.2s ease;
+    }
+
+    .plan-card.active {
+      border-color: var(--accent-orange);
+      background: rgba(82,99,122, 0.14);
+    }
+
+    .plan-name { font-size: 17px; font-weight: 800; }
+    .plan-desc { font-size: 13px; color: var(--text-muted); display: block; margin-top: 2px; }
+    .plan-price { font-size: 24px; font-weight: 800; margin-top: 10px; color: #fff; }
+
+    /* User ID Badge */
+    .account-badge {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 14px 18px;
+      background: rgba(1, 1, 1, 0.35);
+      border: 1px solid var(--panel-border);
+      border-radius: var(--radius-md);
+      font-size: 14px;
+      margin-bottom: 20px;
+    }
+
+    .account-badge b { color: var(--accent-orange-light); font-weight: 700; font-size: 15px; }
+
+    /* Gateway Selection */
+    .section-title { font-size: 12px; font-weight: 800; margin-bottom: 10px; text-transform: uppercase; letter-spacing: 0.08em; color: var(--text-muted); }
+
+    .providers-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; margin-bottom: 10px; }
+
+    .provider-card {
+      border: 2px solid var(--panel-border);
+      border-radius: var(--radius-md);
+      padding: 14px 18px;
+      background: rgba(254, 254, 254, 0.02);
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      transition: all 0.2s ease;
+    }
+
+    .provider-card.active {
+      border-color: #7084A0;
+      background: rgba(82,99,122, 0.16);
+    }
+
+    .provider-card span { font-size: 15px; font-weight: 800; }
+    .provider-logo { height: 22px; width: auto; object-fit: contain; }
+
+    .provider-note { font-size: 12px; color: var(--text-muted); margin: 0 0 16px; line-height: 1.5; }
+
+    /* Custom crypto coin picker (native <select> can't render coin icons) */
+    .crypto-picker { position: relative; margin-bottom: 16px; display: none; }
+    .crypto-picker-trigger {
+      width: 100%;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      padding: 12px 14px;
+      background: rgba(1, 1, 1, 0.6);
+      border: 1px solid var(--panel-border);
+      border-radius: var(--radius-md);
+      color: #fff;
+      font-size: 15px;
+      font-weight: 600;
+      cursor: pointer;
+      transition: border-color .2s;
+    }
+    .crypto-picker-trigger:hover { border-color: var(--panel-border-hover); }
+    .crypto-picker-trigger img { width: 22px; height: 22px; border-radius: 50%; }
+    .crypto-picker-trigger .cp-label { flex: 1; text-align: left; color: var(--text-muted); }
+    .crypto-picker-trigger.has-value .cp-label { color: #fff; }
+    .crypto-picker-trigger .cp-chevron { transition: transform .2s; color: var(--text-muted); }
+    .crypto-picker.open .cp-chevron { transform: rotate(180deg); }
+
+    .crypto-picker-menu {
+      position: absolute;
+      top: calc(100% + 6px);
+      left: 0;
+      right: 0;
+      max-height: 320px;
+      overflow-y: auto;
+      background: #010101;
+      border: 1px solid var(--panel-border);
+      border-radius: var(--radius-md);
+      box-shadow: 0 20px 44px rgba(1, 1, 1, 0.55);
+      padding: 8px;
+      z-index: 40;
+    }
+    .crypto-picker:not(.open) .crypto-picker-menu { display: none; }
+    .cp-group-label { font-size: 10px; font-weight: 800; letter-spacing: .08em; text-transform: uppercase; color: var(--text-muted); padding: 10px 10px 6px; }
+    .cp-option {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      width: 100%;
+      padding: 9px 10px;
+      border-radius: 10px;
+      background: transparent;
+      border: 0;
+      color: #fff;
+      font-size: 14px;
+      font-weight: 600;
+      cursor: pointer;
+      text-align: left;
+    }
+    .cp-option:hover { background: rgba(82,99,122, 0.12); }
+    .cp-option img { width: 20px; height: 20px; border-radius: 50%; flex-shrink: 0; }
+
+    /* Main Action Button */
+    .checkout-btn {
+      width: 100%;
+      height: 56px;
+      border: 0;
+      border-radius: var(--radius-md);
+      background: var(--accent-gradient);
+      color: #010101;
+      font-size: 18px;
+      font-weight: 800;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      box-shadow: 0 10px 28px rgba(82,99,122, 0.35);
+    }
+    .checkout-btn:disabled { opacity: .6; cursor: not-allowed; }
+
+    .error-msg { background: rgba(102, 117, 127, 0.2); border: 1px solid rgba(102, 117, 127, 0.4); color: #CCD6DD; font-size: 13px; padding: 12px; border-radius: var(--radius-sm); margin-bottom: 12px; }
+    .secure-notice { font-size: 12px; color: var(--text-muted); text-align: center; margin-top: 14px; }
+
+    /* Order Summary Panel */
+    .summary-panel { position: sticky; top: 24px; height: max-content; }
+    .summary-item { display: flex; justify-content: space-between; padding: 14px 0; border-bottom: 1px solid var(--panel-border); font-size: 15px; color: var(--text-muted); }
+    .summary-item b { color: var(--text-main); font-size: 16px; }
+    .summary-total { font-size: 22px; font-weight: 800; color: #fff; border-bottom: 0; padding-top: 18px; }
+
+    .cancel-link { display: block; text-align: center; font-size: 13px; color: var(--text-muted); margin-top: 18px; text-decoration: none; }
+
+    /* Sticky Mobile Bottom Bar */
+    .mobile-pay-bar {
+      display: none;
+      position: fixed;
+      bottom: 0;
+      left: 0;
+      right: 0;
+      background: rgba(1, 1, 1, 0.98);
+      backdrop-filter: blur(16px);
+      -webkit-backdrop-filter: blur(16px);
+      border-top: 1px solid var(--panel-border);
+      padding: 12px 18px;
+      z-index: 999;
+    }
+
+    .mobile-pay-inner { display: flex; align-items: center; justify-content: space-between; gap: 14px; }
+    .mobile-total-box span { font-size: 11px; color: var(--text-muted); text-transform: uppercase; font-weight: 700; display: block; }
+    .mobile-total-box b { font-size: 22px; font-weight: 800; color: #fff; }
+
+    .mobile-pay-btn {
+      flex: 1;
+      max-width: 220px;
+      height: 50px;
+      border: 0;
+      border-radius: var(--radius-md);
+      background: var(--accent-gradient);
+      color: #010101;
+      font-size: 16px;
+      font-weight: 800;
+      cursor: pointer;
+    }
+    .mobile-pay-btn:disabled { opacity: .6; cursor: not-allowed; }
+
+    /* Liquid-glass ambient blobs (matches index.html) */
+    .liquid-glass-bg { position: fixed; inset: 0; overflow: hidden; z-index: -1; pointer-events: none; background: #010101; }
+    .liquid-blob { position: absolute; border-radius: 50%; filter: blur(80px); opacity: 0.35; animation: zpFloatBlob 18s infinite alternate ease-in-out; }
+    .liquid-blob.blob-1 { width: 450px; height: 450px; background: rgba(82,99,122, 0.25); top: -10%; left: 10%; animation-duration: 20s; }
+    .liquid-blob.blob-2 { width: 550px; height: 550px; background: rgba(143,158,180, 0.2); bottom: -20%; right: 5%; animation-duration: 25s; animation-delay: -5s; }
+    @keyframes zpFloatBlob { 0% { transform: translate(0,0) scale(1); } 50% { transform: translate(50px,-70px) scale(1.1); } 100% { transform: translate(-40px,50px) scale(.9); } }
+    @media (prefers-reduced-motion: reduce) { .liquid-blob { animation: none; } }
+
+    /* RESPONSIVE LAYOUT */
+    @media (max-width: 768px) {
+      body { padding: 12px 10px 80px 10px; justify-content: flex-start; }
+      main { grid-template-columns: 1fr; gap: 16px; }
+      .glass-panel { padding: 20px; border-radius: 20px; }
+      h1 { font-size: 24px; }
+      p.subtitle { font-size: 13px; margin-bottom: 16px; }
+
+      /* Order Summary is NOW VISIBLE on Mobile! */
+      .summary-panel { display: block; position: static; }
+      .desktop-checkout-btn { display: none; }
+      .mobile-pay-bar { display: block; }
+    }
+
+    .checkout-shell {
+      width: min(1120px, 100%);
+      margin: 0 auto;
+      padding: 10px 0 24px;
+    }
+    .checkout-topbar {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 18px;
+      margin: 0 0 22px;
+      padding: 0 4px;
+      animation: checkoutFadeUp .5s cubic-bezier(.2,.7,.2,1) both;
+    }
+    .checkout-brand {
+      display: inline-flex;
+      align-items: center;
+      gap: 11px;
+      color: var(--text-main);
+      text-decoration: none;
+      font-size: 17px;
+      font-weight: 800;
+      letter-spacing: -.04em;
+    }
+    .checkout-brand-mark {
+      display: grid;
+      width: 38px;
+      height: 38px;
+      flex: 0 0 38px;
+      place-items: center;
+      border: 1px solid rgba(143,158,180,.24);
+      border-radius: 13px;
+      background: linear-gradient(145deg, rgba(82,99,122,.22), rgba(143,158,180,.05));
+      color: #A9B5C6;
+      font-size: 23px;
+      font-weight: 850;
+      line-height: 1;
+      box-shadow: 0 8px 24px rgba(82,99,122,.18);
+    }
+    .checkout-brand small {
+      display: block;
+      color: var(--text-muted);
+      font-size: 10px;
+      font-weight: 650;
+      letter-spacing: .12em;
+      text-transform: uppercase;
+    }
+    .checkout-back {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      min-height: 40px;
+      padding: 0 14px;
+      border: 1px solid rgba(254,254,254,.1);
+      border-radius: 999px;
+      background: rgba(254,254,254,.035);
+      color: var(--text-muted);
+      text-decoration: none;
+      font-size: 12px;
+      font-weight: 700;
+      transition: border-color .2s, color .2s, transform .2s, background .2s;
+    }
+    .checkout-back:hover {
+      transform: translateY(-1px);
+      border-color: rgba(143,158,180,.35);
+      background: rgba(82,99,122,.1);
+      color: #fff;
+    }
+    .checkout-shell main {
+      max-width: none;
+      grid-template-columns: minmax(0, 1.35fr) minmax(290px, .75fr);
+      align-items: start;
+      gap: 20px;
+    }
+    .checkout-shell .glass-panel {
+      position: relative;
+      overflow: visible;
+      border: 1px solid rgba(254,254,254,.09) !important;
+      border-radius: 26px;
+      background:
+        linear-gradient(145deg, rgba(82,99,122,.055), transparent 42%),
+        rgba(12,15,18,.74) !important;
+      box-shadow: 0 28px 80px rgba(0,0,0,.48), inset 0 1px rgba(255,255,255,.035) !important;
+      -webkit-backdrop-filter: blur(28px) saturate(135%);
+      backdrop-filter: blur(28px) saturate(135%);
+    }
+    .checkout-shell .glass-panel::before {
+      position: absolute;
+      top: 0;
+      left: 9%;
+      width: 82%;
+      height: 1px;
+      background: linear-gradient(90deg, transparent, rgba(143,158,180,.48), transparent);
+      content: "";
+      pointer-events: none;
+    }
+    @keyframes checkoutFadeUp {
+      from { opacity: 0; transform: translateY(14px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+    @keyframes checkoutFadeIn {
+      from { opacity: 0; }
+      to { opacity: 1; }
+    }
+    .checkout-shell main > .main-panel {
+      animation: checkoutFadeUp .58s .06s cubic-bezier(.2,.7,.2,1) both;
+    }
+    .checkout-shell main > .summary-panel {
+      animation: checkoutFadeUp .58s .16s cubic-bezier(.2,.7,.2,1) both;
+    }
+    .checkout-shell .main-panel { padding: 30px; }
+    .checkout-shell .summary-panel { top: 22px; padding: 25px; }
+    .checkout-shell .header-top { margin-bottom: 22px; }
+    .checkout-shell .social-icon-btn {
+      width: 32px;
+      height: 32px;
+      border: 0;
+      background: transparent;
+      color: #A6B3C4;
+    }
+    .checkout-shell .social-icon-btn:hover {
+      background: rgba(143,158,180,.08);
+      color: #fff;
+    }
+    .checkout-shell .eyebrow {
+      gap: 8px;
+      padding: 7px 12px;
+      border-color: rgba(143,158,180,.25);
+      background: rgba(82,99,122,.1);
+      color: #A9B5C6;
+      font-size: 10px;
+      letter-spacing: .11em;
+    }
+    .checkout-shell h1 {
+      margin-top: 0;
+      font-size: clamp(27px, 4vw, 34px);
+      letter-spacing: -.055em;
+      line-height: 1.12;
+    }
+    .checkout-shell .subtitle { margin-top: 8px; color: #97A5B9; }
+    .checkout-section-heading {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 10px;
+      margin: 24px 0 10px;
+      color: #A6B3C4;
+      font-size: 10px;
+      font-weight: 800;
+      letter-spacing: .12em;
+      text-transform: uppercase;
+    }
+    .checkout-section-heading span:last-child {
+      color: #6d8297;
+      font-size: 10px;
+      font-weight: 600;
+      letter-spacing: 0;
+      text-transform: none;
+    }
+    .checkout-shell .billing-toggle {
+      gap: 8px;
+      margin: 18px 0 14px;
+      padding: 0;
+      border: 0;
+      background: transparent;
+    }
+    .checkout-shell .billing-toggle button {
+      min-height: 44px;
+      border: 0;
+      border-radius: 10px;
+      background: rgba(255,255,255,.025);
+      color: #A6B3C4;
+      font-size: 13px;
+      transition: background .2s, color .2s, border-color .2s, box-shadow .2s;
+    }
+    .checkout-shell .billing-toggle button.active {
+      border-color: rgba(143,158,180,.22);
+      background: linear-gradient(135deg, rgba(82,99,122,.26), rgba(143,158,180,.11));
+      color: #fff;
+      box-shadow: inset 0 1px rgba(255,255,255,.06), 0 5px 16px rgba(0,0,0,.18);
+    }
+    .checkout-shell .billing-toggle em {
+      border: 1px solid rgba(143,158,180,.16);
+      background: rgba(82,99,122,.14);
+      color: #A9B5C6;
+      font-size: 9px;
+      font-weight: 800;
+      letter-spacing: .04em;
+      text-transform: uppercase;
+    }
+    .checkout-shell .plans-list { gap: 12px; margin-bottom: 17px; }
+    .checkout-shell .plan-card {
+      position: relative;
+      min-height: 126px;
+      padding: 17px;
+      border: 1px solid rgba(255,255,255,.09);
+      border-radius: 17px;
+      background: linear-gradient(145deg, rgba(255,255,255,.035), rgba(255,255,255,.012));
+      color: var(--text-main);
+      text-align: left;
+      box-shadow: inset 0 1px rgba(255,255,255,.025);
+      transition: transform .2s, border-color .2s, background .2s, box-shadow .2s;
+      animation: checkoutFadeIn .42s .18s ease both;
+    }
+    .checkout-shell .plan-card:nth-child(2) { animation-delay: .25s; }
+    .checkout-shell .plan-card:hover { transform: translateY(-2px); border-color: rgba(143,158,180,.3); }
+    .checkout-shell .plan-card.active {
+      border-color: rgba(143,158,180,.58);
+      background: linear-gradient(145deg, rgba(82,99,122,.18), rgba(143,158,180,.045));
+      box-shadow: 0 10px 30px rgba(82,99,122,.1), inset 0 1px rgba(255,255,255,.05);
+    }
+    .checkout-shell .plan-card:focus-visible,
+    .checkout-shell button:focus-visible,
+    .checkout-shell a:focus-visible {
+      outline: 2px solid #A9B5C6;
+      outline-offset: 3px;
+    }
+    .plan-card-top { display: flex; align-items: flex-start; justify-content: space-between; gap: 10px; }
+    .plan-card .plan-name { display: block; font-size: 15px; letter-spacing: -.02em; }
+    .plan-card .plan-desc { color: #A6B3C4; font-size: 11px; }
+    .plan-choice-indicator {
+      display: grid;
+      width: 20px;
+      height: 20px;
+      flex: 0 0 20px;
+      place-items: center;
+      border: 1px solid rgba(255,255,255,.2);
+      border-radius: 50%;
+      color: #fff;
+      transition: background .2s, border-color .2s, color .2s;
+    }
+    .plan-choice-indicator svg,
+    .provider-radio svg { width: 11px; height: 11px; }
+    .plan-choice-indicator svg path,
+    .provider-radio svg path { fill: none; stroke: currentColor; stroke-width: 2.5; stroke-linecap: round; stroke-linejoin: round; }
+    .plan-card.active .plan-choice-indicator { border-color: #8F9EB4; background: #7084A0; color: #fff; }
+    .checkout-shell .plan-price { margin-top: 13px; font-size: 22px; letter-spacing: -.045em; }
+    .checkout-shell .plan-price small { color: #97A5B9; font-size: 11px; font-weight: 650; letter-spacing: 0; }
+    .checkout-shell .account-badge {
+      margin: 0;
+      padding: 9px 0;
+      border: 0;
+      border-bottom: 1px solid rgba(255,255,255,.07);
+      border-radius: 0;
+      background: transparent;
+      color: #A6B3C4;
+      font-size: 12px;
+    }
+    .checkout-shell .account-badge span { display: flex; align-items: center; gap: 8px; }
+    .checkout-shell .account-badge span svg { width: 16px; height: 16px; color: #A9B5C6; }
+    .checkout-shell .account-badge b { color: #A9B5C6; font-size: 12px; letter-spacing: .04em; }
+    .checkout-shell .section-title { margin: 24px 0 10px; color: #A6B3C4; font-size: 10px; letter-spacing: .12em; }
+    .checkout-shell .providers-grid { gap: 10px; margin-bottom: 10px; }
+    .checkout-shell .provider-card {
+      min-height: 66px;
+      gap: 12px;
+      padding: 12px 14px;
+      border: 1px solid rgba(255,255,255,.085);
+      border-radius: 15px;
+      background: rgba(255,255,255,.025);
+      color: #E0E5EB;
+      text-align: left;
+      transition: transform .2s, border-color .2s, background .2s, box-shadow .2s;
+      animation: checkoutFadeIn .42s .3s ease both;
+    }
+    .checkout-shell .provider-card:nth-child(2) { animation-delay: .37s; }
+    .checkout-shell .provider-card:hover { transform: translateY(-1px); border-color: rgba(143,158,180,.32); }
+    .checkout-shell .provider-card.active {
+      border-color: rgba(92,111,138,.72);
+      background: linear-gradient(120deg, rgba(82,99,122,.17), rgba(255,255,255,.025));
+      box-shadow: inset 0 1px rgba(255,255,255,.04), 0 8px 22px rgba(82,99,122,.08);
+    }
+    .provider-brand { display: flex; min-width: 0; flex-direction: column; gap: 3px; }
+    .provider-brand strong { font-size: 13px; font-weight: 800; }
+    .provider-brand small { color: #8197ac; font-size: 10px; }
+    .provider-wordmark {
+      display: inline-flex;
+      flex: 0 0 auto;
+      align-items: center;
+      gap: 6px;
+      color: #BEC7D3;
+      font-size: 12px;
+      font-weight: 800;
+      letter-spacing: -.04em;
+    }
+    .checkout-shell .provider-logo {
+      display: block;
+      width: 100px;
+      max-width: 27%;
+      height: 22px;
+      object-fit: contain;
+      filter: brightness(0) invert(1);
+    }
+    .provider-fallback { color: #DDE2E8; font-size: 11px; font-weight: 800; }
+    .provider-fallback[hidden] { display: none; }
+    .provider-wordmark.stripe { color: #B9C3D0; font-size: 16px; letter-spacing: -.07em; }
+    .provider-wordmark svg { width: 20px; height: 20px; }
+    .provider-radio {
+      display: grid;
+      width: 20px;
+      height: 20px;
+      flex: 0 0 20px;
+      place-items: center;
+      margin-left: auto;
+      border: 1px solid rgba(255,255,255,.22);
+      border-radius: 50%;
+      color: #fff;
+    }
+    .provider-card.active .provider-radio { border-color: #8F9EB4; background: #7084A0; color: #fff; }
+    .checkout-shell .provider-note {
+      min-height: 34px;
+      margin: 8px 0 10px;
+      color: #8da4ba;
+      font-size: 11px;
+    }
+    .checkout-shell .crypto-picker-trigger {
+      border-color: rgba(255,255,255,.1);
+      background: rgba(0,0,0,.24);
+    }
+    .checkout-shell .crypto-picker-menu {
+      border-color: rgba(255,255,255,.12);
+      background: rgba(12,15,19,.98);
+      -webkit-backdrop-filter: blur(20px);
+      backdrop-filter: blur(20px);
+    }
+    .crypto-supported {
+      display: flex;
+      align-items: center;
+      gap: 9px;
+      margin: 2px 0 16px;
+      color: #8197ac;
+      font-size: 10px;
+    }
+    .crypto-coins { display: inline-flex; align-items: center; padding-left: 4px; }
+    .crypto-coins span {
+      display: grid;
+      width: 23px;
+      height: 23px;
+      place-items: center;
+      margin-left: -4px;
+      border: 2px solid #11171c;
+      border-radius: 50%;
+      background: linear-gradient(145deg, #1E242C, #101419);
+      color: #DDE2E9;
+      font-size: 7px;
+      font-weight: 850;
+      letter-spacing: -.04em;
+    }
+    .crypto-coins span:first-child { color: #f3aa3c; }
+    .crypto-coins span:nth-child(2) { color: #C3CBD7; }
+    .crypto-coins span:nth-child(3) { color: #67d5b4; }
+    .crypto-coins span:nth-child(4) { color: #BEC7D3; }
+    .crypto-supported[hidden] { display: none; }
+    .checkout-shell .checkout-btn,
+    .checkout-shell .mobile-pay-btn {
+      position: relative;
+      overflow: hidden;
+      border: 1px solid rgba(174,185,201,.34);
+      border-radius: 15px;
+      background: linear-gradient(110deg, #4C5C73, #7084A0 54%, #566881);
+      color: #fff;
+      box-shadow: 0 12px 30px rgba(82,99,122,.25), inset 0 1px rgba(255,255,255,.18);
+      transition: transform .2s, filter .2s, box-shadow .2s;
+    }
+    .checkout-shell .checkout-btn:hover,
+    .checkout-shell .mobile-pay-btn:hover {
+      transform: translateY(-1px);
+      filter: brightness(1.08);
+      box-shadow: 0 15px 34px rgba(82,99,122,.33), inset 0 1px rgba(255,255,255,.2);
+    }
+    .checkout-shell .checkout-btn:disabled,
+    .checkout-shell .mobile-pay-btn:disabled { transform: none; filter: saturate(.65); }
+    .checkout-shell .secure-notice {
+      display: flex;
+      flex-wrap: wrap;
+      justify-content: center;
+      gap: 7px 14px;
+      margin-top: 15px;
+      color: #8398ad;
+      font-size: 10px;
+    }
+    .trust-item { display: inline-flex; align-items: center; gap: 5px; }
+    .trust-item svg { width: 13px; height: 13px; color: #8F9EB4; }
+    .summary-top { display: flex; align-items: flex-start; justify-content: space-between; gap: 12px; }
+    .summary-top h2 { margin: 14px 0 5px !important; font-size: 19px !important; letter-spacing: -.04em; }
+    .summary-description { margin: 0 0 17px; color: #8da4ba; font-size: 11px; line-height: 1.55; }
+    .summary-shield {
+      display: grid;
+      width: 42px;
+      height: 42px;
+      flex: 0 0 42px;
+      place-items: center;
+      margin-top: 4px;
+      border: 1px solid rgba(143,158,180,.22);
+      border-radius: 14px;
+      background: linear-gradient(145deg, rgba(82,99,122,.2), rgba(143,158,180,.05));
+      color: #A9B5C6;
+    }
+    .summary-shield svg { width: 20px; height: 20px; }
+    .checkout-shell .summary-item { padding: 13px 0; border-color: rgba(255,255,255,.07); font-size: 12px; }
+    .checkout-shell .summary-item b { font-size: 12px; }
+    .checkout-shell .summary-total { align-items: center; padding: 17px 0 12px; color: #E0E5EB; font-size: 14px; }
+    .checkout-shell .summary-total b { color: #fff; font-size: 25px; letter-spacing: -.05em; }
+    .summary-frequency { min-height: 17px; color: #8197ac; font-size: 10px; text-align: right; }
+    .summary-includes {
+      display: grid;
+      gap: 10px;
+      margin: 18px 0 0;
+      padding: 17px 0 0;
+      border-top: 1px solid rgba(255,255,255,.07);
+      list-style: none;
+    }
+    .summary-includes li { display: flex; align-items: flex-start; gap: 9px; color: #a5b7c9; font-size: 11px; line-height: 1.4; }
+    .summary-includes svg { width: 15px; height: 15px; flex: 0 0 15px; color: #8596AE; }
+    .billing-footnote { margin: 16px 0 0; color: #778da2; font-size: 10px; line-height: 1.5; }
+    .checkout-shell .cancel-link {
+      display: inline-flex;
+      justify-content: center;
+      width: 100%;
+      margin-top: 20px;
+      color: #97A5B9;
+      font-size: 11px;
+      font-weight: 650;
+      transition: color .2s;
+    }
+    .checkout-shell .cancel-link:hover { color: #A9B5C6; }
+    .checkout-shell .error-msg { border-color: rgba(255,123,123,.2); background: rgba(140,39,39,.14); color: #ffb7b7; }
+    .checkout-shell .mobile-pay-bar {
+      border-color: rgba(255,255,255,.1);
+      background: rgba(9,11,13,.91);
+      box-shadow: 0 -12px 30px rgba(0,0,0,.25);
+      -webkit-backdrop-filter: blur(22px) saturate(140%);
+      backdrop-filter: blur(22px) saturate(140%);
+    }
+    @media (max-width: 768px) {
+      body { padding: 12px 14px 100px; }
+      .checkout-shell { padding: 0; }
+      .checkout-topbar { margin: 0 2px 15px; }
+      .checkout-shell main { grid-template-columns: minmax(0, 1fr); gap: 14px; }
+      .checkout-shell .main-panel { padding: 22px 18px; }
+      .checkout-shell .summary-panel { padding: 21px 18px; }
+      .checkout-shell .summary-includes { grid-template-columns: 1fr 1fr; column-gap: 12px; }
+      .checkout-shell .mobile-pay-bar { display: block; }
+      .checkout-shell .desktop-checkout-btn { display: none; }
+      .checkout-shell .summary-panel { position: static; }
+    }
+    @media (max-width: 420px) {
+      .checkout-shell .main-panel { padding: 19px 15px; }
+      .checkout-shell .plans-list { gap: 8px; }
+      .checkout-shell .plan-card { min-height: 118px; padding: 13px 11px; }
+      .checkout-shell .plan-card .plan-name { font-size: 13px; }
+      .checkout-shell .plan-price { font-size: 19px; }
+      .checkout-shell .provider-card { gap: 7px; padding: 10px 9px; }
+      .provider-wordmark { gap: 4px; font-size: 10px; }
+      .provider-wordmark.stripe { font-size: 14px; }
+      .provider-brand strong { font-size: 11px; }
+      .provider-brand small { font-size: 9px; }
+      .social-links-top { display: none; }
+    }
+    @media (prefers-reduced-motion: reduce) {
+      .checkout-shell *, .checkout-shell *::before, .checkout-shell *::after {
+        scroll-behavior: auto !important;
+        transition-duration: .01ms !important;
+        animation: none !important;
+      }
+    }
+  </style>
+  <link rel="stylesheet" href="css/zpass-glass-theme.css?v=101">
+  <link rel="stylesheet" href="/css/site-responsive.css?v=102"><link rel="stylesheet" href="/css/mobile-nav.css?v=102">
+  <style>
+    body { display: block; }
+    .checkout-shell .plan-card {
+      border: 1px solid rgba(255,255,255,.09) !important;
+      background: linear-gradient(145deg, rgba(255,255,255,.035), rgba(255,255,255,.012)) !important;
+      box-shadow: inset 0 1px rgba(255,255,255,.025) !important;
+      -webkit-backdrop-filter: none !important;
+      backdrop-filter: none !important;
+    }
+    .checkout-shell .plan-card:hover {
+      transform: translateY(-5px);
+      border-color: rgba(143,158,180,.38) !important;
+      background: linear-gradient(145deg, rgba(82,99,122,.09), rgba(255,255,255,.025)) !important;
+      box-shadow: 0 16px 34px rgba(82,99,122,.12), inset 0 1px rgba(255,255,255,.05) !important;
+    }
+    .checkout-shell .plan-card.active {
+      border-color: rgba(143,158,180,.58) !important;
+      background: linear-gradient(145deg, rgba(82,99,122,.18), rgba(143,158,180,.045)) !important;
+      box-shadow: 0 10px 30px rgba(82,99,122,.1), inset 0 1px rgba(255,255,255,.05) !important;
+    }
+    .checkout-shell .plan-card:active { transform: translateY(-1px) scale(.99); }
+    .checkout-shell .plan-choice-indicator,
+    .checkout-shell .provider-radio {
+      width: 20px !important;
+      height: 20px !important;
+      min-width: 20px;
+      flex: 0 0 20px;
+      padding: 0;
+      border: 1px solid rgba(255,255,255,.24) !important;
+      border-radius: 50%;
+      background: rgba(0,0,0,.2) !important;
+      box-shadow: none !important;
+      color: transparent;
+      -webkit-backdrop-filter: none !important;
+      backdrop-filter: none !important;
+    }
+    .checkout-shell .plan-card.active .plan-choice-indicator,
+    .checkout-shell .provider-card.active .provider-radio {
+      border-color: #8F9EB4 !important;
+      background: #7084A0 !important;
+      color: #fff;
+    }
+    .checkout-shell .plan-choice-indicator svg,
+    .checkout-shell .provider-radio svg {
+      display: block;
+      width: 11px;
+      height: 11px;
+      opacity: 0;
+      transform: scale(.5);
+      transition: opacity .18s ease, transform .18s cubic-bezier(.2,.8,.2,1.4);
+    }
+    .checkout-shell .plan-card.active .plan-choice-indicator svg,
+    .checkout-shell .provider-card.active .provider-radio svg {
+      opacity: 1;
+      transform: scale(1);
+    }
+    .checkout-shell .plan-choice-indicator svg path,
+    .checkout-shell .provider-radio svg path {
+      fill: none;
+      stroke: currentColor;
+      stroke-width: 2.5;
+      stroke-linecap: round;
+      stroke-linejoin: round;
+    }
+    .checkout-shell .provider-card {
+      min-width: 0;
+      border: 1px solid rgba(255,255,255,.085) !important;
+      background: rgba(255,255,255,.025) !important;
+      box-shadow: inset 0 1px rgba(255,255,255,.025) !important;
+      -webkit-backdrop-filter: none !important;
+      backdrop-filter: none !important;
+    }
+    .checkout-shell .provider-card.active {
+      border-color: rgba(92,111,138,.72) !important;
+      background: linear-gradient(120deg, rgba(82,99,122,.17), rgba(255,255,255,.025)) !important;
+      box-shadow: inset 0 1px rgba(255,255,255,.04), 0 8px 22px rgba(82,99,122,.08) !important;
+    }
+    .checkout-shell .provider-brand { flex: 1 1 auto; }
+    .checkout-shell .account-badge {
+      margin: 0;
+      padding: 13px 15px;
+      border: 1px solid rgba(255,255,255,.075);
+      border-radius: 14px;
+      background: linear-gradient(110deg, rgba(82,99,122,.07), rgba(255,255,255,.018));
+      box-shadow: inset 0 1px rgba(255,255,255,.035);
+      animation: checkoutFadeUp .52s .2s cubic-bezier(.2,.7,.2,1) both;
+    }
+    .checkout-shell .crypto-picker.open .crypto-picker-menu {
+      position: static;
+      inset: auto;
+      width: 100%;
+      max-height: min(320px, 42vh);
+      margin-top: 8px;
+      transform: none;
+    }
+    @media (max-width: 380px) {
+      .checkout-shell .providers-grid { grid-template-columns: minmax(0, 1fr); }
+    }
+    @media (prefers-reduced-motion: reduce) {
+      .checkout-shell .checkout-topbar,
+      .checkout-shell main > .main-panel,
+      .checkout-shell main > .summary-panel,
+      .checkout-shell .plan-card,
+      .checkout-shell .provider-card,
+      .checkout-shell .account-badge { animation: none !important; }
+      .checkout-shell .plan-choice-indicator svg,
+      .checkout-shell .provider-radio svg { transition: none !important; }
+    }
+  </style>
+<link rel="stylesheet" href="/css/footer-modern.css?v=106"><link rel="stylesheet" href="/css/pages-modern.css?v=101"><script src="/js/zpass-theme.js?v=3"></script><link rel="stylesheet" href="/css/zpass-app-theme.css?v=109"><link rel="stylesheet" href="/css/performance.css">
+<link rel="stylesheet" href="/css/zpass-design-system.css">
+<link rel="stylesheet" href="/css/unified-2026.css?v=414"></head>
+<body class="pm auth-checking">
+  <div class="liquid-glass-bg"><div class="liquid-blob blob-1"></div><div class="liquid-blob blob-2"></div></div>
+  <div class="checkout-shell">
+    <header class="checkout-topbar">
+      <a class="checkout-brand" href="/" aria-label="Z Pass home">
+        <span class="checkout-brand-mark" aria-hidden="true">Z</span>
+        <span>Z Pass<small>Secure checkout</small></span>
+      </a>
+      <a class="checkout-back" href="/dashboard.html"><span aria-hidden="true">←</span> Back to plans</a>
+    </header>
+  <main>
+    <!-- Main Form Panel -->
+    <section class="glass-panel main-panel">
+      <!-- Top Row with Title & Upper Social Buttons -->
+      <div class="header-top">
+        <span class="eyebrow"><span aria-hidden="true">✦</span> Encrypted checkout</span>
+        <div class="social-links-top">
+          <a href="https://t.me/ZizoSoftware" target="_blank" class="social-icon-btn" title="Telegram">
+            <svg viewBox="0 0 24 24"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm4.64 6.8c-.15 1.58-.8 5.42-1.13 7.19-.14.75-.42 1-.68 1.03-.58.05-1.02-.38-1.58-.75-.88-.58-1.38-.94-2.23-1.5-.99-.65-.35-1.01.22-1.59.15-.15 2.71-2.48 2.76-2.69a.2.2 0 00-.05-.18c-.06-.05-.14-.03-.21-.02-.09.02-1.49.95-4.22 2.79-.4.27-.76.41-1.08.4-.36-.01-1.04-.2-1.55-.37-.63-.2-1.12-.31-1.08-.66.02-.18.27-.36.74-.55 2.92-1.27 4.86-2.11 5.83-2.51 2.78-1.16 3.35-1.36 3.73-1.36.08 0 .27.02.39.12.1.08.13.19.14.27-.01.06.01.24 0 .38z"/></svg>
+          </a>
+          <a href="https://x.com/4rezan" target="_blank" class="social-icon-btn" title="X (Twitter)">
+            <svg viewBox="0 0 24 24"><path d="M18.244 2.25h3.308l-7.227 8.26 8.502 11.24H16.17l-5.214-6.817L4.99 21.75H1.68l7.73-8.835L1.254 2.25H8.08l4.713 6.231zm-1.161 17.52h1.833L7.084 4.126H5.117z"/></svg>
+          </a>
+          <a href="https://instagram.com/4rezan" target="_blank" class="social-icon-btn" title="Instagram">
+            <svg viewBox="0 0 24 24"><path d="M12 2.163c3.204 0 3.584.012 4.85.07 3.252.148 4.771 1.691 4.919 4.919.058 1.265.069 1.645.069 4.849 0 3.205-.012 3.584-.069 4.849-.149 3.225-1.664 4.771-4.919 4.919-1.266.058-1.644.07-4.85.07-3.204 0-3.584-.012-4.849-.07-3.26-.149-4.771-1.699-4.919-4.92-.058-1.265-.07-1.644-.07-4.849 0-3.204.013-3.583.07-4.849.149-3.227 1.664-4.771 4.919-4.919 1.266-.057 1.645-.069 4.849-.069zM12 0C8.741 0 8.333.014 7.053.072 2.695.272.273 2.69.073 7.052.014 8.333 0 8.741 0 12c0 3.259.014 3.668.072 4.948.2 4.358 2.618 6.78 6.98 6.98 1.28.058 1.689.072 4.948.072 3.259 0 3.668-.014 4.948-.072 4.354-.2 6.782-2.618 6.979-6.98.059-1.28.073-1.689.073-4.948 0-3.259-.014-3.667-.072-4.947-.196-4.354-2.617-6.78-6.979-6.98C15.668.014 15.259 0 12 0zm0 5.838a6.162 6.162 0 100 12.324 6.162 6.162 0 000-12.324zM12 16a4 4 0 110-8 4 4 0 010 8zm6.406-11.845a1.44 1.44 0 100 2.881 1.44 1.44 0 000-2.881z"/></svg>
+          </a>
+          <a href="https://github.com/4rezan" target="_blank" class="social-icon-btn" title="GitHub">
+            <svg viewBox="0 0 24 24" aria-hidden="true" focusable="false"><path d="M12 .297a12 12 0 0 0-3.797 23.4c.6.111.82-.261.82-.577v-2.234c-3.338.726-4.043-1.416-4.043-1.416-.546-1.387-1.333-1.756-1.333-1.756-1.09-.745.083-.729.083-.729 1.205.084 1.84 1.237 1.84 1.237 1.07 1.834 2.807 1.304 3.492.997.108-.775.418-1.305.762-1.605-2.665-.3-5.467-1.334-5.467-5.931 0-1.311.469-2.381 1.236-3.221-.124-.303-.536-1.523.117-3.176 0 0 1.008-.323 3.301 1.23a11.5 11.5 0 0 1 6.006 0c2.291-1.553 3.297-1.23 3.297-1.23.655 1.653.243 2.873.12 3.176.77.84 1.235 1.91 1.235 3.221 0 4.609-2.807 5.628-5.479 5.921.43.372.823 1.102.823 2.222v3.293c0 .319.216.694.825.576A12.001 12.001 0 0 0 12 .297z"/></svg>
+          </a>
+        </div>
+      </div>
+
+      <h1>More peace of mind.<br><span style="color:#A9B5C6">One secure vault.</span></h1>
+      <p class="subtitle">Choose your plan and finish securely with a trusted payment provider.</p>
+
+      <!-- Billing Cycle Switch -->
+      <div class="checkout-section-heading"><span>Billing cycle</span><span>Change any time</span></div>
+      <div class="billing-toggle" role="group" aria-label="Choose billing cycle">
+        <button type="button" data-period="MONTHLY" class="active" aria-pressed="true">Monthly</button>
+        <button type="button" data-period="YEARLY" aria-pressed="false">Yearly <em id="yearlySavings">Save</em></button>
+      </div>
+
+      <!-- Plan Cards Grid -->
+      <div class="checkout-section-heading"><span>Choose your plan</span><span>Cancel any time</span></div>
+      <div class="plans-list" role="group" aria-label="Choose a Z Pass plan">
+        <button type="button" class="plan-card active" data-plan="PLUS" aria-pressed="true">
+          <div class="plan-card-top">
+            <div>
+            <span class="plan-name">Z Pass Plus</span>
+            <span class="plan-desc" id="plusPeriod">1 account</span>
+            </div>
+            <span class="plan-choice-indicator" aria-hidden="true"><svg viewBox="0 0 12 12"><path d="m2 6.2 2.6 2.6L10 3.5"/></svg></span>
+          </div>
+          <div class="plan-price" id="plusPrice">$4.99</div>
+        </button>
+
+        <button type="button" class="plan-card" data-plan="PRO" aria-pressed="false">
+          <div class="plan-card-top">
+            <div>
+            <span class="plan-name">Z Pass Pro</span>
+            <span class="plan-desc" id="proPeriod">1 account</span>
+            </div>
+            <span class="plan-choice-indicator" aria-hidden="true"><svg viewBox="0 0 12 12"><path d="m2 6.2 2.6 2.6L10 3.5"/></svg></span>
+          </div>
+          <div class="plan-price" id="proPrice">$9.00</div>
+        </button>
+      </div>
+
+      <!-- User ID Badge -->
+      <div class="account-badge">
+        <span><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="8" r="3.2"/><path d="M5.5 20c.8-3.4 3.1-5.2 6.5-5.2s5.7 1.8 6.5 5.2"/></svg> Signed-in account</span>
+        <b id="accountValue">Loading...</b>
+      </div>
+
+      <!-- Gateway Select -->
+      <div class="section-title">Choose a secure payment method</div>
+      <div class="providers-grid" role="group" aria-label="Choose a payment method">
+        <button type="button" class="provider-card active" id="chooseStripe" aria-pressed="true">
+          <span class="provider-brand"><strong>Credit or debit card</strong><small>Recurring · cancel any time</small></span>
+          <span class="provider-wordmark stripe" aria-label="Stripe">stripe</span>
+          <span class="provider-radio" aria-hidden="true"><svg viewBox="0 0 12 12"><path d="m2 6.2 2.6 2.6L10 3.5"/></svg></span>
+        </button>
+
+        <button type="button" class="provider-card" id="chooseCrypto" aria-pressed="false">
+          <span class="provider-brand"><strong>Cryptocurrency</strong><small>One-time · no auto-renewal</small></span>
+          <img class="provider-logo" id="nowPaymentsLogo" src="https://account.nowpayments.io/images/logo-black.svg" alt="NOWPayments">
+          <span class="provider-fallback" id="nowPaymentsFallback" hidden>NOWPayments</span>
+          <span class="provider-radio" aria-hidden="true"><svg viewBox="0 0 12 12"><path d="m2 6.2 2.6 2.6L10 3.5"/></svg></span>
+        </button>
+      </div>
+      <p class="provider-note" id="providerNote">Auto-renewing subscription billed by Stripe. Cancel anytime from your Stripe receipt email.</p>
+      <div class="crypto-supported" id="cryptoSupported" hidden>
+        <span class="crypto-coins" aria-hidden="true">
+          <span>₿</span><span>Ξ</span><span>₮</span><span>SOL</span>
+        </span>
+        <span>Bitcoin, Ethereum, stablecoins &amp; more via NOWPayments</span>
+      </div>
+
+      <!-- Custom Crypto Coin Picker (icons via CoinCap CDN) -->
+      <div class="crypto-picker" id="cryptoPicker">
+        <button type="button" class="crypto-picker-trigger" id="cryptoTrigger">
+          <img id="cryptoTriggerIcon" src="" alt="" hidden>
+          <span class="cp-label" id="cryptoTriggerLabel">Select a coin…</span>
+          <svg class="cp-chevron" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><polyline points="6 9 12 15 18 9"/></svg>
+        </button>
+        <div class="crypto-picker-menu" id="cryptoMenu"></div>
+      </div>
+
+      <div id="pmError" class="error-msg" style="display: none;"></div>
+
+      <!-- Desktop Action Button -->
+      <button id="checkoutBtn" class="checkout-btn desktop-checkout-btn"><span>Continue to secure payment</span><span aria-hidden="true">→</span></button>
+
+      <div class="secure-notice">
+        <span class="trust-item"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="4" y="10" width="16" height="11" rx="2"/><path d="M8 10V7a4 4 0 0 1 8 0v3"/><path d="M12 14v3"/></svg> Secure payment</span>
+        <span class="trust-item"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m5 12 4 4L19 6"/></svg> Automatic activation</span>
+        <span class="trust-item"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 3 19 6v5c0 4.5-3 7.5-7 10-4-2.5-7-5.5-7-10V6l7-3Z"/></svg> Z Pass never sees card details</span>
+      </div>
+    </section>
+
+    <!-- Order Summary Panel (Desktop + Mobile Visible) -->
+    <aside class="glass-panel summary-panel">
+      <div class="summary-top">
+        <div>
+          <span class="eyebrow">Order summary</span>
+          <h2>Subscription details</h2>
+        </div>
+        <span class="summary-shield" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3 19 6v5c0 4.5-3 7.5-7 10-4-2.5-7-5.5-7-10V6l7-3Z"/><path d="m9 12 2 2 4-4"/></svg></span>
+      </div>
+      <p class="summary-description">Your premium tools, protected in one private vault.</p>
+
+      <div class="summary-item">
+        <span>Selected Plan</span>
+        <b id="summaryPlan">Z Pass Plus</b>
+      </div>
+      <div class="summary-item">
+        <span>Billing Cycle</span>
+        <b id="summaryBilling">Monthly</b>
+      </div>
+      <div class="summary-item summary-total">
+        <span>Total Due</span>
+        <b id="summaryPrice">$5.00</b>
+      </div>
+      <p class="summary-frequency" id="summaryFrequency">Billed monthly · renews automatically</p>
+
+      <ul class="summary-includes" id="summaryIncludes">
+        <li><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m5 12 4 4L19 6"/></svg><span>Unlimited secure logins and notes</span></li>
+        <li><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m5 12 4 4L19 6"/></svg><span>Passkeys and authenticator codes</span></li>
+        <li><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m5 12 4 4L19 6"/></svg><span>Private encrypted cloud vault</span></li>
+        <li><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m5 12 4 4L19 6"/></svg><span id="includedMembers">1 individual account</span></li>
+      </ul>
+      <p class="billing-footnote" id="billingFootnote">Your card is charged securely by Stripe. You can manage or cancel renewal from your billing portal.</p>
+
+      <a href="/dashboard.html" class="cancel-link">← Return to Z Pass</a>
+    </aside>
+  </main>
+
+  <!-- Mobile Sticky Pay Bar -->
+  <div class="mobile-pay-bar">
+    <div class="mobile-pay-inner">
+      <div class="mobile-total-box">
+        <span>Total Due</span>
+        <b id="mobileSummaryPrice">$5.00</b>
+      </div>
+      <button id="mobileCheckoutBtn" class="mobile-pay-btn">Continue securely&nbsp; →      </button>
+    </div>
+  </div>
+
+
+<script type="module">
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
+    import { getAuth, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js";
+
+    import {requestCheckout} from "./js/firebase-checkout.mjs";
+
+    import {firebaseConfig} from "/js/firebase-config.mjs";
+    const firebaseApp = initializeApp(firebaseConfig);
+    const auth = getAuth(firebaseApp);
+
+    const money = value => new Intl.NumberFormat("en-US", { style: "currency", currency: "USD" }).format(Number(value) || 0);
+
+    // Real Stripe-side amounts (must match Payment-bot/Crypto4PayBot.py CHECKOUT_PLANS exactly —
+    // this is what the customer is actually charged, so the display can never drift from it).
+    import {paymentPlans as catalog,runtimeConfig} from "./js/payment-plans.mjs";
+
+    // Same curated coin list as the Android/Windows apps (CryptoCurrencyCatalog): 15 popular
+    // coins plus 5 picked for near-zero network fees. Icons load from CoinCap's free CDN.
+    const CRYPTO_POPULAR = [
+      ["btc", "Bitcoin", "btc"], ["eth", "Ethereum", "eth"], ["usdttrc20", "USDT (Tron)", "usdt"],
+      ["usdterc20", "USDT (Ethereum)", "usdt"], ["usdtbsc", "USDT (BSC)", "usdt"], ["usdtsol", "USDT (Solana)", "usdt"],
+      ["usdc", "USD Coin", "usdc"], ["sol", "Solana", "sol"], ["ton", "Toncoin", "ton"], ["trx", "Tron", "trx"],
+      ["bnbbsc", "BNB (BSC)", "bnb"], ["xrp", "XRP", "xrp"], ["ada", "Cardano", "ada"], ["doge", "Dogecoin", "doge"],
+      ["ltc", "Litecoin", "ltc"]
+    ];
+    const CRYPTO_LOW_FEE = [
+      ["usdtton", "USDT (TON)", "usdt"], ["usdcsol", "USDC (Solana)", "usdc"], ["usdcbsc", "USDC (BSC)", "usdc"],
+      ["matic", "Polygon (MATIC)", "matic"], ["usdtmatic", "USDT (Polygon)", "usdt"]
+    ];
+    const coinIconUrl = symbol => `https://assets.coincap.io/assets/icons/${symbol}@2x.png`;
+
+    const initialQuery = new URLSearchParams(location.search);
+    let selected = (initialQuery.get("plan") || "PLUS").toUpperCase() === "PRO" ? "PRO" : "PLUS";
+    let period = (initialQuery.get("billing") || "MONTHLY").toUpperCase() === "YEARLY" ? "YEARLY" : "MONTHLY";
+    let selectedProvider = "stripe";
+    let selectedCoin = null;
+    let user = null;
+    const cryptoSupported = document.getElementById("cryptoSupported");
+    const summaryFrequency = document.getElementById("summaryFrequency");
+    const billingFootnote = document.getElementById("billingFootnote");
+    const includedMembers = document.getElementById("includedMembers");
+    const yearlySavings = document.getElementById("yearlySavings");
+    const nowPaymentsLogo = document.getElementById("nowPaymentsLogo");
+    const nowPaymentsFallback = document.getElementById("nowPaymentsFallback");
+
+    nowPaymentsLogo.addEventListener("error", () => {
+      nowPaymentsLogo.hidden = true;
+      nowPaymentsFallback.hidden = false;
+    }, { once: true });
+
+    // Same derivation the app and payment bot both use — must match exactly or the bot can
+    // never find the account (Firestore stores this exact value on the user's document).
+    function zPassIdFor(uid) { return "ZP-" + uid.slice(0, 6).toUpperCase() + uid.slice(-4).toUpperCase(); }
+
+    const render = () => {
+      chooseStripe.disabled=runtimeConfig?.providers.stripe.enabled===false;
+      chooseCrypto.disabled=runtimeConfig?.providers.crypto.enabled===false;
+      document.querySelectorAll(".plan-card").forEach(x => {
+        const active = x.dataset.plan === selected;
+        x.classList.toggle("active", active);
+        x.setAttribute("aria-pressed", String(active));
+      });
+      document.querySelectorAll(".billing-toggle button").forEach(x => {
+        const active = x.dataset.period === period;
+        x.classList.toggle("active", active);
+        x.setAttribute("aria-pressed", String(active));
+      });
+
+      plusPrice.textContent = money(catalog.PLUS[period.toLowerCase()].price) + (period === "YEARLY" ? "/yr" : "/mo");
+      proPrice.textContent = money(catalog.PRO[period.toLowerCase()].price) + (period === "YEARLY" ? "/yr" : "/mo");
+      plusPeriod.textContent = period === "YEARLY" ? "1 account · billed yearly" : "1 account";
+      proPeriod.textContent = period === "YEARLY" ? "1 account · billed yearly" : "1 account";
+
+      const choice = catalog[selected][period.toLowerCase()];
+      const planTitle = catalog[selected].name;
+      const periodTitle = period === "YEARLY" ? "Yearly" : "Monthly";
+
+      summaryPlan.textContent = planTitle;
+      summaryPrice.textContent = money(choice.price);
+      mobileSummaryPrice.textContent = money(choice.price);
+      summaryBilling.textContent = periodTitle;
+      summaryFrequency.textContent = selectedProvider === "crypto"
+        ? `${period === "YEARLY" ? "One-time annual payment" : "One-time monthly payment"} · no automatic renewal`
+        : `Billed ${period.toLowerCase()} · renews automatically`;
+      billingFootnote.textContent = selectedProvider === "crypto"
+        ? "Crypto payments are one-time. Your plan activates after the network confirms your payment."
+        : "Your card is charged securely by Stripe. You can manage or cancel renewal from your billing portal.";
+      includedMembers.textContent = "1 individual account · billed to you";
+      const planPricing = catalog[selected];
+      const savedLoginLimit = selected === "PRO" ? 10 : 5;
+      const featureRows = [
+        `<li><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m5 12 4 4L19 6"/></svg><span>Up to ${savedLoginLimit} saved logins</span></li>`,
+        `<li><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m5 12 4 4L19 6"/></svg><span>Passkeys and authenticator codes</span></li>`,
+        `<li><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m5 12 4 4L19 6"/></svg><span>Private encrypted cloud vault</span></li>`,
+        `<li><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m5 12 4 4L19 6"/></svg><span>Custom app icons</span></li>`,
+        ...(selected === "PRO" ? [`<li><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m5 12 4 4L19 6"/></svg><span>Voice message transcription</span></li>`] : []),
+        `<li><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m5 12 4 4L19 6"/></svg><span id="includedMembers">1 individual account</span></li>`
+      ];
+      document.getElementById("summaryIncludes").innerHTML = featureRows.join("");
+      const yearlySave = Math.round((1 - planPricing.yearly.price / (planPricing.monthly.price * 12)) * 100);
+      yearlySavings.textContent = yearlySave > 0 ? `Save ${yearlySave}%` : "Billed once per year";
+    };
+
+    window.addEventListener("zpass-config-updated",render);
+    document.querySelectorAll(".plan-card").forEach(x => x.onclick = () => { selected = x.dataset.plan; render(); });
+    document.querySelectorAll(".billing-toggle button").forEach(x => x.onclick = () => { period = x.dataset.period; render(); });
+
+    chooseStripe.onclick = () => {
+      selectedProvider = "stripe";
+      chooseStripe.classList.add("active");
+      chooseStripe.setAttribute("aria-pressed", "true");
+      chooseCrypto.classList.remove("active");
+      chooseCrypto.setAttribute("aria-pressed", "false");
+      cryptoPicker.style.display = "none";
+      cryptoSupported.hidden = true;
+      cryptoPicker.classList.remove("open");
+      providerNote.textContent = "Auto-renewing subscription billed by Stripe. Cancel anytime from your Stripe receipt email.";
+      render();
+    };
+
+    chooseCrypto.onclick = () => {
+      selectedProvider = "crypto";
+      chooseCrypto.classList.add("active");
+      chooseCrypto.setAttribute("aria-pressed", "true");
+      chooseStripe.classList.remove("active");
+      chooseStripe.setAttribute("aria-pressed", "false");
+      cryptoPicker.style.display = "block";
+      cryptoSupported.hidden = false;
+      providerNote.textContent = "NOWPayments creates a secure crypto invoice. Your plan activates automatically once it's confirmed on-chain — crypto payments are one-time, not auto-renewing.";
+      render();
+    };
+
+    // --- Custom crypto coin picker ---
+    function buildCryptoMenu() {
+      const groupHtml = (label, coins) => `<div class="cp-group-label">${label}</div>` +
+        coins.map(([code, name, symbol]) => `<button type="button" class="cp-option" data-code="${code}" data-name="${name}" data-symbol="${symbol}"><img src="${coinIconUrl(symbol)}" alt=""><span>${name}</span></button>`).join("");
+      cryptoMenu.innerHTML = groupHtml("Popular", CRYPTO_POPULAR) + groupHtml("Lowest network fee", CRYPTO_LOW_FEE);
+      cryptoMenu.querySelectorAll(".cp-option").forEach(opt => opt.addEventListener("click", () => {
+        selectedCoin = opt.dataset.code;
+        cryptoTriggerIcon.src = coinIconUrl(opt.dataset.symbol);
+        cryptoTriggerIcon.hidden = false;
+        cryptoTriggerLabel.textContent = opt.dataset.name;
+        cryptoTrigger.classList.add("has-value");
+        cryptoPicker.classList.remove("open");
+      }));
+    }
+    buildCryptoMenu();
+    cryptoTrigger.addEventListener("click", () => cryptoPicker.classList.toggle("open"));
+    document.addEventListener("click", (e) => { if (!cryptoPicker.contains(e.target)) cryptoPicker.classList.remove("open"); });
+
+    onAuthStateChanged(auth, current => {
+      if (!current) {
+        sessionStorage.setItem("zpassAfterLogin", `${location.pathname}${location.search}`);
+        sessionStorage.setItem("zpassCheckoutCreated",String(Date.now()));
+        location.replace("/dashboard.html#login");
+        return;
+      }
+      user = current;
+      accountValue.textContent = zPassIdFor(current.uid);
+      document.body.classList.remove("auth-checking");
+      render();
+    });
+
+
+    function showPmError(text) { pmError.style.display = "block"; pmError.textContent = text; }
+    function clearPmError() { pmError.style.display = "none"; pmError.textContent = ""; }
+
+    async function startPayment(btnElement) {
+      clearPmError();
+      const pId = `zpass_${selected.toLowerCase()}_${period.toLowerCase()}`;
+
+      btnElement.disabled = true;
+      const oldText = btnElement.textContent;
+      btnElement.textContent = "Processing...";
+
+      try {
+        if(runtimeConfig?.providers[selectedProvider]?.enabled===false || catalog[selected][period.toLowerCase()].enabled===false)throw Error('This payment option is temporarily unavailable.');
+        if(selectedProvider !== 'stripe' && !selectedCoin)throw Error('Please select a coin.');
+        const url=await requestCheckout(firebaseApp,user,pId,selectedProvider==='stripe'?'STRIPE':'NOWPAYMENTS',selectedCoin || '');
+        const proceed=document.createElement('a');proceed.href=url;proceed.className='checkout-btn';proceed.textContent='Continue to secure payment';
+        pmError.replaceChildren(proceed);pmError.style.display='block';
+        btnElement.textContent='Opening secure payment…';
+        window.location.assign(url);
+      } catch (err) {
+        showPmError(err.message);
+        btnElement.disabled = false;
+        btnElement.textContent = oldText;
+      }
+    }
+
+    checkoutBtn.onclick = (e) => { e.preventDefault(); startPayment(checkoutBtn); };
+    mobileCheckoutBtn.onclick = (e) => { e.preventDefault(); startPayment(mobileCheckoutBtn); };
+
+    render();
+  </script>
+  <script src="/js/desktop-i18n.js?v=21"></script>
+<script type="module" src="/js/mobile-nav.mjs?v=4"></script><script src="/js/site-footer.js"></script><script src="/js/hide-links.js?v=1"></script><script type="module" src="/js/wallpapers.mjs?v=414"></script></body>
+</html>

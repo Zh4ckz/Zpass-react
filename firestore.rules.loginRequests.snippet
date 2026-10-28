@@ -1,0 +1,31 @@
+// NOT wired into firebase.json and NOT deployed. This is only the rule block for the new
+// `loginRequests` collection (the "approve on your phone" login feature). No firestore.rules
+// file is currently tracked in this repo — your production rules for `users`, `vaults`,
+// `subscriptions`, etc. live only in the Firebase Console right now. Before deploying anything,
+// pull your CURRENT rules from the Console into a real firestore.rules file and merge this
+// match block in — do NOT deploy this snippet standalone, it would wipe every other collection's
+// rules back to "no access" the moment it's applied.
+//
+// Merge this `match` block inside your existing `match /databases/{database}/documents { ... }`:
+
+match /loginRequests/{requestId} {
+  // Anyone signed in can create a request for their OWN uid.
+  allow create: if request.auth != null
+    && request.auth.uid == request.resource.data.uid
+    && request.resource.data.status == "pending";
+
+  // Only the account owner (any of their own signed-in devices) can read a request,
+  // and can only ever move it from pending -> approved/denied, never edit the code fields.
+  allow get: if request.auth != null && request.auth.uid == resource.data.uid;
+
+  allow update: if request.auth != null
+    && request.auth.uid == resource.data.uid
+    && resource.data.status == "pending"
+    && request.resource.data.status in ["approved", "denied"]
+    && request.resource.data.diff(resource.data).affectedKeys()
+         .hasOnly(["status", "approvedSecretEnc", "respondedAt"]);
+
+  allow delete: if request.auth != null && request.auth.uid == resource.data.uid;
+
+  // No `list` — requests are only ever fetched by their known document id, never enumerated.
+}

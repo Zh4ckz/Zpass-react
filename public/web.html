@@ -1,0 +1,77 @@
+<!doctype html>
+<html lang="tr">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="theme-color" content="#f5f7fb">
+  <title>Z Pass Sohbet</title>
+  <link rel="icon" type="image/png" href="/resources/assets/app-logo/zpass.png">
+  <link rel="stylesheet" href="/css/web-chat.css?v=2">
+</head>
+<body>
+  <main id="auth-view" class="auth-view">
+    <section class="auth-card">
+      <div class="brand-mark">Z</div>
+      <p class="eyebrow">Z PASS MESAJLAŞMA</p>
+      <h1>Özel sohbetler.<br>Tüm cihazlarında.</h1>
+      <p class="muted">Z Pass hesabınla giriş yap. Mevcut uçtan uca şifreleme anahtarını kullanmak için bu tarayıcıyı telefonunla eşleştir.</p>
+      <button id="google-signin" class="button button-google" type="button"><span class="google-g">G</span> Google ile devam et</button>
+      <div class="divider"><span>veya e-posta kullan</span></div>
+      <form id="email-form" class="auth-form">
+        <label>E-posta<input id="email" type="email" autocomplete="email" required></label>
+        <label>Şifre<input id="password" type="password" autocomplete="current-password" minlength="6" required></label>
+        <button id="email-submit" class="button button-primary" type="submit">Giriş yap</button>
+      </form>
+      <a class="text-button" href="/apps.html#android">Hesabın yok mu? Android uygulamasını indir</a>
+      <p id="auth-status" class="status" role="status"></p>
+      <small class="privacy-note">Mesajların uçtan uca şifrelenir. Özel sohbet anahtarın yalnızca telefonundan bu tarayıcıyı onayladığında aktarılır.</small>
+    </section>
+  </main>
+
+  <main id="setup-view" class="setup-view" hidden>
+    <section class="setup-card">
+      <div class="brand-mark">Z</div><p class="eyebrow">Z PASS ANDROID</p>
+      <h1>Hesabını uygulamada oluştur</h1><p class="muted">Yeni hesap açmak ve sohbet kimliğini kurmak için Android uygulamasını indir. Ardından burada hesabına giriş yapıp telefonunu eşleştirebilirsin.</p>
+      <a class="button button-primary" href="/apps.html#android">APK’yı indir</a>
+      <p id="profile-status" class="status" role="status"></p>
+    </section>
+  </main>
+
+  <main id="chat-app" class="chat-app" hidden>
+    <aside class="sidebar">
+      <header class="side-head"><div class="brand-small">Z</div><div><b>Z Pass</b><small>Güvenli mesajlaşma</small></div><button id="signout" class="icon-button" title="Çıkış yap" aria-label="Çıkış yap">↗</button></header>
+      <div class="search-wrap"><span>⌕</span><input id="search" placeholder="Kullanıcı adı ara" autocomplete="off"><button id="clear-search" class="icon-button" hidden aria-label="Temizle">×</button></div>
+      <div id="search-results" class="result-list" hidden></div>
+      <div class="list-label">SOHBETLER</div>
+      <div id="chat-list" class="chat-list"></div>
+      <div class="side-foot"><span class="secure-dot"></span><span>Uçtan uca şifreli</span><button id="pair-device" class="text-button">Tarayıcıyı eşleştir</button></div>
+    </aside>
+    <section id="empty-state" class="empty-state"><div class="empty-orb">✦</div><h2>Sohbetlerin</h2><p>Özel bir sohbet başlatmak için kullanıcı adı ara.</p><span class="secure-label">UÇTAN UCA ŞİFRELİ · ANLIK</span></section>
+    <section id="conversation" class="conversation" hidden>
+      <header class="chat-head"><button id="back-list" class="icon-button back-button" aria-label="Sohbetlere dön">‹</button><div id="peer-avatar" class="avatar">Z</div><div class="peer-head"><b id="peer-name">—</b><small id="peer-status">Uçtan uca şifreli</small></div><div class="chat-actions"><button id="audio-call" class="icon-button" title="Sesli ara" aria-label="Sesli ara">⌕</button><button id="video-call" class="icon-button" title="Görüntülü ara" aria-label="Görüntülü ara">▣</button></div></header>
+      <div id="e2e-banner" class="e2e-banner"><span>♢</span> Uçtan uca şifreli · mesajları yalnızca sen ve sohbet ettiğin kişi okuyabilir</div>
+      <div id="messages" class="messages" role="log" aria-live="polite"></div>
+      <form id="composer" class="composer"><textarea id="message-input" rows="1" maxlength="4096" placeholder="Mesaj yaz…" aria-label="Mesaj yaz"></textarea><button id="send-message" class="send-button" type="submit" aria-label="Mesajı gönder">↑</button></form>
+    </section>
+  </main>
+
+  <dialog id="pair-dialog" class="modal">
+    <form method="dialog"><button class="modal-close" aria-label="Close">×</button></form>
+    <div class="modal-icon">⌑</div><p class="eyebrow">GÜVENLİ CİHAZ EŞLEŞTİRME</p><h2>Telefonundan onayla</h2>
+    <p class="muted">Telefonunda Z Pass'i aç ve aynı iki haneli kodu onayla. Mevcut sohbet anahtarın tek kullanımlık şifreli bir kanalla aktarılır.</p>
+    <div id="pair-code" class="pair-code">··</div><p id="pair-status" class="status" role="status">Telefon onayı bekleniyor…</p>
+    <button id="pair-start" class="button button-primary" type="button">Telefon onayı iste</button>
+    <p class="privacy-note">Sen başlatmadıysan hiçbir kodu onaylama. Tarayıcı anahtarı bu tarayıcının yerel korumalı deposunda kalır.</p>
+  </dialog>
+
+  <dialog id="call-dialog" class="call-modal">
+    <div class="call-title"><b id="call-peer">Arama</b><span id="call-state">Bağlanıyor…</span></div>
+    <div id="call-videos" class="call-videos"><video id="remote-video" autoplay playsinline></video><video id="local-video" autoplay muted playsinline></video></div><audio id="remote-audio" autoplay></audio>
+    <div id="audio-call-art" class="audio-call-art">Z</div>
+    <div class="call-controls"><button id="toggle-mic" class="icon-button" aria-label="Mikrofonu kapat">Mikrofon</button><button id="hangup" class="hangup">Aramayı bitir</button><button id="toggle-camera" class="icon-button" aria-label="Kamerayı aç veya kapat">Kamera</button></div>
+    <button id="accept-call" class="button button-primary" hidden>Aramayı yanıtla</button>
+  </dialog>
+  <div id="toast" class="toast" role="status"></div>
+  <script type="module" src="/js/web-chat.mjs?v=2"></script>
+</body>
+</html>

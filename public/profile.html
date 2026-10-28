@@ -1,0 +1,21 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="robots" content="noindex">
+  <title>Z Pass profile</title>
+  <script>
+    (() => {
+      const parts = location.pathname.split('/').filter(Boolean);
+      const handle = parts[0] || '';
+      if (!handle || handle.startsWith('+')) {
+        location.replace('https://web.zpas.org/login');
+        return;
+      }
+      location.replace(`https://web.zpas.org/login?profile=${encodeURIComponent(handle.replace(/^@/, ''))}`);
+    })();
+  </script>
+</head>
+<body><p>Opening Z Pass profile…</p></body>
+</html>

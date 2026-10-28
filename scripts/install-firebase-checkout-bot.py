@@ -1,0 +1,17 @@
+from pathlib import Path
+import shutil
+r=Path(r'C:\Users\rezan\Desktop\Bots\Payment-bot')
+p=r/'Crypto4PayBot.py';s=p.read_text(encoding='utf-8')
+if 'import zpass_checkout_queue' not in s:s=s.replace('import zpass_support','import zpass_support\nimport zpass_checkout_queue')
+s=s.replace('async def verify_checkout_user(request):\n','async def verify_checkout_user(request):\n    if isinstance(request, zpass_checkout_queue.TrustedCheckoutRequest):\n        return request.identity\n')
+if 'create_task(zpass_checkout_queue' not in s:s=s.replace('    asyncio.create_task(zpass_web_bridge.watch_new_users(globals()))','    asyncio.create_task(zpass_web_bridge.watch_new_users(globals()))\n    asyncio.create_task(zpass_checkout_queue.watch_checkout_requests(globals()))')
+s=s.replace('        public_id = zpass_id(firebase_uid)\n        selected = CHECKOUT_PLANS.get(product_id)','        public_id = zpass_id(firebase_uid)\n        origin = payload.get("origin") if payload.get("origin") in zpass_checkout_queue.ORIGINS else "https://zpass.web.app"\n        selected = CHECKOUT_PLANS.get(product_id)')
+s=s.replace('success_url="https://zpass.web.app/?payment=crypto-success"','success_url=f"{origin}/subscription.html?payment=crypto-success"').replace('cancel_url="https://zpass.web.app/?payment=cancelled"','cancel_url=f"{origin}/checkout.html?payment=cancelled"')
+s=s.replace('"success_url": "https://zpass.web.app/subscription.html?payment=stripe-success&session_id={CHECKOUT_SESSION_ID}"','"success_url": origin + "/subscription.html?payment=stripe-success&session_id={CHECKOUT_SESSION_ID}"').replace('"cancel_url": f"https://zpass.web.app/checkout.html?plan=', '"cancel_url": f"{origin}/checkout.html?plan=')
+s=s.replace('headers={"Authorization": f"Bearer {STRIPE_SECRET_KEY}"}) as session:\n            async with session.post("https://api.stripe.com/v1/checkout/sessions"','headers={"Authorization": f"Bearer {STRIPE_SECRET_KEY}", "Idempotency-Key": "zpass-" + str(payload.get("requestId") or __import__("uuid").uuid4().hex)}) as session:\n            async with session.post("https://api.stripe.com/v1/checkout/sessions"')
+p.write_text(s,encoding='utf-8')
+p=Path('Zpass/scripts/zpass_web_bridge.py');s=p.read_text(encoding='utf-8').replace("'status': 'PENDING', 'createdAt':", "'paymentUrl': result.get('checkoutUrl') or result.get('invoiceUrl') or '',\n                'status': 'PENDING', 'createdAt':");p.write_text(s,encoding='utf-8')
+for name in ['zpass_checkout_queue.py','zpass_web_bridge.py']:shutil.copyfile(Path('Zpass/scripts')/name,r/name)
+p=r/'PAYMENT-BOT-CONTROL.ps1';s=p.read_text(encoding='utf-8-sig');s=s.replace("@{ Root = 'C:\\Users\\rezan\\Desktop\\Web-Sites\\Zpass'; Project = 'tomsss'; Only = 'hosting:tomsss' }", "@{ Root = 'C:\\Users\\rezan\\Desktop\\Web-Sites\\Zpass'; Project = 'tomsss'; Only = 'hosting'; Config = 'firebase.json' },\n    @{ Root = 'C:\\Users\\rezan\\Desktop\\Web-Sites\\Zpass'; Project = 'zpasss'; Only = 'hosting'; Config = 'firebase.zpass.json' }")
+s=s.replace("$deploy = Start-Process -FilePath 'firebase.cmd' -ArgumentList @('deploy','--only',$site.Only,'--project',$site.Project,'--non-interactive')", "if (-not $site.Config) { $site.Config = 'firebase.json' }\n    $cli = Join-Path $env:APPDATA 'npm\\node_modules\\firebase-tools\\lib\\bin\\firebase.js'\n    $deploy = Start-Process -FilePath 'C:\\Program Files\\nodejs\\node.exe' -ArgumentList @($cli,'deploy','--only',$site.Only,'--project',$site.Project,'--config',$site.Config,'--non-interactive')")
+p.write_text(s,encoding='utf-8-sig')

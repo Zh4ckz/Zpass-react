@@ -1,0 +1,321 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <meta name="theme-color" content="#010101">
+  <meta name="robots" content="noindex, nofollow">
+  <title>Z Pass Admin</title>
+  <link rel="icon" type="image/png" href="images/zpass.png?v=3">
+  <style>
+    :root {
+      --bg: #010101;
+      --panel: #292F33;
+      --panel-2: #292F33;
+      --border: #292F33;
+      --text: #FEFEFE;
+      --muted: #A6B3C4;
+      --accent: #A6B3C4;
+      --good: #8999B0;
+      --bad: #A6B3C4;
+      --warn: #CCD6DD;
+    }
+    * { box-sizing: border-box; }
+    body {
+      margin: 0;
+      background: var(--bg);
+      color: var(--text);
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+    }
+    header {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      padding: 16px 24px;
+      border-bottom: 1px solid var(--border);
+    }
+    header img { width: 28px; height: 28px; border-radius: 6px; }
+    header h1 { font-size: 16px; margin: 0; font-weight: 700; }
+    header .who { margin-left: auto; font-size: 13px; color: var(--muted); }
+    header button {
+      background: transparent;
+      border: 1px solid var(--border);
+      color: var(--text);
+      padding: 6px 12px;
+      border-radius: 8px;
+      cursor: pointer;
+    }
+    main { max-width: 1080px; margin: 0 auto; padding: 24px; }
+    .hidden { display: none !important; }
+
+    .auth-wrap {
+      max-width: 360px;
+      margin: 80px auto;
+      background: var(--panel);
+      border: 1px solid var(--border);
+      border-radius: 16px;
+      padding: 28px;
+      text-align: center;
+    }
+    .auth-wrap img { width: 48px; margin-bottom: 12px; }
+    .auth-wrap input {
+      width: 100%;
+      margin-bottom: 10px;
+      padding: 10px 12px;
+      border-radius: 8px;
+      border: 1px solid var(--border);
+      background: var(--panel-2);
+      color: var(--text);
+    }
+    .auth-wrap button.primary {
+      width: 100%;
+      padding: 10px;
+      border-radius: 8px;
+      border: none;
+      background: var(--accent);
+      color: white;
+      font-weight: 600;
+      cursor: pointer;
+      margin-top: 4px;
+    }
+    .auth-wrap .or { color: var(--muted); font-size: 12px; margin: 12px 0; }
+    .auth-wrap button.google {
+      width: 100%;
+      padding: 10px;
+      border-radius: 8px;
+      border: 1px solid var(--border);
+      background: var(--panel-2);
+      color: var(--text);
+      cursor: pointer;
+    }
+    #authMessage, #deniedMessage { font-size: 13px; margin-top: 10px; color: var(--bad); }
+
+    section.card {
+      background: var(--panel);
+      border: 1px solid var(--border);
+      border-radius: 14px;
+      padding: 18px 20px;
+      margin-bottom: 20px;
+    }
+    section.card h2 { margin: 0 0 4px; font-size: 15px; }
+    section.card p.hint { margin: 0 0 14px; color: var(--muted); font-size: 12.5px; }
+
+    table { width: 100%; border-collapse: collapse; font-size: 13px; }
+    th, td { text-align: left; padding: 8px 6px; border-bottom: 1px solid var(--border); vertical-align: top; }
+    th { color: var(--muted); font-weight: 600; font-size: 11px; text-transform: uppercase; letter-spacing: .04em; }
+    td.mono { font-family: ui-monospace, SFMono-Regular, Menlo, monospace; font-size: 12px; }
+    .pill {
+      display: inline-block;
+      padding: 2px 8px;
+      border-radius: 999px;
+      font-size: 11px;
+      font-weight: 600;
+    }
+    .pill.pending { background: rgba(204, 214, 221, 0.15); color: var(--warn); }
+    .pill.active, .pill.approved { background: rgba(137,153,176, 0.15); color: var(--good); }
+    .pill.rejected, .pill.revoked { background: rgba(166,179,196, 0.15); color: var(--bad); }
+    .pill.free { background: rgba(166,179,196, 0.15); color: var(--muted); }
+
+    .row-actions { display: flex; gap: 6px; flex-wrap: wrap; }
+    .row-actions button, .form-row button {
+      padding: 5px 10px;
+      border-radius: 6px;
+      border: 1px solid var(--border);
+      background: var(--panel-2);
+      color: var(--text);
+      cursor: pointer;
+      font-size: 12px;
+    }
+    .row-actions button.approve { border-color: var(--good); color: var(--good); }
+    .row-actions button.reject { border-color: var(--bad); color: var(--bad); }
+
+    .form-row {
+      display: flex;
+      gap: 8px;
+      flex-wrap: wrap;
+      align-items: center;
+      margin-top: 6px;
+    }
+    .form-row input, .form-row select {
+      padding: 7px 9px;
+      border-radius: 6px;
+      border: 1px solid var(--border);
+      background: var(--panel-2);
+      color: var(--text);
+      font-size: 13px;
+    }
+    .form-row button.primary {
+      border: none;
+      background: var(--accent);
+      color: white;
+      font-weight: 600;
+    }
+    .empty { color: var(--muted); font-size: 13px; padding: 8px 0; }
+    .status-line { font-size: 12.5px; margin-top: 8px; min-height: 16px; }
+    .status-line.ok { color: var(--good); }
+    .status-line.err { color: var(--bad); }
+  </style>
+  <link rel="stylesheet" href="/css/site-responsive.css?v=102"><link rel="stylesheet" href="/css/mobile-nav.css?v=102">
+  <link rel="stylesheet" href="css/zpass-glass-theme.css?v=101">
+  <link rel="stylesheet" href="css/admin-modern.css?v=105">
+<script src="/js/zpass-theme.js?v=3"></script><link rel="stylesheet" href="/css/zpass-app-theme.css?v=109"><link rel="stylesheet" href="/css/performance.css">
+<link rel="stylesheet" href="/css/zpass-design-system.css">
+<link rel="stylesheet" href="/css/unified-2026.css?v=414"></head>
+<body>
+
+  <div id="authGate" class="auth-wrap">
+    <img src="images/zpass.png?v=3" alt="Z Pass">
+    <h2>Z Pass Admin</h2>
+    <p style="color:var(--muted); font-size:13px; margin-top:-6px;">Restricted to the account owner.</p>
+    <form id="loginForm">
+      <input id="email" type="email" placeholder="Email" autocomplete="email" required>
+      <input id="password" type="password" placeholder="Password" autocomplete="current-password" required>
+      <button class="primary" type="submit">Sign in</button>
+    </form>
+    <div class="or">or</div>
+    <button id="googleLogin" class="google" type="button" aria-label="Continue with Google" title="Continue with Google"><img src="images/google-mark.svg?v=2" alt="" width="22" height="22"></button>
+    <p id="authMessage"></p>
+    <p id="deniedMessage" class="hidden">Signed in, but this account is not the Z Pass admin account. <button id="signOutDenied" type="button">Sign out</button></p>
+  </div>
+
+  <div id="adminApp" class="hidden">
+    <header>
+      <img src="images/zpass.png?v=3" alt="">
+      <h1>Z Pass Admin</h1>
+      <span class="who" id="whoAmI"></span>
+      <button id="signOut">Sign out</button>
+    </header>
+
+    <nav class="admin-nav"><a href="#sec-updates">Updates</a><a href="#sec-crypto">Crypto</a><a href="#sec-paypal">Card / PayPal</a><a href="#sec-changes">Changes</a><a href="#sec-manage">Manage</a><a href="#sec-active">Active</a><a href="#sec-users">Users</a><a href="#sec-payments">Payments</a></nav>
+
+    <main>
+      <section class="card" id="sec-updates">
+        <h2>Updates &amp; releases</h2>
+        <p class="hint">Controls the Android app (APK) live, and records the Windows (EXE) release. Raise <b>Minimum version code</b> or turn on <b>Force update</b> to require users to update; <b>Maintenance mode</b> shows a message in the app instead of the vault.</p>
+        <div class="upd-grid">
+          <div class="upd-tile"><small>Android (APK)</small><label>Latest version name<input id="updName" placeholder="4.10"></label><label>Latest version code<input id="updCode" type="number" min="1" inputmode="numeric"></label><label>Minimum supported code<input id="updMin" type="number" min="1" inputmode="numeric"></label><label>Official signed download URL<input id="updUrl" placeholder="No website-hosted APK download"></label></div>
+          <div class="upd-tile"><small>Windows (EXE)</small><label>Latest version<input id="winVersion" placeholder="1.1.0"></label><label>Download URL<input id="winUrl" placeholder="Windows installer URL (external host required)"></label><label>Release notes<textarea id="winNotes" rows="3" placeholder="What's new"></textarea></label></div>
+          <div class="upd-tile"><small>Announcement &amp; status</small><label>Announcement shown in the app<textarea id="updAnnouncement" rows="3" placeholder="What's new in this version"></textarea></label><label>Maintenance message<input id="updMaintMsg" placeholder="Z Pass is temporarily under maintenance."></label><div class="upd-switches"><label class="switch"><input id="updForce" type="checkbox"><span></span>Force update</label><label class="switch"><input id="updMaint" type="checkbox"><span></span>Maintenance mode</label></div></div>
+        </div>
+        <div class="form-row"><button id="updSave" class="primary">Publish changes</button><button id="updReload">Reload</button><span id="updStatus" class="status-line"></span></div>
+      </section>
+
+      <section class="card" id="sec-crypto">
+        <h2>Crypto payment requests</h2>
+        <p class="hint">Approving activates the subscription immediately. Default duration comes from the request's billing period (Monthly = 1 month, Yearly = 12 months) at the PRO tier &mdash; override either before approving if needed.</p>
+        <div class="form-row">
+          <label style="color:var(--muted); font-size:12.5px;">Status:</label>
+          <select id="cryptoStatusFilter">
+            <option value="PENDING">PENDING</option>
+            <option value="APPROVED">APPROVED</option>
+            <option value="REJECTED">REJECTED</option>
+          </select>
+          <button id="cryptoRefresh">Refresh</button>
+        </div>
+        <table id="cryptoTable">
+          <thead><tr><th>zPassId</th><th>Plan</th><th>Amount</th><th>Network</th><th>TxID</th><th>Status</th><th></th></tr></thead>
+          <tbody></tbody>
+        </table>
+        <p class="empty hidden" id="cryptoEmpty">No requests.</p>
+      </section>
+
+      <section class="card" id="sec-paypal">
+        <h2>Card / Google Pay / PayPal requests</h2>
+        <p class="hint">From the website checkout's PayPal integration. PayPal has already captured the payment by the time a request appears here &mdash; cross-check the Order ID in your PayPal dashboard, then approve to activate the subscription for the tier/billing the customer selected.</p>
+        <div class="form-row">
+          <label style="color:var(--muted); font-size:12.5px;">Status:</label>
+          <select id="paypalStatusFilter">
+            <option value="PENDING">PENDING</option>
+            <option value="APPROVED">APPROVED</option>
+            <option value="REJECTED">REJECTED</option>
+          </select>
+          <button id="paypalRefresh">Refresh</button>
+        </div>
+        <table id="paypalTable">
+          <thead><tr><th>zPassId</th><th>Tier</th><th>Billing</th><th>Amount</th><th>Method</th><th>Order ID</th><th>Status</th><th></th></tr></thead>
+          <tbody></tbody>
+        </table>
+        <p class="empty hidden" id="paypalEmpty">No requests.</p>
+      </section>
+
+      <section class="card" id="sec-changes">
+        <h2>Subscription change requests</h2>
+        <p class="hint">From the website's plan/family management flow. Approving a plan change updates the subscription directly; approving a family add/remove updates the family member list.</p>
+        <div class="form-row">
+          <label style="color:var(--muted); font-size:12.5px;">Status:</label>
+          <select id="changeStatusFilter">
+            <option value="PENDING">PENDING</option>
+            <option value="APPROVED">APPROVED</option>
+            <option value="REJECTED">REJECTED</option>
+          </select>
+          <button id="changeRefresh">Refresh</button>
+        </div>
+        <table id="changeTable">
+          <thead><tr><th>zPassId</th><th>Type</th><th>Plan / Target</th><th>Status</th><th></th></tr></thead>
+          <tbody></tbody>
+        </table>
+        <p class="empty hidden" id="changeEmpty">No requests.</p>
+      </section>
+
+      <section class="card" id="sec-manage">
+        <h2>Manage a subscription directly</h2>
+        <p class="hint">Grant, extend, or revoke a plan by zPassId (e.g. from a bank transfer, promo, or support request) without needing a payment request on file.</p>
+        <div class="form-row">
+          <input id="manageZpId" placeholder="zPassId, e.g. ZP-ABC123DEF4" style="min-width:200px;">
+          <button id="manageLookup">Look up</button>
+        </div>
+        <div class="form-row">
+          <select id="manageTier">
+            <option value="PRO">PRO</option>
+            <option value="FAMILY">FAMILY</option>
+          </select>
+          <input id="manageMonths" type="number" min="1" value="1" style="width:80px;" placeholder="Months">
+          <button id="manageGrant" class="primary">Grant / extend</button>
+          <button id="manageRevoke" class="reject">Revoke</button>
+        </div>
+        <p class="status-line" id="manageStatus"></p>
+      </section>
+
+      <section class="card" id="sec-active">
+        <h2>Active subscriptions</h2>
+        <p class="hint">Everyone currently ACTIVE, most recently updated first.</p>
+        <button id="activeRefresh">Refresh</button>
+        <table id="activeTable">
+          <thead><tr><th>zPassId</th><th>Plan</th><th>Status</th><th>Expires</th></tr></thead>
+          <tbody></tbody>
+        </table>
+        <p class="empty hidden" id="activeEmpty">No active subscriptions.</p>
+      </section>
+
+      <section class="card" id="sec-users">
+        <h2>Users</h2>
+        <p class="hint">Search account records. The table loads the most recent 200 user profiles.</p>
+        <div class="form-row">
+          <input id="userSearch" type="search" placeholder="Search email, name, or Z Pass ID" style="min-width:260px;">
+          <button id="usersRefresh">Refresh</button>
+        </div>
+        <table id="usersTable">
+          <thead><tr><th>Z Pass ID</th><th>Name</th><th>Email</th><th>Account created</th></tr></thead>
+          <tbody></tbody>
+        </table>
+        <p class="empty hidden" id="usersEmpty">No matching users.</p>
+      </section>
+
+      <section class="card" id="sec-payments">
+        <h2>Payment history</h2>
+        <p class="hint">Latest completed card and crypto payments. Stripe invoices are also available in each customer's billing portal.</p>
+        <button id="paymentsRefresh">Refresh</button>
+        <table id="paymentsTable">
+          <thead><tr><th>Z Pass ID</th><th>Email</th><th>Plan</th><th>Billing</th><th>Amount</th><th>Provider</th><th>Paid</th></tr></thead>
+          <tbody></tbody>
+        </table>
+        <p class="empty hidden" id="paymentsEmpty">No completed payments.</p>
+      </section>
+    </main>
+  </div>
+
+  <script type="module" src="js/admin.js?v=1"></script>
+<script type="module" src="/js/mobile-nav.mjs?v=4"></script><script type="module" src="/js/wallpapers.mjs?v=414"></script></body>
+</html>
+
+

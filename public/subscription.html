@@ -1,0 +1,172 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <meta name="theme-color" content="#010101">
+  <meta name="robots" content="noindex">
+  <title>Manage Subscription · Z Pass</title>
+  <link rel="icon" href="images/zpass.png">
+  <style>
+    :root{color-scheme:dark;font-family:Inter,ui-sans-serif,system-ui,-apple-system,Segoe UI,sans-serif;--bg:#010101;--panel:#292F33;--panel2:#292F33;--line:#292F33;--text:#FEFEFE;--muted:#A6B3C4;--brand:#8F9EB4;--brand2:#A6B3C4;--green:#8999B0}
+    *{box-sizing:border-box}
+    body{margin:0;background:radial-gradient(circle at 85% -10%,#3C589833,transparent 40%),var(--bg);color:var(--text);line-height:1.6;min-height:100vh}
+    body.embedded .top{display:none}
+    a{color:#D7DDE5}
+    .top{height:64px;border-bottom:1px solid var(--line);display:flex;align-items:center;gap:11px;padding:0 max(20px,calc((100vw - 720px)/2))}
+    .top a{display:flex;align-items:center;gap:10px;color:#fff;text-decoration:none;font-weight:800}
+    .top img{width:34px;height:34px;border-radius:10px}
+    main{max-width:720px;margin:auto;padding:40px 20px 70px}
+    body.embedded main{padding:24px 4px}
+    h1{font-size:26px;margin:0 0 6px;letter-spacing:-.02em}
+    .lead{color:var(--muted);margin:0 0 28px;font-size:14px}
+    .card{background:linear-gradient(150deg,var(--panel2),var(--panel));border:1px solid var(--line);border-radius:22px;padding:26px;margin-bottom:18px}
+    .plan-row{display:flex;justify-content:space-between;align-items:flex-start;gap:16px;flex-wrap:wrap}
+    .plan-name{font-size:22px;font-weight:850}
+    .plan-sub{color:var(--muted);font-size:13px;margin-top:4px}
+    .badge{padding:7px 14px;border-radius:99px;font-size:12px;font-weight:750;white-space:nowrap}
+    .badge.active{background:#69C9D01f;color:var(--green);border:1px solid #69C9D045}
+    .badge.free{background:#FEFEFE12;color:#CCD6DD;border:1px solid #FEFEFE20}
+    dl{display:grid;grid-template-columns:1fr auto;gap:10px 16px;margin:22px 0 0;padding-top:18px;border-top:1px solid var(--line)}
+    dt{color:var(--muted);font-size:13px}
+    dd{margin:0;font-weight:650;font-size:13px;text-align:right}
+    .actions{display:flex;flex-wrap:wrap;gap:10px;margin-top:22px}
+    .btn{display:inline-flex;align-items:center;justify-content:center;gap:8px;padding:13px 20px;border-radius:99px;text-decoration:none;font-weight:750;font-size:14px;border:0;cursor:pointer}
+    .btn-primary{background:linear-gradient(100deg,#55667F,var(--brand2));color:#fff;box-shadow:0 12px 26px #3C589840}
+    .btn-ghost{background:#FEFEFE10;color:var(--text);border:1px solid var(--line)}
+    .note{font-size:12px;color:#66757F;margin-top:16px}
+    .empty{text-align:center;padding:60px 20px;color:var(--muted)}
+    .empty a{color:var(--brand2);font-weight:700}
+    .skeleton{opacity:.5}
+  </style>
+  <link rel="stylesheet" href="css/zpass-glass-theme.css?v=101">
+  <link rel="stylesheet" href="/css/site-responsive.css?v=102"><link rel="stylesheet" href="/css/mobile-nav.css?v=102">
+<link rel="stylesheet" href="/css/footer-modern.css?v=106"><link rel="stylesheet" href="/css/pages-modern.css?v=101"><script src="/js/zpass-theme.js?v=3"></script><link rel="stylesheet" href="/css/zpass-app-theme.css?v=109"><link rel="stylesheet" href="/css/performance.css">
+<link rel="stylesheet" href="/css/zpass-design-system.css">
+<link rel="stylesheet" href="/css/unified-2026.css?v=414"></head>
+<body class="pm">
+  <header class="top"><a href="/"><img src="images/zpass.png" alt="">Z Pass</a></header>
+  <main>
+    <div id="signedOut" class="empty" style="display:none">
+      <p>Sign in to manage your subscription.</p>
+      <a href="/dashboard.html#login">Go to sign in →</a>
+    </div>
+    <div id="content" class="skeleton" style="display:none">
+      <h1>Subscription</h1>
+      <p class="lead">Your Z Pass plan, billing period, and renewal status.</p>
+      <div class="card">
+        <div class="plan-row">
+          <div>
+            <div class="plan-name" id="planName">—</div>
+            <div class="plan-sub" id="planSub">—</div>
+          </div>
+          <span class="badge" id="planBadge">—</span>
+        </div>
+        <dl>
+          <dt>Z Pass ID</dt><dd id="zpassId">—</dd>
+          <dt>Renews / expires</dt><dd id="expiresAt">—</dd>
+        </dl>
+        <div class="actions" id="actions"></div>
+        <p class="note" id="billingNote"></p>
+      </div>
+    </div>
+  </main>
+  <script src="/js/payment-endpoint.js?v=1"></script>
+<script type="module">
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
+    import { getAuth, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js";
+    import { getFirestore, doc, getDoc } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
+
+    if(window.top!==window.self)window.top.location.replace("/dashboard.html#subscription");
+
+    import {firebaseConfig} from "/js/firebase-config.mjs";
+    const app = initializeApp(firebaseConfig);
+    const auth = getAuth(app);
+    const db = getFirestore(app);
+    const $ = (id) => document.getElementById(id);
+
+    function zPassId(uid) {
+      return "ZP-" + uid.slice(0, 6).toUpperCase() + uid.slice(-4).toUpperCase();
+    }
+
+    function actionButtons(plan, isActive, data) {
+      const actions = [];
+      if (!isActive || plan === "FREE") {
+        actions.push(`<a class="btn btn-primary" href="/checkout?plan=PLUS">Upgrade to Plus</a>`);
+        actions.push(`<a class="btn btn-ghost" href="/checkout?plan=PRO">Upgrade to Pro</a>`);
+      } else if (plan === "PRO") {
+        actions.push(`<a class="btn btn-ghost" href="/checkout?plan=PRO">Switch to Pro</a>`);
+      }
+      if (data.stripeCustomerId) {
+        actions.push(`<button class="btn btn-ghost" type="button" id="manageBilling">Manage billing &amp; invoices</button>`);
+      }
+      return actions.join("");
+    }
+
+    onAuthStateChanged(auth, async (user) => {
+      if (!user) {
+        $("signedOut").style.display = "block";
+        $("content").style.display = "none";
+        return;
+      }
+      $("signedOut").style.display = "none";
+      $("content").style.display = "block";
+      $("zpassId").textContent = zPassId(user.uid);
+
+      let data = {};
+      try {
+        const snapshot = await getDoc(doc(db, "subscriptions", user.uid));
+        data = snapshot.exists() ? snapshot.data() : {};
+      } catch {
+        $("billingNote").textContent = "Could not load subscription details right now. Try again shortly.";
+      }
+
+      const legacyPlan = String(data.plan || "FREE").toUpperCase();
+      const plan = String(data.planId || "").startsWith("zpass_pro_") || legacyPlan === "FAMILY" ? "PRO" : legacyPlan === "FREE" ? "FREE" : "PLUS";
+      const expiresDate = data.expiresAt?.toDate ? data.expiresAt.toDate() : null;
+      const isActive = data.status === "ACTIVE" && plan !== "FREE" && expiresDate instanceof Date && expiresDate > new Date();
+
+      $("planName").textContent = isActive ? `Z Pass ${plan.charAt(0) + plan.slice(1).toLowerCase()}` : "Z Pass Free";
+      $("planSub").textContent = isActive
+        ? plan === "PRO"
+          ? "Up to 10 saved logins · voice transcription · custom app icons · unlimited vaults"
+          : "Up to 5 saved logins · custom app icons · up to 50 vaults"
+        : "Up to 3 saved logins · 15 vaults · 10 TOTP codes · 10 aliases · share with 3 people per vault";
+      $("planBadge").textContent = isActive ? "Active" : "Free plan";
+      $("planBadge").className = "badge " + (isActive ? "active" : "free");
+      $("expiresAt").textContent = isActive
+        ? (expiresDate ? expiresDate.toLocaleDateString(undefined, { year: "numeric", month: "long", day: "numeric" }) : "—")
+        : "Not applicable";
+      $("actions").innerHTML = actionButtons(plan, isActive, data);
+      $("billingNote").textContent = isActive
+        ? (data.stripeCustomerId
+          ? "Your Stripe billing portal lets you update payment details, view invoices, or cancel renewal."
+          : "Need help with billing? Contact support with your Z Pass ID.")
+        : "";
+      $("manageBilling")?.addEventListener("click", async (event) => {
+        const button = event.currentTarget;
+        button.disabled = true;
+        button.textContent = "Opening billing…";
+        try {
+          const idToken = await user.getIdToken();
+          const response = await fetch((await (window.ZPassPaymentEndpoint || Promise.resolve("/api"))) + "/checkout/create-portal-session", {
+            method: "POST",
+            headers: { "Authorization": `Bearer ${idToken}`, "Content-Type": "application/json" }
+          });
+          const result = await response.json();
+          if (!response.ok || !result.url) throw new Error(result.error || "Could not open Stripe billing.");
+          location.href = result.url;
+        } catch (error) {
+          $("billingNote").textContent = error.message;
+          button.disabled = false;
+          button.textContent = "Manage billing & invoices";
+        }
+      });
+      if (new URLSearchParams(location.search).get("payment") === "stripe-success") {
+        $("billingNote").textContent = "Payment completed. Stripe is confirming your subscription; refresh this page in a moment if your plan has not updated yet.";
+      }
+      $("content").classList.remove("skeleton");
+    });
+  </script>
+<script type="module" src="/js/mobile-nav.mjs?v=4"></script><script src="/js/site-footer.js"></script><script src="/js/hide-links.js?v=1"></script><script type="module" src="/js/wallpapers.mjs?v=414"></script></body>
+</html>

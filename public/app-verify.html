@@ -1,0 +1,100 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <meta name="theme-color" content="#010101">
+  <meta name="description" content="Z Pass — Complete your account verification.">
+  <title>Verify Account | Z Pass</title>
+  <link rel="icon" type="image/png" href="images/zpass.png?v=3">
+  <link rel="apple-touch-icon" href="images/zpass.png?v=3">
+  <link rel="stylesheet" href="css/zpass-bundle.css?v=107">
+  <style>
+    .verify-card {
+        max-width: 440px;
+        margin: 100px auto;
+        padding: 40px;
+        text-align: center;
+        background: linear-gradient(145deg, #292F33, #292F33);
+        border: 1px solid #292F33;
+        border-radius: 30px;
+        box-shadow: 0 34px 90px #0009;
+    }
+    .verify-icon {
+        width: 64px;
+        height: 64px;
+        background: #66757F25;
+        color: #8F9EB4;
+        border-radius: 18px;
+        display: grid;
+        place-items: center;
+        margin: 0 auto 24px;
+        font-size: 28px;
+    }
+    h1 { font-size: 28px; margin-bottom: 12px; color: #fff; }
+    p { color: #A6B3C4; line-height: 1.6; margin-bottom: 32px; }
+    .status-msg { margin-top: 24px; font-weight: 650; }
+    .success { color: #8999B0; }
+    .error { color: #CCD6DD; }
+    .loader {
+        width: 24px;
+        height: 24px;
+        border: 3px solid #292F33;
+        border-top-color: #66757F;
+        border-radius: 50%;
+        margin: 0 auto;
+        animation: spin 1s linear infinite;
+    }
+    @keyframes spin { to { transform: rotate(360deg); } }
+    .verify-card label{display:block;text-align:left;margin-top:16px;font-size:.85em;color:#CCD6DD}
+    .verify-card input{width:100%;margin-top:6px;padding:10px 12px;border-radius:10px;border:1px solid rgba(254, 254, 254, 0.12);background:rgba(254, 254, 254, 0.04);color:#fff;font-size:1em;box-sizing:border-box}
+    .verify-note{font-size:.8em;color:#CCD6DD;text-align:left;margin-top:14px;margin-bottom:0;line-height:1.5}
+    .verify-actions{margin-top:24px;display:flex;flex-direction:column;gap:10px}
+    .verify-actions button{padding:12px;border-radius:10px;border:none;font-weight:600;cursor:pointer;background:#66757F;color:#fff;font-size:1em}
+  </style>
+  <link rel="stylesheet" href="css/zpass-glass-theme.css?v=101">
+  <link rel="stylesheet" href="/css/site-responsive.css?v=102"><link rel="stylesheet" href="/css/mobile-nav.css?v=102">
+<script src="/js/zpass-theme.js?v=3"></script><link rel="stylesheet" href="/css/zpass-app-theme.css?v=109"><link rel="stylesheet" href="/css/performance.css">
+<link rel="stylesheet" href="/css/zpass-design-system.css">
+<link rel="stylesheet" href="/css/unified-2026.css?v=414"></head>
+<body>
+  <div class="ambient ambient-one"></div><div class="ambient ambient-two"></div>
+
+  <header class="topbar">
+    <a class="brand" href="./"><img class="brand-logo" src="images/zpass.png?v=3" alt=""><span>Z Pass</span></a>
+  </header>
+
+  <main>
+    <div class="verify-card">
+      <div class="verify-icon" id="verifyIcon">✓</div>
+      <h1 id="title">Verifying your account</h1>
+      <p id="subtitle">Please wait while we confirm your credentials with our secure servers.</p>
+
+      <div id="loader" class="loader"></div>
+      <div id="status" class="status-msg"></div>
+
+      <!-- Recovery-password reset: shown only when this link came from "Forgot recovery
+           password?" in the app (a Firebase email-link sign-in, mode=signIn), never for the
+           standard verifyEmail/resetPassword account flows above. -->
+      <div id="confirmEmailStep" class="hidden">
+        <label>Confirm your email<input id="confirmEmailInput" type="email" placeholder="name@example.com"></label>
+        <div class="verify-actions"><button id="confirmEmailBtn" type="button">Continue</button></div>
+      </div>
+
+      <form id="resetRecoveryForm" class="hidden">
+        <label>New recovery password<input id="newRecoveryPassword" type="password" minlength="10" autocomplete="off" placeholder="At least 10 characters"></label>
+        <label>Confirm new recovery password<input id="newRecoveryPasswordConfirm" type="password" minlength="10" autocomplete="off"></label>
+        <p class="verify-note"><b>Note:</b> this starts a fresh, empty vault. Items encrypted under the old recovery password cannot be carried over. After this, set the same new password in the Z Pass Android app so both stay in sync.</p>
+        <div class="verify-actions"><button id="setNewRecoveryBtn" type="button">Set new recovery password</button></div>
+      </form>
+
+      <div id="actions" class="hidden" style="margin-top: 32px;">
+        <a href="/" class="primary" style="text-decoration: none; display: inline-flex; width: auto; padding: 12px 32px;">Go to Dashboard</a>
+      </div>
+    </div>
+  </main>
+
+  <script src="js/argon2.umd.min.js"></script>
+  <script type="module" src="js/app-verify.js"></script>
+<script type="module" src="/js/mobile-nav.mjs?v=4"></script><script type="module" src="/js/wallpapers.mjs?v=414"></script></body>
+</html>

@@ -1,0 +1,631 @@
+@page "/vault"
+@inject AppState AppState
+@inject NavigationManager Nav
+@inject IJSRuntime JS
+@inject LocalPasscodeStore PasscodeStore
+
+<PageTitle>Vault — Zapp</PageTitle>
+
+@if (_offline)
+{
+    <div class="offline-banner">You're offline — showing the last synced data. View and copy only.</div>
+}
+
+<div class="vault-shell">
+    <aside class="vault-sidebar">
+        <div class="vault-brand"><img src="icon-192.png" alt="" />Zapp</div>
+
+        <div class="nav-item @(_filterType is null && _filterCategory is null ? "active" : "")" @onclick="() => SelectAll()">
+            <span>All items</span><span class="count">@TotalCount</span>
+        </div>
+        <div class="nav-item @(_filterType == ItemType.Password ? "active" : "")" @onclick="() => SelectType(ItemType.Password)">
+            <span>Passwords</span><span class="count">@_passwords.Count</span>
+        </div>
+        <div class="nav-item @(_filterType == ItemType.Card ? "active" : "")" @onclick="() => SelectType(ItemType.Card)">
+            <span>Cards</span><span class="count">@_cards.Count</span>
+        </div>
+        <div class="nav-item @(_filterType == ItemType.Totp ? "active" : "")" @onclick="() => SelectType(ItemType.Totp)">
+            <span>Authenticator</span><span class="count">@_totps.Count</span>
+        </div>
+
+        @if (Categories.Count > 0)
+        {
+            <div class="nav-section-label">Categories</div>
+            @foreach (var category in Categories)
+            {
+                <div class="nav-item @(_filterCategory == category ? "active" : "")" @onclick="() => SelectCategory(category)">
+                    <span>@category</span>
+                </div>
+            }
+        }
+    </aside>
+
+    <div class="vault-main" style="position:relative">
+        <div class="item-column">
+            <div class="vault-topbar" style="border-bottom:1px solid var(--border)">
+                <input class="vault-search" placeholder="Search..." @bind="_search" @bind:event="oninput" />
+            </div>
+            @foreach (var item in FilteredItems)
+            {
+                <div class="item-row @(item == _selected ? "selected" : "")" @onclick="() => Select(item)">
+                    <div class="item-favicon">
+                        @if (item.Type != ItemType.Totp && !string.IsNullOrWhiteSpace(item.Domain))
+                        {
+                            <img src="@FaviconUrl(item.Domain)" alt="" onerror="this.style.display='none'" />
+                        }
+                        else
+                        {
+                            @Initial(item.Title)
+                        }
+                    </div>
+                    <div class="item-row-text">
+                        <div class="item-row-title">@item.Title</div>
+                        <div class="item-row-sub">@item.Subtitle</div>
+                    </div>
+                </div>
+            }
+            @if (!FilteredItems.Any())
+            {
+                <div style="padding:24px;color:var(--muted);font-size:13px;text-align:center">No items here yet.</div>
+            }
+        </div>
+
+        <div style="flex:1;display:flex;flex-direction:column;min-width:0">
+            <div class="vault-topbar">
+                <div style="font-weight:700">@HeaderTitle</div>
+                <div style="display:flex;gap:10px;align-items:center">
+                    <button class="btn btn-primary btn-sm" disabled="@_offline" @onclick="OpenAddModal">+ Add</button>
+                    <button class="profile-menu-btn" @onclick="() => _showProfileMenu = !_showProfileMenu">@ProfileInitial</button>
+                </div>
+            </div>
+
+            @if (_selected is null)
+            {
+                <div class="empty-state">Select an item to view its details.</div>
+            }
+            else
+            {
+                <div class="detail-panel">
+                    <div class="detail-header">
+                        <div class="item-favicon">
+                            @if (_selected.Type != ItemType.Totp && !string.IsNullOrWhiteSpace(_selected.Domain))
+                            {
+                                <img src="@FaviconUrl(_selected.Domain)" alt="" onerror="this.style.display='none'" />
+                            }
+                            else
+                            {
+                                @Initial(_selected.Title)
+                            }
+                        </div>
+                        <div>
+                            <div class="detail-title">@_selected.Title</div>
+                            <div class="detail-sub">@_selected.Subtitle</div>
+                        </div>
+                        <div style="margin-left:auto;display:flex;gap:4px">
+                            <button class="icon-btn" title="Edit" disabled="@_offline" @onclick="() => OpenEditModal(_selected)">✎</button>
+                            <button class="icon-btn" title="Delete" disabled="@_offline" @onclick="() => DeleteSelectedAsync()">🗑</button>
+                        </div>
+                    </div>
+
+                    @if (_selected.Type == ItemType.Password && _selected.Password is not null)
+                    {
+                        var p = _selected.Password;
+                        @Field("Username", p.Username, copyable: true)
+                        @SecretField("Password", p.Password, () => _showSecret = !_showSecret, _showSecret)
+                        @if (!string.IsNullOrWhiteSpace(p.Domain))
+                        {
+                            <div class="detail-field">
+                                <div class="detail-field-text">
+                                    <div class="detail-field-label">Website</div>
+                                    <a class="detail-field-value" href="@NormalizeUrl(p.Domain)" target="_blank" rel="noopener">@p.Domain</a>
+                                </div>
+                            </div>
+                        }
+                        @if (!string.IsNullOrWhiteSpace(p.Notes))
+                        {
+                            @Field("Notes", p.Notes, copyable: false)
+                        }
+                    }
+                    else if (_selected.Type == ItemType.Card && _selected.Card is not null)
+                    {
+                        var c = _selected.Card;
+                        @SecretField("Card number", c.Number, () => _showSecret = !_showSecret, _showSecret)
+                        @Field("Cardholder", c.Cardholder, copyable: true)
+                        @Field("Expiry", c.Expiry, copyable: false)
+                        @SecretField("CVV", c.Cvv, () => _showCvv = !_showCvv, _showCvv)
+                        @Field("Brand", c.Brand, copyable: false)
+                    }
+                    else if (_selected.Type == ItemType.Totp && _selected.Totp is not null)
+                    {
+                        <div class="detail-field">
+                            <div class="detail-field-text">
+                                <div class="detail-field-label">Current code (refreshes every @_selected.Totp.Period s)</div>
+                                <div class="otp-code">@_otpCode</div>
+                            </div>
+                            <div class="detail-field-actions">
+                                <button class="icon-btn" title="Copy" @onclick="() => CopyAsync(_otpCode)">⧉</button>
+                            </div>
+                        </div>
+                    }
+                </div>
+            }
+        </div>
+
+        @if (_showProfileMenu)
+        {
+            <div class="profile-dropdown">
+                <div class="profile-dropdown-item" @onclick="OpenPasscodeModal">Set local passcode</div>
+                <div class="profile-dropdown-item" @onclick="OpenDevicesAsync">Connected devices</div>
+                <div class="profile-dropdown-item" @onclick="SignOut">Sign out</div>
+            </div>
+        }
+    </div>
+
+    @if (_showPasscodeModal)
+    {
+        <div class="modal-backdrop" @onclick="() => _showPasscodeModal = false">
+            <div class="modal-card" @onclick:stopPropagation="true">
+                <div class="modal-title">Set a local passcode</div>
+                <p class="auth-subtitle" style="text-align:left;margin-bottom:16px">
+                    Next time you open Zapp in this browser, this short passcode unlocks the vault instead of your
+                    recovery password or phone code. Forgetting it just means signing in again the normal way.
+                </p>
+                <label class="field-label">New passcode</label>
+                <input class="input" type="password" @bind="_newPasscode" @bind:event="oninput" />
+                <label class="field-label">Confirm passcode</label>
+                <input class="input" type="password" @bind="_newPasscodeConfirm" @bind:event="oninput" />
+                @if (!string.IsNullOrEmpty(_passcodeError))
+                {
+                    <p class="error-text">@_passcodeError</p>
+                }
+                <div class="modal-actions">
+                    <button class="btn btn-ghost btn-sm" @onclick="() => _showPasscodeModal = false">Cancel</button>
+                    <button class="btn btn-primary btn-sm" @onclick="SavePasscodeAsync">Save</button>
+                </div>
+            </div>
+        </div>
+    }
+</div>
+
+@if (_showDevicesModal)
+{
+    <div class="modal-backdrop" @onclick="() => _showDevicesModal = false">
+        <div class="modal-card" @onclick:stopPropagation="true">
+            <div class="modal-title">Connected devices</div>
+            <p class="auth-subtitle" style="text-align:left">Read-only session list. Location and session controls are available in the Android app.</p>
+            @if (_devicesLoading)
+            {
+                <p class="status-text">Loading sessions…</p>
+            }
+            else if (_devices.Count == 0)
+            {
+                <p class="status-text">No devices are registered yet.</p>
+            }
+            else
+            {
+                @foreach (var device in _devices)
+                {
+                    var revoked = device.Fields.TryGetValue("revoked", out var state) && state is true;
+                    <div class="detail-field">
+                        <div class="detail-field-text">
+                            <div class="detail-field-label">@device.GetString("deviceName")</div>
+                            <div class="detail-field-value">@device.GetString("platform") · @device.GetString("appVersion") · @(revoked ? "Signed out" : "Active")</div>
+                        </div>
+                    </div>
+                }
+            }
+            <div class="modal-actions"><button class="btn btn-primary btn-sm" @onclick="() => _showDevicesModal = false">Close</button></div>
+        </div>
+    </div>
+}
+
+@if (_modalKind is not null)
+{
+    <div class="modal-backdrop" @onclick="CloseModal">
+        <div class="modal-card" @onclick:stopPropagation="true">
+            <div class="modal-title">@(_editing is null ? "Add" : "Edit") @_modalKind</div>
+
+            @if (_modalKind == ItemType.Password)
+            {
+                <label class="field-label">Platform</label>
+                <input class="input" @bind="_formPlatform" />
+                <label class="field-label">Username</label>
+                <input class="input" @bind="_formUsername" />
+                <label class="field-label">Password</label>
+                <input class="input" @bind="_formPassword" />
+                <label class="field-label">Website</label>
+                <input class="input" @bind="_formDomain" />
+                <label class="field-label">Category</label>
+                <input class="input" @bind="_formCategory" list="category-options" />
+                <label class="field-label">Notes</label>
+                <input class="input" @bind="_formNotes" />
+            }
+            else if (_modalKind == ItemType.Card)
+            {
+                <label class="field-label">Nickname</label>
+                <input class="input" @bind="_formPlatform" />
+                <label class="field-label">Card number</label>
+                <input class="input" @bind="_formNumber" />
+                <label class="field-label">Cardholder</label>
+                <input class="input" @bind="_formUsername" />
+                <label class="field-label">Expiry (MM/YY)</label>
+                <input class="input" @bind="_formDomain" />
+                <label class="field-label">CVV</label>
+                <input class="input" @bind="_formPassword" />
+                <label class="field-label">Category</label>
+                <input class="input" @bind="_formCategory" list="category-options" />
+            }
+            else if (_modalKind == ItemType.Totp)
+            {
+                <label class="field-label">Issuer</label>
+                <input class="input" @bind="_formPlatform" />
+                <label class="field-label">Account</label>
+                <input class="input" @bind="_formUsername" />
+                <label class="field-label">Secret (Base32)</label>
+                <input class="input" @bind="_formPassword" />
+            }
+
+            <datalist id="category-options">
+                @foreach (var c in Categories) { <option value="@c"></option> }
+            </datalist>
+
+            @if (!string.IsNullOrEmpty(_modalError))
+            {
+                <p class="error-text">@_modalError</p>
+            }
+
+            <div class="modal-actions">
+                <button class="btn btn-ghost btn-sm" @onclick="CloseModal">Cancel</button>
+                <button class="btn btn-primary btn-sm" disabled="@_busy" @onclick="SaveModalAsync">Save</button>
+            </div>
+        </div>
+    </div>
+}
+
+@code {
+    public enum ItemType { Password, Card, Totp }
+
+    public sealed class VaultListItem
+    {
+        public required ItemType Type { get; init; }
+        public required string Title { get; init; }
+        public required string Subtitle { get; init; }
+        public string? Domain { get; init; }
+        public string? Category { get; init; }
+        public PasswordItem? Password { get; init; }
+        public CardItem? Card { get; init; }
+        public TotpItem? Totp { get; init; }
+    }
+
+    private List<PasswordItem> _passwords = new();
+    private List<CardItem> _cards = new();
+    private List<TotpItem> _totps = new();
+    private VaultListItem? _selected;
+    private bool _offline;
+    private bool _busy;
+    private bool _showSecret;
+    private bool _showCvv;
+    private bool _showProfileMenu;
+    private bool _showDevicesModal;
+    private bool _devicesLoading;
+    private List<Zapp.Cloud.FirestoreDocument> _devices = new();
+    private string _search = "";
+    private ItemType? _filterType;
+    private string? _filterCategory;
+    private string _otpCode = "------";
+    private System.Threading.Timer? _otpTimer;
+
+    private ItemType? _modalKind;
+    private object? _editing;
+    private string _formPlatform = "", _formUsername = "", _formPassword = "", _formDomain = "", _formCategory = "", _formNotes = "", _formNumber = "";
+    private string? _modalError;
+
+    private string ProfileInitial => (AppState.SessionHolder?.Email ?? "?").Trim() is { Length: > 0 } email ? email[0].ToString().ToUpper() : "?";
+    private int TotalCount => _passwords.Count + _cards.Count + _totps.Count;
+
+    private List<string> Categories =>
+        _passwords.Select(p => p.Category).Concat(_cards.Select(c => c.Category)).Concat(_totps.Select(t => ""))
+            .Where(c => !string.IsNullOrWhiteSpace(c)).Distinct().OrderBy(c => c).ToList()!;
+
+    private IEnumerable<VaultListItem> AllItems
+    {
+        get
+        {
+            foreach (var p in _passwords)
+                yield return new VaultListItem { Type = ItemType.Password, Title = p.Platform, Subtitle = p.Username, Domain = p.Domain, Category = p.Category, Password = p };
+            foreach (var c in _cards)
+                yield return new VaultListItem { Type = ItemType.Card, Title = string.IsNullOrWhiteSpace(c.Nickname) ? c.Brand : c.Nickname, Subtitle = c.MaskedNumber, Domain = null, Category = c.Category, Card = c };
+            foreach (var t in _totps)
+                yield return new VaultListItem { Type = ItemType.Totp, Title = t.Issuer, Subtitle = t.AccountName, Domain = null, Category = null, Totp = t };
+        }
+    }
+
+    private IEnumerable<VaultListItem> FilteredItems =>
+        AllItems
+            .Where(i => _filterType is null || i.Type == _filterType)
+            .Where(i => _filterCategory is null || i.Category == _filterCategory)
+            .Where(i => string.IsNullOrWhiteSpace(_search) ||
+                        i.Title.Contains(_search, StringComparison.OrdinalIgnoreCase) ||
+                        i.Subtitle.Contains(_search, StringComparison.OrdinalIgnoreCase));
+
+    private string HeaderTitle => _filterCategory ?? _filterType switch
+    {
+        ItemType.Password => "Passwords",
+        ItemType.Card => "Cards",
+        ItemType.Totp => "Authenticator",
+        _ => "All items"
+    };
+
+    protected override async Task OnInitializedAsync()
+    {
+        if (AppState.Repository is null || AppState.Cipher is null)
+        {
+            Nav.NavigateTo("/");
+            return;
+        }
+        await LoadAsync();
+    }
+
+    private async Task LoadAsync()
+    {
+        try
+        {
+            _passwords = await AppState.Repository!.GetPasswordsAsync(AppState.Cipher!);
+            _cards = await AppState.Repository!.GetCardsAsync(AppState.Cipher!);
+            _totps = await AppState.Repository!.GetTotpsAsync(AppState.Cipher!);
+            _offline = false;
+            await CacheOfflineSnapshotAsync();
+            _ = AppState.Repository!.RefreshCountsAsync(AppState.Cipher!, _passwords.Count, _cards.Count, _totps.Count);
+        }
+        catch
+        {
+            _offline = true;
+            await LoadOfflineSnapshotAsync();
+        }
+    }
+
+    private async Task CacheOfflineSnapshotAsync()
+    {
+        try
+        {
+            var snapshot = System.Text.Json.JsonSerializer.Serialize(new { _passwords, _cards, _totps });
+            await JS.InvokeVoidAsync("localStorage.setItem", "zpassOfflineSnapshot", snapshot);
+        }
+        catch { /* best effort */ }
+    }
+
+    private async Task LoadOfflineSnapshotAsync()
+    {
+        try
+        {
+            var json = await JS.InvokeAsync<string?>("localStorage.getItem", "zpassOfflineSnapshot");
+            if (string.IsNullOrEmpty(json)) return;
+            using var doc = System.Text.Json.JsonDocument.Parse(json);
+            _passwords = System.Text.Json.JsonSerializer.Deserialize<List<PasswordItem>>(doc.RootElement.GetProperty("_passwords").GetRawText()) ?? new();
+            _cards = System.Text.Json.JsonSerializer.Deserialize<List<CardItem>>(doc.RootElement.GetProperty("_cards").GetRawText()) ?? new();
+            _totps = System.Text.Json.JsonSerializer.Deserialize<List<TotpItem>>(doc.RootElement.GetProperty("_totps").GetRawText()) ?? new();
+        }
+        catch { /* nothing cached yet */ }
+    }
+
+    private void SelectAll() { _filterType = null; _filterCategory = null; }
+    private async Task OpenDevicesAsync()
+    {
+        _showProfileMenu = false;
+        _showDevicesModal = true;
+        _devicesLoading = true;
+        _devices.Clear();
+        try
+        {
+            var uid = AppState.SessionHolder?.Uid;
+            if (!string.IsNullOrWhiteSpace(uid) && AppState.Firestore is not null)
+                _devices = await AppState.Firestore.ListDocumentsAsync($"users/{uid}/sessionDirectory");
+        }
+        catch { /* keep the modal read-only and report an empty list on transient errors */ }
+        finally { _devicesLoading = false; }
+    }
+    private void SelectType(ItemType type) { _filterType = type; _filterCategory = null; }
+    private void SelectCategory(string category) { _filterCategory = category; _filterType = null; }
+
+    private void Select(VaultListItem item)
+    {
+        _selected = item;
+        _showSecret = false;
+        _showCvv = false;
+        _otpTimer?.Dispose();
+        _otpTimer = null;
+        if (item.Type == ItemType.Totp && item.Totp is not null)
+        {
+            TickOtp(item.Totp);
+            _otpTimer = new System.Threading.Timer(_ => InvokeAsync(() => { TickOtp(item.Totp); StateHasChanged(); }), null, 1000, 1000);
+        }
+    }
+
+    private void TickOtp(TotpItem totp)
+    {
+        try { _otpCode = TotpEngine.CodeForSecret(totp.Secret, totp.Algorithm, totp.Digits, totp.Period); }
+        catch { _otpCode = "------"; }
+    }
+
+    private static string Initial(string title) => title.Length > 0 ? title[..1].ToUpper() : "?";
+
+    private static string FaviconUrl(string domain) =>
+        $"https://www.google.com/s2/favicons?domain={Uri.EscapeDataString(domain)}&sz=64";
+
+    private static string NormalizeUrl(string domain) =>
+        domain.StartsWith("http://") || domain.StartsWith("https://") ? domain : $"https://{domain}";
+
+    private async Task CopyAsync(string text)
+    {
+        try { await JS.InvokeVoidAsync("navigator.clipboard.writeText", text); } catch { /* clipboard permission denied */ }
+    }
+
+    private RenderFragment Field(string label, string value, bool copyable) => builder =>
+    {
+        builder.OpenElement(0, "div"); builder.AddAttribute(1, "class", "detail-field");
+        builder.OpenElement(2, "div"); builder.AddAttribute(3, "class", "detail-field-text");
+        builder.OpenElement(4, "div"); builder.AddAttribute(5, "class", "detail-field-label"); builder.AddContent(6, label); builder.CloseElement();
+        builder.OpenElement(7, "div"); builder.AddAttribute(8, "class", "detail-field-value"); builder.AddContent(9, value); builder.CloseElement();
+        builder.CloseElement();
+        if (copyable)
+        {
+            builder.OpenElement(10, "div"); builder.AddAttribute(11, "class", "detail-field-actions");
+            builder.OpenElement(12, "button"); builder.AddAttribute(13, "class", "icon-btn");
+            builder.AddAttribute(14, "onclick", Microsoft.AspNetCore.Components.EventCallback.Factory.Create(this, () => CopyAsync(value)));
+            builder.AddContent(15, "⧉");
+            builder.CloseElement();
+            builder.CloseElement();
+        }
+        builder.CloseElement();
+    };
+
+    private RenderFragment SecretField(string label, string value, Action toggle, bool shown) => builder =>
+    {
+        builder.OpenElement(0, "div"); builder.AddAttribute(1, "class", "detail-field");
+        builder.OpenElement(2, "div"); builder.AddAttribute(3, "class", "detail-field-text");
+        builder.OpenElement(4, "div"); builder.AddAttribute(5, "class", "detail-field-label"); builder.AddContent(6, label); builder.CloseElement();
+        builder.OpenElement(7, "div"); builder.AddAttribute(8, "class", "detail-field-value");
+        builder.AddContent(9, shown ? value : new string('•', Math.Max(6, value.Length)));
+        builder.CloseElement();
+        builder.CloseElement();
+        builder.OpenElement(10, "div"); builder.AddAttribute(11, "class", "detail-field-actions");
+        builder.OpenElement(12, "button"); builder.AddAttribute(13, "class", "icon-btn");
+        builder.AddAttribute(14, "onclick", Microsoft.AspNetCore.Components.EventCallback.Factory.Create(this, toggle));
+        builder.AddContent(15, shown ? "🙈" : "👁");
+        builder.CloseElement();
+        builder.OpenElement(16, "button"); builder.AddAttribute(17, "class", "icon-btn");
+        builder.AddAttribute(18, "onclick", Microsoft.AspNetCore.Components.EventCallback.Factory.Create(this, () => CopyAsync(value)));
+        builder.AddContent(19, "⧉");
+        builder.CloseElement();
+        builder.CloseElement();
+        builder.CloseElement();
+    };
+
+    private void OpenAddModal()
+    {
+        _editing = null;
+        _modalKind = _filterType ?? ItemType.Password;
+        _formPlatform = _formUsername = _formPassword = _formDomain = _formCategory = _formNotes = _formNumber = "";
+        _modalError = null;
+    }
+
+    private void OpenEditModal(VaultListItem item)
+    {
+        _modalKind = item.Type;
+        _modalError = null;
+        switch (item.Type)
+        {
+            case ItemType.Password when item.Password is not null:
+                _editing = item.Password;
+                _formPlatform = item.Password.Platform; _formUsername = item.Password.Username; _formPassword = item.Password.Password;
+                _formDomain = item.Password.Domain; _formCategory = item.Password.Category; _formNotes = item.Password.Notes;
+                break;
+            case ItemType.Card when item.Card is not null:
+                _editing = item.Card;
+                _formPlatform = item.Card.Nickname; _formNumber = item.Card.Number; _formUsername = item.Card.Cardholder;
+                _formDomain = item.Card.Expiry; _formPassword = item.Card.Cvv; _formCategory = item.Card.Category;
+                break;
+            case ItemType.Totp when item.Totp is not null:
+                _editing = item.Totp;
+                _formPlatform = item.Totp.Issuer; _formUsername = item.Totp.AccountName; _formPassword = item.Totp.Secret;
+                break;
+        }
+    }
+
+    private void CloseModal() { _modalKind = null; _editing = null; }
+
+    private async Task SaveModalAsync()
+    {
+        if (_offline) { _modalError = "You're offline — editing is disabled."; return; }
+        _busy = true;
+        _modalError = null;
+        try
+        {
+            switch (_modalKind)
+            {
+                case ItemType.Password:
+                    var pw = (PasswordItem?)_editing ?? new PasswordItem();
+                    pw.Platform = _formPlatform.Trim(); pw.Username = _formUsername.Trim(); pw.Password = _formPassword;
+                    pw.Domain = _formDomain.Trim(); pw.Category = _formCategory.Trim(); pw.Notes = _formNotes;
+                    if (pw.Platform.Length == 0) { _modalError = "Platform is required."; return; }
+                    await AppState.Repository!.SavePasswordAsync(AppState.Cipher!, pw);
+                    break;
+                case ItemType.Card:
+                    var card = (CardItem?)_editing ?? new CardItem();
+                    card.Nickname = _formPlatform.Trim(); card.Number = _formNumber.Trim(); card.Cardholder = _formUsername.Trim();
+                    card.Expiry = _formDomain.Trim(); card.Cvv = _formPassword.Trim(); card.Category = _formCategory.Trim();
+                    if (card.Number.Length == 0) { _modalError = "Card number is required."; return; }
+                    await AppState.Repository!.SaveCardAsync(AppState.Cipher!, card);
+                    break;
+                case ItemType.Totp:
+                    var totp = (TotpItem?)_editing ?? new TotpItem();
+                    totp.Issuer = _formPlatform.Trim(); totp.AccountName = _formUsername.Trim(); totp.Secret = _formPassword.Trim().Replace(" ", "").ToUpperInvariant();
+                    if (totp.Issuer.Length == 0 || totp.Secret.Length < 16) { _modalError = "Issuer is required and the secret must be at least 16 characters."; return; }
+                    await AppState.Repository!.SaveTotpAsync(AppState.Cipher!, totp);
+                    break;
+            }
+            CloseModal();
+            await LoadAsync();
+        }
+        catch (Exception ex)
+        {
+            _modalError = $"Could not save: {ex.Message}";
+        }
+        finally
+        {
+            _busy = false;
+        }
+    }
+
+    private async Task DeleteSelectedAsync()
+    {
+        if (_selected is null || _offline) return;
+        try
+        {
+            switch (_selected.Type)
+            {
+                case ItemType.Password when _selected.Password is not null:
+                    await AppState.Repository!.DeletePasswordAsync(_selected.Password.DocId);
+                    break;
+                case ItemType.Card when _selected.Card is not null:
+                    await AppState.Repository!.DeleteCardAsync(_selected.Card.DocId);
+                    break;
+                case ItemType.Totp when _selected.Totp is not null:
+                    await AppState.Repository!.DeleteTotpAsync(_selected.Totp.DocId);
+                    break;
+            }
+            _selected = null;
+            await LoadAsync();
+        }
+        catch { /* ignore */ }
+    }
+
+    private bool _showPasscodeModal;
+    private string _newPasscode = "", _newPasscodeConfirm = "";
+    private string? _passcodeError;
+
+    private void OpenPasscodeModal()
+    {
+        _showProfileMenu = false;
+        _showPasscodeModal = true;
+        _newPasscode = _newPasscodeConfirm = "";
+        _passcodeError = null;
+    }
+
+    private async Task SavePasscodeAsync()
+    {
+        if (_newPasscode.Length < 4) { _passcodeError = "Use at least 4 characters."; return; }
+        if (_newPasscode != _newPasscodeConfirm) { _passcodeError = "Passcodes don't match."; return; }
+        if (AppState.SessionHolder is null || AppState.RecoveryPassword is null) { _passcodeError = "Session not ready."; return; }
+
+        await PasscodeStore.SaveAsync(_newPasscode, AppState.SessionHolder.RefreshToken, AppState.SessionHolder.Email, AppState.RecoveryPassword);
+        _showPasscodeModal = false;
+    }
+
+    private async Task SignOut()
+    {
+        await PasscodeStore.ClearAsync();
+        AppState.Clear();
+        Nav.NavigateTo("/");
+    }
+}

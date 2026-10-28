@@ -1,0 +1,12 @@
+/* Z Pass 4.11: lightweight shared blue/violet palette. */
+:root{color-scheme:dark!important;--bg:#0b1220!important;--bg-1:#142035!important;--bg-2:#1d2c45!important;--panel:rgba(20,32,53,.96)!important;--panel-strong:#1d2c45!important;--line:#35465e!important;--text:#f8fafc!important;--muted:#a8b8cf!important;--accent:#60a5fa!important;--accent-bright:#93c5fd!important;--accent-strong:#93c5fd!important;--blue:#60a5fa!important;--cyan:#67e8f9!important;--purple:#a78bfa!important;--green:#4ade80!important;--a1:#60a5fa!important}
+body{font-family:Inter,"Segoe UI Variable","Segoe UI",system-ui,sans-serif!important;background:#0b1220!important;color:#f8fafc!important}
+button,input,select,textarea{font:inherit}
+body:before,body:after,.ambient{display:none!important}
+.topbar{background:rgba(20,32,53,.95)!important;border-bottom:1px solid #35465e!important}
+.card,.panel,.vault-card,.auth-card,.recovery-dialog{border-radius:20px!important;border-color:#35465e!important;box-shadow:0 8px 28px rgba(0,0,0,.16)!important}
+button:focus-visible,a:focus-visible,input:focus-visible{outline:2px solid #93c5fd!important;outline-offset:3px}
+@media(max-width:720px){.card,.panel,.vault-card,.auth-card{border-radius:16px!important}*{backdrop-filter:none!important;will-change:auto!important}}
+@media(prefers-reduced-motion:reduce){*,*:before,*:after{animation:none!important;transition:none!important;scroll-behavior:auto!important}}
+
+.auth-card,.price-card,.demo-card,.item-drawer,.panel,.vault-card{background:linear-gradient(135deg,rgba(29,44,69,.98),rgba(20,32,53,.96))!important;border:1px solid #35465e!important}

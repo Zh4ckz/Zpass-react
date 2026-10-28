@@ -1,0 +1,25 @@
+{
+    "platforms":  {
+                      "android":  {
+                                      "published":  true,
+                                      "publisher":  "Z Pass",
+                                      "version":  "4.15",
+                                      "versionCode":  42,
+                                      "releasedAt":  "2026-10-28T06:01:49Z",
+                                      "downloadUrl":  "",
+                                      "sha256":  "5fb42cac5d6f255a6ea21f0fd2a4daabc1e80ae67910595914244d922b4de0da",
+                                      "sizeBytes":  95169367,
+                                      "signingCertificate":  "CN=Zh4ckz, OU=Zh4ckz, O=Zh4ckz, L=Pennsylvania, ST=Pennsylvania, C=US",
+                                      "signingCertificateSha256":  "3f7673eb7bd222e77dabab5eb0708b490dacc7eada5f8e254032dd8473359f47",
+                                      "availabilityNote":  "This signed release is verified, but direct APK downloads are temporarily unavailable on this Firebase Hosting plan.",
+                                      "downloadAvailable":  false
+                                  },
+                      "windows":  {
+                                      "version":  "4.11.0",
+                                      "releasedAt":  "2026-10-20T20:53:37Z",
+                                      "downloadUrl":  "",
+                                      "sha256":  "721dd3d1b889b44545ce4fe7ef681be8882c39e9d25f6dfcaa76a0306b285fdf",
+                                      "sizeBytes":  144366201
+                                  }
+                  }
+}

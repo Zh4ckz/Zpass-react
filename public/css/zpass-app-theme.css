@@ -1,0 +1,128 @@
+/* Z Pass unified theme: same palette as the Android app dark theme. Loaded last on every page. */
+:root {
+  color-scheme: dark;
+  --zp-bg: #0F172A;
+  --zp-card: #262626;
+  --zp-card-2: #303030;
+  --zp-line: rgba(245, 245, 245, 0.10);
+  --zp-text: #F5F5F5;
+  --zp-muted: #94A3B8;
+  --zp-accent: #94A3B8;
+  --zp-accent-strong: #CBD5E1;
+
+  --bg: var(--zp-bg);
+  --panel: var(--zp-card);
+  --panel2: var(--zp-card-2);
+  --panel-raised: var(--zp-card-2);
+  --card: var(--zp-card);
+  --line: var(--zp-line);
+  --border: var(--zp-line);
+  --text: var(--zp-text);
+  --tx: var(--zp-text);
+  --muted: var(--zp-muted);
+  --mu: var(--zp-muted);
+  --accent: var(--zp-accent);
+  --accent-bright: var(--zp-accent-strong);
+  --accent-soft: rgba(148, 163, 184, 0.14);
+  --ac: var(--zp-accent);
+  --ac2: var(--zp-accent-strong);
+  --blue: var(--zp-accent);
+  --cyan: var(--zp-accent-strong);
+  --purple: var(--zp-accent);
+  --purple2: var(--zp-accent-strong);
+  --green: var(--zp-accent);
+  --a1: var(--zp-accent);
+  --a2: var(--zp-accent-strong);
+  --a3: var(--zp-accent);
+  --desktop-bg: var(--zp-bg);
+  --desktop-surface: var(--zp-card);
+  --desktop-line: var(--zp-line);
+  --desktop-muted: var(--zp-muted);
+  --desktop-blue: var(--zp-accent);
+  --glass-neon: var(--zp-accent);
+  --glass-neon-glow: rgba(148, 163, 184, 0.35);
+  --glass-card-bg: rgba(38, 38, 38, 0.85);
+}
+
+html,
+body {
+  background: var(--zp-bg) !important;
+  color: var(--zp-text) !important;
+}
+
+body::before,
+body::after,
+.ambient,
+.ambient-one,
+.ambient-two,
+.ambient-three {
+  background: none !important;
+  opacity: 0 !important;
+}
+
+/* No glow / neon / gradient backdrops */
+.hero:before,.final-cta,.tools-section,.plan-card.featured{background:none !important}
+.final-cta{background:none !important}
+body{background-image:none !important}
+.btn.primary{box-shadow:none !important;background:#94A3B8 !important}
+.btn.primary:hover{background:#A9B6C8 !important}
+.vault-preview,.plan-card.selected,.badge i{box-shadow:none !important}
+.glass-card{background:#171c25 !important}
+*{text-shadow:none !important}
+
+/* Theme: light is the default, dark via html[data-theme="dark"]. Light mode inverts the dark palette. */
+html[data-theme="light"]{filter:invert(1) hue-rotate(180deg)}
+html[data-theme="light"] img,html[data-theme="light"] video,html[data-theme="light"] picture,html[data-theme="light"] iframe,html[data-theme="light"] canvas{filter:invert(1) hue-rotate(180deg)}
+html[data-theme="light"] .lf-social img,html[data-theme="light"] .footer-community img{filter:none}
+#zpThemeToggle{display:inline-flex;align-items:center;justify-content:center;width:38px;height:38px;border-radius:12px;border:1px solid rgba(245,245,245,.18);background:rgba(245,245,245,.06);color:#F5F5F5;cursor:pointer;padding:0;flex:0 0 auto}
+#zpThemeToggle:hover{background:rgba(245,245,245,.14)}
+#zpThemeToggle svg{width:19px;height:19px;fill:none;stroke:currentColor;stroke-width:2;stroke-linecap:round;stroke-linejoin:round}
+#zpThemeToggle.floating{position:fixed;right:14px;bottom:14px;z-index:9999;background:#262626}
+html[data-theme="light"]{--zp-bg:#000;--bg:#000;--desktop-bg:#000}
+html[data-theme="light"] .landing-nav,html[data-theme="light"] header{background-color:rgba(0,0,0,.85)}
+
+/* Light palette (values are pre-filter): text navy, muted slate, navy buttons with white text */
+html[data-theme="light"]{--zp-card:#070B0F;--zp-card-2:#0B1015;--zp-line:#12182099;--zp-text:#CDD8EA;--zp-muted:#7F8FA6;--zp-accent:#E1E9FC;--zp-accent-strong:#CDD8EA;--text:#CDD8EA;--tx:#CDD8EA;--muted:#7F8FA6;--mu:#7F8FA6;--card:#070B0F;--panel:#070B0F;--line:#121820;--border:#121820;--brand:#E1E9FC;--accent:#E1E9FC}
+html[data-theme="light"] body{color:#CDD8EA !important}
+html[data-theme="light"] h1,html[data-theme="light"] h2,html[data-theme="light"] h3,html[data-theme="light"] h4,html[data-theme="light"] .brand{color:#E1E9FC !important}
+html[data-theme="light"] .gradient{background:none !important;-webkit-text-fill-color:#E1E9FC !important;color:#E1E9FC !important}
+html[data-theme="light"] .btn.primary,html[data-theme="light"] a.btn.primary{background:#E1E9FC !important;color:#000 !important;border-color:#E1E9FC !important}
+html[data-theme="light"] .btn.primary:hover{background:#B3C1D5 !important}
+html[data-theme="light"] .btn:not(.primary){color:#E1E9FC;background:#070B0F;border-color:#121820}
+
+
+/* section separators */
+.separator{position:relative;width:min(1160px,calc(100% - 40px));height:1px;margin:clamp(20px,4vw,44px) auto;background:linear-gradient(90deg,transparent,rgba(127,143,166,.38) 12%,rgba(127,143,166,.38) 88%,transparent)}
+.separator em{position:absolute;inset:0;display:block;pointer-events:none}
+.separator em::before,.separator em::after{content:"";position:absolute;top:-6px;width:13px;height:13px;background:
+linear-gradient(rgba(127,143,166,.75),rgba(127,143,166,.75)) center/1px 100% no-repeat,
+linear-gradient(rgba(127,143,166,.75),rgba(127,143,166,.75)) center/100% 1px no-repeat}
+.separator em::before{left:-6px}.separator em::after{right:-6px}
+/* floating squircle header */
+.landing-nav{position:sticky!important;top:0!important;height:72px!important;min-height:0!important;border:0!important;background:none!important;-webkit-backdrop-filter:none!important;backdrop-filter:none!important;box-shadow:none!important;pointer-events:none;overflow:visible!important}
+.landing-nav .nav-inner{pointer-events:auto;position:relative;width:min(960px,calc(100% - 24px))!important;max-width:none!important;min-height:0!important;height:52px;margin:10px auto 0!important;padding:0 8px 0 16px!important;flex-wrap:nowrap!important;gap:12px!important;border-radius:22px;border:1px solid rgba(255,255,255,.14);background:linear-gradient(180deg,rgba(255,255,255,.10),rgba(255,255,255,.02)),rgba(14,18,25,.55);-webkit-backdrop-filter:blur(22px) saturate(180%);backdrop-filter:blur(22px) saturate(180%);box-shadow:0 10px 30px rgba(0,0,0,.32),inset 0 1px 0 rgba(255,255,255,.22);transition:transform .55s cubic-bezier(.3,1.15,.4,1),opacity .35s ease,background .3s,box-shadow .3s;will-change:transform}
+.landing-nav.is-scrolled .nav-inner{background:linear-gradient(180deg,rgba(255,255,255,.12),rgba(255,255,255,.03)),rgba(10,14,20,.72);box-shadow:0 14px 38px rgba(0,0,0,.42),inset 0 1px 0 rgba(255,255,255,.26)}
+.landing-nav.nav-hide .nav-inner{transform:translateY(calc(-100% - 24px)) scale(.96);opacity:0;pointer-events:none}
+.landing-nav .brand{font-size:15px!important;gap:8px!important}
+.landing-nav .brand img{width:24px!important;height:24px!important}
+.landing-nav .nav-actions{gap:8px!important;margin-inline-start:auto}
+.landing-nav .nav-actions .btn{padding:7px 14px!important;font-size:13px!important;border-radius:14px!important;min-height:0!important}
+.landing-nav .nav-actions .nav-signin{font-size:13px!important}
+.landing-nav .nav-actions #zpThemeToggle{width:34px!important;height:34px!important;border-radius:12px!important}
+.landing-nav .language-trigger{height:34px!important;padding:0 9px!important;border-radius:12px!important;gap:6px!important}
+.landing-nav .language-trigger .language-globe{width:16px!important;height:16px!important}
+.landing-nav .language-trigger .language-flag{width:22px!important;height:15px!important;border-radius:3px!important}
+@media(min-width:761px){
+.landing-nav nav{padding:3px!important;background:none!important;border:0!important;box-shadow:none!important;-webkit-backdrop-filter:none!important;backdrop-filter:none!important}
+.landing-nav nav a{padding:6px 13px!important;font-size:13px!important}
+.zp-pill{top:3px!important;bottom:3px!important}
+}
+@media(max-width:760px){.landing-nav{height:62px!important}.landing-nav .nav-inner{height:46px;padding:0 6px 0 12px!important}.landing-nav .nav-actions .nav-signin{display:none}.landing-nav nav{display:none!important}}
+@media(prefers-reduced-motion:reduce){.landing-nav .nav-inner{transition:none}}
+/* language picker: icon + label + arrow, no flags */
+.language-trigger{display:inline-flex!important;align-items:center!important;width:auto!important;gap:6px!important;padding:0 10px!important;color:inherit}
+.language-trigger .icon-language{width:18px;height:18px;flex:none}
+.language-trigger .icon-arrow{width:16px;height:16px;flex:none;opacity:.7}
+.language-trigger span{position:static!important;width:auto!important;height:auto!important;overflow:visible!important;clip-path:none!important;font-size:13px;font-weight:600;white-space:nowrap}
+.language-options button img{display:none!important}
+@media(max-width:760px){.language-trigger span{display:inline!important;max-width:84px;overflow:hidden!important;text-overflow:ellipsis}}

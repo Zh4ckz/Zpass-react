@@ -1,0 +1,376 @@
+rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+    function isAdmin() {
+      return request.auth != null && (request.auth.token.get('admin', false) == true || (request.auth.token.get('email_verified', false) == true && request.auth.token.get('email', '') == 'zh4ckz@proton.me'));
+    }
+
+    match /app_config/public { allow read: if true; allow write: if isAdmin(); }
+    match /app_config/turn { allow read: if request.auth != null; allow write: if isAdmin(); }
+    match /web_site_config/{configId} {
+      allow read: if configId == 'web_ads';
+      allow write: if false;
+    }
+    match /users/{userId} {
+      allow read: if (request.auth != null && request.auth.uid == userId) || isAdmin();
+      allow create: if request.auth != null && request.auth.uid == userId && !request.resource.data.keys().hasAny(['webLoginSecret']);
+      allow update: if request.auth != null && request.auth.uid == userId
+        && (!request.resource.data.keys().hasAny(['webLoginSecret']) || !request.resource.data.diff(resource.data).affectedKeys().hasAny(['webLoginSecret']));
+      allow delete: if false;
+      match /devices/{deviceId} {
+        allow read: if (request.auth != null && request.auth.uid == userId) || isAdmin();
+        allow create, update: if request.auth != null && request.auth.uid == userId
+          && request.resource.data.ownerUid == request.auth.uid
+          && request.resource.data.deviceId == deviceId;
+        allow delete: if false;
+      }
+      match /sessionDirectory/{deviceId} {
+        allow read: if (request.auth != null && request.auth.uid == userId) || isAdmin();
+        allow create, update: if request.auth != null && request.auth.uid == userId
+          && request.resource.data.ownerUid == request.auth.uid
+          && request.resource.data.deviceId == deviceId
+          && request.resource.data.keys().hasOnly(['deviceId','ownerUid','deviceName','platform','appVersion','lastSeenAt','revoked','revokedAt']);
+        allow delete: if false;
+      }
+      match /chatRecovery/{identityId} {
+        allow read: if request.auth != null && request.auth.uid == userId;
+        allow create, update: if request.auth != null && request.auth.uid == userId
+          && identityId == 'identity'
+          && request.resource.data.keys().hasOnly(['version','salt1','salt2','ciphertext','updatedAt'])
+          && request.resource.data.version == 1
+          && request.resource.data.salt1 is string && request.resource.data.salt1.size() <= 128
+          && request.resource.data.salt2 is string && request.resource.data.salt2.size() <= 128
+          && request.resource.data.ciphertext is string && request.resource.data.ciphertext.size() <= 8192
+          && request.resource.data.updatedAt == request.time;
+        allow delete: if false;
+      }
+    }
+    match /subscriptions/{userId} {
+      allow read: if (request.auth != null && request.auth.uid == userId) || isAdmin();
+      allow write: if isAdmin();
+    }
+    match /loginRequests/{requestId} {
+      allow create: if request.auth != null
+        && request.auth.uid == request.resource.data.uid
+        && request.resource.data.status == 'pending'
+        && request.resource.data.purpose in ['LOGIN', 'CHAT_PAIR', 'CARD_VIEW']
+        && request.resource.data.createdAt is timestamp
+        && request.resource.data.createdAt >= request.time - duration.value(10, 's')
+        && request.resource.data.createdAt <= request.time + duration.value(5, 's')
+        && request.resource.data.displayCode is string && request.resource.data.displayCode.matches('[0-9]{2}')
+        && request.resource.data.candidateCodes is string && request.resource.data.candidateCodes.matches('[0-9]{2},[0-9]{2},[0-9]{2}')
+        && request.resource.data.keys().hasOnly(['uid','purpose','cardId','deviceLabel','accountEmail','accountName','locationLabel','locationKind','displayCode','candidateCodes','status','createdAt','expiresAt','protocolVersion','requestPublicKey'])
+        && !request.resource.data.keys().hasAny(['wrapKey'])
+        && (request.resource.data.purpose == 'CARD_VIEW' || (request.resource.data.protocolVersion == 2 && request.resource.data.requestPublicKey is string && request.resource.data.requestPublicKey.size() <= 256));
+      allow read: if request.auth != null && request.auth.uid == resource.data.uid;
+      allow update: if request.auth != null
+        && request.auth.uid == resource.data.uid
+        && resource.data.status == 'pending'
+        && request.resource.data.status in ['approved', 'denied']
+        && (request.resource.data.status == 'denied' ||
+          (resource.data.createdAt is timestamp && request.time < resource.data.createdAt + duration.value(60, 's')))
+        && request.resource.data.diff(resource.data).affectedKeys()
+          .hasOnly(['status', 'approvedSecretEnc', 'responsePublicKey', 'respondedAt']);
+      allow delete: if request.auth != null && request.auth.uid == resource.data.uid;
+    }
+    match /crypto_payment_requests/{requestId} {
+      allow create: if request.auth != null
+        && request.resource.data.uid == request.auth.uid
+        && request.resource.data.zPassId is string
+        && request.resource.data.txId is string
+        && request.resource.data.txId.size() >= 8
+        && request.resource.data.status == 'PENDING'
+        && request.resource.data.plan in ['Monthly', 'Yearly']
+        && request.resource.data.keys().hasOnly(['uid','zPassId','plan','amountUsd','network','symbol','walletAddress','txId','status','createdAt']);
+      allow read: if (request.auth != null && resource.data.uid == request.auth.uid) || isAdmin();
+      allow update, delete: if isAdmin();
+    }
+    match /subscription_change_requests/{requestId} {
+      allow create: if request.auth != null
+        && request.resource.data.ownerUid == request.auth.uid
+        && request.resource.data.ownerZpId is string
+        && request.resource.data.ownerZpId.size() == 13
+        && request.resource.data.type in ['CHANGE_PLAN','CANCEL','ADD_FAMILY_MEMBER','REMOVE_FAMILY_MEMBER']
+        && (request.resource.data.type != 'CHANGE_PLAN' || request.resource.data.plan in ['PLUS','PRO'])
+        && request.resource.data.status == 'PENDING'
+        && request.resource.data.keys().hasOnly(['ownerUid','ownerZpId','type','plan','billing','target','status','createdAt']);
+      allow read: if (request.auth != null && resource.data.ownerUid == request.auth.uid) || isAdmin();
+      allow update, delete: if isAdmin();
+    }
+    match /vaults/{userId} {
+      allow read, create: if request.auth != null && request.auth.uid == userId;
+      allow update: if request.auth != null && request.auth.uid == userId
+        && (!('recoveryKeyCheck' in resource.data) || !request.resource.data.diff(resource.data).affectedKeys().hasAny(['encryption','recoverySalt','recoverySalt2','recoveryKeyCheck','kdf']));
+      allow delete: if false;
+      match /{collectionId}/{documentId} {
+        allow read, create, update: if request.auth != null && request.auth.uid == userId;
+        allow delete: if request.auth != null && request.auth.uid == userId
+          && !(collectionId in ['portableItems','portableCards','portableAuthenticators']);
+      }
+    }
+
+    match /error_reports/{reportId} {
+      allow create: if request.auth != null && reportId == request.auth.uid && request.resource.data.uid == request.auth.uid
+        && getAfter(/databases/$(database)/documents/error_report_limits/$(request.auth.uid)).data.lastReportAt == request.time
+        && (!exists(/databases/$(database)/documents/error_report_limits/$(request.auth.uid)) || request.time >= get(/databases/$(database)/documents/error_report_limits/$(request.auth.uid)).data.lastReportAt + duration.value(300, 's'))
+        && request.resource.data.platform in ['android','windows','web']
+        && request.resource.data.version == '4.11'
+        && request.resource.data.code is string && request.resource.data.code.matches('[A-Z0-9_]{1,64}')
+        && request.resource.data.operation is string && request.resource.data.operation.matches('[a-zA-Z0-9_.-]{1,80}')
+        && request.resource.data.createdAt == request.time
+        && request.resource.data.keys().hasOnly(['uid','platform','version','code','operation','createdAt']);
+      allow read: if isAdmin();
+      allow update, delete: if false;
+    }
+
+    match /error_report_limits/{uid} {
+      allow read: if request.auth != null && request.auth.uid == uid;
+      allow create, update: if request.auth != null && request.auth.uid == uid
+        && request.resource.data.keys().hasOnly(['lastReportAt'])
+        && request.resource.data.lastReportAt == request.time
+        && getAfter(/databases/$(database)/documents/error_reports/$(uid)).data.createdAt == request.time
+        && (!exists(/databases/$(database)/documents/error_report_limits/$(uid)) || request.time >= resource.data.lastReportAt + duration.value(300, 's'));
+      allow delete: if false;
+    }
+    match /products/{productId} { allow read: if true; allow write: if isAdmin(); }
+    match /orders/{orderId} { allow read: if isAdmin() || (request.auth != null && resource.data.get('uid', '') == request.auth.uid); allow write: if isAdmin(); }
+    match /licenseKeys/{keyId} { allow read: if isAdmin() || (request.auth != null && resource.data.get('uid', '') == request.auth.uid); allow write: if isAdmin(); }
+    match /logs/{logId} { allow read, write: if isAdmin(); }
+    match /vault_files/{fileId} { allow read: if isAdmin() || (request.auth != null && resource.data.get('uid', '') == request.auth.uid); allow write: if isAdmin(); }
+    match /worldcup_chat/{chatId} { allow read, write: if isAdmin(); }
+    match /worldcup_chat_mutes/{muteId} { allow read, write: if isAdmin(); }
+    match /worldcup_stats/{document=**} { allow read: if true; allow write: if isAdmin(); }
+    match /match_viewers/{viewerId} { allow read, write: if isAdmin(); }
+    match /devices/{deviceId} { allow read: if isAdmin() || (request.auth != null && resource.data.get('uid', '') == request.auth.uid); allow write: if isAdmin(); }
+    match /config/{docId} { allow read: if true; allow write: if isAdmin(); }
+    match /webtv_channels/{channelId} { allow read: if true; allow write: if isAdmin(); }
+    match /match_servers/{serverId} { allow read: if true; allow write: if isAdmin(); }
+    match /settings/{docId} { allow read: if true; allow write: if isAdmin(); }
+      match /web_checkout_requests/{requestId} {
+      allow create: if request.auth != null
+        && request.resource.data.uid == request.auth.uid
+        && request.resource.data.status == 'PENDING'
+        && request.resource.data.createdAt == request.time
+        && request.resource.data.productId in ['zpass_plus_monthly','zpass_plus_yearly','zpass_pro_monthly','zpass_pro_yearly']
+        && request.resource.data.provider in ['STRIPE','NOWPAYMENTS']
+        && request.resource.data.coin is string && request.resource.data.coin.size() <= 32
+        && request.resource.data.origin in ['https://zpass.web.app','http://localhost:4178','http://127.0.0.1:4178']
+        && request.resource.data.keys().hasOnly(['uid','productId','provider','coin','origin','status','createdAt']);
+      allow read: if request.auth != null && request.auth.uid == resource.data.uid;
+      allow update, delete: if false;
+    }
+
+    match /chat_profiles/{uid} {
+      allow read: if request.auth != null;
+      allow create, update: if request.auth != null && request.auth.uid == uid
+        && !("verified" in request.resource.data);
+    }
+
+    match /chat_contacts/{owner}/members/{viewer} {
+      allow read: if request.auth != null && (request.auth.uid == owner || request.auth.uid == viewer);
+      allow write: if request.auth != null && request.auth.uid == owner;
+    }
+
+    match /chat_media_profiles/{uid} {
+      allow read: if request.auth != null;
+      allow create, update: if request.auth != null && request.auth.uid == uid
+        && request.resource.size() < 400000;
+      allow delete: if request.auth != null && request.auth.uid == uid;
+    }
+
+    match /chat_wallet/{uid} {
+      allow read: if request.auth != null && request.auth.uid == uid;
+      allow create: if request.auth != null && request.auth.uid == uid
+        && request.resource.data.get('claimed', 0) <= 50
+        && request.resource.data.get('sent', 0) <= 1000;
+      allow update: if request.auth != null && request.auth.uid == uid && (
+        (request.resource.data.claimed > resource.data.get('claimed', 0)
+          && request.resource.data.claimed - resource.data.get('claimed', 0) <= 50
+          && request.time > resource.data.get('lastClaim', timestamp.value(0)) + duration.value(20, 'h')
+          && request.resource.data.lastClaim == request.time
+          && request.resource.data.get('sent', 0) == resource.data.get('sent', 0))
+        || (request.resource.data.get('sent', 0) > resource.data.get('sent', 0)
+          && request.resource.data.get('sent', 0) - resource.data.get('sent', 0) <= 1000
+          && request.resource.data.get('claimed', 0) == resource.data.get('claimed', 0)
+          && request.resource.data.get('lastClaim', timestamp.value(0)) == resource.data.get('lastClaim', timestamp.value(0)))
+      );
+      match /gifts/{gid} {
+        allow read: if request.auth != null && request.auth.uid == uid;
+        allow create: if request.auth != null && request.auth.uid != uid
+          && request.resource.data.from == request.auth.uid
+          && request.resource.data.amount is int
+          && request.resource.data.amount >= 1 && request.resource.data.amount <= 1000
+          && request.resource.data.at == request.time;
+      }
+    }
+
+    match /chat_usernames/{name} {
+      allow read: if request.auth != null;
+      allow create: if request.auth != null && request.resource.data.uid == request.auth.uid;
+      allow update: if request.auth != null && resource.data.uid == request.auth.uid && request.resource.data.uid == request.auth.uid;
+      allow delete: if request.auth != null && resource.data.uid == request.auth.uid;
+    }
+
+    match /chat_groups/{gid} {
+      function me() { return request.auth.uid; }
+      function isMember(d) { return me() in d.members; }
+      function isAdmin(d) { return me() in d.admins; }
+      allow get: if request.auth != null && (resource.data.isPublic == true || isMember(resource.data));
+      allow list: if request.auth != null && isMember(resource.data);
+      allow create: if request.auth != null && request.resource.data.ownerUid == me()
+        && me() in request.resource.data.members && me() in request.resource.data.admins;
+      allow delete: if request.auth != null && resource.data.ownerUid == me();
+      allow update: if request.auth != null && (
+        (resource.data.ownerUid == me()
+          && request.resource.data.ownerUid == resource.data.ownerUid
+          && request.resource.data.type == resource.data.type
+          && me() in request.resource.data.admins
+          && me() in request.resource.data.members
+          && (request.resource.data.username == resource.data.get('username', '')
+            || (resource.data.get('username', '') == '' && request.resource.data.username != ''
+              && getAfter(/databases/$(database)/documents/chat_usernames/$(request.resource.data.username)).data.gid == gid
+              && getAfter(/databases/$(database)/documents/chat_usernames/$(request.resource.data.username)).data.uid == me())))
+        || (isAdmin(resource.data)
+          && request.resource.data.diff(resource.data).affectedKeys().hasOnly(['members','lastMessage','lastAt'])
+          && resource.data.ownerUid in request.resource.data.members)
+        || (request.resource.data.diff(resource.data).affectedKeys().hasOnly(['members','admins'])
+          && !(me() in request.resource.data.members) && me() in resource.data.members
+          && request.resource.data.members == resource.data.members.removeAll([me()])
+          && request.resource.data.admins == resource.data.admins.removeAll([me()])
+          && resource.data.ownerUid != me())
+        || (resource.data.isPublic == true
+          && resource.data.get('approve', false) != true
+          && request.resource.data.diff(resource.data).affectedKeys().hasOnly(['members'])
+          && me() in request.resource.data.members
+          && request.resource.data.members.hasAll(resource.data.members)
+          && !(me() in resource.data.members)
+          && request.resource.data.members.size() == resource.data.members.size() + 1)
+        || (request.resource.data.diff(resource.data).affectedKeys().hasOnly(['members','joinCode'])
+          && me() in request.resource.data.members
+          && request.resource.data.members.hasAll(resource.data.members)
+          && !(me() in resource.data.members)
+          && request.resource.data.members.size() == resource.data.members.size() + 1
+          && get(/databases/$(database)/documents/chat_group_invites/$(request.resource.data.joinCode)).data.gid == gid
+          && (get(/databases/$(database)/documents/chat_group_invites/$(request.resource.data.joinCode)).data.get('expiresAt', 0) == 0
+            || get(/databases/$(database)/documents/chat_group_invites/$(request.resource.data.joinCode)).data.get('expiresAt', 0) > request.time.toMillis())
+          && (get(/databases/$(database)/documents/chat_group_invites/$(request.resource.data.joinCode)).data.get('limit', 0) == 0
+            || get(/databases/$(database)/documents/chat_group_invites/$(request.resource.data.joinCode)).data.get('uses', 0) < get(/databases/$(database)/documents/chat_group_invites/$(request.resource.data.joinCode)).data.get('limit', 0))
+          && resource.data.get('approve', false) != true)
+        || (isMember(resource.data)
+          && request.resource.data.diff(resource.data).affectedKeys().hasOnly(['lastMessage','lastAt']))
+      );
+      match /requests/{r} {
+        allow create: if request.auth != null && request.auth.uid == r && request.resource.data.uid == r;
+        allow read, delete: if request.auth != null && (request.auth.uid == r
+          || request.auth.uid in get(/databases/$(database)/documents/chat_groups/$(gid)).data.admins);
+      }
+      match /presence/{uid} {
+        allow read: if request.auth != null && request.auth.uid in get(/databases/$(database)/documents/chats/$(chatId)).data.participants;
+        allow create, update: if request.auth != null && request.auth.uid == uid
+          && request.auth.uid in get(/databases/$(database)/documents/chats/$(chatId)).data.participants
+          && request.resource.data.keys().hasOnly(['lastInputAt','updatedAt'])
+          && request.resource.data.lastInputAt is int;
+        allow delete: if request.auth != null && request.auth.uid == uid
+          && request.auth.uid in get(/databases/$(database)/documents/chats/$(chatId)).data.participants;
+      }
+      match /messages/{mid} {
+        allow read: if request.auth != null && (get(/databases/$(database)/documents/chat_groups/$(gid)).data.isPublic == true
+          || request.auth.uid in get(/databases/$(database)/documents/chat_groups/$(gid)).data.members);
+        allow create: if request.auth != null && request.resource.data.sender == request.auth.uid
+          && request.auth.uid in get(/databases/$(database)/documents/chat_groups/$(gid)).data.members
+          && (get(/databases/$(database)/documents/chat_groups/$(gid)).data.adminsOnlyPost == false
+            || request.auth.uid in get(/databases/$(database)/documents/chat_groups/$(gid)).data.admins)
+          && (request.resource.data.get('imageUrl', '') == ''
+            || get(/databases/$(database)/documents/chat_groups/$(gid)).data.get('allowMedia', true) == true
+            || request.auth.uid in get(/databases/$(database)/documents/chat_groups/$(gid)).data.admins);
+        allow update: if request.auth != null && resource.data.sender == request.auth.uid
+          && request.auth.uid in get(/databases/$(database)/documents/chat_groups/$(gid)).data.members
+          && (!get(/databases/$(database)/documents/chat_groups/$(gid)).data.adminsOnlyPost
+            || request.auth.uid in get(/databases/$(database)/documents/chat_groups/$(gid)).data.admins)
+          && request.resource.data.diff(resource.data).affectedKeys().hasOnly(['text', 'editedAt'])
+          && request.resource.data.text is string && request.resource.data.text.size() <= 2000
+          && (request.resource.data.text.size() > 0 || resource.data.get('imageUrl', '') != '')
+          && request.resource.data.editedAt is int
+          && request.resource.data.editedAt > resource.data.get('editedAt', 0)
+          && request.resource.data.editedAt <= request.time.toMillis() + 60000;
+        allow delete: if request.auth != null && request.auth.uid in get(/databases/$(database)/documents/chat_groups/$(gid)).data.admins;
+      }
+    }
+
+    match /chat_group_invites/{code} {
+      allow get: if request.auth != null;
+      allow list: if request.auth != null
+        && request.auth.uid in get(/databases/$(database)/documents/chat_groups/$(resource.data.gid)).data.admins;
+      allow create: if request.auth != null
+        && request.auth.uid in getAfter(/databases/$(database)/documents/chat_groups/$(request.resource.data.gid)).data.admins;
+      allow update: if request.auth != null && (
+        request.auth.uid in get(/databases/$(database)/documents/chat_groups/$(resource.data.gid)).data.admins
+        || (request.resource.data.diff(resource.data).affectedKeys().hasOnly(['uses'])
+          && request.resource.data.uses == resource.data.uses + 1));
+      allow delete: if request.auth != null
+        && request.auth.uid in get(/databases/$(database)/documents/chat_groups/$(resource.data.gid)).data.admins;
+    }
+
+    match /chats/{chatId} {
+      allow read: if request.auth != null && request.auth.uid in resource.data.participants;
+      allow create: if request.auth != null
+        && request.auth.uid in request.resource.data.participants
+        && request.resource.data.participants.size() == 2
+        && chatId.matches('.*' + request.auth.uid + '.*');
+      allow update: if request.auth != null && request.auth.uid in resource.data.participants
+        && request.resource.data.participants.toSet() == resource.data.participants.toSet()
+        && request.resource.data.participants.size() == 2
+        && request.resource.data.diff(resource.data).affectedKeys().hasOnly(['participants','lastMessage','lastAt']);
+      allow delete: if request.auth != null && request.auth.uid in resource.data.participants;
+      match /messages/{mid} {
+        allow read: if request.auth != null && request.auth.uid in get(/databases/$(database)/documents/chats/$(chatId)).data.participants;
+        allow update: if request.auth != null && resource.data.sender != request.auth.uid
+          && request.auth.uid in get(/databases/$(database)/documents/chats/$(chatId)).data.participants
+          && request.resource.data.diff(resource.data).affectedKeys().hasOnly(["read"]);
+        allow update: if request.auth != null && resource.data.sender == request.auth.uid
+          && request.auth.uid in get(/databases/$(database)/documents/chats/$(chatId)).data.participants
+          && request.resource.data.diff(resource.data).affectedKeys().hasOnly(["text", "editedAt"])
+          && request.resource.data.text is string && request.resource.data.text.size() <= 12000
+          && (request.resource.data.text.size() > 0 || resource.data.get('imageUrl', '') != '')
+          && resource.data.get('audioUrl', '') == ''
+          && request.resource.data.editedAt is int
+          && request.resource.data.editedAt > resource.data.get('editedAt', 0)
+          && request.resource.data.editedAt <= request.time.toMillis() + 60000;
+        allow delete: if request.auth != null
+          && request.auth.uid in get(/databases/$(database)/documents/chats/$(chatId)).data.participants;
+        allow create: if request.auth != null && request.resource.data.sender == request.auth.uid
+          && request.auth.uid in get(/databases/$(database)/documents/chats/$(chatId)).data.participants;
+      }
+    }
+
+    match /chat_calls/{callId} {
+      function callPermitted() {
+        let callee = request.resource.data.callee;
+        let kind = request.resource.data.get('video', false) ? 'video' : 'call';
+        let privacy = get(/databases/$(database)/documents/chat_profiles/$(callee)).data.get('privacy', {}).get(kind, 'contacts');
+        return privacy == 'everybody' || (privacy == 'contacts' && exists(/databases/$(database)/documents/chat_contacts/$(callee)/members/$(request.auth.uid)));
+      }
+      allow read: if request.auth != null && request.auth.uid in resource.data.parties;
+      allow create: if request.auth != null && request.resource.data.caller == request.auth.uid
+        && request.resource.data.callee is string && request.resource.data.callee != request.auth.uid
+        && request.resource.data.parties.size() == 2 && request.resource.data.parties.toSet() == [request.auth.uid, request.resource.data.callee].toSet()
+        && request.resource.data.state == 'ringing' && request.resource.data.createdAt is int
+        && request.resource.data.createdAt >= request.time.toMillis() - 10000
+        && request.resource.data.createdAt <= request.time.toMillis() + 5000
+        && callPermitted();
+      allow update: if request.auth != null && request.auth.uid in resource.data.parties
+        && request.resource.data.parties == resource.data.parties
+        && request.resource.data.diff(resource.data).affectedKeys().hasOnly(['state','answer'])
+        && request.resource.data.state in ['ringing','active','ended','declined','missed']
+        && (!request.resource.data.diff(resource.data).affectedKeys().hasAny(['answer']) || request.auth.uid == resource.data.callee);
+      allow delete: if request.auth != null && request.auth.uid in resource.data.parties;
+      match /ice/{iid} {
+        allow read, create: if request.auth != null
+          && request.auth.uid in get(/databases/$(database)/documents/chat_calls/$(callId)).data.parties;
+        allow delete: if request.auth != null
+          && request.auth.uid in get(/databases/$(database)/documents/chat_calls/$(callId)).data.parties;
+      }
+    }
+
+}
+}

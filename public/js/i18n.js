@@ -1,0 +1,183 @@
+const trToEn = {
+  "Özellikler":"Features","Fiyatlar":"Pricing","Güvenlik":"Security","İndir":"Download","Giriş yap":"Sign in",
+  "Z PASS ECOSYSTEM":"Z PASS ECOSYSTEM","Dijital hayatınız.":"Your digital life.","Tek güvenli kasada.":"In one secure vault.",
+  "Mobil uygulamadaki Z Pass hesabınızla giriş yapın. Aboneliğinizi, cihazlarınızı ve şifreli bulut kasanızın durumunu webden görün.":"Sign in with your Z Pass mobile account. View your subscription, devices, and encrypted cloud vault on the web.",
+  "Uçtan uca":"End-to-end","şifreli yedek":"encrypted backup","Tek hesap":"One account","mobil + web":"mobile + web","Gizlilik":"Privacy","düz metin yok":"no plain text",
+  "Tekrar hoş geldiniz":"Welcome back","Z Pass hesabınızla devam edin":"Continue with your Z Pass account","E-posta":"Email","Şifre":"Password","veya":"or","Google ile devam et":"Continue with Google","Şifrenizi mi unuttunuz?":"Forgot your password?",
+  "Giriş yaparak Z Pass güvenlik koşullarını kabul etmiş olursunuz.":"By signing in, you agree to the Z Pass security terms.",
+  "Tüm hesaplarınız. Tek güvenli yerde.":"All your accounts. In one secure place.","HER ŞEY DAHİL":"EVERYTHING INCLUDED","Paroladan çok daha fazlası":"Much more than passwords",
+  "Z Pass; parolalarınızı, banka kartlarınızı, doğrulama kodlarınızı ve kişisel bilgilerinizi tek bir şifreli kasada birleştirir.":"Z Pass brings your passwords, bank cards, authentication codes, and personal information together in one encrypted vault.",
+  "Güçlü parola oluştur":"Generate strong password","Parola Kasası":"Password Vault","Kartlar":"Cards","Otomatik Doldurma":"Autofill",
+  "◆ Parola Kasası":"◆ Password Vault","▤ Kartlar":"▤ Cards","⌁ Otomatik Doldurma":"⌁ Autofill",
+  "Sınırsız parolayı şifreli saklayın ve otomatik doldurun.":"Store unlimited passwords securely and autofill them.",
+  "Ödeme kartlarını maskeli ve kurtarma parolasıyla koruyun.":"Protect masked payment cards with your recovery password.",
+  "6 haneli doğrulama kodlarını çevrimdışı üretin.":"Generate six-digit authentication codes offline.",
+  "Adresleri ve kişisel bilgileri formlara güvenle doldurun.":"Securely fill addresses and personal information in forms.",
+  "SIFIR BİLGİ MİMARİSİ":"ZERO-KNOWLEDGE ARCHITECTURE","Sırlarınızı biz bile göremeyiz.":"Even we cannot see your secrets.",
+  "Kurtarma parolanız cihazınızdan ayrılmaz. Bulut kasanız PBKDF2-SHA256 ve AES-256-GCM ile uçtan uca korunur.":"Your recovery password never leaves your device. Your cloud vault is protected end-to-end with PBKDF2-SHA256 and AES-256-GCM.",
+  "Android Keystore koruması":"Android Keystore protection","Biyometrik kilit":"Biometric lock","Şifreli bulut yedeği":"Encrypted cloud backup","Otomatik ekran kilidi":"Automatic screen lock",
+  "BASİT FİYATLANDIRMA":"SIMPLE PRICING","Z Pass planınızı seçin":"Choose your Z Pass plan",
+  "Ücretsiz başlayın, daha fazla alan gerektiğinde Pro’ya geçin.":"Start free and upgrade to Pro when you need more space.","Aylık":"Monthly","Yıllık":"Yearly","Ücretsiz devam et":"Continue free",
+  "%40 indirim":"40% off","Güvenli kasaya başlayın":"Start with a secure vault","/ay":"/month",
+  "50 parola hesabı":"50 password accounts","Şifreli kart kasası":"Encrypted card vault","Parola üretici":"Password generator","Android ve web erişimi":"Android and web access",
+  "EN ÇOK TERCİH EDİLEN":"MOST POPULAR","Tüm dijital hayatınız için":"For your entire digital life","Pro’yu kullan":"Get Pro",
+  "Sınırsız parola hesabı":"Unlimited password accounts","Sınırsız şifreli bulut":"Unlimited encrypted cloud","Kart ve TOTP web senkronizasyonu":"Card and TOTP web sync","Gelişmiş kasa sağlığı":"Advanced vault health","Öncelikli destek":"Priority support",
+  "Güvendiğiniz kişilerle":"For people you trust","Family’yi seç":"Choose Family","6 bağımsız kullanıcı":"6 independent users","Paylaşılan güvenli kasalar":"Shared secure vaults","Sınırsız hesap ve cihaz":"Unlimited accounts and devices","Aile güvenlik paneli":"Family security dashboard","Acil durum erişimi":"Emergency access",
+  "NEDEN Z PASS?":"WHY Z PASS?","Tek uygulama, tam koruma":"One app, complete protection","Özellik":"Feature","Standart yöneticiler":"Standard managers","Uçtan uca şifreli bulut":"End-to-end encrypted cloud","Yerleşik Authenticator":"Built-in Authenticator","Web + Android eşitleme":"Web + Android sync","Kurtarma parolası kontrolü":"Recovery password control",
+  "Z PASS’İ KEŞFEDİN":"DISCOVER Z PASS","Güvenli dijital hayatınız bugün başlıyor.":"Your secure digital life starts today.","Ücretsiz hesabınızı açın veya Android uygulamasını indirin.":"Create your free account or download the Android app.","Web kasasına giriş":"Sign in to web vault",
+  "Parolalar, kartlar ve doğrulama kodları için güvenli dijital kasa.":"A secure digital vault for passwords, cards, and authentication codes.","Tüm hakları saklıdır.":"All rights reserved.",
+  "KASALAR":"VAULTS","Tüm Öğeler":"All items","Kişisel":"Personal","Kişisel kasa":"Personal vault","Çöp":"Trash","Z PASS ARAÇLARI":"Z PASS TOOLS","Profil":"Profile",
+  "Kasa İzleme":"Pass Monitor","Z Pass’i kilitle":"Lock Z Pass","Gelişmiş":"Advanced","Oluşturulan şifreler":"Generated passwords","Verileri şimdi eşitle":"Sync data now","Uygulamaları indir":"Download apps",
+  "Android için Z Pass":"Z Pass for Android","Ayarlar":"Settings","Genel":"General","Alias":"Aliases","Erişim anahtarları":"Access tokens","İçe aktar":"Import","Dışa aktar":"Export","Hesap":"Account","Destek":"Support","Çıkış yap":"Sign out",
+  "Tüm öğelerde ara…":"Search all items…","Kasayı aç":"Unlock vault","Pro’ya geç":"Upgrade","Yeni öğe":"Create item",
+  "Kasanız kilitli":"Your vault is locked","Bulut öğelerinizi görmek için kurtarma parolanızla kasayı açın.":"Unlock with your recovery password to view cloud items.",
+  "Şifreli kasayı aç":"Unlock encrypted vault","Yeni giriş oluştur":"Create a login","Yeni kart oluştur":"Create a card","Yeni kimlik oluştur":"Create an identity","Mobil uygulamadan yedekle":"Back up from mobile",
+  "GÜVENLİK MERKEZİ":"SECURITY CENTER","Koruma durumunuz":"Your protection status","Hesap ve web oturumu güvenlik özeti.":"Account and web-session security summary.",
+  "Oturum açma bilgileriniz korunur.":"Your account sign-in is protected.",
+  "Şifreli Bulut":"Encrypted Cloud","Güvenli Oturum":"Secure Session","Cihaz Güvenliği":"Device Security","Etkin":"Active","Mobil korumalı":"Protected on mobile",
+  "Daha fazla bilgi":"Want to learn more?","Hesaplarınızı daha güvenli ve gizli tutmak için rehberler.":"Guides to keep your accounts safer and more private.",
+  "Dark web nedir?":"What is the dark web?","E-posta alias’ı nedir?":"What is an email alias?","2FA ile daha iyi koruma":"Better protection with 2FA","Rehberi aç →":"Open guide →",
+  "ŞİFRELİ KART KASASI":"ENCRYPTED CARD VAULT","Kart bilgileriniz varsayılan olarak maskelenir.":"Card details are masked by default.","Şifreli kart kasasını açın":"Unlock encrypted card vault","Kurtarma parolasıyla aç":"Unlock with recovery password",
+  "ÇEVRİMDIŞI DOĞRULAMA":"OFFLINE AUTHENTICATION","Canlı 6 haneli kodlarınız telefonda korunur.":"Your live six-digit codes are protected on your phone.","Şifreli Authenticator kasasını açın":"Unlock encrypted Authenticator vault","2FA kullanım rehberi":"2FA user guide",
+  "Z PASS HESABI":"Z PASS ACCOUNT","Hesabınız, planınız ve bağlı cihazlarınız.":"Your account, plan, and connected devices.","Hesap Bilgileri":"Account information","Ülke":"Country","Son etkinlik":"Last activity","Hızlı İşlemler":"Quick actions","Şifre sıfırlama e-postası":"Password reset email","Android uygulamasını indir":"Download Android app","Hesaptan çıkış yap":"Sign out",
+  "Görünüm ve dil":"Appearance and language","Tema":"Theme","Koyu":"Dark","Sistem ayarı":"System setting","Dil":"Language",
+  "Alias alan adları":"Alias domains","Varsayılan alias alan adı":"Default alias domain","Henüz kullanılamıyor":"Not available yet","Posta kutuları":"Mailboxes","HAZIRLANIYOR":"COMING SOON","Alias özelliğini öğren →":"Learn about aliases →",
+  "Kasa kilidi":"Vault lock","Otomatik kilitle":"Auto-lock after","1 dakika":"1 minute","2 dakika":"2 minutes","5 dakika":"5 minutes","10 dakika":"10 minutes","30 dakika":"30 minutes","1 saat":"1 hour","Kasayı şimdi kilitle":"Lock vault now",
+  "Yeni erişim anahtarı":"New access token","Parolaları içe aktar":"Import passwords","Genel CSV":"Generic CSV","Seçilen CSV’yi içe aktar":"Import selected CSV","Kasayı dışa aktar":"Export vault","Z Pass şifreli dosya (önerilen)":"Z Pass encrypted file (recommended)","CSV — düz metin, güvenli olmayan":"CSV — unencrypted and unsafe",
+  "Hesap ve parola":"Account and password","Parola sıfırlama e-postası gönder":"Send password reset email","İki adımlı doğrulama rehberi →":"Two-factor authentication guide →","Sorun bildir":"Report a problem","E-posta ile gönder":"Send by email","Yardım":"Help",
+  "Bulut kasasını aç":"Unlock cloud vault","Kurtarma parolanız cihazınızda işlenir ve sunucuya gönderilmez.":"Your recovery password is processed on your device and is never sent to the server.","Kurtarma parolası":"Recovery password","İptal":"Cancel","Güvenle aç":"Unlock securely",
+  "YENİ ÖĞE":"NEW ITEM","Yeni giriş":"New login","Kaydet":"Save","Giriş":"Login","Kart":"Card","Kimlik":"Identity","Başlık":"Title","Not":"Note"
+};
+const placeholders = {
+  "Tüm öğelerde ara…":"Search all items…","En az 10 karakter":"At least 10 characters","Örn. Google hesabım":"e.g. My Google account","Güvenli not ekleyin":"Add a secure note","Sorunu ve varsa hata mesajını açıklayın":"Describe the problem and include any error messages"
+};
+Object.assign(trToEn, {
+  "Abonelik":"Subscription",
+  "◇ Abonelik":"◇ Subscription",
+  "Dil seçiminiz bu tarayıcıda saklanır.":"Your language choice is saved in this browser.",
+  "Güvenli Web Kasası":"Secure Web Vault",
+  "GÜVENLİ WEB KASASI":"SECURE WEB VAULT",
+  "0 öğe":"0 items",
+  "Bağlı Cihaz":"Connected device",
+  "Bulut Kasası":"Cloud Vault",
+  "Profil Bilgileri":"Profile information",
+  "Son görülme":"Last seen",
+  "Ücretsiz plan · 50 hesap":"Free plan · 50 accounts",
+  "Çıkış":"Sign out",
+  "ŞİFRELİ KASA":"ENCRYPTED VAULT",
+  "Hesabınız ve şifreli kasanız korunuyor.":"Your account and encrypted vault are protected.",
+  "Verileriniz koruma altında":"Your data is protected",
+  "Kontrol ediliyor…":"Checking…",
+  "Kasa yedeğiniz aktarım ve depolama sırasında şifreli kalır.":"Your vault backup remains encrypted during transfer and storage.",
+  "Tam şifre çözme anahtarları Android Keystore içinde kalır.":"Full decryption keys remain inside Android Keystore.",
+  "Parolalar web sunucusunda düz metin olarak açılmaz. Kurtarma parolanız yalnızca sizin kontrolünüzdedir.":"Passwords are never opened as plain text on the web server. Your recovery password remains under your control.",
+  "Parolaları eklemek, düzenlemek ve kurtarma parolasıyla geri yüklemek için Z Pass Android uygulamasını kullanın.":"Use the Z Pass Android app to add, edit, and restore passwords with your recovery password.",
+  "Mobil uygulamada tam kasa erişimi":"Full vault access in the mobile app",
+  "APK’yi indir →":"Download APK →",
+  "APK’de Back up now ile korunan kartları görmek için kurtarma parolanızı girin.":"Enter your recovery password to view cards protected with Back up now in the app.",
+  "APK’de Back up now ile korunan kodları görmek için kurtarma parolanızı girin.":"Enter your recovery password to view codes protected with Back up now in the app.",
+  "Authenticator kodlarını güvenle kullanın.":"Use Authenticator codes securely.",
+  "Gerçek e-posta adresinizi gizli tutun.":"Keep your real email address private.",
+  "Veri sızıntılarını ve korunma adımlarını öğrenin.":"Learn about data leaks and protection steps.",
+  "Web kasası kilitlendiğinde şifreler, kartlar ve Authenticator kodları gizlenir; anahtar bellekten silinir.":"When the web vault locks, passwords, cards, and Authenticator codes are hidden and the key is removed from memory.",
+  "Z Pass API erişim anahtarları henüz etkin değildir. Güvenli sunucu altyapısı hazır olmadan tarayıcıda gizli token oluşturulmaz.":"Z Pass API access tokens are not enabled yet. No secret token is created in the browser before the secure server infrastructure is ready.",
+  "CSV dosyanızdaki girişler tarayıcıda okunur, kurtarma anahtarınızla şifrelenir ve kasanıza eklenir.":"Entries in your CSV file are read in the browser, encrypted with your recovery key, and added to your vault.",
+  "Dışa aktarma yalnızca kasa açıkken yapılabilir.":"Export is available only while the vault is unlocked.",
+  "Parola, kurtarma parolası, kart numarası veya 2FA kodu göndermeyin.":"Do not send passwords, recovery passwords, card numbers, or 2FA codes.",
+  "Alias adreslerine gönderilen e-postalar bağlı posta kutunuza yönlendirilir.":"Emails sent to aliases are forwarded to your connected mailbox.",
+  "Z Pass hesabı":"Z Pass account",
+  "0 alias":"0 aliases",
+  "Alias rehberi":"Alias guide",
+  "Dark web rehberi":"Dark web guide",
+  "Z Pass 2FA rehberi":"Z Pass 2FA guide",
+  "Sayfa açılmazsa":"If the page does not open",
+  "Abonelik Yöneticisi’ni tam sayfa açın":"open Subscription Manager in a full page",
+  "Plan":"Plan",
+  "Kullanıcı":"User",
+  "Parola hesapları":"Password accounts",
+  "Şifreli kart kasası":"Encrypted card vault",
+  "Neler dahil?":"What is included?",
+  "Tek abonelikle tam Z Pass koruması":"Complete Z Pass protection with one subscription",
+  "Premium özelliklerin kilidini açın":"Unlock premium features",
+  "Parolalarınız, kartlarınız ve doğrulama kodlarınız için daha fazla alan ve gelişmiş koruma.":"More space and advanced protection for your passwords, cards, and authentication codes.",
+  "En popüler":"Most popular",
+  "6 kullanıcı":"6 users",
+  "Şimdi değil":"Not now",
+  "Z Pass Family’yi seç":"Choose Z Pass Family",
+  "Ücretsiz":"Free",
+  "Güvenli":"Secure",
+  "Bağlı":"Connected",
+  "● Bağlı":"● Connected",
+  "● Etkin":"● Active",
+  "● Güvenli oturum":"● Secure session",
+  "● Mobil korumalı":"● Mobile protected",
+  "● Yeni giriş oluştur":"● Create a login",
+  "▤ Yeni kart oluştur":"▤ Create a card",
+  "▧ Yeni kimlik oluştur":"▧ Create an identity",
+  "＋ Yeni giriş oluştur":"＋ Create a login",
+  "＋ Yeni kart oluştur":"＋ Create a card",
+  "＋ Yeni kimlik oluştur":"＋ Create an identity",
+  "＋ Yeni öğe":"＋ Create item",
+  "⌁ Şifreli kasayı aç":"⌁ Unlock encrypted vault",
+  "↑ Mobil uygulamadan yedekle":"↑ Back up from mobile",
+  "◇ Kasa İzleme":"◇ Pass Monitor",
+  "▣ Z Pass’i kilitle":"▣ Lock Z Pass",
+  "⚡ Gelişmiş":"⚡ Advanced",
+  "⌘ Oluşturulan şifreler":"⌘ Generated passwords",
+  "↻ Verileri şimdi eşitle":"↻ Sync data now",
+  "▣ Uygulamaları indir":"▣ Download apps",
+  "⚙ Genel":"⚙ General",
+  "⌁ Alias":"⌁ Aliases",
+  "▣ Güvenlik":"▣ Security",
+  "↓ İçe aktar":"↓ Import",
+  "↑ Dışa aktar":"↑ Export",
+  "↗ Hesap":"↗ Account",
+  "▱ Destek":"▱ Support",
+  "↪ Çıkış yap":"↪ Sign out",
+  "iOS — yakında":"iOS — coming soon",
+  "Windows — yakında":"Windows — coming soon",
+  "macOS — yakında":"macOS — coming soon",
+  "Linux — yakında":"Linux — coming soon"
+});
+const enToTr = Object.fromEntries(Object.entries(trToEn).map(([tr,en]) => [en,tr]));
+const placeholderBack = Object.fromEntries(Object.entries(placeholders).map(([tr,en]) => [en,tr]));
+let currentLanguage = "en";
+let translating = false;
+function translateTree(language) {
+  if (translating) return;
+  translating = true;
+  const dictionary = language === "en" ? trToEn : enToTr;
+  const placeholderDictionary = language === "en" ? placeholders : placeholderBack;
+  const walker = document.createTreeWalker(document.body, NodeFilter.SHOW_TEXT);
+  const nodes = [];
+  while (walker.nextNode()) nodes.push(walker.currentNode);
+  for (const node of nodes) {
+    if (node.parentElement?.closest("script,style")) continue;
+    const trimmed = node.nodeValue.trim();
+    if (dictionary[trimmed]) node.nodeValue = node.nodeValue.replace(trimmed, dictionary[trimmed]);
+  }
+  document.querySelectorAll("[placeholder]").forEach((element) => {
+    const value = element.getAttribute("placeholder");
+    if (placeholderDictionary[value]) element.setAttribute("placeholder", placeholderDictionary[value]);
+  });
+  document.documentElement.lang = language;
+  const select = document.getElementById("webLanguage");
+  if (select) select.value = language;
+  translating = false;
+}
+function setLanguage(_language, persist = true) {
+  currentLanguage = "en";
+  if (persist) localStorage.setItem("zpassLanguage", currentLanguage);
+  translateTree(currentLanguage);
+}
+function getLanguage() { return currentLanguage; }
+function getSavedLanguage() { return localStorage.getItem("zpassLanguage") || "en"; }
+function t(tr, en) { return currentLanguage === "en" ? en : tr; }
+window.ZPassI18n = { setLanguage, getLanguage, getSavedLanguage, t };
+translateTree(currentLanguage);
+let translationTimer = 0;
+new MutationObserver((changes) => {
+  if (!changes.some((change) => change.type === "characterData" || change.addedNodes.length || change.removedNodes.length)) return;
+  clearTimeout(translationTimer);
+  translationTimer = setTimeout(() => translateTree(currentLanguage), 180);
+}).observe(document.body, { childList:true, characterData:true, subtree:true });

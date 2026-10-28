@@ -1,0 +1,7 @@
+from pathlib import Path
+p=Path('Zpass/scripts/CloudDataSync.kt');s=p.read_text(encoding='utf-8');s=s.replace('        val vault=FirebaseFirestore.getInstance()', '        var cardsReady=false\n        var personalReady=false\n        val vault=FirebaseFirestore.getInstance()');s=s.replace('if(local?.cloudDirty==true){','if(local?.cloudDirty==true && local.cloudModifiedAt>0){');s=s.replace('                    dao.insertFromCloud(item)\n                }','                    dao.insertFromCloud(item)\n                }\n                cardsReady=true');s=s.replace('if(error!=null||doc==null||!doc.exists()||!valid(owner))return@addSnapshotListener','if(error!=null||doc==null||!valid(owner))return@addSnapshotListener');s=s.replace('                if(!valid(owner)||db.personalInfoDao().getForUserSync(userId)?.cloudDirty==true)return@withLock','''                if(!valid(owner))return@withLock
+                personalReady=true
+                val local=db.personalInfoDao().getForUserSync(userId)
+                if(!doc.exists() || (local?.cloudDirty==true && local.cloudModifiedAt>0))return@withLock''');s=s.replace('            if(!valid(owner))return@withLock\n            val encode=encrypt','            if(!valid(owner)||!cardsReady||!personalReady)return@withLock\n            val encode=encrypt');p.write_text(s,encoding='utf-8')
+import shutil
+shutil.copyfile(p,Path(r'C:\Users\rezan\AndroidStudioProjects\ZPassManager\app\src\main\java\com\zpass\security\CloudDataSync.kt'))

@@ -1,0 +1,81 @@
+{
+  "schemaVersion": 1,
+  "updatedAt": "2026-10-26T00:00:00Z",
+  "app": {
+    "title": "Z Pass",
+    "checkoutTitle": "Z Pass Secure Checkout"
+  },
+  "currency": "USD",
+  "plans": {
+    "PLUS_MONTHLY": {
+      "id": "PLUS_MONTHLY",
+      "title": "Z Pass Plus Monthly",
+      "price": 4.99,
+      "period": "month",
+      "stripeUrl": "",
+      "cryptoUrl": "",
+      "otherUrl": "",
+      "enabled": true
+    },
+    "PLUS_YEARLY": {
+      "id": "PLUS_YEARLY",
+      "title": "Z Pass Plus Yearly",
+      "price": 49.9,
+      "period": "year",
+      "stripeUrl": "",
+      "cryptoUrl": "",
+      "otherUrl": "",
+      "enabled": true
+    },
+    "PRO_MONTHLY": {
+      "id": "PRO_MONTHLY",
+      "title": "Z Pass Pro Monthly",
+      "price": 9,
+      "period": "month",
+      "stripeUrl": "",
+      "cryptoUrl": "",
+      "otherUrl": "",
+      "enabled": true
+    },
+    "PRO_YEARLY": {
+      "id": "PRO_YEARLY",
+      "title": "Z Pass Pro Yearly",
+      "price": 90,
+      "period": "year",
+      "stripeUrl": "",
+      "cryptoUrl": "",
+      "otherUrl": "",
+      "enabled": true
+    }
+  },
+  "providers": {
+    "stripe": {
+      "enabled": true,
+      "label": "Card payment"
+    },
+    "crypto": {
+      "enabled": true,
+      "label": "Crypto"
+    },
+    "other": {
+      "enabled": false,
+      "label": "Other payment"
+    }
+  },
+  "revision": 3,
+  "cacheSeconds": 900,
+  "pages": [
+    {
+      "id": "help",
+      "title": "Help & support",
+      "url": "https://zpass.web.app/dashboard.html#support",
+      "enabled": true
+    },
+    {
+      "id": "plans",
+      "title": "Plans & billing",
+      "url": "https://zpass.web.app/checkout.html",
+      "enabled": true
+    }
+  ]
+}

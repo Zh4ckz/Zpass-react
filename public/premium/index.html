@@ -1,0 +1,83 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="theme-color" content="#111216">
+  <meta name="description" content="Choose a secure Z Pass plan for your passwords, cards and authenticator codes.">
+  <title>Z Pass Premium</title>
+  <link rel="stylesheet" href="/css/premium.css?v=2">
+  <link rel="stylesheet" href="/css/site-responsive.css?v=1">
+<script src="/js/zpass-theme.js?v=3"></script><link rel="stylesheet" href="/css/zpass-app-theme.css?v=109"></head>
+<body class="auth-pending">
+  <main class="premium-shell">
+    <header class="premium-header">
+      <a class="brand" href="/" aria-label="Z Pass home"><span class="brand-mark" aria-hidden="true">Z</span><span>Z Pass</span></a>
+      <nav class="header-actions" aria-label="Account">
+        <a href="/dashboard.html#login">Sign in</a>
+        <a class="signup-link" href="/dashboard.html#login">Sign up</a>
+      </nav>
+      <button class="close-button" type="button" id="closePremium" aria-label="Close premium offer">×</button>
+    </header>
+
+    <section class="hero" aria-labelledby="premium-title">
+      <div class="hero-copy">
+        <span class="eyebrow"><span class="eyebrow-dot"></span> YOUR VAULT, WITH ROOM TO GROW</span>
+        <h1 id="premium-title">Your digital life.<br><span>Better protected.</span></h1>
+        <p>More room for the things you rely on, with secure access wherever you need it.</p>
+        <div class="hero-assurance">
+          <span><i>✓</i> Encrypted sync</span>
+          <span><i>✓</i> Cancel any time</span>
+        </div>
+      </div>
+      <div class="hero-art" aria-hidden="true">
+        <div class="orbit orbit-one"></div><div class="orbit orbit-two"></div><div class="vault-glow"></div>
+        <div class="vault-icon"><span class="vault-shackle"></span><span class="vault-body">✦</span></div>
+        <span class="float-chip chip-one">PASSWORDS</span><span class="float-chip chip-two">2FA CODES</span><span class="float-chip chip-three">PRIVATE</span>
+      </div>
+    </section>
+
+    <section class="plans" id="plans" aria-labelledby="plans-title">
+      <div class="section-heading">
+        <div><span class="eyebrow">SIMPLE, SECURE PLANS</span><h2 id="plans-title">Choose what fits you</h2></div>
+        <div class="billing-toggle" role="group" aria-label="Billing period">
+          <button type="button" data-period="MONTHLY" aria-pressed="true">Monthly</button>
+          <button type="button" data-period="YEARLY" aria-pressed="false">Yearly <span class="save-pill" id="savePill">SAVE</span></button>
+        </div>
+      </div>
+      <div class="plan-grid">
+        <article class="plan-card" data-plan-card="PRO">
+          <div class="card-top"><span class="plan-icon" aria-hidden="true">◈</span><span class="plan-label">FOR ONE</span></div>
+          <h3>Z Pass Plus</h3><p class="plan-description">Your personal secure vault, everywhere.</p>
+          <p class="price"><span data-price="PRO">$5</span><span class="price-period" data-price-period="PRO">/ month</span></p>
+          <p class="billed-note" data-billed="PRO">Billed monthly</p>
+          <ul class="features"><li>One personal account</li><li>Secure cloud sync</li><li>Passwords, cards and 2FA</li><li>Priority support</li></ul>
+          <a class="plan-button plan-button-secondary" data-checkout="PRO" href="/checkout?plan=PRO&amp;billing=MONTHLY">Choose Plus <span>↗</span></a>
+        </article>
+        <article class="plan-card plan-card-featured" data-plan-card="FAMILY">
+          <span class="popular-badge">BEST FOR FAMILIES</span>
+          <div class="card-top"><span class="plan-icon plan-icon-family" aria-hidden="true">♧</span><span class="plan-label">SHARE SECURELY</span></div>
+          <h3>Z Pass Family</h3><p class="plan-description">One plan for your whole household.</p>
+          <p class="price"><span data-price="FAMILY">$10</span><span class="price-period" data-price-period="FAMILY">/ month</span></p>
+          <p class="billed-note" data-billed="FAMILY">Billed monthly</p>
+          <ul class="features"><li>Up to 5 family members</li><li>Private account for each member</li><li>Secure cloud sync</li><li>Shared vaults and priority support</li></ul>
+          <a class="plan-button plan-button-primary" data-checkout="FAMILY" href="/checkout?plan=FAMILY&amp;billing=MONTHLY">Choose Family <span>↗</span></a>
+        </article>
+      </div>
+      <p class="fine-print">Payments are securely processed by our payment providers. Your vault contents remain encrypted.</p>
+    </section>
+    <aside class="security-note" id="security">
+      <span class="security-mark" aria-hidden="true">◆</span>
+      <div><span class="eyebrow">PRIVACY COMES FIRST</span><p>Your plan changes the space you have—not the care we take with your vault.</p></div>
+    </aside>
+    <footer class="premium-footer"><span>◈ &nbsp; Built around your privacy</span><a href="/subscription.html">Already subscribed? Manage your plan</a></footer>
+  </main>
+  <nav class="mobile-dock" aria-label="Site navigation">
+    <a href="/" aria-label="Home"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="m3 10 9-7 9 7v10a1 1 0 0 1-1 1h-5v-7H9v7H4a1 1 0 0 1-1-1z"/></svg><span>HOME</span></a>
+    <a class="dock-active" href="#plans" aria-label="Plans"><svg viewBox="0 0 24 24" aria-hidden="true"><rect x="4" y="3" width="16" height="18" rx="2"/><path d="M8 8h8M8 12h8M8 16h5"/></svg><span>PLANS</span></a>
+    <a href="#security" aria-label="Security"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 22s8-4 8-11V5l-8-3-8 3v6c0 7 8 11 8 11z"/><path d="m9 12 2 2 4-4"/></svg><span>SECURITY</span></a>
+    <a href="/subscription.html" aria-label="Account"><svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="8" r="4"/><path d="M4 21a8 8 0 0 1 16 0"/></svg><span>ACCOUNT</span></a>
+  </nav>
+  <script type="module" src="/js/premium-page.mjs?v=2"></script>
+</body>
+</html>

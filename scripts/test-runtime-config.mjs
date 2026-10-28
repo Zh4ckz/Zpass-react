@@ -1,0 +1,18 @@
+import assert from 'node:assert/strict';
+import fs from 'node:fs';
+const storage=new Map();globalThis.localStorage={getItem:k=>storage.get(k)??null,setItem:(k,v)=>storage.set(k,v)};
+const {validateConfig,refreshConfig}=await import('../public/js/runtime-config.mjs');
+const sample=JSON.parse(fs.readFileSync(new URL('../public/api/payment-config.json',import.meta.url),'utf8'));
+assert.equal(validateConfig(sample).plans.FAMILY_MONTHLY.price,10);
+assert.throws(()=>validateConfig({...sample,schemaVersion:99}));
+assert.throws(()=>validateConfig({...sample,plans:{...sample.plans,PRO_MONTHLY:{price:-1}}}));
+assert.equal(validateConfig({...sample,pages:[{title:'Unsafe',url:'https://zpass.web.app.evil.test/'},{title:'Unsafe',url:'javascript:alert(1)'},{title:'Safe',url:'https://zpass.web.app/help'}]}).pages.length,1);
+let requests=0;globalThis.fetch=async()=>{requests++;return{ok:true,headers:new Headers(),text:async()=>JSON.stringify(sample)}};
+const first=await refreshConfig();assert.equal(first.plans.PRO_YEARLY.price,55);
+await refreshConfig();assert.equal(requests,1,'Fresh config must reuse cache');
+const old=JSON.parse(storage.get('zpassRuntimeConfigV1'));old.fetchedAt=0;storage.set('zpassRuntimeConfigV1',JSON.stringify(old));
+globalThis.fetch=async()=>{throw Error('Offline')};
+assert.equal((await refreshConfig()).plans.FAMILY_MONTHLY.price,10,'Offline must retain valid settings');
+globalThis.fetch=async()=>({ok:true,headers:new Headers(),text:async()=>'invalid'});
+assert.equal((await refreshConfig()).plans.PRO_MONTHLY.price,5,'Malformed update must preserve last valid cache');
+console.log('PASS: remote config schema, unsafe links, cached refresh, offline fallback and malformed-update preservation');

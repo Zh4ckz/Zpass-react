@@ -1,0 +1,91 @@
+@page "/quick-unlock"
+@inject AppState AppState
+@inject NavigationManager Nav
+@inject LocalPasscodeStore PasscodeStore
+@inject Zapp.Security.PortableCloudCrypto Crypto
+
+<PageTitle>Quick unlock — Zapp</PageTitle>
+
+<div class="center-screen">
+    <div class="auth-card">
+        <img class="auth-logo" src="icon-192.png" alt="" />
+        <h1 class="auth-title">Welcome back</h1>
+        <p class="auth-subtitle">Enter your local passcode to unlock Zapp on this device.</p>
+
+        <label class="field-label">Passcode</label>
+        <input class="input code-input" type="password" @bind="_passcode" @bind:event="oninput" @onkeydown="OnKeyDown" />
+
+        @if (!string.IsNullOrEmpty(_error))
+        {
+            <p class="error-text">@_error</p>
+        }
+
+        <button class="btn btn-primary" disabled="@_busy" @onclick="UnlockAsync">
+            @(_busy ? "Unlocking..." : "Unlock")
+        </button>
+        <button class="btn btn-ghost" style="margin-top:10px" @onclick="ForgotPasscodeAsync">
+            Forgot passcode? Sign out
+        </button>
+    </div>
+</div>
+
+@code {
+    private string _passcode = "";
+    private string? _error;
+    private bool _busy;
+    private int _attempts;
+
+    private async Task OnKeyDown(KeyboardEventArgs e)
+    {
+        if (e.Key == "Enter") await UnlockAsync();
+    }
+
+    private async Task UnlockAsync()
+    {
+        if (string.IsNullOrEmpty(_passcode)) return;
+        _busy = true;
+        _error = null;
+        try
+        {
+            var recovered = await PasscodeStore.TryUnlockAsync(_passcode);
+            if (recovered is null)
+            {
+                _attempts++;
+                if (_attempts >= LocalPasscodeStore.MaxAttempts)
+                {
+                    await PasscodeStore.ClearAsync();
+                    Nav.NavigateTo("/");
+                    return;
+                }
+                _error = $"Incorrect passcode. {LocalPasscodeStore.MaxAttempts - _attempts} attempt(s) left.";
+                return;
+            }
+
+            var auth = new FirebaseAuthClient(AppConfig.FirebaseApiKey);
+            var session = await auth.RefreshFromTokenAsync(recovered.Value.RefreshToken, recovered.Value.Email);
+            AppState.SessionHolder = new SessionHolder(auth, session);
+            AppState.Firestore = new FirestoreClient(AppConfig.FirebaseProjectId, AppState.SessionHolder.GetValidIdTokenAsync);
+
+            var repository = new VaultRepository(AppState.Firestore, Crypto, AppState.SessionHolder.Uid);
+            var cipher = await repository.ResolveCipherAsync(recovered.Value.RecoveryPassword);
+            AppState.Repository = repository;
+            AppState.Cipher = cipher;
+            AppState.RecoveryPassword = recovered.Value.RecoveryPassword;
+            Nav.NavigateTo("/vault");
+        }
+        catch (Exception ex)
+        {
+            _error = $"Could not restore your session: {ex.Message}. Try signing in again.";
+        }
+        finally
+        {
+            _busy = false;
+        }
+    }
+
+    private async Task ForgotPasscodeAsync()
+    {
+        await PasscodeStore.ClearAsync();
+        Nav.NavigateTo("/");
+    }
+}

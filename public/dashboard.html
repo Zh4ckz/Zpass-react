@@ -1,0 +1,375 @@
+<!doctype html>
+<html lang="en">
+<head>
+<script>if(new URLSearchParams(location.search).get("embedded")==="login")document.documentElement.classList.add("auth-embedded");else if(location.hash==="#login")location.replace("/"+location.search+"#login");</script>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <meta name="theme-color" content="#010101">
+  <meta name="description" content="Z Pass Web — securely access your account and encrypted vault summary.">
+  <title>Z Pass — Vault</title>
+  <link rel="icon" type="image/png" href="/resources/assets/app-logo/zpass.png">
+  <link rel="apple-touch-icon" href="img/favicon.png">
+  <link rel="stylesheet" href="css/zpass-bundle.css?v=107">
+  <style>
+    .nav-icon-img{width:18px;height:18px;object-fit:contain;flex-shrink:0}
+    .nav-icon-badge{width:22px;height:22px;object-fit:contain;flex-shrink:0;border-radius:6px}
+    .nav-icon-invert{filter:brightness(0) invert(1)}
+    .nav-icon-inline{width:15px;height:15px;object-fit:contain;vertical-align:-2px;margin-right:5px}
+    .nav-icon-inline.nav-icon-invert{filter:invert(1)}
+    .guide-icon-img{width:26px;height:26px;object-fit:contain;filter:invert(1)}
+    .empty-shield img{width:28px;height:28px;object-fit:contain;filter:invert(1)}
+  </style>
+  <link rel="stylesheet" href="css/desktop-vault.css?v=104">
+  <link rel="stylesheet" href="css/hold-selection.css?v=1">
+  <link rel="stylesheet" href="css/auth.css?v=110">
+<link rel="stylesheet" href="/css/login-support.css?v=101"><link rel="stylesheet" href="/css/site-responsive.css?v=102"><link rel="stylesheet" href="/css/mobile-nav.css?v=102"><link rel="stylesheet" href="/css/login-mobile.css?v=106"><script src="/js/zpass-theme.js?v=3"></script><link rel="stylesheet" href="/css/zpass-app-theme.css?v=109"><link rel="stylesheet" href="/css/performance.css">
+<link rel="stylesheet" href="/css/zpass-design-system.css">
+  <link rel="stylesheet" href="/css/web-modern-2026.css?v=1">
+<link rel="stylesheet" href="/css/unified-2026.css?v=414"></head>
+<body>
+  <div class="ambient ambient-one"></div><div class="ambient ambient-two"></div><div class="ambient-three"></div>
+  <header class="topbar">
+    <a class="topbar-back" id="topbarBack" href="./" aria-label="Go back" title="Go back"><span aria-hidden="true">←</span><span>Back</span></a>
+    <a class="brand" href="./" aria-label="Z Pass home"><span>Z Pass</span></a>
+    <nav class="marketing-nav"><a href="#features">Features</a><a href="#pricing">Pricing</a><a href="#security">Security</a><a href="apps.html">Download</a></nav>
+    <a class="nav-login" href="#login">Sign in</a>
+  </header>
+
+  <main>
+    <div id="authView" class="marketing-view">
+    <header class="auth-header"><a href="/" class="auth-brand"><img src="/resources/assets/app-logo/zpass.png" alt=""><span>Z Pass</span></a><div class="login-language" data-language-picker></div></header><section class="auth-layout" id="login">
+      <div class="hero">
+        <div class="eyebrow">Z PASS ECOSYSTEM</div>
+        <h1>Your digital life.<br><span>In one secure vault.</span></h1>
+        <p>Sign in with your Z Pass mobile account. View your subscription, devices, and encrypted cloud vault on the web.</p>
+        <div class="trust-row">
+          <div><b>End-to-end</b><small>encrypted backup</small></div>
+          <div><b>One account</b><small>mobile + web</small></div>
+          <div><b>Privacy</b><small>no plain text</small></div>
+        </div>
+      </div>
+
+      <div class="auth-card">
+        <img class="auth-app-logo" src="/resources/assets/app-logo/zpass.png" alt="Z Pass">
+        <h2>Welcome back</h2>
+        <p class="muted">Continue with your Z Pass account</p>
+        <div id="checkoutIntent" class="checkout-intent" hidden><p id="checkoutIntentText"></p><button id="skipCheckout" type="button">Continue to vault</button></div><form id="loginForm">
+          <label>Email<input id="email" type="email" autocomplete="email" required placeholder="name@example.com"></label>
+          <label>Password<input id="password" type="password" autocomplete="current-password" minlength="6" required placeholder="••••••••••"></label>
+          <button class="primary" type="submit"><span>Sign in</span><span>→</span></button>
+        </form>
+        <div class="divider"><span>or</span></div>
+        <div class="social-row">
+          <button id="googleLogin" class="gsi-material-button google" type="button" aria-label="Sign in with Google" title="Sign in with Google">
+            <span class="gsi-material-button-state"></span>
+            <span class="gsi-material-button-content-wrapper">
+              <span class="gsi-material-button-icon" aria-hidden="true">
+                <svg viewBox="0 0 48 48" xmlns="http://www.w3.org/2000/svg">
+                  <path fill="#EA4335" d="M24 9.5c3.54 0 6.71 1.22 9.21 3.6l6.85-6.85C35.9 2.38 30.47 0 24 0 14.62 0 6.51 5.38 2.56 13.22l7.98 6.19C12.43 13.72 17.74 9.5 24 9.5z"/>
+                  <path fill="#4285F4" d="M46.98 24.55c0-1.57-.15-3.09-.38-4.55H24v9.02h12.94c-.58 2.96-2.26 5.48-4.78 7.18l7.73 6c4.51-4.18 7.09-10.36 7.09-17.65z"/>
+                  <path fill="#FBBC05" d="M10.53 28.59c-.48-1.45-.76-2.99-.76-4.59s.27-3.14.76-4.59l-7.98-6.19C.92 16.46 0 20.12 0 24c0 3.88.92 7.54 2.56 10.78l7.97-6.19z"/>
+                  <path fill="#34A853" d="M24 48c6.48 0 11.93-2.13 15.89-5.81l-7.73-6c-2.15 1.45-4.92 2.3-8.16 2.3-6.26 0-11.57-4.22-13.47-9.91l-7.98 6.19C6.51 42.62 14.62 48 24 48z"/>
+                </svg>
+              </span>
+              <span class="gsi-material-button-contents">Sign in with Google</span>
+            </span>
+          </button>
+        </div>
+        <button id="resetPassword" class="text-button" type="button">Forgot your password?</button>
+        <p id="authMessage" class="message" role="status"></p>
+        <p class="legal">By signing in, you agree to the Z Pass security terms.</p>
+      </div>
+    </section>
+
+    <section class="trust-badges reveal" aria-label="Security standards">
+      <span><b>AES-256-GCM</b><small>end-to-end encryption</small></span>
+      <span><b>PBKDF2-SHA256</b><small>210,000 iterations</small></span>
+      <span><b>Zero-knowledge</b><small>recovery key stays on your device</small></span>
+      <span><b>Biometric lock</b><small>protected by Android Keystore</small></span>
+    </section>
+
+    <section id="features" class="marketing-section">
+      <div class="section-copy reveal"><p class="eyebrow">EVERYTHING INCLUDED</p><h2>Much more than passwords</h2><p>Z Pass brings your passwords, bank cards, authentication codes, and personal information together in one encrypted vault.</p></div>
+      <div class="feature-showcase">
+                <article class="showcase-main reveal">
+          <figure class="vault-illustration" role="img" aria-label="An original Z Pass shield protects passwords, cards, and authentication codes.">
+            <img src="/images/vault-illustration.svg" alt="">
+            <figcaption><strong>One vault. Every key.</strong><span>Private by design, ready everywhere.</span></figcaption>
+          </figure>
+        </article>
+        <article class="reveal"><b><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="8" cy="15" r="4"/><path d="M10.8 12.2 20 3M17 6l2 2M13.6 9.4l2 2"/></svg> Password Vault</b><p>Store unlimited passwords securely and autofill them.</p></article>
+        <article class="reveal"><b><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="5" width="20" height="14" rx="2"/><path d="M2 10h20"/></svg> Cards</b><p>Protect masked payment cards with your recovery password.</p></article>
+        <article class="reveal"><b><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3l7 3v6c0 4.5-3 7.5-7 9-4-1.5-7-4.5-7-9V6l7-3z"/><path d="M9 12l2 2 4-4"/></svg> Authenticator</b><p>Generate six-digit authentication codes offline.</p></article>
+        <article class="reveal"><b><svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor"><path d="M13 2 4 14h6l-1 8 9-12h-6l1-8z"/></svg> Autofill</b><p>Securely fill addresses and personal information in forms.</p></article>
+      </div>
+    </section>
+
+    <section id="security" class="security-marketing">
+      <div class="reveal"><p class="eyebrow">ZERO-KNOWLEDGE ARCHITECTURE</p><h2>Even we cannot see your secrets.</h2><p>Your recovery password never leaves your device. Your cloud vault is protected end-to-end with PBKDF2-SHA256 and AES-256-GCM.</p><ul><li>Android Keystore protection</li><li>Biometric lock</li><li>Encrypted cloud backup</li><li>Automatic screen lock</li></ul></div>
+      <div class="security-orbit reveal"><div><svg width="42" height="42" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3l7 3v6c0 4.5-3 7.5-7 9-4-1.5-7-4.5-7-9V6l7-3z"/><rect x="9.5" y="11" width="5" height="4" rx="1"/><path d="M10.2 11v-1.3a1.8 1.8 0 0 1 3.6 0V11"/></svg></div><span>END-TO-END<br>ENCRYPTED</span></div>
+    </section>
+
+    <section id="pricing" class="pricing-section">
+      <div class="section-copy centered reveal"><p class="eyebrow">SIMPLE PRICING</p><h2>Choose your Z Pass plan</h2><p>Start free and upgrade to Pro when you need more space.</p></div>
+<div class="billing-toggle tab-list sp-glass-toggle" id="pricingBillingToggle" role="group" aria-label="Monthly or yearly">
+        <span class="indicator" aria-hidden="true"></span>
+        <button type="button" class="tab-btn active" data-billing="MONTHLY" aria-pressed="true">Monthly</button>
+        <button type="button" class="tab-btn" data-billing="YEARLY" aria-pressed="false"><em class="save-badge" id="yearlySavingsBadge">%17</em><span>Yearly</span></button>
+      </div>
+      <div id="personalPlans">
+        <div class="pricing-grid">
+          <article class="price-card reveal" data-plan-card="FREE"><h3>Z Pass Free</h3><p>Secure essentials for your personal account</p><div class="price">$0<small>/month</small></div><button class="plan-select-button" type="button" data-select-plan="FREE">Select Free</button><ul><li>Up to 3 saved logins</li><li>Up to 15 vaults</li><li>10 authenticator codes</li><li>10 aliases</li><li>Share each vault with 3 people</li></ul></article>
+          <article class="price-card recommended reveal" data-plan-card="PLUS"><div class="recommend">MOST POPULAR</div><h3>Z Pass Plus</h3><p>Premium essentials for one account</p><div class="price" id="marketingPlusPrice">$4.99<small>/month</small></div><p class="billed-note" id="marketingPlusBilledNote"></p><button class="plan-select-button" type="button" data-select-plan="PLUS">Select Plus</button><ul><li>Up to 5 saved logins</li><li>Up to 50 vaults</li><li>Unlimited authenticator codes and aliases</li><li>Custom app icons</li><li>Share each vault with 10 people</li><li>Priority support</li></ul></article>
+          <article class="price-card reveal" data-plan-card="PRO"><h3>Z Pass Pro</h3><p>More capacity for your personal account</p><div class="price" id="marketingProPrice">$9<small>/month</small></div><p class="billed-note" id="marketingProBilledNote"></p><button class="plan-select-button" type="button" data-select-plan="PRO">Select Pro</button><ul><li>Up to 10 saved logins</li><li>Unlimited vaults</li><li>Voice message transcription</li><li>Custom app icons</li><li>Expanded sharing and recovery tools</li><li>Priority support</li></ul></article>
+        </div>
+      </div>
+      <p class="pricing-disclaimer">Pricing shown in USD. Annual plans are billed once per year. Taxes not included.</p>
+    </section>
+    <div class="checkout-footer" id="pricingCheckoutBar" aria-live="polite">
+      <div class="checkout-info">
+        <div class="plan-name" id="pricingCheckoutPlan">Z Pass Plus</div>
+        <div class="plan-cost" id="pricingCheckoutCost">$5 <span>/ month</span></div>
+        <div class="checkout-billed" id="pricingCheckoutBilled">Billed monthly</div>
+      </div>
+      <a class="subscribe-btn" id="pricingCheckoutCta" href="/checkout.html?product=zpass&amp;plan=PLUS&amp;billing=MONTHLY">Continue</a>
+    </div>
+
+    <section id="comparison" class="comparison" aria-labelledby="comparison-heading">
+      <div class="section-copy centered reveal">
+        <p class="eyebrow">A CLEARER WAY TO PROTECT WHAT MATTERS</p>
+        <h2 id="comparison-heading">Why choose Z Pass?</h2>
+        <p>Everything you need for everyday digital security, brought together in one private vault.</p>
+      </div>
+      <div class="compare-brand-strip compare-capabilities-panel reveal" aria-label="What you can do with Z Pass">
+        <div class="compare-capabilities-heading">
+          <span class="compare-brand-label">WHAT Z PASS DOES</span>
+          <h3>Your essentials, protected in one place.</h3>
+        </div>
+        <div class="compare-capabilities">
+          <article class="compare-capability featured">
+            <span class="compare-benefit-icon" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><circle cx="8" cy="15" r="4"/><path d="m11 12 9-9M16 7l2 2m-5 1 2 2"/></svg></span>
+            <div><h4>Password vault</h4><p>Keep your logins together in an encrypted vault.</p></div>
+          </article>
+          <article class="compare-capability">
+            <span class="compare-benefit-icon" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="5" width="18" height="14" rx="2"/><path d="M3 10h18M7 15h3"/></svg></span>
+            <div><h4>Card vault</h4><p>Store payment cards with details masked by default.</p></div>
+          </article>
+          <article class="compare-capability">
+            <span class="compare-benefit-icon" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="8"/><path d="M12 8v4l3 2M12 2v2M12 20v2"/></svg></span>
+            <div><h4>Authenticator</h4><p>Generate six-digit verification codes offline.</p></div>
+          </article>
+          <article class="compare-capability">
+            <span class="compare-benefit-icon" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><rect x="4" y="3" width="16" height="18" rx="2"/><path d="M8 8h8M8 12h5M8 16h3"/></svg></span>
+            <div><h4>Secure autofill</h4><p>Fill addresses and personal details more easily.</p></div>
+          </article>
+        </div>
+      </div>
+      <div class="compare-platforms reveal">
+        <div class="compare-platforms-heading"><span class="compare-platforms-mark"><img src="/resources/assets/app-logo/zpass.png" alt=""></span><div><h3>Your vault, across your devices</h3><p>One Z Pass account on Android, web, and Windows.</p></div></div>
+        <div class="platform-primary" aria-label="Z Pass is available for Android, web, and Windows">
+          <span class="platform-tile"><span class="platform-icon"><img src="images/apps/Android.svg" alt=""></span><b>Android</b></span>
+          <span class="platform-tile"><span class="platform-icon"><img src="images/apps/Web%20App.svg" alt=""></span><b>Web App</b></span>
+          <span class="platform-tile"><span class="platform-icon"><img src="images/apps/Windows.svg" alt=""></span><b>Windows</b></span>
+        </div>
+        <div class="platform-more">
+          <span class="platform-more-label">More platforms</span>
+          <div class="platform-compact-list" aria-label="Chrome, Brave, Edge, Firefox, Safari, Linux, and macOS">
+            <span class="platform-compact"><img src="images/apps/Chrome.svg" alt=""><b>Chrome</b></span>
+            <span class="platform-compact"><img src="images/apps/Brave.svg" alt=""><b>Brave</b></span>
+            <span class="platform-compact"><img src="images/apps/Edge.svg" alt=""><b>Edge</b></span>
+            <span class="platform-compact"><img src="images/apps/Firefox.svg" alt=""><b>Firefox</b></span>
+            <span class="platform-compact"><img src="images/apps/Safari.svg" alt=""><b>Safari</b></span>
+            <span class="platform-compact"><img src="images/apps/Linux.svg" alt=""><b>Linux</b></span>
+            <span class="platform-compact"><img src="images/apps/MacOS.svg" alt=""><b>macOS</b></span>
+          </div>
+        </div>
+      </div>
+      <div class="compare-benefits">
+        <article class="compare-benefit reveal">
+          <span class="compare-benefit-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 3 19 6v6c0 4.5-3 7.5-7 9-4-1.5-7-4.5-7-9V6l7-3Z"/><rect x="9" y="11" width="6" height="5" rx="1"/><path d="M10.5 11V9.5a1.5 1.5 0 0 1 3 0V11"/></svg></span>
+          <h3>Private by design</h3>
+          <p>Your encrypted vault is protected with your recovery password, which stays on your device.</p>
+        </article>
+        <article class="compare-benefit reveal">
+          <span class="compare-benefit-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="8" cy="15" r="4"/><path d="m11 12 9-9M16 7l2 2m-5 1 2 2"/></svg></span>
+          <h3>More than passwords</h3>
+          <p>Keep logins, payment cards, personal details, and authenticator codes together.</p>
+        </article>
+        <article class="compare-benefit reveal">
+          <span class="compare-benefit-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 3v18m9-9H3"/><circle cx="12" cy="12" r="9"/></svg></span>
+          <h3>Start with the essentials</h3>
+          <p>Get started for free, then choose a plan when you need more.</p>
+        </article>
+      </div>
+      <div class="compare-cta reveal"><a href="#login">Create your free account <span aria-hidden="true">→</span></a></div>
+    </section>
+
+    <section class="final-cta reveal"><div><p class="eyebrow">DISCOVER Z PASS</p><h2>Your secure digital life starts today.</h2><p>Create your free account or find Z Pass for your device.</p></div><div><a class="cta-primary" href="#login">Sign in to web vault</a><a class="cta-secondary" href="apps.html">Explore apps</a></div></section>
+    <footer class="marketing-footer" aria-label="Site footer">
+      <div class="footer-community" aria-label="Follow Z Pass">
+        <a href="https://x.com/4rezan" target="_blank" rel="noopener noreferrer">
+          <img src="images/ui/social-media/x-twitter.png" alt="" loading="lazy"><span><b>Follow on X</b><small>Updates from Z Pass</small></span><span class="footer-arrow" aria-hidden="true">↗</span>
+        </a>
+        <a href="https://youtube.com/@4rezan" target="_blank" rel="noopener noreferrer">
+          <img src="images/ui/social-media/youtube.png" alt="" loading="lazy"><span><b>Watch on YouTube</b><small>Tips and product news</small></span><span class="footer-arrow" aria-hidden="true">↗</span>
+        </a>
+        <a href="https://github.com/4rezan" target="_blank" rel="noopener noreferrer">
+          <img src="images/ui/social-media/github.png" alt="" loading="lazy"><span><b>Find us on GitHub</b><small>Explore Z Pass projects</small></span><span class="footer-arrow" aria-hidden="true">↗</span>
+        </a>
+      </div>
+      <div class="footer-main">
+        <div class="footer-brand-column">
+          <a class="footer-brand" href="./"><img src="/resources/assets/app-logo/zpass.png" alt="" loading="lazy"><span>Z Pass</span></a>
+          <p>Your passwords, cards, and authentication codes—protected in one secure vault.</p>
+          <a class="footer-download" href="apps.html">Explore Z Pass apps <span aria-hidden="true">→</span></a>
+        </div>
+        <nav class="footer-link-group" aria-label="Product">
+          <h2>Product</h2><a href="#features">Features</a><a href="#pricing">Plans &amp; pricing</a><a href="#security">Security</a><a href="apps.html">Download apps</a>
+        </nav>
+        <nav class="footer-link-group" aria-label="Guides">
+          <h2>Guides</h2><a href="2fa.html">Authenticator guide</a><a href="aliases.html">Email aliases</a><a href="info.html">Info &amp; legal</a>
+        </nav>
+        <nav class="footer-link-group" aria-label="Support and social">
+          <h2>Support</h2><a href="mailto:rezan@dr.com">Contact support</a><a href="https://instagram.com/4rezan" target="_blank" rel="noopener noreferrer">Instagram</a><a href="https://tiktok.com/@4rezan" target="_blank" rel="noopener noreferrer">TikTok</a><a href="https://t.me/Qurmar" target="_blank" rel="noopener noreferrer">Telegram</a>
+        </nav>
+      </div>
+      <div class="footer-bottom"><span>© 2026 Z Pass. All rights reserved.</span><span>Built for a more secure digital life.</span></div>
+    </footer>
+    </div>
+
+    <section id="dashboardView" class="dashboard hidden">
+      <aside class="sidebar">
+        <div class="side-brand"><img class="side-app-logo" src="/resources/assets/app-logo/zpass.png" alt="Z Pass"><div><b>Z Pass</b><small>WEB VAULT</small></div></div>
+        <div class="side-section-title"><span>VAULTS</span><button id="addCategory" aria-label="Add category"><img class="quick-action-icon" src="/images/ui/add.svg" alt=""></button></div>
+        <nav>
+          <button class="nav-item active" data-panel="overview"><span><img class="nav-icon-img nav-icon-invert" src="/resources/assets/icons/ui/all.png" alt=""></span><div>All vaults<small id="sideItemCount">0 items</small></div><i>⋮</i></button>
+          
+          
+          <button class="nav-item" id="archiveNav"><img src="/resources/assets/icons/modern/archive.svg" alt=""><span>Archived</span></button><div id="categoryList" class="category-list"></div>
+        </nav>
+        <button id="toolsToggle" class="side-section-title tools-title tools-toggle" type="button" aria-expanded="false" aria-controls="toolsNav"><span>Z PASS TOOLS</span><span class="tools-chevron" aria-hidden="true">⌄</span></button>
+        <nav id="toolsNav" class="tools-nav"><button id="vaultNav" class="nav-item"><img src="/resources/assets/icons/modern/shield.svg" alt="">Vault</button>
+          <button class="nav-item" data-panel="security" hidden><span class="nav-svg" aria-hidden="true"><svg viewBox="0 0 24 24"><path d="M12 3 5 6v5c0 4.7 2.9 8.8 7 10 4.1-1.2 7-5.3 7-10V6l-7-3Z"/><path d="m9 12 2 2 4-5"/></svg></span>Security</button>
+          <button class="nav-item" data-panel="cards"><img src="/resources/assets/icons/modern/card.svg" alt="">Cards</button>
+          <button class="nav-item" data-panel="authenticator"><img src="/resources/assets/icons/modern/shield.svg" alt="">Authenticator</button>
+        <button class="nav-item" data-panel="trash"><img src="/resources/assets/icons/ui/trash-fill-18.png" alt="">Trash</button><button class="nav-item mobile-settings" data-panel-link="settings">⚙ Settings</button></nav>
+        <div class="side-links">
+          <button data-panel-link="security"><img class="nav-icon-inline nav-icon-invert" src="/images/monitor.png" alt="">Pass Monitor</button>
+          <button id="sideLock"><img class="nav-icon-inline nav-icon-invert" src="/images/lock.png" alt="">Lock Z Pass</button>
+          <details class="side-expand"><summary><img class="nav-icon-inline" src="/images/advanced.png" alt="">Advanced</summary><button id="generatedPasswords">⌘ Generated passwords</button><button id="manualSync">↻ Sync data now</button></details>
+          <details class="side-expand"><summary><img class="nav-icon-inline nav-icon-invert" src="/images/download.png" alt="">Download apps</summary><a href="apps.html">Choose a platform</a></details>
+        </div>
+        <div class="side-footer"><img id="sideAvatar" class="profile-app-logo" src="/resources/assets/app-logo/zpass.png" alt="Account avatar" data-panel-link="profile" style="cursor:pointer"><div data-panel-link="profile" style="cursor:pointer"><b id="sideName" data-private>Z Pass User</b><small id="sideEmail" data-private></small></div><button data-panel-link="settings" data-settings-tab="general" aria-label="Open settings">⚙</button>
+        </div>
+      </aside>
+
+      <div class="content">
+        <div class="mobile-head"><div class="brand"><img class="brand-logo" src="/resources/assets/app-logo/zpass.png" alt="">Z Pass</div><button id="mobileLogout">Sign out</button></div>
+        <div class="vault-toolbar"><div class="vault-search">⌕ <input id="vaultSearch" type="search" placeholder="Search all items…"></div><select id="vaultSort" class="vault-sort" aria-label="Sort vault"><option value="newest">Newest</option><option value="oldest">Oldest</option><option value="az">A–Z</option><option value="za">Z–A</option></select><button id="openUpgrade" class="upgrade-button">Upgrade</button><button id="createItemTop" class="create-button" disabled>＋ New item</button></div>
+        <section class="web-panel active" data-panel-view="overview"><div class="desktop-page-title"><h2 id="vaultPageTitle">All vaults</h2><p class="muted">Passwords, cards and encrypted accounts.</p></div>
+        <div class="welcome"><div><p class="eyebrow">SECURE WEB VAULT</p><h2>Welcome, <span id="welcomeName" data-private>Z Pass User</span></h2><p class="muted">Your account and encrypted vault are protected.</p></div><div class="secure-badge">● Secure session</div></div>
+
+        <div class="stats">
+          <article><div class="stat-icon purple">☁</div><div><small>Cloud Vault</small><b id="vaultStatus">Checking…</b></div></article>
+          <article><div class="stat-icon blue">◇</div><div><small>Plan</small><b id="planStatus">FREE</b></div></article>
+          <article><div class="stat-icon green">▣</div><div><small>Connected device</small><b id="deviceCount">—</b></div></article>
+        </div>
+
+        <div class="grid">
+          <article class="panel vault-panel">
+            <div class="panel-head"><div><small>ENCRYPTED VAULT</small><h3>Z Pass Cloud</h3></div><span class="status-dot">● Connected</span></div>
+            <div class="vault-visual"><div class="vault-ring"><span>◆</span></div><div><b>Your data is protected</b><p>Passwords are never opened as plain text on the web server. Your recovery password remains under your control.</p></div></div>
+            <div class="progress"><span id="planDescription">Free plan · up to 3 logins</span><span id="usageLabel">0 / 3 logins</span></div><div class="bar"><i id="usageBar"></i></div>
+          </article>
+
+          <article class="panel account-panel">
+            <div class="panel-head"><div><small>ACCOUNT</small><h3>Profile information</h3></div></div>
+            <dl><div><dt>Z Pass ID</dt><dd id="uid" data-private>—</dd></div><div><dt>Email</dt><dd id="profileEmail" data-private>—</dd></div><div><dt>Last seen</dt><dd id="lastSeen">—</dd></div></dl>
+          </article>
+        </div>
+
+        <article id="passwordsLocked" class="vault-empty"><div class="empty-shield" aria-hidden="true"><img src="/images/lock.png" alt="Lock"></div><h3>Your vault is locked</h3><p>Unlock with your recovery password to view cloud items.</p><button class="quick-create unlock-cloud" type="button">Unlock encrypted vault</button><a class="quick-create import-action" href="apps.html#android">↑ Back up from mobile</a></article>
+        <div class="desktop-vault-columns"><div id="passwordsList" class="password-list hidden"></div><aside id="loginDetails"></aside></div>
+        <article class="panel security-strip"><div class="stat-icon purple">◇</div><div><b>Full vault access in the mobile app</b><p>Use the Z Pass Android app to add, edit, and restore passwords with your recovery password.</p></div><a href="apps.html#android">Download app →</a></article>
+        </section>
+
+        <section class="web-panel" data-panel-view="security">
+          <div class="page-title"><p class="eyebrow">SECURITY CENTER</p><h2>Your protection status</h2><p class="muted">Account and web-session security summary.</p></div>
+          <div class="feature-grid">
+            <article class="feature-card"><div class="feature-icon">◇</div><h3>Encrypted Cloud</h3><p>Your vault backup remains encrypted during transfer and storage.</p><span class="ok">● Active</span></article>
+            <article class="feature-card"><div class="feature-icon">⌁</div><h3>Secure Session</h3><p>Your account sign-in is protected.</p><span class="ok">● Active</span></article>
+            <article class="feature-card"><div class="feature-icon">▣</div><h3>Device Security</h3><p>Full decryption keys remain inside Android Keystore.</p><span class="ok">● Mobile protected</span></article>
+          </div>
+          <div class="monitor-learn">
+            <div><h3>Want to learn more?</h3><p class="muted">Guides to keep your accounts safer and more private.</p></div>
+            <div class="monitor-guide-grid">
+              <a href="/info.html"><span>◎</span><b>Info, dark web &amp; legal</b><small>About Z Pass, data leaks, privacy and terms.</small><i>Open guide →</i></a>
+              <a href="/aliases.html"><span>⌁</span><b>What is an email alias?</b><small>Keep your real email address private.</small><i>Open guide →</i></a>
+              <a href="/2fa.html"><span><img class="guide-icon-img" src="/images/2fa.png" alt=""></span><b>Better protection with 2FA</b><small>Use Authenticator codes securely.</small><i>Open guide →</i></a>
+            </div>
+          </div>
+        </section>
+
+        <section class="web-panel" data-panel-view="cards">
+          <div class="page-title"><p class="eyebrow">ENCRYPTED CARD VAULT</p><h2>Cards</h2><p class="muted">Card details are masked by default.</p></div>
+          <div id="cardsLocked" class="empty-product panel"><div class="demo-card"><span>Z PASS CARD</span><b>•••• &nbsp;•••• &nbsp;•••• &nbsp;••••</b><small>CARDHOLDER &nbsp;&nbsp; MM/YY</small></div><h3>Unlock encrypted card vault</h3><p>Enter your recovery password to view cards protected with Back up now in the app.</p><button class="inline-primary unlock-cloud" type="button">Unlock with recovery password</button></div>
+          <div id="cardsList" class="product-list hidden"></div>
+        </section>
+
+        <section class="web-panel" data-panel-view="authenticator">
+          <div class="page-title"><p class="eyebrow">OFFLINE AUTHENTICATION</p><h2>Authenticator</h2><p class="muted">Your live six-digit codes are protected on your phone.</p></div>
+          <div id="authLocked" class="empty-product panel"><div class="totp-demo"><div><b>Authenticator</b><small id="profileEmail2">Z Pass account</small></div><strong>••• •••</strong><i></i></div><h3>Unlock encrypted Authenticator vault</h3><p>Enter your recovery password to view codes protected with Back up now in the app.</p><button class="inline-primary unlock-cloud" type="button">Unlock with recovery password</button> <a class="inline-primary" href="/2fa.html">2FA user guide</a></div>
+          <div id="authList" class="product-list hidden"></div>
+        </section>
+
+        <section class="web-panel" data-panel-view="trash"><div class="page-title"><h2>Trash</h2><p class="muted">Encrypted deleted items</p></div><div id="trashList" class="product-list"></div></section><section class="web-panel" data-panel-view="profile">
+          <div class="page-title"><p class="eyebrow">Z PASS ACCOUNT</p><h2>Profile</h2><p class="muted">Your account, plan, and connected devices.</p></div>
+          <div class="profile-hero panel"><div class="avatar large" id="profileAvatar">Z</div><div><h3 id="profileName">Z Pass User</h3><p id="profileEmailLarge" class="muted">—</p></div><span id="profilePlan" class="plan-chip">FREE</span></div>
+          <div class="grid"><article class="panel"><div class="panel-head"><h3>Account information</h3></div><dl><div><dt>Z Pass ID</dt><dd id="profileUid">—</dd></div><div><dt>Last activity</dt><dd id="profileLastSeen">—</dd></div></dl></article><article class="panel"><div class="panel-head"><h3>Quick actions</h3></div><div class="quick-actions"><button id="profileReset">Password reset email</button><a href="apps.html">Download Z Pass apps</a><button id="profileLogout"><img class="quick-action-icon" src="/images/ui/arrow-door-out-3-fill-18.svg" alt="">Sign out</button></div></article></div>
+          <article class="panel device-sessions-panel"><div class="panel-head"><div><small>READ ONLY</small><h3>Connected devices</h3></div></div><p class="muted">View sessions here. Location and session controls are available in the Android app.</p><div id="profileDevicesList" class="device-session-list"></div></article>
+        </section>
+
+        <section class="web-panel settings-panel" data-panel-view="settings">
+          <div class="settings-heading"><button id="settingsBack" type="button">←</button><h2>Settings</h2></div>
+          <nav class="settings-tabs" aria-label="Settings sections">
+            <button class="active" data-settings-tab="general">General</button><button data-settings-tab="security">Security</button><button data-settings-tab="account">Personal information</button><button data-settings-tab="import">Import</button><button data-settings-tab="export">Export</button><button data-settings-tab="subscription">Subscription</button><button data-settings-tab="support">Support</button><button id="logout">↪ Sign out</button></nav>
+          <div class="settings-view active" data-settings-view="general"><article class="settings-box"><h3>Language</h3><select id="themeChoice" hidden><option value="dark">Dark</option></select><label>Language<select id="webLanguage" hidden><option value="ar-AR">العربية</option><option value="de-DE">Deutsch</option><option value="en-US">English</option><option value="es-ES">Español</option><option value="fr-FR">Français</option><option value="hi-IN">हिन्दी</option><option value="id-ID">Bahasa Indonesia</option><option value="it-IT">Italiano</option><option value="ja-JP">日本語</option><option value="ko-KR">한국어</option><option value="ku-KU">Kurdî (ku)</option><option value="pt-BR">Português</option><option value="tr-TR">Türkçe</option></select><div data-language-picker></div></label><p class="settings-note" id="languageNote">Choose your language. Changes apply immediately.</p></article><article class="settings-box"><h3>Display</h3><label class="website-icon-option"><input id="websiteIcons" type="checkbox" checked>Show website icons</label><p>Display the best available logo from the Z Pass icon service or local icon library.</p></article><article class="settings-box"><h3>Desktop appearance</h3><p>Dark surfaces, clear outline icons and blue selection accents.</p></article><article class="settings-box"><h3>Profile identity</h3><p>Your sign-in avatar is selected automatically. You can override it and set a preferred name.</p><label>Preferred name<input id="webPreferredName" autocomplete="nickname" data-private></label><button id="savePreferredName" class="settings-primary">Save</button></article></div>
+          <div class="settings-view settings-subscription-view" data-settings-view="subscription">
+            <article class="settings-box"><h3>Subscription &amp; billing</h3><p>Choose your plan and continue directly to secure checkout.</p><div class="subscription-account"><div><small>YOUR PLAN</small><h3 id="subscriptionCurrentPlan">Z Pass Free</h3><p id="subscriptionValidUntil">Free plan</p></div><span id="subscriptionAccountId"></span></div></article>
+            <div id="remoteSubscriptionPages" class="subscription-actions"></div>
+            <div class="subscription-billing"><button type="button" data-subscription-billing="MONTHLY" class="active">Monthly</button><button type="button" data-subscription-billing="YEARLY">Yearly</button></div>
+            <div class="subscription-plans">
+              <article class="settings-box"><h3>Z Pass Free</h3><p>Up to 3 saved logins and 10 Authenticator tokens.</p><strong class="subscription-price">$0</strong><p>For personal use.</p></article>
+              <article class="settings-box"><h3>Z Pass Plus</h3><p>Up to 5 saved logins, unlimited authenticator codes, and custom app icons.</p><strong class="subscription-price" data-subscription-price="PLUS">$4.99 / month</strong><div class="subscription-actions"><a class="settings-primary" data-checkout-plan="PLUS" href="/checkout.html?plan=PLUS&amp;billing=MONTHLY">Continue to checkout</a></div></article>
+              <article class="settings-box"><h3>Z Pass Pro</h3><p>Up to 10 saved logins, voice transcription, and custom app icons.</p><strong class="subscription-price" data-subscription-price="PRO">$9 / month</strong><p>Unlimited vaults and expanded premium tools.</p><div class="subscription-actions"><a class="settings-primary" data-checkout-plan="PRO" href="/checkout.html?plan=PRO&amp;billing=MONTHLY">Continue to checkout</a></div></article>
+            </div>
+          </div>
+          <div class="settings-view" data-settings-view="aliases"><article class="settings-box"><h3>Hide-my-email aliases</h3><p id="aliasPlanLimit">Free includes 10 aliases. Pass Plus and Unlimited include unlimited aliases.</p><label>Default alias domain<select disabled><option>Not available yet</option></select></label><hr><h3>Mailboxes</h3><p>Emails sent to aliases are forwarded to your connected mailbox.</p><div class="mailbox-row"><b id="aliasMailbox">Z Pass account</b><span>0 aliases</span><i>COMING SOON</i></div><a class="settings-help" href="/aliases.html">Learn about aliases →</a></article></div>
+          <div class="settings-view" data-settings-view="security"><article class="settings-box"><h3>Vault lock</h3><p>When the web vault locks, passwords, cards, and Authenticator codes are hidden and the key is removed from memory.</p><label>Auto-lock after<select id="autoLockMinutes"><option value="1">1 minute</option><option value="2">2 minutes</option><option value="5">5 minutes</option><option value="10">10 minutes</option><option value="30">30 minutes</option><option value="60">1 hour</option></select></label><button id="lockNow" class="settings-primary">Lock vault now</button></article><article class="settings-box"><h3>Local passcode</h3><p>Set a short passcode for this browser so reopening the vault doesn't need your full recovery password or phone code every time. It never leaves this device, and forgetting it just means unlocking the normal way again.</p><button id="setLocalPasscode" class="settings-primary">Set local passcode</button><button id="removeLocalPasscode">Remove local passcode</button></article></div>
+          <div class="settings-view" data-settings-view="tokens"><article class="settings-box"><h3>Access tokens</h3><p>Z Pass API access tokens are not enabled yet. No secret token is created in the browser before the secure server infrastructure is ready.</p><button disabled>New access token</button></article></div>
+          <div class="settings-view" data-settings-view="import"><article class="settings-box"><h3>Import passwords</h3><p>Drop a Z Pass .zhc backup here or select a file. Portable backups work on Android, Windows and Web. CSV and older web exports are also supported.</p><div class="import-grid"><span>1Password<small>CSV</small></span><span>Apple Passwords<small>CSV</small></span><span>Bitwarden<small>CSV</small></span><span>Chrome<small>CSV</small></span><span>Firefox<small>CSV</small></span><span>Dashlane<small>CSV</small></span><span>LastPass<small>CSV</small></span><span>Generic CSV<small>CSV</small></span></div><input id="importFile" type="file" accept=".zhc,.json,.csv,application/x-zpass-backup,application/json,text/csv"><button id="startImport" class="settings-primary">Import selected file</button><p id="importMessage" class="settings-note"></p></article></div>
+          <div class="settings-view" data-settings-view="export"><article class="settings-box"><h3>Export vault</h3><p>Export is available only while the vault is unlocked.</p><label><input type="radio" name="exportFormat" value="encrypted" checked> Z Pass encrypted file (recommended)</label><label><input type="radio" name="exportFormat" value="csv"> CSV — unencrypted and unsafe</label><button id="startExport" class="settings-primary">Export</button><p id="exportMessage" class="settings-note"></p></article></div>
+          <div class="settings-view" data-settings-view="account"><article class="settings-box"><h3>Account and password</h3><div class="account-setting-row"><span>Email</span><b id="settingsEmail">—</b></div><div class="account-setting-row"><span>Z Pass ID</span><b id="settingsUid">—</b></div><button id="settingsResetPassword">Send password reset email</button><a class="settings-help" href="/2fa.html">Two-factor authentication guide →</a></article></div>
+          <div class="settings-view" data-settings-view="support"><article class="settings-box"><h3>Support &amp; developer</h3><p class="settings-note">Do not send passwords, recovery passwords, card numbers, or 2FA codes.</p><textarea id="supportText" rows="7" placeholder="Describe the problem and include any error messages"></textarea><button id="sendSupport" class="settings-primary"><img class="quick-action-icon" src="/images/ui/send.svg" alt="">Send by email</button><hr><h3>Social media</h3><div class="support-socials"><a href="https://github.com/4rezan" target="_blank" rel="noopener"><img src="/images/ui/social-media/github.png" alt="">GitHub <b>@4rezan</b></a><a href="https://x.com/4rezan" target="_blank" rel="noopener"><img src="/images/ui/social-media/x-twitter.png" alt="">X <b>@4rezan</b></a><a href="https://instagram.com/4rezan" target="_blank" rel="noopener"><img src="/images/ui/social-media/instagram.png" alt="">Instagram <b>@4rezan</b></a><a href="https://tiktok.com/@4rezan" target="_blank" rel="noopener"><img src="/images/ui/social-media/tik-tok.png" alt="">TikTok <b>@4rezan</b></a><a href="https://youtube.com/@4rezan" target="_blank" rel="noopener"><img src="/images/ui/social-media/youtube.png" alt="">YouTube <b>@4rezan</b></a><a href="https://t.me/Qurmar" target="_blank" rel="noopener"><img src="/images/ui/social-media/telegram.png" alt="">Telegram <b>@Qurmar</b></a></div><hr><h3>Help</h3><a class="settings-help" href="/2fa.html">Z Pass 2FA guide</a><a class="settings-help" href="/aliases.html">Aliases guide</a><a class="settings-help" href="/info.html">Info &amp; legal</a></article></div>
+        </section>
+        <p id="dashboardMessage" class="message" role="status"></p>
+      </div>
+    </section>
+  </main>
+  <dialog id="recoveryDialog" class="recovery-dialog"><form method="dialog"><div class="shield">◆</div><h2>Unlock cloud vault</h2><p>Your recovery password is processed on your device and is never sent to the server. If you've turned on the Authenticator code in the app, that's used instead — this password is for older vaults or when the code is turned off.</p><label>Recovery password<input id="recoveryPassword" type="password" minlength="10" autocomplete="off" placeholder="At least 10 characters"></label><p id="recoveryMessage" class="message"></p><div class="dialog-actions"><button id="openForgotRecovery" type="button" style="margin-right:auto;">Forgot recovery password?</button><button value="cancel">Cancel</button><button id="unlockRecovery" value="default" type="button">Unlock securely</button></div></form></dialog>
+  <dialog id="forgotRecoveryDialog" class="recovery-dialog"><div class="shield">✉</div><h2>Reset recovery password</h2><p>This sends a verification link to <b id="forgotRecoveryEmail">your account email</b>. Clicking it proves the request is really you, then lets you set a brand-new recovery password.</p><p style="color:#CCD6DD;font-size:.85em;"><b>Important:</b> your existing encrypted vault items were locked with the <i>old</i> recovery password and cannot be decrypted with a new one — resetting starts a fresh, empty vault. If you still might remember the old password, cancel and keep trying it instead.</p><p id="forgotRecoveryMessage" class="message"></p><div class="dialog-actions"><button id="forgotRecoveryCancel" type="button">Cancel</button><button id="forgotRecoverySend" type="button">Send verification email</button></div></dialog>
+  <dialog id="webTwoFactorDialog" class="recovery-dialog"><div class="shield"><images>lock.png</div><h2>Code required to unlock vault</h2><p>Open the Z Pass app on your phone → <b>Authenticator</b> → enter the 6-digit code from the <b>zpass.web.app</b> card at the top. This code both verifies your identity and unlocks your encrypted vault; it's never sent to the server.</p><label>6-digit code<input id="webTwoFactorCode" type="text" inputmode="numeric" pattern="[0-9]*" maxlength="6" autocomplete="one-time-code" placeholder="000000"></label><p id="webTwoFactorMessage" class="message"></p><div class="dialog-actions"><button id="webTwoFactorSignOut" type="button">Cancel</button><button id="webTwoFactorVerify" type="button">Verify</button></div></dialog>
+  <dialog id="loginApprovalDialog" class="recovery-dialog"><div class="approval-body"><div class="shield">◆</div><h2>Approve on your phone</h2><p>Confirm this code in Z Pass on your phone.</p><div id="loginApprovalCode" class="approval-code">--</div><p id="loginApprovalMessage" class="message"></p><div class="dialog-actions"><button id="loginApprovalUseRecovery" type="button" hidden style="display:none">Use recovery password instead</button><button id="loginApprovalRetry" type="button" hidden>Request a new code</button><button id="loginApprovalCancel" type="button">Cancel</button></div></div></dialog>
+  <dialog id="quickUnlockDialog" class="recovery-dialog"><div class="shield">🔑</div><h2>Enter your local passcode</h2><p>This short passcode unlocks the vault on this device only, instead of your recovery password or phone code.</p><label>Passcode<input id="quickUnlockCode" type="password" autocomplete="off" placeholder="Local passcode"></label><p id="quickUnlockMessage" class="message"></p><div class="dialog-actions"><button id="quickUnlockForgot" type="button">Forgot passcode? Sign in normally</button><button id="quickUnlockVerify" type="button">Unlock</button></div></dialog>
+  <dialog id="setPasscodeDialog" class="recovery-dialog"><div class="shield">🔑</div><h2>Set a local passcode</h2><p>Next time this vault locks in this browser, this passcode unlocks it instead of your recovery password or phone code.</p><label>New passcode<input id="newPasscode" type="password" autocomplete="off" placeholder="At least 4 characters"></label><label>Confirm passcode<input id="newPasscodeConfirm" type="password" autocomplete="off"></label><p id="newPasscodeMessage" class="message"></p><div class="dialog-actions"><button value="cancel" onclick="document.getElementById('setPasscodeDialog').close()">Cancel</button><button id="savePasscode" type="button">Save</button></div></dialog>
+  <div id="drawerBackdrop" class="drawer-backdrop hidden"></div>
+  <aside id="itemDrawer" class="item-drawer" aria-hidden="true"><header><button id="closeDrawer">×</button><div><small>NEW ITEM</small><h2 id="drawerTitle">New login</h2></div><button id="saveItem">Save</button></header><div class="type-tabs"><button data-kind="login" class="active">Login</button><button data-kind="card">Card</button><button data-kind="authenticator">Authenticator</button></div><form id="itemForm"><label>Title<input name="title" required placeholder="e.g. My Google account"></label><div id="dynamicFields"></div><label>Note<textarea name="notes" placeholder="Add a secure note"></textarea></label><p id="drawerMessage" class="message"></p></form></aside>
+  <dialog id="upgradeDialog" class="upgrade-dialog"><button id="closeUpgrade" class="upgrade-close" aria-label="Close">×</button><div class="upgrade-progress"><i></i><i class="active"></i><i></i></div><div class="upgrade-layout"><section><p class="upgrade-kicker">Z PASS PREMIUM</p><h2>Unlock premium features</h2><p class="upgrade-lead">More space and advanced protection for your passwords, cards, and authentication codes.</p><div class="upgrade-billing" role="group" aria-label="Billing period"><button class="upgrade-billing-btn active" id="upgradeMonthly" data-billing="MONTHLY">Monthly</button><button class="upgrade-billing-btn" id="upgradeYearly" data-billing="YEARLY">Yearly<span class="upgrade-save">Save</span></button></div><button class="upgrade-plan" data-plan="PLUS" data-monthly="4.99" data-yearly="49.90"><span><b>Z Pass Plus</b><small class="upgrade-plan-price">$4.99 / month</small></span><strong>Most popular</strong></button><button class="upgrade-plan" data-plan="PRO" data-monthly="9" data-yearly="90"><span><b>Z Pass Pro</b><small class="upgrade-plan-price">$9 / month</small></span><strong>10 logins + voice tools</strong></button></section><section><h3>Personal protection for one account</h3><div class="product-icons"><div><span>◆</span>Pass</div><div><span>▤</span>Cards</div><div><span>✣</span>2FA</div><div><span>☁</span>Cloud</div><div><span>◇</span>Health</div></div><div class="included-head"><h3>What is included?</h3><div><span>Plus</span><b>Pro</b></div></div><div class="included-row"><span>Saved logins</span><b>5</b><strong>10</strong></div><div class="included-row"><span>Encrypted cloud</span><b>50 vaults</b><strong>Unlimited vaults</strong></div><div class="included-row"><span>Custom app icons</span><b>✓</b><strong>✓</strong></div><div class="included-row"><span>Voice transcription</span><b>—</b><strong>✓</strong></div><div class="included-row"><span>Priority support</span><b>✓</b><strong>✓</strong></div></section></div><footer><button id="skipUpgrade">Not now</button><button id="chooseUpgrade">Choose Z Pass Plus</button></footer></dialog>
+  <script src="js/argon2.umd.min.js"></script>
+  <script src="js/payment-config.js?v=3"></script>
+  <script src="js/modern-validation.js?v=2"></script><script src="js/liquid-nav.js?v=2"></script>
+  <script src="js/desktop-i18n.js?v=21"></script>
+  <script defer src="js/reveal.js?v=1"></script>
+  <script type="module" src="js/app.js?v=33"></script><script type="module" src="js/google-onetap.mjs?v=1"></script>
+<script src="/js/payment-endpoint.js?v=1"></script><script src="/js/login-support.js?v=1"></script><script type="module" src="/js/mobile-nav.mjs?v=4"></script><script type="module" src="/js/wallpapers.mjs?v=414"></script></body>
+</html>

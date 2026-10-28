@@ -1,0 +1,31 @@
+# Dependencies and local Firebase state
+node_modules/
+functions/node_modules/
+.firebase/
+
+# Local credentials and signing material
+.env
+.env.*
+!.env.example
+*firebase-adminsdk*.json
+*service-account*.json
+serviceAccountKey.json
+*.jks
+*.keystore
+*.p12
+
+# App packages and build output
+*.apk
+*.aab
+*.ipa
+*.exe
+*.dll
+*.msi
+*.tmp.old
+Zapp/bin/
+Zapp/obj/
+cloudflare/pages/dist/
+artifacts/releases/
+
+# Quarantined third-party page snapshots
+artifacts/quarantined-third-party-page-copy-20261028/

@@ -1,0 +1,11 @@
+{
+    "latestVersionCode":  46,
+    "latestVersionName":  "4.15",
+    "minimumSupportedVersionCode":  41,
+    "updateUrl":  "",
+    "forceUpdate":  false,
+    "maintenanceMode":  false,
+    "maintenanceMessage":  "Z Pass is temporarily under maintenance.",
+    "announcementId":  "zpass-4.10-automatic-updates",
+    "announcement":  "Z Pass 4.10 downloads required app updates automatically. Android will ask you to confirm installation."
+}

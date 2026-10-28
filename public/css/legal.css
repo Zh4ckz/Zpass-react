@@ -1,0 +1,40 @@
+:root{--bg:#080A0C;--line:rgba(255,255,255,.1);--tx:#E0E5EB;--mu:#9a9ab5;--ac:#A6B3C4;--ac2:#8395AD}
+*{box-sizing:border-box}
+html{scroll-behavior:smooth}
+body.lg{margin:0;font-family:Inter,"Segoe UI",system-ui,sans-serif;color:var(--tx);background:radial-gradient(900px 520px at 12% -6%,rgba(166,179,196,.25),transparent 60%),radial-gradient(800px 500px at 100% 8%,rgba(131,149,173,.16),transparent 60%),var(--bg);min-height:100vh;display:flex;flex-direction:column;line-height:1.7}
+.lg-nav{position:sticky;top:0;z-index:20;display:flex;align-items:center;gap:22px;padding:14px max(22px,calc((100% - 1160px)/2));background:rgba(14,16,20,.6);backdrop-filter:blur(22px) saturate(160%);-webkit-backdrop-filter:blur(22px) saturate(160%);border-bottom:1px solid var(--line)}
+.lg-nav .brand{display:flex;align-items:center;gap:10px;color:#fff;font-weight:700;text-decoration:none}
+.lg-nav .brand img{height:30px}
+.lg-nav nav{margin-left:auto;display:flex;gap:6px;flex-wrap:wrap}
+.lg-nav nav a{color:var(--mu);text-decoration:none;font-size:14px;padding:7px 14px;border-radius:999px;border:1px solid transparent}
+.lg-nav nav a:hover{color:#fff;background:rgba(255,255,255,.06)}
+.lg-nav nav a.on{color:#fff;background:rgba(166,179,196,.22);border-color:rgba(166,179,196,.45)}
+.lg-hero{padding:76px max(22px,calc((100% - 1160px)/2)) 34px}
+.lg-hero .tag{display:inline-block;font-size:12px;letter-spacing:.14em;font-weight:700;color:var(--ac2);background:rgba(131,149,173,.1);border:1px solid rgba(131,149,173,.3);padding:6px 14px;border-radius:999px}
+.lg-hero h1{font-size:clamp(34px,5vw,58px);line-height:1.08;margin:18px 0 14px;background:linear-gradient(120deg,#fff,#CBD2DC 55%,#AFBACA);-webkit-background-clip:text;background-clip:text;color:transparent}
+.lg-hero p{max-width:720px;color:var(--mu);font-size:18px;margin:0}
+.lg-meta{display:flex;gap:10px;flex-wrap:wrap;margin-top:22px}
+.lg-meta span{font-size:13px;color:var(--mu);border:1px solid var(--line);background:rgba(255,255,255,.04);padding:6px 14px;border-radius:999px}
+.lg-wrap{flex:1 0 auto;display:grid;grid-template-columns:250px 1fr;gap:32px;padding:20px max(22px,calc((100% - 1160px)/2)) 40px;align-items:start}
+.lg-toc{position:sticky;top:84px;padding:18px;border:1px solid var(--line);border-radius:20px;background:linear-gradient(160deg,rgba(255,255,255,.07),rgba(255,255,255,.02));backdrop-filter:blur(16px)}
+.lg-toc b{display:block;font-size:12px;letter-spacing:.12em;color:var(--mu);margin-bottom:10px}
+.lg-toc a{display:block;color:var(--tx);text-decoration:none;font-size:14px;padding:7px 10px;border-radius:10px}
+.lg-toc a:hover{background:rgba(255,255,255,.07)}
+.lg-main{display:grid;gap:18px}
+.lg-card{padding:28px 30px;border:1px solid var(--line);border-radius:24px;background:linear-gradient(160deg,rgba(255,255,255,.07),rgba(255,255,255,.02));backdrop-filter:blur(18px);-webkit-backdrop-filter:blur(18px);box-shadow:0 18px 50px rgba(0,0,0,.35);scroll-margin-top:90px}
+.lg-card h2{margin:0 0 12px;font-size:24px;display:flex;align-items:center;gap:12px}
+.lg-card h2 i{font-style:normal;display:grid;place-items:center;width:38px;height:38px;border-radius:12px;background:linear-gradient(135deg,var(--ac),var(--ac2));font-size:18px}
+.lg-card h3{margin:20px 0 6px;font-size:16px;color:#fff}
+.lg-card p,.lg-card li{color:#c7c7dc}
+.lg-card ul{padding-left:20px}
+.lg-card a{color:#CBD2DC}
+.lg-hi{display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:14px}
+.lg-hi div{padding:18px;border:1px solid var(--line);border-radius:18px;background:rgba(255,255,255,.04)}
+.lg-hi b{display:block;color:#fff;margin-bottom:4px}
+.lg-hi span{color:var(--mu);font-size:14px}
+.lg-note{margin-top:14px;padding:14px 18px;border-radius:16px;border:1px solid rgba(251,191,36,.35);background:rgba(251,191,36,.08);color:#fde68a;font-size:14px}
+.lg-table{width:100%;border-collapse:collapse;font-size:14px;margin-top:10px}
+.lg-table th,.lg-table td{text-align:left;padding:10px 12px;border-bottom:1px solid var(--line);color:#c7c7dc}
+.lg-table th{color:#fff}
+body.lg footer.landing-footer{margin-top:40px}
+@media(max-width:900px){.lg-wrap{grid-template-columns:1fr}.lg-toc{position:static}.lg-nav nav{display:none}.lg-card{padding:22px 18px}}
