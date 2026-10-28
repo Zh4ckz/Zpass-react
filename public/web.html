@@ -1,74 +1,124 @@
 <!doctype html>
-<html lang="tr">
+<html lang="tr" class="custom-scroll night">
 <head>
   <meta charset="utf-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1">
-  <meta name="theme-color" content="#72b27b">
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no, shrink-to-fit=no">
   <title>Z Pass Web</title>
   <link rel="icon" type="image/png" href="/resources/assets/app-logo/zpass.png">
-  <link rel="stylesheet" href="/css/web-chat.css?v=5">
+  <link rel="stylesheet" href="/css/web-chat.css?v=6">
 </head>
 <body class="telegram-theme">
 
   <!-- Floating Theme Toggle Button -->
-  <button id="theme-toggle" class="theme-toggle" type="button" title="Temayı değiştir" aria-label="Temayı değiştir">
+  <button id="theme-toggle" class="rp btn-icon darkmode_filled _themeButton_140gf_39" type="button" title="Temayı değiştir" aria-label="Temayı değiştir">
     <span id="theme-icon">🌙</span>
   </button>
 
   <main id="auth-view" class="auth-view">
-    <section class="telegram-card">
+    <div class="_cardsContainer_140gf_90">
 
-      <!-- VIEW 1: LOG IN BY QR CODE (DEFAULT VIEW) -->
-      <div id="view-qr" class="auth-subview">
-        <div class="qr-container">
-          <div class="qr-frame">
-            <canvas id="web-login-qr" width="220" height="220" aria-label="Süreli Z Pass web giriş QR kodu"></canvas>
+      <!-- VIEW 1: LOG IN BY QR CODE (DEFAULT) -->
+      <div id="view-qr" class="_card_140gf_90 _pageSignQR_140gf_259">
+        <div class="_container_16kfa_1">
+          <div class="_sticker_16kfa_21 _qrContainer_140gf_230">
+            <canvas id="web-login-qr" width="240" height="240" class="_qrCanvas_140gf_237"></canvas>
             <div class="qr-logo-badge">Z</div>
             <div id="qr-loading" class="qr-loading">Güvenli QR kod hazırlanıyor…</div>
           </div>
+          <h1 class="_title_16kfa_11 text-center"><span class="i18n">Log in by QR Code</span></h1>
+          <div class="_subtitle_16kfa_12 secondary"><span class="i18n">Scan with Z Pass app on your phone</span></div>
         </div>
 
-        <h1 class="card-title">Log in by QR Code</h1>
-        <p class="card-subtitle">Scan with Z Pass app on your phone</p>
-
-        <ol class="qr-steps">
-          <li><span class="step-num">1</span> <span>Open <b>Z Pass</b> on your phone</span></li>
-          <li><span class="step-num">2</span> <span>Go to <b>Settings &gt; Devices &gt; Add Device</b></span></li>
-          <li><span class="step-num">3</span> <span>Point your phone at this screen to confirm login</span></li>
+        <ol class="_qrDescription_140gf_198">
+          <li class="_qrDescriptionItem_140gf_222">
+            <span class="_qrDescriptionMarker_140gf_208">1</span>
+            <span class="i18n">Open <b>Z Pass</b> on your phone</span>
+          </li>
+          <li class="_qrDescriptionItem_140gf_222">
+            <span class="_qrDescriptionMarker_140gf_208">2</span>
+            <span class="i18n">Go to <b>Settings</b> › <b>Devices</b> › <b>Add Device</b></span>
+          </li>
+          <li class="_qrDescriptionItem_140gf_222">
+            <span class="_qrDescriptionMarker_140gf_208">3</span>
+            <span class="i18n">Point your phone at this screen to confirm login</span>
+          </li>
         </ol>
 
         <p id="qr-login-status" class="status-msg" role="status">Kod hazırlanıyor…</p>
         <p class="qr-expiry-text">Kodun geçerliliği: <strong id="qr-login-countdown">--:--</strong></p>
         <button id="qr-login-retry" class="button button-primary tg-btn-submit" type="button" hidden>Yeni QR Kodu Oluştur</button>
 
-        <div class="action-links">
-          <button id="switch-to-phone" class="tg-link-button" type="button">LOG IN BY PHONE NUMBER OR EMAIL <span aria-hidden="true">›</span></button>
-          <button id="switch-to-passkey-from-qr" class="tg-link-button" type="button">LOG IN BY PASSKEY <span aria-hidden="true">›</span></button>
-        </div>
+        <button id="switch-to-phone" class="rp btn-primary btn-secondary btn-primary-transparent primary tg-link-btn" type="button">
+          <span class="i18n">Log in by phone number or email <span class="inline-icon">›</span></span>
+        </button>
+        <button id="switch-to-passkey-from-qr" class="rp btn-primary btn-secondary btn-primary-transparent primary tg-link-btn" type="button">
+          <span class="i18n">Log in by passkey <span class="inline-icon">›</span></span>
+        </button>
       </div>
 
-      <!-- VIEW 2: LOG IN BY PHONE / EMAIL -->
-      <div id="view-phone" class="auth-subview" hidden>
+      <!-- VIEW 2: LOG IN BY PHONE NUMBER / EMAIL -->
+      <div id="view-phone" class="_card_140gf_90 _pageSignQR_140gf_259" hidden>
         <div class="brand-avatar-badge">
           <span>Z</span>
         </div>
 
-        <h1 class="card-title">Sign in to Z Pass</h1>
-        <p class="card-subtitle">Please confirm your country code and enter your phone number or email.</p>
+        <h1 class="_title_16kfa_11 text-center">Sign in to Z Pass</h1>
+        <div class="_subtitle_16kfa_12 secondary">Please confirm your country code and enter your phone number or email.</div>
 
         <form id="email-form" class="tg-auth-form">
           <div class="form-group">
             <label class="tg-label" for="country-select">Country</label>
             <select id="country-select" class="tg-input tg-select">
-              <option value="+90">Turkey (+90)</option>
-              <option value="+1">United States (+1)</option>
-              <option value="+44">United Kingdom (+44)</option>
-              <option value="+49">Germany (+49)</option>
-              <option value="+33">France (+33)</option>
-              <option value="+963">Syria (+963)</option>
-              <option value="+964">Iraq (+964)</option>
-              <option value="+966">Saudi Arabia (+966)</option>
-              <option value="+971">UAE (+971)</option>
+              <option value="+90">🇹🇷 Turkey (+90)</option>
+              <option value="+1">🇺🇸 United States / Canada (+1)</option>
+              <option value="+44">🇬🇧 United Kingdom (+44)</option>
+              <option value="+49">🇩🇪 Germany (+49)</option>
+              <option value="+33">🇫🇷 France (+33)</option>
+              <option value="+963">🇸🇾 Syria (+963)</option>
+              <option value="+964">🇮🇶 Iraq (+964)</option>
+              <option value="+966">🇸🇦 Saudi Arabia (+966)</option>
+              <option value="+971">🇦🇪 UAE (+971)</option>
+              <option value="+93">🇦🇫 Afghanistan (+93)</option>
+              <option value="+213">🇩🇿 Algeria (+213)</option>
+              <option value="+54">🇦🇷 Argentina (+54)</option>
+              <option value="+61">🇦🇺 Australia (+61)</option>
+              <option value="+43">🇦🇹 Austria (+43)</option>
+              <option value="+994">🇦🇿 Azerbaijan (+994)</option>
+              <option value="+880">🇧🇩 Bangladesh (+880)</option>
+              <option value="+32">🇧🇪 Belgium (+32)</option>
+              <option value="+55">🇧🇷 Brazil (+55)</option>
+              <option value="+86">🇨🇳 China (+86)</option>
+              <option value="+20">🇪🇬 Egypt (+20)</option>
+              <option value="+995">🇬🇪 Georgia (+995)</option>
+              <option value="+30">🇬🇷 Greece (+30)</option>
+              <option value="+91">🇮🇳 India (+91)</option>
+              <option value="+62">🇮🇩 Indonesia (+62)</option>
+              <option value="+98">🇮🇷 Iran (+98)</option>
+              <option value="+39">🇮🇹 Italy (+39)</option>
+              <option value="+81">🇯🇵 Japan (+81)</option>
+              <option value="+962">🇯🇴 Jordan (+962)</option>
+              <option value="+7">🇰🇿 Kazakhstan (+7)</option>
+              <option value="+82">🇰🇷 South Korea (+82)</option>
+              <option value="+965">🇰🇼 Kuwait (+965)</option>
+              <option value="+961">🇱🇧 Lebanon (+961)</option>
+              <option value="+218">🇱🇾 Libya (+218)</option>
+              <option value="+60">🇲🇾 Malaysia (+60)</option>
+              <option value="+52">🇲🇽 Mexico (+52)</option>
+              <option value="+31">🇳🇱 Netherlands (+31)</option>
+              <option value="+64">🇳🇿 New Zealand (+64)</option>
+              <option value="+92">🇵🇰 Pakistan (+92)</option>
+              <option value="+970">🇵🇸 Palestine (+970)</option>
+              <option value="+48">🇵🇱 Poland (+48)</option>
+              <option value="+351">🇵🇹 Portugal (+351)</option>
+              <option value="+974">🇶🇦 Qatar (+974)</option>
+              <option value="+40">🇷🇴 Romania (+40)</option>
+              <option value="+7">🇷🇺 Russia (+7)</option>
+              <option value="+34">🇪🇸 Spain (+34)</option>
+              <option value="+46">🇸🇪 Sweden (+46)</option>
+              <option value="+41">🇨🇭 Switzerland (+41)</option>
+              <option value="+216">🇹🇳 Tunisia (+216)</option>
+              <option value="+380">🇺🇦 Ukraine (+380)</option>
+              <option value="+998">🇺🇿 Uzbekistan (+998)</option>
             </select>
           </div>
 
@@ -88,37 +138,41 @@
           </div>
 
           <button id="email-submit" class="button button-primary tg-btn-submit" type="submit">NEXT</button>
-          <button id="phone-cancel" class="tg-link-button" type="button" hidden>CANCEL PHONE LOGIN</button>
+          <button id="phone-cancel" class="tg-link-btn" type="button" hidden>CANCEL PHONE LOGIN</button>
         </form>
 
         <div id="recaptcha-container"></div>
         <p id="auth-status" class="status-msg" role="status"></p>
 
-        <div class="action-links">
-          <button id="switch-to-qr" class="tg-link-button" type="button">LOG IN BY QR CODE <span aria-hidden="true">›</span></button>
-          <button id="switch-to-passkey-from-phone" class="tg-link-button" type="button">LOG IN BY PASSKEY <span aria-hidden="true">›</span></button>
-        </div>
+        <button id="switch-to-qr" class="rp btn-primary btn-secondary btn-primary-transparent primary tg-link-btn" type="button">
+          <span class="i18n">Log in by QR Code <span class="inline-icon">›</span></span>
+        </button>
+        <button id="switch-to-passkey-from-phone" class="rp btn-primary btn-secondary btn-primary-transparent primary tg-link-btn" type="button">
+          <span class="i18n">Log in by passkey <span class="inline-icon">›</span></span>
+        </button>
       </div>
 
       <!-- VIEW 3: LOG IN BY PASSKEY -->
-      <div id="view-passkey" class="auth-subview" hidden>
+      <div id="view-passkey" class="_card_140gf_90 _pageSignQR_140gf_259" hidden>
         <div class="brand-avatar-badge passkey-badge">
           <span>🔑</span>
         </div>
 
-        <h1 class="card-title">Log in by Passkey</h1>
-        <p class="card-subtitle">Use your device biometric or hardware security key to sign in.</p>
+        <h1 class="_title_16kfa_11 text-center">Log in by Passkey</h1>
+        <div class="_subtitle_16kfa_12 secondary">Use your device biometric or hardware security key to sign in.</div>
 
         <button id="passkey-login-btn" class="button button-primary tg-btn-submit" type="button">CONTINUE WITH PASSKEY</button>
         <p id="passkey-status" class="status-msg" role="status"></p>
 
-        <div class="action-links">
-          <button id="switch-to-qr-from-passkey" class="tg-link-button" type="button">LOG IN BY QR CODE <span aria-hidden="true">›</span></button>
-          <button id="switch-to-phone-from-passkey" class="tg-link-button" type="button">LOG IN BY PHONE NUMBER OR EMAIL <span aria-hidden="true">›</span></button>
-        </div>
+        <button id="switch-to-qr-from-passkey" class="rp btn-primary btn-secondary btn-primary-transparent primary tg-link-btn" type="button">
+          <span class="i18n">Log in by QR Code <span class="inline-icon">›</span></span>
+        </button>
+        <button id="switch-to-phone-from-passkey" class="rp btn-primary btn-secondary btn-primary-transparent primary tg-link-btn" type="button">
+          <span class="i18n">Log in by phone number or email <span class="inline-icon">›</span></span>
+        </button>
       </div>
 
-    </section>
+    </div>
   </main>
 
   <!-- SETUP / APP DOWNLOAD VIEW -->
@@ -168,6 +222,6 @@
   </dialog>
   <div id="toast" class="toast" role="status"></div>
   <script src="/js/vendor/qrcode-generator.js"></script>
-  <script type="module" src="/js/web-chat.mjs?v=5"></script>
+  <script type="module" src="/js/web-chat.mjs?v=6"></script>
 </body>
 </html>

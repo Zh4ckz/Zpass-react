@@ -195,6 +195,16 @@ async function startWebQrLogin() {
 
 $('qr-login-retry')?.addEventListener('click', startWebQrLogin);
 
+// Country Select Listener
+$('country-select')?.addEventListener('change', (e) => {
+  const prefix = e.target.value;
+  const input = $('login-identifier');
+  if (input && !input.value.includes('@')) {
+    input.value = prefix + ' ';
+    input.focus();
+  }
+});
+
 // Email / Phone Login Form
 $('email-form')?.addEventListener('submit', async (e) => {
   e.preventDefault();
