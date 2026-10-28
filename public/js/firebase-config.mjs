@@ -10,7 +10,7 @@ const projects = Object.freeze({
 });
 export function firebaseConfigForHostname(hostname) {
   const host=String(hostname).toLowerCase();
-  if(host==='zpas.org' || host==='www.zpas.org' || host==='web.zpas.org' || host==='zpass.web.app' || host==='zpass.firebaseapp.com' || /^zpass--[a-z0-9-]+\.web\.app$/.test(host))return projects.zpasss;
+  if(host==='zpas.org' || host==='www.zpas.org' || host==='web.zpas.org' || host==='login.zpas.org' || host==='zpass.web.app' || host==='zpass.firebaseapp.com' || /^zpass--[a-z0-9-]+\.web\.app$/.test(host))return projects.zpasss;
   if(host==='localhost' || host==='127.0.0.1' || host==='[::1]')return projects.zpasss;
   throw new Error('This hostname has no configured Firebase project.');
 }

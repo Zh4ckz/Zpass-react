@@ -16,12 +16,16 @@
       <h1>Özel sohbetler.<br>Tüm cihazlarında.</h1>
       <p class="muted">Z Pass hesabınla giriş yap. Mevcut uçtan uca şifreleme anahtarını kullanmak için bu tarayıcıyı telefonunla eşleştir.</p>
       <button id="google-signin" class="button button-google" type="button"><span class="google-g">G</span> Google ile devam et</button>
-      <div class="divider"><span>veya e-posta kullan</span></div>
+      <div class="divider"><span>veya e-posta / telefon kullan</span></div>
       <form id="email-form" class="auth-form">
-        <label>E-posta<input id="email" type="email" autocomplete="email" required></label>
-        <label>Şifre<input id="password" type="password" autocomplete="current-password" minlength="6" required></label>
+        <label>E-posta veya telefon numarası<input id="login-identifier" type="text" autocomplete="username" inputmode="email" placeholder="E-posta veya +15551234567" required></label>
+        <label id="password-label">Şifre<input id="password" type="password" autocomplete="current-password" minlength="6" required></label>
+        <label id="phone-code-label" hidden>SMS doğrulama kodu<input id="phone-code" type="text" inputmode="numeric" autocomplete="one-time-code" maxlength="6" pattern="[0-9]{6}" placeholder="6 haneli kod"></label>
         <button id="email-submit" class="button button-primary" type="submit">Giriş yap</button>
+        <button id="phone-cancel" class="text-button" type="button" hidden>Telefon girişini iptal et</button>
       </form>
+      <div id="recaptcha-container"></div>
+      <p class="privacy-note">Telefon numaranı ülke koduyla yaz (ör. +1…). Telefon girişinde SMS doğrulaması gerekir.</p>
       <a class="text-button" href="/apps.html#android">Hesabın yok mu? Android uygulamasını indir</a>
       <p id="auth-status" class="status" role="status"></p>
       <small class="privacy-note">Mesajların uçtan uca şifrelenir. Özel sohbet anahtarın yalnızca telefonundan bu tarayıcıyı onayladığında aktarılır.</small>
@@ -72,6 +76,6 @@
     <button id="accept-call" class="button button-primary" hidden>Aramayı yanıtla</button>
   </dialog>
   <div id="toast" class="toast" role="status"></div>
-  <script type="module" src="/js/web-chat.mjs?v=2"></script>
+  <script type="module" src="/js/web-chat.mjs?v=3"></script>
 </body>
 </html>
