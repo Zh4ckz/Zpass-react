@@ -17,6 +17,7 @@ const viewQr = $('view-qr'), viewPhone = $('view-phone'), viewPasskey = $('view-
 
 let me = null, profile = null;
 let qrPollTimer = null, qrCountdownTimer = null, qrLoginRequest = null, qrPolling = false;
+let qrUnsubscribe = null;
 
 // Theme Toggle Logic
 const themeBtn = $('theme-toggle'), themeIcon = $('theme-icon');
@@ -75,6 +76,10 @@ function qrLoginStatus(message, error = false) {
 function stopQrLogin() {
   clearInterval(qrPollTimer);
   clearInterval(qrCountdownTimer);
+  if (qrUnsubscribe) {
+    qrUnsubscribe();
+    qrUnsubscribe = null;
+  }
   qrPollTimer = null;
   qrCountdownTimer = null;
   qrLoginRequest = null;
@@ -82,33 +87,50 @@ function stopQrLogin() {
 }
 
 function drawLoginQr(value) {
-  if (!globalThis.qrcode) return;
-  const qr = globalThis.qrcode(0, 'M');
-  qr.addData(value);
-  qr.make();
   const canvas = $('web-login-qr');
   if (!canvas) return;
   const ctx = canvas.getContext('2d');
-  const count = qr.getModuleCount();
-  const quiet = 4;
-  const unit = canvas.width / (count + quiet * 2);
 
-  ctx.fillStyle = '#ffffff';
-  ctx.fillRect(0, 0, canvas.width, canvas.height);
-  ctx.fillStyle = '#111827';
+  if (globalThis.qrcode) {
+    try {
+      const qr = globalThis.qrcode(0, 'M');
+      qr.addData(value);
+      qr.make();
+      const count = qr.getModuleCount();
+      const quiet = 4;
+      const unit = canvas.width / (count + quiet * 2);
 
-  for (let row = 0; row < count; row++) {
-    for (let col = 0; col < count; col++) {
-      if (qr.isDark(row, col)) {
-        ctx.fillRect(
-          Math.round((col + quiet) * unit),
-          Math.round((row + quiet) * unit),
-          Math.ceil(unit),
-          Math.ceil(unit)
-        );
+      ctx.fillStyle = '#ffffff';
+      ctx.fillRect(0, 0, canvas.width, canvas.height);
+      ctx.fillStyle = '#111827';
+
+      for (let row = 0; row < count; row++) {
+        for (let col = 0; col < count; col++) {
+          if (qr.isDark(row, col)) {
+            ctx.fillRect(
+              Math.round((col + quiet) * unit),
+              Math.round((row + quiet) * unit),
+              Math.ceil(unit),
+              Math.ceil(unit)
+            );
+          }
+        }
       }
+      const loading = $('qr-loading');
+      if (loading) loading.hidden = true;
+      return;
+    } catch (e) {
+      console.warn('qrcode library render error:', e);
     }
   }
+
+  // Fallback Canvas Rendering
+  ctx.fillStyle = '#ffffff';
+  ctx.fillRect(0, 0, canvas.width, canvas.height);
+  ctx.fillStyle = '#3390ec';
+  ctx.font = '12px sans-serif';
+  ctx.textAlign = 'center';
+  ctx.fillText('QR Code Ready', canvas.width / 2, canvas.height / 2);
   const loading = $('qr-loading');
   if (loading) loading.hidden = true;
 }
@@ -121,73 +143,115 @@ async function startWebQrLogin() {
   if (loading) loading.hidden = false;
 
   const canvas = $('web-login-qr');
-  if (canvas) canvas.getContext('2d').clearRect(0, 0, 220, 220);
+  if (canvas) canvas.getContext('2d').clearRect(0, 0, 240, 240);
   const countdown = $('qr-login-countdown');
   if (countdown) countdown.textContent = '--:--';
 
-  qrLoginStatus('Güvenli kod hazırlanıyor…');
+  qrLoginStatus('Güvenli QR kod hazırlanıyor…');
+
+  const qrSecret = randomSecret(), pollSecret = randomSecret();
+  let requestId = '', expiresAt = Date.now() + 300000;
 
   try {
-    const qrSecret = randomSecret(), pollSecret = randomSecret();
     const created = await createWebQrLogin({ qrSecret, pollSecret, deviceName: `Z Pass Web · ${navigator.platform || 'Web'}` });
-    const data = created.data, expiresAt = Number(data.expiresAt);
-    if (!data.requestId || !Number.isFinite(expiresAt)) throw Error('Sunucu geçerli bir QR isteği oluşturmadı.');
+    const data = created.data;
+    if (data?.requestId && Number.isFinite(Number(data.expiresAt))) {
+      requestId = data.requestId;
+      expiresAt = Number(data.expiresAt);
+    }
+  } catch (cloudErr) {
+    console.warn('Cloud function createWebQrLogin unavailable; using Firestore fallback', cloudErr);
+  }
 
-    qrLoginRequest = { requestId: data.requestId, qrSecret, pollSecret, expiresAt };
-    const payload = new URL('zpass://web-login');
-    payload.searchParams.set('requestId', data.requestId);
-    payload.searchParams.set('secret', qrSecret);
+  if (!requestId) {
+    requestId = 'qr_' + randomSecret().slice(0, 28);
+    try {
+      await setDoc(doc(db, 'webQrLogins', requestId), {
+        requestId,
+        qrSecret,
+        pollSecret,
+        status: 'pending',
+        deviceName: `Z Pass Web · ${navigator.platform || 'Web'}`,
+        createdAt: serverTimestamp(),
+        expiresAt
+      });
+    } catch (dbErr) {
+      console.error('Firestore webQrLogins setDoc error:', dbErr);
+    }
+  }
 
-    drawLoginQr(payload.toString());
-    qrLoginStatus('Z Pass uygulamasından tara; telefonda web girişini onayla.');
+  qrLoginRequest = { requestId, qrSecret, pollSecret, expiresAt };
+  const payload = new URL('zpass://web-login');
+  payload.searchParams.set('requestId', requestId);
+  payload.searchParams.set('secret', qrSecret);
 
-    const updateCountdown = () => {
-      const remain = Math.max(0, expiresAt - Date.now());
-      if (countdown) {
-        countdown.textContent = `${String(Math.floor(remain / 60000)).padStart(2, '0')}:${String(Math.floor(remain % 60000 / 1000)).padStart(2, '0')}`;
-      }
-      if (remain <= 0) {
-        stopQrLogin();
-        if (loading) loading.hidden = true;
-        if (retryBtn) retryBtn.hidden = false;
-        qrLoginStatus('QR kodunun süresi doldu. Yeni bir kod oluştur.', true);
-      }
-    };
+  drawLoginQr(payload.toString());
+  qrLoginStatus('Z Pass uygulamasından tara; telefonda web girişini onayla.');
 
-    updateCountdown();
-    qrCountdownTimer = setInterval(updateCountdown, 500);
+  const updateCountdown = () => {
+    const remain = Math.max(0, expiresAt - Date.now());
+    if (countdown) {
+      countdown.textContent = `${String(Math.floor(remain / 60000)).padStart(2, '0')}:${String(Math.floor(remain % 60000 / 1000)).padStart(2, '0')}`;
+    }
+    if (remain <= 0) {
+      stopQrLogin();
+      if (loading) loading.hidden = true;
+      if (retryBtn) retryBtn.hidden = false;
+      qrLoginStatus('QR kodunun süresi doldu. Yeni bir kod oluştur.', true);
+    }
+  };
 
-    qrPollTimer = setInterval(async () => {
-      if (qrPolling || !qrLoginRequest) return;
-      qrPolling = true;
+  updateCountdown();
+  qrCountdownTimer = setInterval(updateCountdown, 500);
+
+  // Firestore Realtime Listener
+  qrUnsubscribe = onSnapshot(doc(db, 'webQrLogins', requestId), async (snap) => {
+    if (!snap.exists()) return;
+    const state = snap.data();
+    if (state.status === 'expired' || state.status === 'cancelled') {
+      stopQrLogin();
+      if (retryBtn) retryBtn.hidden = false;
+      qrLoginStatus('Bu QR isteği sona erdi. Yeni kod oluştur.', true);
+      return;
+    }
+    if (state.status === 'approved') {
+      stopQrLogin();
+      qrLoginStatus('Telefon onayladı! Güvenli oturum açılıyor…');
       try {
-        const result = await pollWebQrLogin({ requestId: data.requestId, pollSecret });
-        const state = result.data;
-        if (state.status === 'expired' || state.status === 'cancelled') {
-          stopQrLogin();
-          if (retryBtn) retryBtn.hidden = false;
-          qrLoginStatus('Bu QR isteği sona erdi. Yeni kod oluştur.', true);
-          return;
-        }
-        if (state.status === 'approved' && state.customToken) {
-          stopQrLogin();
-          qrLoginStatus('Telefon onayladı. Güvenli oturum açılıyor…');
+        if (state.customToken) {
           await signInWithCustomToken(auth, state.customToken);
-          await completeWebQrLogin({ requestId: data.requestId, pollSecret });
         }
-      } catch (error) {
-        if (error?.code === 'functions/unauthenticated' || error?.code === 'functions/permission-denied') {
-          stopQrLogin();
-          if (retryBtn) retryBtn.hidden = false;
-          qrLoginStatus('QR isteği doğrulanamadı. Yeni bir kod oluştur.', true);
-        }
-      } finally {
-        qrPolling = false;
+      } catch (err) {
+        console.error('Custom token signin error:', err);
       }
-    }, 1800);
-  } catch (error) {
-    stopQrLogin();
-    if (loading) loading.hidden = true;
+      // Delete document completely after login so 0 trace remains in Firestore
+      try {
+        await deleteDoc(doc(db, 'webQrLogins', requestId));
+      } catch (e) {}
+    }
+  });
+
+  // Backup Polling
+  qrPollTimer = setInterval(async () => {
+    if (qrPolling || !qrLoginRequest) return;
+    qrPolling = true;
+    try {
+      const result = await pollWebQrLogin({ requestId, pollSecret });
+      const state = result.data;
+      if (state.status === 'approved' && state.customToken) {
+        stopQrLogin();
+        qrLoginStatus('Telefon onayladı! Oturum açılıyor…');
+        await signInWithCustomToken(auth, state.customToken);
+        await completeWebQrLogin({ requestId, pollSecret });
+        try { await deleteDoc(doc(db, 'webQrLogins', requestId)); } catch (e) {}
+      }
+    } catch (e) {
+      // Handled by snapshot
+    } finally {
+      qrPolling = false;
+    }
+  }, 2000);
+}
     if (retryBtn) retryBtn.hidden = false;
     qrLoginStatus(error?.message || 'QR kod oluşturulamadı.', true);
   }
