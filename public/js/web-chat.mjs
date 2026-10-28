@@ -225,10 +225,6 @@ function startWebQrLogin() {
   createWebQrLogin({ qrSecret, pollSecret, deviceName: `Z Pass Web · ${navigator.platform || 'Web'}` })
     .catch(() => { /* handled by Firestore fallback */ });
 }
-    if (retryBtn) retryBtn.hidden = false;
-    qrLoginStatus(error?.message || 'QR kod oluşturulamadı.', true);
-  }
-}
 
 $('qr-login-retry')?.addEventListener('click', startWebQrLogin);
 
