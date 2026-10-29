@@ -17,6 +17,43 @@
       "**/*.exe",
       "**/*.zip"
     ],
+    "redirects": [
+      {
+        "source": "/api.html",
+        "destination": "https://zpas.org/api.html",
+        "type": 301
+      },
+      {
+        "source": "/apps.html",
+        "destination": "https://zpas.org/apps.html",
+        "type": 301
+      },
+      {
+        "source": "/faq.html",
+        "destination": "https://zpas.org/faq.html",
+        "type": 301
+      },
+      {
+        "source": "/info.html",
+        "destination": "https://zpas.org/info.html",
+        "type": 301
+      },
+      {
+        "source": "/privacy.html",
+        "destination": "https://zpas.org/privacy.html",
+        "type": 301
+      },
+      {
+        "source": "/security.html",
+        "destination": "https://zpas.org/security.html",
+        "type": 301
+      },
+      {
+        "source": "/news",
+        "destination": "https://zpas.org/#news",
+        "type": 301
+      }
+    ],
     "rewrites": [
       {
         "source": "**",
