@@ -2,168 +2,34 @@
   "firestore": {
     "rules": "firestore.rules"
   },
-  "hosting": [
-    {
-      "site": "passgram",
-      "public": "public",
-      "ignore": [
-        "firebase.json",
-        "**/.git/**",
-        "**/.DS_Store",
-        "**/node_modules/**",
-        "web-preview.html",
-        "js/web-test-bot.mjs",
-        "checkout (2).html",
-        "images/ui/hexagon-check (1).png",
-        "apps/**",
-        "**/*.bin",
-        "**/*.tmp.old",
-        "**/*.zip",
-        "**/*.exe",
-        "**/*.msix",
-        "**/*.appinstaller",
-        "**/*.apk"
-      ],
-      "redirects": [
-        {
-          "source": "/web",
-          "destination": "https://web.zpas.org/login",
-          "type": 301
-        },
-        {
-          "source": "/web.html",
-          "destination": "https://web.zpas.org/login",
-          "type": 301
-        },
-        {
-          "source": "/what-is-dark-web",
-          "destination": "/info",
-          "type": 301
-        }
-      ],
-      "rewrites": [
-        {
-          "source": "/login",
-          "destination": "/web.html"
-        },
-        {
-          "source": "/login/**",
-          "destination": "/web.html"
-        },
-        {
-          "source": "/:username",
-          "destination": "/profile.html"
-        },
-        {
-          "source": "**",
-          "destination": "/index.html"
-        }
-      ],
-      "cleanUrls": false,
-      "trailingSlash": false,
-      "headers": [
-        {
-          "source": "/.well-known/assetlinks.json",
-          "headers": [
-            {
-              "key": "Cache-Control",
-              "value": "public, max-age=3600"
-            }
-          ]
-        },
-        {
-          "source": "/api/payment-config.json",
-          "headers": [
-            {
-              "key": "Cache-Control",
-              "value": "public, max-age=60, must-revalidate"
-            }
-          ]
-        },
-        {
-          "source": "/dashboard.html",
-          "headers": [
-            {
-              "key": "Cache-Control",
-              "value": "no-store, max-age=0"
-            }
-          ]
-        },
-        {
-          "source": "/index.html",
-          "headers": [
-            {
-              "key": "Cache-Control",
-              "value": "no-store, max-age=0"
-            }
-          ]
-        },
-        {
-          "source": "/web.html",
-          "headers": [
-            {
-              "key": "Cache-Control",
-              "value": "no-store, max-age=0"
-            }
-          ]
-        },
-        {
-          "source": "/js/web-chat.mjs",
-          "headers": [
-            {
-              "key": "Cache-Control",
-              "value": "no-store, max-age=0"
-            }
-          ]
-        },
-        {
-          "source": "/css/web-chat.css",
-          "headers": [
-            {
-              "key": "Cache-Control",
-              "value": "no-store, max-age=0"
-            }
-          ]
-        },
-        {
-          "source": "/js/app.js",
-          "headers": [
-            {
-              "key": "Cache-Control",
-              "value": "no-store, max-age=0"
-            }
-          ]
-        },
-        {
-          "source": "**",
-          "headers": [
-            {
-              "key": "X-Content-Type-Options",
-              "value": "nosniff"
-            },
-            {
-              "key": "X-Frame-Options",
-              "value": "SAMEORIGIN"
-            },
-            {
-              "key": "Referrer-Policy",
-              "value": "strict-origin-when-cross-origin"
-            }
-          ]
-        }
-      ]
-    }
-  ],
-  "emulators": {
-    "firestore": {
-      "port": 8080
-    },
-    "hosting": {
-      "port": 5000
-    },
-    "ui": {
-      "enabled": true
-    },
-    "singleProjectMode": true
+  "hosting": {
+    "site": "passgram",
+    "public": "public",
+    "ignore": [
+      "firebase.json",
+      "**/.*",
+      "**/node_modules/**",
+      "apps/**",
+      "**/*.tmp*",
+      "**/*.old",
+      "**/*.bin",
+      "**/*.apk",
+      "**/*.exe",
+      "**/*.zip"
+    ],
+    "rewrites": [
+      {
+        "source": "/login",
+        "destination": "/web.html"
+      },
+      {
+        "source": "/login/**",
+        "destination": "/web.html"
+      },
+      {
+        "source": "**",
+        "destination": "/index.html"
+      }
+    ]
   }
 }
