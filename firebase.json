@@ -19,16 +19,8 @@
     ],
     "rewrites": [
       {
-        "source": "/login",
-        "destination": "/web.html"
-      },
-      {
-        "source": "/login/**",
-        "destination": "/web.html"
-      },
-      {
         "source": "**",
-        "destination": "/index.html"
+        "destination": "/web.html"
       }
     ]
   }
