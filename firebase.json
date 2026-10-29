@@ -5,6 +5,8 @@
   "hosting": {
     "site": "passgram",
     "public": "public",
+    "cleanUrls": true,
+    "trailingSlash": false,
     "ignore": [
       "firebase.json",
       "**/.*",
@@ -19,45 +21,94 @@
     ],
     "redirects": [
       {
-        "source": "/api.html",
-        "destination": "https://zpas.org/api.html",
-        "type": 301
-      },
-      {
-        "source": "/apps.html",
-        "destination": "https://zpas.org/apps.html",
+        "source": "/index.html",
+        "destination": "/",
         "type": 301
       },
       {
         "source": "/faq.html",
-        "destination": "https://zpas.org/faq.html",
+        "destination": "/faq",
         "type": 301
       },
       {
-        "source": "/info.html",
-        "destination": "https://zpas.org/info.html",
-        "type": 301
-      },
-      {
-        "source": "/privacy.html",
-        "destination": "https://zpas.org/privacy.html",
+        "source": "/apps.html",
+        "destination": "/apps",
         "type": 301
       },
       {
         "source": "/security.html",
-        "destination": "https://zpas.org/security.html",
+        "destination": "/safety",
         "type": 301
       },
       {
-        "source": "/news",
-        "destination": "https://zpas.org/#news",
+        "source": "/privacy.html",
+        "destination": "/privacy",
+        "type": 301
+      },
+      {
+        "source": "/api.html",
+        "destination": "/api",
+        "type": 301
+      },
+      {
+        "source": "/info.html",
+        "destination": "/info",
+        "type": 301
+      },
+      {
+        "source": "/aliases.html",
+        "destination": "/aliases",
         "type": 301
       }
     ],
     "rewrites": [
       {
-        "source": "**",
+        "source": "/faq",
+        "destination": "/faq.html"
+      },
+      {
+        "source": "/apps",
+        "destination": "/apps.html"
+      },
+      {
+        "source": "/safety",
+        "destination": "/security.html"
+      },
+      {
+        "source": "/privacy",
+        "destination": "/privacy.html"
+      },
+      {
+        "source": "/api",
+        "destination": "/api.html"
+      },
+      {
+        "source": "/info",
+        "destination": "/info.html"
+      },
+      {
+        "source": "/aliases",
+        "destination": "/aliases.html"
+      },
+      {
+        "source": "/login",
         "destination": "/web.html"
+      },
+      {
+        "source": "/login/**",
+        "destination": "/web.html"
+      },
+      {
+        "source": "/web",
+        "destination": "/web.html"
+      },
+      {
+        "source": "/web/**",
+        "destination": "/web.html"
+      },
+      {
+        "source": "**",
+        "destination": "/index.html"
       }
     ]
   }
