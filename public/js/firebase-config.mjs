@@ -1,17 +1,14 @@
 const projects = Object.freeze({
-  "zpasss": {
-    "apiKey": "AIzaSyDU8VWXJj_Jyauczr3jnvQ_iHfVKaroiqI",
-    "authDomain": "zpasss.firebaseapp.com",
-    "projectId": "zpasss",
-    "storageBucket": "zpasss.firebasestorage.app",
-    "messagingSenderId": "734994147577",
-    "appId": "1:734994147577:web:7120334294f5c5bc1b9a28"
+  "passgram-org": {
+    "apiKey": "AIzaSyBvnc-swQuAx_Fe67TUY7TGoM4VdG89cI4",
+    "authDomain": "passgram-org.firebaseapp.com",
+    "projectId": "passgram-org",
+    "storageBucket": "passgram-org.firebasestorage.app",
+    "messagingSenderId": "157086803240",
+    "appId": "1:157086803240:web:152ae9d14c582db8c91c1d"
   }
 });
 export function firebaseConfigForHostname(hostname) {
-  const host=String(hostname).toLowerCase();
-  if(host==='zpas.org' || host==='www.zpas.org' || host==='web.zpas.org' || host==='login.zpas.org' || host==='zpass.web.app' || host==='zpass.firebaseapp.com' || /^zpass--[a-z0-9-]+\.web\.app$/.test(host))return projects.zpasss;
-  if(host==='localhost' || host==='127.0.0.1' || host==='[::1]')return projects.zpasss;
-  throw new Error('This hostname has no configured Firebase project.');
+  return projects["passgram-org"];
 }
 export const firebaseConfig = Object.freeze({...firebaseConfigForHostname(globalThis.location?.hostname || 'localhost')});
