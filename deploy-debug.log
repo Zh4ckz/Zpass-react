@@ -1,0 +1,37 @@
+[2026-10-29T02:28:56.239Z] ----------------------------------------------------------------------
+[2026-10-29T02:28:56.243Z] Command:       C:\Program Files\nodejs\node.exe C:\Users\rezan\AppData\Roaming\npm\node_modules\firebase-tools\lib\bin\firebase.js deploy --only hosting --project passgram-org --debug
+[2026-10-29T02:28:56.243Z] CLI Version:   15.34.1
+[2026-10-29T02:28:56.243Z] Platform:      win32
+[2026-10-29T02:28:56.243Z] Node Version:  v24.22.1
+[2026-10-29T02:28:56.243Z] Detected Agent: unknown
+[2026-10-29T02:28:56.244Z] Time:          Wed Oct 28 2026 22:28:56 GMT-0400 (Eastern Daylight Time)
+[2026-10-29T02:28:56.244Z] ----------------------------------------------------------------------
+
+[2026-10-29T02:29:00.826Z] > command requires scopes: ["email","openid","https://www.googleapis.com/auth/cloudplatformprojects.readonly","https://www.googleapis.com/auth/firebase","https://www.googleapis.com/auth/cloud-platform"]
+[2026-10-29T02:29:00.826Z] > authorizing via signed-in user (rezanhassoun@gmail.com)
+[2026-10-29T02:29:00.826Z] [iam] checking project passgram-org for permissions ["firebase.projects.get","firebasehosting.sites.update"]
+[2026-10-29T02:29:00.838Z] Checked if tokens are valid: true, expires at: 1793244114775
+[2026-10-29T02:29:00.838Z] Checked if tokens are valid: true, expires at: 1793244114775
+[2026-10-29T02:29:00.839Z] >>> [apiv2][query] POST https://cloudresourcemanager.googleapis.com/v1/projects/passgram-org:testIamPermissions [none]
+[2026-10-29T02:29:00.839Z] >>> [apiv2][(partial)header] POST https://cloudresourcemanager.googleapis.com/v1/projects/passgram-org:testIamPermissions  x-goog-user-project=passgram-org
+[2026-10-29T02:29:00.839Z] >>> [apiv2][body] POST https://cloudresourcemanager.googleapis.com/v1/projects/passgram-org:testIamPermissions {"permissions":["firebase.projects.get","firebasehosting.sites.update"]}
+[2026-10-29T02:29:01.097Z] <<< [apiv2][status] POST https://cloudresourcemanager.googleapis.com/v1/projects/passgram-org:testIamPermissions 200
+[2026-10-29T02:29:01.098Z] <<< [apiv2][body] POST https://cloudresourcemanager.googleapis.com/v1/projects/passgram-org:testIamPermissions {"permissions":["firebase.projects.get","firebasehosting.sites.update"]}
+[2026-10-29T02:29:01.100Z] Checked if tokens are valid: true, expires at: 1793244114775
+[2026-10-29T02:29:01.100Z] Checked if tokens are valid: true, expires at: 1793244114775
+[2026-10-29T02:29:01.100Z] >>> [apiv2][query] GET https://firebase.googleapis.com/v1beta1/projects/passgram-org [none]
+[2026-10-29T02:29:01.371Z] <<< [apiv2][status] GET https://firebase.googleapis.com/v1beta1/projects/passgram-org 200
+[2026-10-29T02:29:01.371Z] <<< [apiv2][body] GET https://firebase.googleapis.com/v1beta1/projects/passgram-org {"projectId":"passgram-org","projectNumber":"157086803240","displayName":"PassGram","name":"projects/passgram-org","resources":{"hostingSite":"passgram-org"},"state":"ACTIVE","labels":{"firebase":"enabled"},"etag":"1_8ffad262-a0c1-4bd5-83be-11618a1734e3"}
+
+=== Deploying to 'passgram-org'...
+
+i  deploying hosting 
+[2026-10-29T02:29:01.375Z] Checked if tokens are valid: true, expires at: 1793244114775
+[2026-10-29T02:29:01.375Z] Checked if tokens are valid: true, expires at: 1793244114775
+[2026-10-29T02:29:01.375Z] >>> [apiv2][query] GET https://firebasehosting.googleapis.com/v1beta1/projects/passgram-org/sites/passgram [none]
+[2026-10-29T02:29:01.979Z] <<< [apiv2][status] GET https://firebasehosting.googleapis.com/v1beta1/projects/passgram-org/sites/passgram 200
+[2026-10-29T02:29:01.979Z] <<< [apiv2][body] GET https://firebasehosting.googleapis.com/v1beta1/projects/passgram-org/sites/passgram {"name":"projects/passgram-org/sites/passgram","defaultUrl":"https://passgram.web.app","appId":"1:157086803240:web:71d47993c605a759c91c1d","type":"USER_SITE"}
+[2026-10-29T02:29:01.983Z] Checked if tokens are valid: true, expires at: 1793244114775
+[2026-10-29T02:29:01.983Z] Checked if tokens are valid: true, expires at: 1793244114775
+[2026-10-29T02:29:01.984Z] >>> [apiv2][query] POST https://firebasehosting.googleapis.com/v1beta1/projects/passgram-org/sites/passgram/versions [none]
+[2026-10-29T02:29:01.984Z] >>> [apiv2][body] POST https://firebasehosting.googleapis.com/v1beta1/projects/passgram-org/sites/passgram/versions {"status":"CREATED","labels":{"deployment-tool":"cli-firebase"}}

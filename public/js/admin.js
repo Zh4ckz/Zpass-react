@@ -584,7 +584,7 @@ async function saveUpdates() {
     updateUrl: $("updUrl").value.trim(),
     forceUpdate: $("updForce").checked,
     maintenanceMode: $("updMaint").checked,
-    maintenanceMessage: $("updMaintMsg").value.trim() || "Z Pass is temporarily under maintenance.",
+    maintenanceMessage: $("updMaintMsg").value.trim() || "PassGram is temporarily under maintenance.",
     announcement,
     announcementId: announcement ? "a" + Date.now() : "",
     windowsVersion: $("winVersion").value.trim(),

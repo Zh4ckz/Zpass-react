@@ -387,7 +387,7 @@ $("resetPassword").addEventListener("click", async () => {
 
 async function loadDashboard(user) {
   const preferred = localStorage.getItem("zpassPreferredName:"+user.uid) || "";
-  const name = preferred || user.displayName || user.email?.split("@")[0] || "Z Pass User";
+  const name = preferred || user.displayName || user.email?.split("@")[0] || "PassGram User";
   $("webPreferredName").value=preferred;
   $("welcomeName").textContent = name;
   $("sideName").textContent = name;
@@ -406,11 +406,11 @@ async function loadDashboard(user) {
   }
   $("profileName").textContent = name;
   $("profileEmailLarge").textContent = maskEmail(user.email);
-  $("profileEmail2").textContent = user.email ? maskEmail(user.email) : "Z Pass hesabı";
+  $("profileEmail2").textContent = user.email ? maskEmail(user.email) : "PassGram hesabı";
   $("profileUid").textContent = user.uid;
   $("settingsEmail").textContent = maskEmail(user.email);
   $("settingsUid").textContent = user.uid;
-  $("aliasMailbox").textContent = user.email ? maskEmail(user.email) : "Z Pass hesabı";
+  $("aliasMailbox").textContent = user.email ? maskEmail(user.email) : "PassGram hesabı";
 
   try {
     const results = await Promise.allSettled([
@@ -436,7 +436,7 @@ async function loadDashboard(user) {
     renderReadOnlyDevices(devicesSnap, user.uid);
     $("planStatus").textContent = tier;
     $("profilePlan").textContent = tier;
-    if($('subscriptionCurrentPlan'))$('subscriptionCurrentPlan').textContent=`Z Pass ${tier.charAt(0)+tier.slice(1).toLowerCase()}`;
+    if($('subscriptionCurrentPlan'))$('subscriptionCurrentPlan').textContent=`PassGram ${tier.charAt(0)+tier.slice(1).toLowerCase()}`;
     if($('subscriptionValidUntil'))$('subscriptionValidUntil').textContent=isPro&&expires?'Valid until '+expires.toLocaleDateString():'Free plan';
     if($('subscriptionAccountId'))$('subscriptionAccountId').textContent='ZP-'+user.uid.slice(0,6).toUpperCase()+user.uid.slice(-4).toUpperCase();
     $("planDescription").textContent = `${tier} plan · en fazla ${limit} giriş`;
@@ -629,7 +629,7 @@ $("settingsResetPassword").addEventListener("click", () => $("profileReset").cli
 $("sendSupport").addEventListener("click", () => {
   const body = $("supportText").value.trim();
   if (!body) return;
-  window.location.href = `mailto:support@zh4ckz.web.app?subject=${encodeURIComponent("Z Pass destek talebi")}&body=${encodeURIComponent(body)}`;
+  window.location.href = `mailto:support@zh4ckz.web.app?subject=${encodeURIComponent("PassGram destek talebi")}&body=${encodeURIComponent(body)}`;
 });
 
 function parseCsv(text) {
@@ -709,7 +709,7 @@ async function importBackupFile(file){
    if(!Array.isArray(payload.items))throw Error('Invalid backup contents.');
    data={entries:payload.items,cards:[],authenticators:[],personalInfo:null};
   }else if(/\.csv$/i.test(file.name)){data={entries:parseCsv(content),cards:[],authenticators:[],personalInfo:null};}
-  else throw Error('This file is not a supported Z Pass backup or CSV.');
+  else throw Error('This file is not a supported PassGram backup or CSV.');
   const knownPasswords=new Set(currentPasswords.map(p=>JSON.stringify([p.platform,p.username,p.domain])));
   const knownCards=new Set(currentCards.map(c=>String(c.number).replace(/\D/g,'')));
   const knownTokens=new Set(unlockedAuthenticators.map(t=>JSON.stringify([t.issuer,t.account,t.secret])));
@@ -1317,7 +1317,7 @@ function renderCards(cards) {
     article.className = "cloud-card";
     const digits = card.number.replace(/\D/g, "");
     article.innerHTML = "<header><b></b><span class=\"card-network\"></span></header><div class=\"number\"></div><footer><span></span><span></span></footer>";
-    article.querySelector("header b").textContent = card.bank || "Z Pass Card";
+    article.querySelector("header b").textContent = card.bank || "PassGram Card";
     const detectedBrand = detectCardBrand(card.number);
     const network = article.querySelector(".card-network");
     if (detectedBrand) {
@@ -1689,7 +1689,7 @@ $("upgradeYearly").addEventListener("click", () => setUpgradeBilling("YEARLY"));
 document.querySelectorAll(".upgrade-plan").forEach((button) => button.addEventListener("click", () => {
   selectedUpgradePlan = button.dataset.plan;
   document.querySelectorAll(".upgrade-plan").forEach((item) => item.classList.toggle("selected", item === button));
-  $("chooseUpgrade").textContent = selectedUpgradePlan === "PRO" ? "Choose Z Pass Pro" : "Choose Z Pass Plus";
+  $("chooseUpgrade").textContent = selectedUpgradePlan === "PRO" ? "Choose PassGram Pro" : "Choose PassGram Plus";
 }));
 $("chooseUpgrade").addEventListener("click", () => {
   window.location.href = `/checkout.html?product=zpass&plan=${selectedUpgradePlan}&billing=${selectedUpgradeBilling}`;
@@ -1708,7 +1708,7 @@ websiteIconsControl.addEventListener('change',()=>{localStorage.setItem('zpassWe
 document.getElementById('savePreferredName').addEventListener('click',()=>{
   const name=document.getElementById('webPreferredName').value.trim();
   if(!auth.currentUser)return;localStorage.setItem('zpassPreferredName:'+auth.currentUser.uid,name);
-  document.getElementById('sideName').textContent=name || auth.currentUser.email?.split('@')[0] || 'Z Pass';
+  document.getElementById('sideName').textContent=name || auth.currentUser.email?.split('@')[0] || 'PassGram';
 });
 
 const checkoutIntent=document.getElementById('checkoutIntent');
@@ -1728,7 +1728,7 @@ async function viewProtectedCard(card) {
   const dialog=document.createElement('dialog');dialog.className='desktop-dialog';
   const heading=document.createElement('h2');heading.textContent='Approve on your phone';
   const codeElement=document.createElement('p');codeElement.style.cssText='font-size:64px;text-align:center;color:#9BA9BC';
-  const message=document.createElement('p');message.textContent=approvalText('Confirm this code in Z Pass on your phone.');
+  const message=document.createElement('p');message.textContent=approvalText('Confirm this code in PassGram on your phone.');
   const cancel=document.createElement('button');cancel.textContent='Cancel';cancel.onclick=()=>dialog.close();
   dialog.append(heading,codeElement,message,cancel);document.body.append(dialog);dialog.showModal();
   let reference,unsubscribe,timer,countdown;

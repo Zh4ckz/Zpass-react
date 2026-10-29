@@ -2,13 +2,13 @@
     "platforms":  {
                       "android":  {
                                       "published":  true,
-                                      "publisher":  "Z Pass",
+                                      "publisher":  "PassGram",
                                       "version":  "4.16",
                                       "versionCode":  42,
-                                      "releasedAt":  "2026-10-28T21:00:13Z",
+                                      "releasedAt":  "2026-10-29T02:31:15Z",
                                       "downloadUrl":  "",
-                                      "sha256":  "9bf1cc6e31e0290caccf7432a21276c3e472f34754422529f62cefb4391e38fe",
-                                      "sizeBytes":  95189561,
+                                      "sha256":  "48537bdc3d00ddf515fa2344b83e229ab170deb6817edeb91f4010c2d12aa425",
+                                      "sizeBytes":  95204464,
                                       "signingCertificate":  "CN=Zh4ckz, OU=Zh4ckz, O=Zh4ckz, L=Pennsylvania, ST=Pennsylvania, C=US",
                                       "signingCertificateSha256":  "3f7673eb7bd222e77dabab5eb0708b490dacc7eada5f8e254032dd8473359f47",
                                       "availabilityNote":  "This signed release is verified, but direct APK downloads are temporarily unavailable on this Firebase Hosting plan.",

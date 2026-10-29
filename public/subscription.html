@@ -5,7 +5,7 @@
   <meta name="viewport" content="width=device-width,initial-scale=1">
   <meta name="theme-color" content="#010101">
   <meta name="robots" content="noindex">
-  <title>Manage Subscription · Z Pass</title>
+  <title>Manage Subscription · PassGram</title>
   <link rel="icon" href="images/zpass.png">
   <style>
     :root{color-scheme:dark;font-family:Inter,ui-sans-serif,system-ui,-apple-system,Segoe UI,sans-serif;--bg:#010101;--panel:#292F33;--panel2:#292F33;--line:#292F33;--text:#FEFEFE;--muted:#A6B3C4;--brand:#8F9EB4;--brand2:#A6B3C4;--green:#8999B0}
@@ -45,7 +45,7 @@
 <link rel="stylesheet" href="/css/zpass-design-system.css">
 <link rel="stylesheet" href="/css/unified-2026.css?v=414"></head>
 <body class="pm">
-  <header class="top"><a href="/"><img src="images/zpass.png" alt="">Z Pass</a></header>
+  <header class="top"><a href="/"><img src="images/zpass.png" alt="">PassGram</a></header>
   <main>
     <div id="signedOut" class="empty" style="display:none">
       <p>Sign in to manage your subscription.</p>
@@ -53,7 +53,7 @@
     </div>
     <div id="content" class="skeleton" style="display:none">
       <h1>Subscription</h1>
-      <p class="lead">Your Z Pass plan, billing period, and renewal status.</p>
+      <p class="lead">Your PassGram plan, billing period, and renewal status.</p>
       <div class="card">
         <div class="plan-row">
           <div>
@@ -63,7 +63,7 @@
           <span class="badge" id="planBadge">—</span>
         </div>
         <dl>
-          <dt>Z Pass ID</dt><dd id="zpassId">—</dd>
+          <dt>PassGram ID</dt><dd id="zpassId">—</dd>
           <dt>Renews / expires</dt><dd id="expiresAt">—</dd>
         </dl>
         <div class="actions" id="actions"></div>
@@ -126,7 +126,7 @@
       const expiresDate = data.expiresAt?.toDate ? data.expiresAt.toDate() : null;
       const isActive = data.status === "ACTIVE" && plan !== "FREE" && expiresDate instanceof Date && expiresDate > new Date();
 
-      $("planName").textContent = isActive ? `Z Pass ${plan.charAt(0) + plan.slice(1).toLowerCase()}` : "Z Pass Free";
+      $("planName").textContent = isActive ? `PassGram ${plan.charAt(0) + plan.slice(1).toLowerCase()}` : "PassGram Free";
       $("planSub").textContent = isActive
         ? plan === "PRO"
           ? "Up to 10 saved logins · voice transcription · custom app icons · unlimited vaults"
@@ -141,7 +141,7 @@
       $("billingNote").textContent = isActive
         ? (data.stripeCustomerId
           ? "Your Stripe billing portal lets you update payment details, view invoices, or cancel renewal."
-          : "Need help with billing? Contact support with your Z Pass ID.")
+          : "Need help with billing? Contact support with your PassGram ID.")
         : "";
       $("manageBilling")?.addEventListener("click", async (event) => {
         const button = event.currentTarget;

@@ -18,11 +18,11 @@ export function normalizeBackup(input,version) {
 export async function readZhc(content,password,cryptoAdapter) {
   if(new TextEncoder().encode(content).length>MAX_BACKUP_BYTES)throw Error('Backup exceeds 20 MB.');
   const parts=content.replace(/^\uFEFF/,'').split('\n');
-  if(parts[0]?.trim()!==magic)throw Error('This file is not a Z Pass backup.');
+  if(parts[0]?.trim()!==magic)throw Error('This file is not a PassGram backup.');
   const version=Number(parts[1]?.trim());
   if(version===2)throw Error('This older Android backup requires the Android key from the installation that created it. A recovery password cannot replace that key. Keep the original file.');
   if(version===3)return normalizeBackup(JSON.parse(await cryptoAdapter.decryptLegacy(parts.slice(2).join('\n').trim())),3);
-  if(version!==4||parts.length!==5)throw Error('Unsupported or incomplete Z Pass backup.');
+  if(version!==4||parts.length!==5)throw Error('Unsupported or incomplete PassGram backup.');
   if(typeof password!=='string'||password.length<10)throw Error('Enter the backup password (at least 10 characters).');
   let plain;
   try{plain=await cryptoAdapter.decrypt(parts[4].trim(),password,parts[2].trim(),parts[3].trim());}

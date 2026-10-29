@@ -61,21 +61,21 @@
     if (selectedPlan.startsWith("BUSINESS_")) {
       const businessPlan = {
         BUSINESS_SINGLE: {
-          name: "Z Pass Business",
+          name: "PassGram Business",
           price: businessSinglePrice?.textContent || "",
           billed: businessSingleTotal?.textContent || "",
           href: businessSingleQuoteHref,
           cta: "Request a quote"
         },
         BUSINESS_TEAM: {
-          name: "Z Pass Teams",
+          name: "PassGram Teams",
           price: businessSeatPrice?.textContent || "",
           billed: businessSeatTotal?.textContent || "",
           href: businessTeamQuoteHref,
           cta: "Request a team quote"
         },
         BUSINESS_ENTERPRISE: {
-          name: "Z Pass Enterprise",
+          name: "PassGram Enterprise",
           price: "Custom pricing",
           billed: "For large organizations",
           href: businessEnterpriseCta?.href || "mailto:rezan@dr.com",
@@ -92,9 +92,9 @@
     }
 
     const plans = {
-      FREE: { name: "Z Pass Free", price: "$0<small>/month</small>", billed: "Free forever", cta: "Continue free" },
-      PLUS: { name: "Z Pass Plus", price: "", billed: "", cta: "Get Pass Plus" },
-      PRO: { name: "Z Pass Pro", price: "", billed: "", cta: "Get Pass Pro" }
+      FREE: { name: "PassGram Free", price: "$0<small>/month</small>", billed: "Free forever", cta: "Continue free" },
+      PLUS: { name: "PassGram Plus", price: "", billed: "", cta: "Get Pass Plus" },
+      PRO: { name: "PassGram Pro", price: "", billed: "", cta: "Get Pass Pro" }
     };
     const plan = plans[selectedPlan] || plans.PRO;
     const priceId = selectedPlan === "PLUS" ? "marketingPlusPrice" : "marketingProPrice";
@@ -222,9 +222,9 @@
     const billingLabel = selectedBilling === "YEARLY" ? "billed annually" : "billed monthly";
     businessSeatTotal.textContent = `${seatCount} ${seatCount === 1 ? "seat" : "seats"} · ${businessMoney.format(total)} ${billingLabel}`;
 
-    const subject = `Z Pass Teams quote: ${seatCount} seats`;
+    const subject = `PassGram Teams quote: ${seatCount} seats`;
     const body = [
-      "Please prepare a Z Pass Teams quote.",
+      "Please prepare a PassGram Teams quote.",
       `Purchased seats: ${seatCount} (including the account owner)`,
       `Price per user/month: ${businessMoney.format(unitPrice)}`,
       `Billing period: ${selectedBilling === "YEARLY" ? "yearly" : "monthly"}`,
@@ -255,8 +255,8 @@
     button.addEventListener("click", () => selectPlan(button.dataset.selectPlan));
   });
   const singleQuote = new URL("mailto:rezan@dr.com");
-  singleQuote.searchParams.set("subject", "Z Pass Business single-user quote");
-  singleQuote.searchParams.set("body", "Please prepare a Z Pass Business quote for one user.");
+  singleQuote.searchParams.set("subject", "PassGram Business single-user quote");
+  singleQuote.searchParams.set("body", "Please prepare a PassGram Business quote for one user.");
   businessSingleQuoteHref = singleQuote.toString();
 
   const pricingSection = document.getElementById("pricing");
@@ -288,6 +288,6 @@
     );
     setBilling(document.querySelector(".billing-toggle [data-billing].active")?.dataset.billing || "MONTHLY");
   } catch (error) {
-    console.warn("Z Pass payment configuration unavailable; using the built-in prices", error);
+    console.warn("PassGram payment configuration unavailable; using the built-in prices", error);
   }
 })();

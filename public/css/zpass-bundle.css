@@ -124,7 +124,7 @@ body:has(.dashboard:not(.hidden)){font-size:15px}.dashboard{grid-template-column
 .social-icon.x-icon{width:15px;height:15px}
 
 
-/* Liquid-glass floating header for Z Pass (matches the app's dark blue/cyan palette). */
+/* Liquid-glass floating header for PassGram (matches the app's dark blue/cyan palette). */
 .topbar {
   position: sticky;
   top: max(12px, env(safe-area-inset-top));
@@ -217,7 +217,7 @@ body:has(.dashboard:not(.hidden)){font-size:15px}.dashboard{grid-template-column
     display: none !important;
   }
 }
-/* Liquid-glass pricing cards + toggles for Z Pass (neon-blue accent, translucent glass surfaces). */
+/* Liquid-glass pricing cards + toggles for PassGram (neon-blue accent, translucent glass surfaces). */
 :root {
   --glass-card-bg: rgba(254, 254, 254, 0.03);
   --glass-card-border: rgba(254, 254, 254, 0.08);

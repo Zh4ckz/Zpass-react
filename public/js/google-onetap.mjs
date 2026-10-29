@@ -2,7 +2,7 @@ import { getApps } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app
 import { getAuth, onAuthStateChanged, signInWithCredential, GoogleAuthProvider } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js";
 
 const CLIENT_IDS = {
-  zpasss: "734994147577-3h0dsolcr4aa84askrek336t2bnk8o0u.apps.googleusercontent.com"
+  "syria-pass": "597701245019-7hqumrggmiqn8kum3rtgu0ramhpbc3ai.apps.googleusercontent.com"
 };
 
 const app = getApps()[0];

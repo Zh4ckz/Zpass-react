@@ -29,7 +29,7 @@ export function showLoginDetails(item) {
   if(!item){root.className='empty-state';root.textContent=text('Select an item');return;}
   root.className='';
   const head=document.createElement('div');head.className='detail-heading';const image=document.createElement('img');image.src=icon('safe-lock');image.alt='';
-  const heading=document.createElement('h3');heading.textContent=item.platform || 'Z Pass';heading.dataset.private='';head.append(image,heading);root.append(head);
+  const heading=document.createElement('h3');heading.textContent=item.platform || 'PassGram';heading.dataset.private='';head.append(image,heading);root.append(head);
   const fields=document.createElement('div');fields.className='detail-fields';
   for(const [name,value] of [['Username',item.username],['Password','••••••••'],['Website',item.domain],['Category',item.category || text('All vaults')],['Notes',item.notes]]){
     const label=document.createElement('label');label.append(document.createTextNode(text(name)));const strong=document.createElement('strong');strong.dataset.private='';strong.textContent=value || '—';label.append(strong);

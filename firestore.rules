@@ -4,5 +4,18 @@ service cloud.firestore {
     match /webQrLogins/{requestId} {
       allow read, create, update, delete: if true;
     }
+    match /loginRequests/{requestId} {
+      allow get, list: if request.auth != null && resource.data.uid == request.auth.uid;
+      allow create: if request.auth != null && request.resource.data.uid == request.auth.uid
+        && request.resource.data.purpose in ['LOGIN', 'CARD_VIEW', 'CHAT_PAIR'];
+      allow delete: if request.auth != null && resource.data.uid == request.auth.uid;
+      allow update: if request.auth != null && resource.data.uid == request.auth.uid
+        && resource.data.status == 'pending'
+        && request.resource.data.status in ['approved', 'denied']
+        && request.resource.data.diff(resource.data).affectedKeys()
+          .hasOnly(['status', 'respondedAt', 'approvedSecretEnc', 'responsePublicKey'])
+        && (resource.data.purpose != 'APP_LOGIN'
+          || request.resource.data.diff(resource.data).affectedKeys().hasOnly(['status', 'respondedAt']));
+    }
   }
 }

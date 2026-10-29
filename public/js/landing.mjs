@@ -25,7 +25,7 @@ function renderPricing(){
   });
   document.querySelector('[data-price-unit]').textContent=' / '+t('monthUnit');
   document.querySelectorAll('[data-total]').forEach(node=>node.textContent=money(prices[node.dataset.total][period])+' · '+t(period==='YEARLY'?'annualBill':'monthlyBill'));
-  $('selectedPlanName').textContent=selected==='FREE'?t('freePlan'):selected==='PLUS'?'Z Pass Plus':'Z Pass Pro';
+  $('selectedPlanName').textContent=selected==='FREE'?t('freePlan'):selected==='PLUS'?'PassGram Plus':'PassGram Pro';
   $('selectedPlanTotal').textContent=selected==='FREE'?t('forever'):money(prices[selected][period])+' · '+t(period==='YEARLY'?'annualBill':'monthlyBill');
   $('subscribe').querySelector('span').textContent=t(selected==='FREE'?'startFree':'subscribe');
 }

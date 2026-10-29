@@ -60,7 +60,7 @@
       }
     })
     .catch((error) => {
-      console.error("Unable to load Z Pass release information.", error);
+      console.error("Unable to load PassGram release information.", error);
       for (const label of versionLabels) label.textContent = "Version information unavailable";
       for (const label of noteLabels) label.textContent = "Release information could not be verified. The download is disabled.";
       for (const link of downloadLinks) {

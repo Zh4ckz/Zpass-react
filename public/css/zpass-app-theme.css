@@ -1,4 +1,4 @@
-/* Z Pass unified theme: same palette as the Android app dark theme. Loaded last on every page. */
+/* PassGram unified theme: same palette as the Android app dark theme. Loaded last on every page. */
 :root {
   color-scheme: dark;
   --zp-bg: #0F172A;

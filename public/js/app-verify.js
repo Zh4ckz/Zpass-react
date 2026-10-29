@@ -45,7 +45,7 @@ async function handleVerify() {
     if (mode === 'verifyEmail') {
       await applyActionCode(auth, actionCode);
       titleEl.textContent = "Email Verified!";
-      subtitleEl.textContent = "Your email has been successfully confirmed. You can now access all features of Z Pass.";
+      subtitleEl.textContent = "Your email has been successfully confirmed. You can now access all features of PassGram.";
       statusEl.className = "status-msg success";
       statusEl.textContent = "Success";
     } else if (mode === 'resetPassword') {
@@ -179,7 +179,7 @@ $('setNewRecoveryBtn').addEventListener('click', async () => {
     await resetPortableVault(uid, password);
     $('resetRecoveryForm').classList.add('hidden');
     titleEl.textContent = "Recovery password reset";
-    subtitleEl.textContent = "Remember to set the same new password in the Z Pass Android app so both stay in sync.";
+    subtitleEl.textContent = "Remember to set the same new password in the PassGram Android app so both stay in sync.";
     statusEl.className = "status-msg success";
     statusEl.textContent = "Done — redirecting you to sign in…";
     setTimeout(() => (window.location.href = "./"), 2500);

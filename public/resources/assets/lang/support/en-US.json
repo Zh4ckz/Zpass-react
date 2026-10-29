@@ -1,6 +1,6 @@
 {
   "help": "Are you struggling with login?",
-  "title": "Z Pass assistant",
+  "title": "PassGram assistant",
   "name": "How would you like me to address you?",
   "hello": "Hi {name}! Choose a topic or describe your problem.",
   "choose": "Automated help · live support on request",

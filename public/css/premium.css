@@ -6,7 +6,7 @@
 @media(prefers-reduced-motion:reduce){*,*:before,*:after{scroll-behavior:auto!important;transition-duration:.01ms!important;animation-duration:.01ms!important}}
 body.auth-pending{visibility:hidden}
 
-/* Quiet, high-contrast surfaces inspired by the Z Pass mobile interface. */
+/* Quiet, high-contrast surfaces inspired by the PassGram mobile interface. */
 :root{--bg:#111216;--panel:#1b1c21;--border:#34363e;--muted:#a4a6ad;--text:#f2f3f5;--blue:#8E9EB4;--cyan:#AAB6C6}
 html,body{background:#111216}
 body{background:radial-gradient(ellipse at 70% 0%,rgba(88,106,131,.11),transparent 34rem),#111216}

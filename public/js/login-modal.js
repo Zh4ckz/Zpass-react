@@ -1,9 +1,9 @@
 (() => {
   const modal=document.createElement('dialog');
-  modal.className='login-modal';modal.setAttribute('aria-label','Z Pass sign in');
+  modal.className='login-modal';modal.setAttribute('aria-label','PassGram sign in');
   const back=document.createElement('button');back.type='button';back.className='login-modal-back';
   back.setAttribute('aria-label','Back');back.innerHTML='<span aria-hidden="true">←</span><span>Back</span>';
-  const frame=document.createElement('iframe');frame.title='Z Pass sign in';
+  const frame=document.createElement('iframe');frame.title='PassGram sign in';
   modal.append(back,frame);document.body.append(modal);
   let trigger;
   const close=()=>{modal.close();frame.removeAttribute('src');document.body.classList.remove('login-modal-open');

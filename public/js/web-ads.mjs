@@ -55,11 +55,11 @@ function renderCampaign() {
   overlay.className = "web-ads-overlay";
   overlay.setAttribute("role", "dialog");
   overlay.setAttribute("aria-modal", "true");
-  overlay.setAttribute("aria-label", "Z Pass premium plans");
+  overlay.setAttribute("aria-label", "PassGram premium plans");
   const frame = document.createElement("iframe");
   frame.className = "web-ads-frame";
   frame.src = "/premium/?campaign=1";
-  frame.title = "Z Pass premium plans";
+  frame.title = "PassGram premium plans";
   frame.tabIndex = 0;
   frame.setAttribute("allow", "payment");
   overlay.append(frame);

@@ -5,7 +5,7 @@
   <meta name="viewport" content="width=device-width,initial-scale=1">
   <meta name="theme-color" content="#010101">
   <meta name="robots" content="noindex, nofollow">
-  <title>Z Pass Admin</title>
+  <title>PassGram Admin</title>
   <link rel="icon" type="image/png" href="images/zpass.png?v=3">
   <style>
     :root {
@@ -164,8 +164,8 @@
 <body>
 
   <div id="authGate" class="auth-wrap">
-    <img src="images/zpass.png?v=3" alt="Z Pass">
-    <h2>Z Pass Admin</h2>
+    <img src="images/zpass.png?v=3" alt="PassGram">
+    <h2>PassGram Admin</h2>
     <p style="color:var(--muted); font-size:13px; margin-top:-6px;">Restricted to the account owner.</p>
     <form id="loginForm">
       <input id="email" type="email" placeholder="Email" autocomplete="email" required>
@@ -175,13 +175,13 @@
     <div class="or">or</div>
     <button id="googleLogin" class="google" type="button" aria-label="Continue with Google" title="Continue with Google"><img src="images/google-mark.svg?v=2" alt="" width="22" height="22"></button>
     <p id="authMessage"></p>
-    <p id="deniedMessage" class="hidden">Signed in, but this account is not the Z Pass admin account. <button id="signOutDenied" type="button">Sign out</button></p>
+    <p id="deniedMessage" class="hidden">Signed in, but this account is not the PassGram admin account. <button id="signOutDenied" type="button">Sign out</button></p>
   </div>
 
   <div id="adminApp" class="hidden">
     <header>
       <img src="images/zpass.png?v=3" alt="">
-      <h1>Z Pass Admin</h1>
+      <h1>PassGram Admin</h1>
       <span class="who" id="whoAmI"></span>
       <button id="signOut">Sign out</button>
     </header>
@@ -195,7 +195,7 @@
         <div class="upd-grid">
           <div class="upd-tile"><small>Android (APK)</small><label>Latest version name<input id="updName" placeholder="4.10"></label><label>Latest version code<input id="updCode" type="number" min="1" inputmode="numeric"></label><label>Minimum supported code<input id="updMin" type="number" min="1" inputmode="numeric"></label><label>Official signed download URL<input id="updUrl" placeholder="No website-hosted APK download"></label></div>
           <div class="upd-tile"><small>Windows (EXE)</small><label>Latest version<input id="winVersion" placeholder="1.1.0"></label><label>Download URL<input id="winUrl" placeholder="Windows installer URL (external host required)"></label><label>Release notes<textarea id="winNotes" rows="3" placeholder="What's new"></textarea></label></div>
-          <div class="upd-tile"><small>Announcement &amp; status</small><label>Announcement shown in the app<textarea id="updAnnouncement" rows="3" placeholder="What's new in this version"></textarea></label><label>Maintenance message<input id="updMaintMsg" placeholder="Z Pass is temporarily under maintenance."></label><div class="upd-switches"><label class="switch"><input id="updForce" type="checkbox"><span></span>Force update</label><label class="switch"><input id="updMaint" type="checkbox"><span></span>Maintenance mode</label></div></div>
+          <div class="upd-tile"><small>Announcement &amp; status</small><label>Announcement shown in the app<textarea id="updAnnouncement" rows="3" placeholder="What's new in this version"></textarea></label><label>Maintenance message<input id="updMaintMsg" placeholder="PassGram is temporarily under maintenance."></label><div class="upd-switches"><label class="switch"><input id="updForce" type="checkbox"><span></span>Force update</label><label class="switch"><input id="updMaint" type="checkbox"><span></span>Maintenance mode</label></div></div>
         </div>
         <div class="form-row"><button id="updSave" class="primary">Publish changes</button><button id="updReload">Reload</button><span id="updStatus" class="status-line"></span></div>
       </section>
@@ -291,11 +291,11 @@
         <h2>Users</h2>
         <p class="hint">Search account records. The table loads the most recent 200 user profiles.</p>
         <div class="form-row">
-          <input id="userSearch" type="search" placeholder="Search email, name, or Z Pass ID" style="min-width:260px;">
+          <input id="userSearch" type="search" placeholder="Search email, name, or PassGram ID" style="min-width:260px;">
           <button id="usersRefresh">Refresh</button>
         </div>
         <table id="usersTable">
-          <thead><tr><th>Z Pass ID</th><th>Name</th><th>Email</th><th>Account created</th></tr></thead>
+          <thead><tr><th>PassGram ID</th><th>Name</th><th>Email</th><th>Account created</th></tr></thead>
           <tbody></tbody>
         </table>
         <p class="empty hidden" id="usersEmpty">No matching users.</p>
@@ -306,7 +306,7 @@
         <p class="hint">Latest completed card and crypto payments. Stripe invoices are also available in each customer's billing portal.</p>
         <button id="paymentsRefresh">Refresh</button>
         <table id="paymentsTable">
-          <thead><tr><th>Z Pass ID</th><th>Email</th><th>Plan</th><th>Billing</th><th>Amount</th><th>Provider</th><th>Paid</th></tr></thead>
+          <thead><tr><th>PassGram ID</th><th>Email</th><th>Plan</th><th>Billing</th><th>Amount</th><th>Provider</th><th>Paid</th></tr></thead>
           <tbody></tbody>
         </table>
         <p class="empty hidden" id="paymentsEmpty">No completed payments.</p>

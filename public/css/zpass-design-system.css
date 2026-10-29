@@ -1,4 +1,4 @@
-/* Z Pass 4.11: lightweight shared blue/violet palette. */
+/* PassGram 4.11: lightweight shared blue/violet palette. */
 :root{color-scheme:dark!important;--bg:#0b1220!important;--bg-1:#142035!important;--bg-2:#1d2c45!important;--panel:rgba(20,32,53,.96)!important;--panel-strong:#1d2c45!important;--line:#35465e!important;--text:#f8fafc!important;--muted:#a8b8cf!important;--accent:#60a5fa!important;--accent-bright:#93c5fd!important;--accent-strong:#93c5fd!important;--blue:#60a5fa!important;--cyan:#67e8f9!important;--purple:#a78bfa!important;--green:#4ade80!important;--a1:#60a5fa!important}
 body{font-family:Inter,"Segoe UI Variable","Segoe UI",system-ui,sans-serif!important;background:#0b1220!important;color:#f8fafc!important}
 button,input,select,textarea{font:inherit}

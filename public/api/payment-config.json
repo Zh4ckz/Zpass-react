@@ -2,14 +2,14 @@
   "schemaVersion": 1,
   "updatedAt": "2026-10-26T00:00:00Z",
   "app": {
-    "title": "Z Pass",
-    "checkoutTitle": "Z Pass Secure Checkout"
+    "title": "PassGram",
+    "checkoutTitle": "PassGram Secure Checkout"
   },
   "currency": "USD",
   "plans": {
     "PLUS_MONTHLY": {
       "id": "PLUS_MONTHLY",
-      "title": "Z Pass Plus Monthly",
+      "title": "PassGram Plus Monthly",
       "price": 4.99,
       "period": "month",
       "stripeUrl": "",
@@ -19,7 +19,7 @@
     },
     "PLUS_YEARLY": {
       "id": "PLUS_YEARLY",
-      "title": "Z Pass Plus Yearly",
+      "title": "PassGram Plus Yearly",
       "price": 49.9,
       "period": "year",
       "stripeUrl": "",
@@ -29,7 +29,7 @@
     },
     "PRO_MONTHLY": {
       "id": "PRO_MONTHLY",
-      "title": "Z Pass Pro Monthly",
+      "title": "PassGram Pro Monthly",
       "price": 9,
       "period": "month",
       "stripeUrl": "",
@@ -39,7 +39,7 @@
     },
     "PRO_YEARLY": {
       "id": "PRO_YEARLY",
-      "title": "Z Pass Pro Yearly",
+      "title": "PassGram Pro Yearly",
       "price": 90,
       "period": "year",
       "stripeUrl": "",
