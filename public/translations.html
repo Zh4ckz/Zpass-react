@@ -438,6 +438,9 @@
 
       if (segments.length === 0 || segments[0] === 'translations' || segments[0] === 'index.html') {
         // VIEW 1: HOME LANDING PAGE (https://translations.zpas.org/)
+        if (location.pathname !== '/' && location.pathname !== '') {
+          try { history.replaceState(null, '', '/'); } catch(e) {}
+        }
         devWrap.hidden = false;
         breadcrumbList.innerHTML = `<li><a href="/">Translations</a></li>`;
       } else if (segments.length === 1) {
