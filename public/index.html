@@ -12,16 +12,32 @@
   <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&family=Manrope:wght@400;500;600;700;800&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="/css/marketing-2026.css?v=1">
   <script>
-    const h = location.hostname.toLowerCase();
-    if (h.includes('translations')) {
-      if (location.pathname === '/' || location.pathname === '' || location.pathname === '/index.html') {
-        location.replace('/translations.html');
+    (function() {
+      const h = location.hostname.toLowerCase();
+      if (h.includes('translations')) {
+        if (location.pathname === '/' || location.pathname === '' || location.pathname === '/index.html') {
+          fetch('/translations.html')
+            .then(r => r.text())
+            .then(html => {
+              document.open();
+              document.write(html);
+              document.close();
+            })
+            .catch(() => {});
+        }
+      } else if (h.includes('web.') || h.includes('login.')) {
+        if (location.pathname === '/' || location.pathname === '' || location.pathname === '/index.html') {
+          fetch('/web.html')
+            .then(r => r.text())
+            .then(html => {
+              document.open();
+              document.write(html);
+              document.close();
+            })
+            .catch(() => {});
+        }
       }
-    } else if (h.includes('web.') || h.includes('login.')) {
-      if (location.pathname === '/' || location.pathname === '' || location.pathname === '/index.html') {
-        location.replace('/web.html');
-      }
-    }
+    })();
   </script>
 </head>
 <body>
