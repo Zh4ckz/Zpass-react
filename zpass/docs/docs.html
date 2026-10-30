@@ -1,0 +1,215 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
+  <title>Z Pass & PassGram Developer Documentation</title>
+  <link rel="icon" type="image/png" href="/resources/assets/app-logo/zpass.png">
+  <style>
+    :root {
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+      --bg: #ffffff;
+      --sidebar-bg: #f8fafc;
+      --text-main: #1c2733;
+      --text-muted: #707579;
+      --accent: #3390ec;
+      --border: #e6ebf2;
+      --code-bg: #1e293b;
+      --code-color: #61afef;
+    }
+    * { box-sizing: border-box; }
+    body {
+      margin: 0;
+      background: var(--bg);
+      color: var(--text-main);
+      font-size: 14px;
+      line-height: 1.6;
+    }
+    header {
+      height: 60px;
+      background: #ffffff;
+      border-bottom: 1px solid var(--border);
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 0 24px;
+      position: sticky;
+      top: 0;
+      z-index: 100;
+    }
+    .brand {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      font-size: 18px;
+      font-weight: 800;
+      color: var(--text-main);
+      text-decoration: none;
+    }
+    .brand-logo {
+      width: 34px;
+      height: 34px;
+      background: var(--accent);
+      color: white;
+      border-radius: 8px;
+      display: grid;
+      place-items: center;
+    }
+    .container {
+      display: grid;
+      grid-template-columns: 260px minmax(0, 1fr);
+      min-height: calc(100dvh - 60px);
+    }
+    aside.sidebar {
+      background: var(--sidebar-bg);
+      border-right: 1px solid var(--border);
+      padding: 24px 0;
+    }
+    .nav-sec-title {
+      padding: 8px 20px;
+      font-size: 11px;
+      font-weight: 800;
+      color: var(--text-muted);
+      text-transform: uppercase;
+      letter-spacing: 0.8px;
+    }
+    .nav-list {
+      list-style: none;
+      padding: 0;
+      margin: 0 0 20px;
+    }
+    .nav-list a {
+      display: block;
+      padding: 8px 20px;
+      color: var(--text-main);
+      text-decoration: none;
+      font-weight: 500;
+    }
+    .nav-list a:hover { color: var(--accent); background: rgba(51, 144, 236, 0.08); }
+    main.content {
+      padding: 36px clamp(20px, 4vw, 48px);
+      max-width: 920px;
+    }
+    h1 { margin: 0 0 12px; font-size: 28px; font-weight: 800; }
+    h2 { margin: 24px 0 12px; font-size: 20px; font-weight: 700; color: var(--accent); }
+    p { margin: 0 0 16px; color: var(--text-muted); font-size: 15px; }
+    .card {
+      background: var(--sidebar-bg);
+      border: 1px solid var(--border);
+      border-radius: 18px;
+      padding: 28px;
+      margin-bottom: 24px;
+    }
+    pre {
+      background: var(--code-bg);
+      color: var(--code-color);
+      padding: 16px;
+      border-radius: 12px;
+      overflow-x: auto;
+      font-family: monospace;
+      font-size: 13px;
+    }
+    code { background: #eef4fc; color: var(--accent); padding: 3px 8px; border-radius: 6px; font-family: monospace; }
+  </style>
+</head>
+<body>
+  <header>
+    <a href="https://docs.zpas.org/" class="brand"><div class="brand-logo">Z</div><span>PassGram Developer Docs</span></a>
+  </header>
+
+  <div class="container">
+    <aside class="sidebar">
+      <div class="nav-sec-title">Getting Started</div>
+      <ul class="nav-list">
+        <li><a href="#quickstart">Quickstart</a></li>
+        <li><a href="#python">Python SDK (pip)</a></li>
+        <li><a href="#nodejs">Node.js SDK (npm)</a></li>
+        <li><a href="#php">PHP SDK (composer)</a></li>
+      </ul>
+      <div class="nav-sec-title">API & Webhooks</div>
+      <ul class="nav-list">
+        <li><a href="#rest-json">HTTP & JSON REST API</a></li>
+        <li><a href="#bot-token">Bot Token Setup</a></li>
+        <li><a href="#webhooks">Webhooks</a></li>
+      </ul>
+      <div class="nav-sec-title">Android SDK</div>
+      <ul class="nav-list">
+        <li><a href="https://github.com/Zh4ckz/passgram-login-android" target="_blank">PassGram Login Android</a></li>
+      </ul>
+    </aside>
+
+    <main class="content">
+      <h1>Developer Documentation</h1>
+      <p>Build Telegram-compatible bots, custom messaging tools, and Python / Node.js / PHP integrations using the PassGram SDKs and HTTP REST API.</p>
+
+      <div class="card" id="quickstart">
+        <h2>1. Quickstart & Bot Token</h2>
+        <p>To start building, obtain a Bot Token from <code>@Zbot</code> inside the Z Pass app or web app. Your bot token format looks like: <code>123456789:ABCdefGHIjklMNOpqrsTUVwxyZ</code>.</p>
+      </div>
+
+      <div class="card" id="python">
+        <h2>2. Python Integration (<code>pip install passgram</code>)</h2>
+        <p>Install the official PassGram Python package using pip:</p>
+        <pre>pip install passgram</pre>
+        <p>Example Python bot script:</p>
+        <pre>from passgram import ZpassBot
+
+bot = ZpassBot(token="123456789:YOUR_BOT_TOKEN")
+
+@bot.on_message()
+def handle_message(message):
+    if message.text == "/start":
+        bot.send_message(message.chat.id, "Hello from PassGram Python Bot!")
+
+bot.run()</pre>
+      </div>
+
+      <div class="card" id="nodejs">
+        <h2>3. Node.js Integration (<code>npm install passgram</code>)</h2>
+        <p>Install the Node.js SDK:</p>
+        <pre>npm install passgram</pre>
+        <p>Example Node.js bot script:</p>
+        <pre>import { ZpassBot } from 'passgram';
+
+const bot = new ZpassBot({ token: '123456789:YOUR_BOT_TOKEN' });
+
+bot.on('message', (msg) => {
+  if (msg.text === '/start') {
+    bot.sendMessage(msg.chat.id, 'Hello from PassGram Node.js Bot!');
+  }
+});
+
+bot.start();</pre>
+      </div>
+
+      <div class="card" id="php">
+        <h2>4. PHP Integration (<code>composer require passgram/bot</code>)</h2>
+        <p>Install via Composer:</p>
+        <pre>composer require passgram/bot</pre>
+        <pre>&lt;?php
+require 'vendor/autoload.php';
+
+use PassGram\ZpassBot;
+
+$bot = new ZpassBot('123456789:YOUR_BOT_TOKEN');
+$bot->sendMessage([
+    'chat_id' => $chatId,
+    'text' => 'Hello from PHP SDK!'
+]);</pre>
+      </div>
+
+      <div class="card" id="rest-json">
+        <h2>5. HTTP & JSON REST API</h2>
+        <p>Send JSON requests over HTTPS:</p>
+        <pre>POST /bot&lt;token&gt;/sendMessage
+Content-Type: application/json
+
+{
+  "chat_id": "123456789",
+  "text": "Hello from Z Pass REST API"
+}</pre>
+      </div>
+    </main>
+  </div>
+</body>
+</html>
