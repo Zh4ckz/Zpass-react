@@ -3,434 +3,274 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
-  <title>Z Pass Translations</title>
+  <title>Z Pass Translations Platform</title>
   <link rel="icon" type="image/png" href="/resources/assets/app-logo/zpass.png">
+
+  <!-- Official Telegram Translations Stylesheets -->
+  <link href="/css/font-roboto.css" rel="stylesheet" type="text/css">
+  <link href="/css/bootstrap.min.css" rel="stylesheet">
+  <link href="/css/bootstrap-extra.css" rel="stylesheet">
+  <link href="/css/telegram.css?256" rel="stylesheet">
+  <link href="/css/translations.css?136" rel="stylesheet">
+  <link href="/css/health.css?149" rel="stylesheet">
+  <link href="/css/translations-dark.css?15" rel="stylesheet">
+
   <style>
     :root {
-      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
-      --bg: #ffffff;
-      --sidebar-bg: #f8fafc;
-      --text-main: #121212;
-      --text-muted: #707579;
-      --accent: #3390ec;
-      --accent-hover: #287cd8;
-      --border: #e6ebf2;
-      --green-applied: #2e7d32;
+      --accent-color: #3390ec;
     }
-    [data-theme="dark"] {
-      --bg: #0f1721;
-      --sidebar-bg: #17212b;
-      --text-main: #ffffff;
-      --text-muted: #aaaaaa;
-      --border: #242f3d;
-    }
-    * { box-sizing: border-box; }
-    body {
-      margin: 0;
-      background: var(--bg);
-      color: var(--text-main);
-      font-size: 14px;
-      line-height: 1.5;
-    }
-
-    /* Top Header & Breadcrumbs */
-    header {
-      height: 58px;
-      background: var(--bg);
-      border-bottom: 1px solid var(--border);
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      padding: 0 24px;
-      position: sticky;
-      top: 0;
-      z-index: 100;
-    }
-    .header-left {
-      display: flex;
-      align-items: center;
-      gap: 16px;
-    }
-    .brand-logo {
+    .brand-logo-badge {
       width: 32px;
       height: 32px;
-      background: var(--accent);
+      background: #3390ec;
       color: white;
       border-radius: 8px;
-      display: grid;
+      display: inline-grid;
       place-items: center;
       font-weight: 800;
-      text-decoration: none;
+      font-size: 16px;
+      margin-right: 8px;
     }
-    .breadcrumb {
-      display: flex;
-      align-items: center;
-      gap: 8px;
-      font-size: 14px;
-      font-weight: 500;
-      color: var(--text-muted);
-    }
-    .breadcrumb a { color: var(--accent); text-decoration: none; font-weight: 600; }
-    .breadcrumb a:hover { text-decoration: underline; }
-    .breadcrumb .sep { color: var(--text-muted); }
-    .breadcrumb .active { color: var(--text-main); font-weight: 700; }
-
-    .header-right {
-      display: flex;
-      align-items: center;
-      gap: 16px;
-    }
-    .theme-btn {
-      width: 38px;
-      height: 38px;
-      border-radius: 50%;
-      border: 1px solid var(--border);
-      background: transparent;
-      color: var(--text-main);
-      cursor: pointer;
-      display: grid;
-      place-items: center;
-      font-size: 18px;
-    }
-    .login-btn {
-      color: var(--accent);
-      text-decoration: none;
-      font-weight: 700;
-      font-size: 14px;
-    }
-
-    /* Search Bar with Dropdown Filters */
-    .search-wrap {
-      background: var(--sidebar-bg);
-      border: 1px solid var(--border);
-      border-radius: 20px;
-      padding: 4px 14px;
+    .tr-share-link-wrap {
       display: flex;
       align-items: center;
       gap: 10px;
-      width: clamp(260px, 40vw, 500px);
-    }
-    .search-wrap input {
-      flex: 1;
-      border: none;
-      background: transparent;
-      outline: none;
-      color: var(--text-main);
-      font-size: 13px;
-    }
-
-    /* Layout & Sidebar */
-    .container {
-      display: grid;
-      grid-template-columns: 240px minmax(0, 1fr);
-      min-height: calc(100dvh - 58px);
-    }
-    aside.sidebar {
-      background: var(--sidebar-bg);
-      border-right: 1px solid var(--border);
-      padding: 24px 0;
-    }
-    .menu-section-label {
-      padding: 6px 20px;
-      font-size: 11px;
-      font-weight: 800;
-      color: var(--text-muted);
-      text-transform: uppercase;
-      letter-spacing: 0.5px;
-    }
-    .menu-items {
-      list-style: none;
-      padding: 0;
-      margin: 0 0 20px;
-    }
-    .menu-items a {
-      display: flex;
-      justify-content: space-between;
-      padding: 9px 20px;
-      color: var(--text-main);
-      text-decoration: none;
-      font-size: 14px;
-      font-weight: 500;
-      transition: background 0.15s;
-    }
-    .menu-items a:hover { background: rgba(51, 144, 236, 0.08); color: var(--accent); }
-    .menu-items li.active a { background: rgba(51, 144, 236, 0.12); color: var(--accent); font-weight: 700; }
-
-    /* Main Content Area */
-    main.main-content {
-      padding: 32px clamp(20px, 4vw, 48px);
-      max-width: 960px;
-    }
-
-    /* Language Overview Header */
-    .lang-header {
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      margin-bottom: 24px;
-      padding-bottom: 16px;
-      border-bottom: 1px solid var(--border);
-    }
-    .lang-title-group h2 {
-      margin: 0;
-      font-size: 24px;
-      font-weight: 800;
-    }
-    .lang-native-name {
-      color: var(--text-muted);
-      font-weight: 500;
-      font-size: 18px;
-    }
-
-    /* App Section Grid */
-    .section-rows {
-      display: grid;
-      grid-template-columns: repeat(auto-fill, minmax(110px, 1fr));
-      gap: 16px;
-      margin-bottom: 32px;
-    }
-    .section-card {
-      background: var(--sidebar-bg);
-      border: 1px solid var(--border);
-      border-radius: 16px;
-      padding: 18px 10px;
-      text-align: center;
-      text-decoration: none;
-      color: var(--text-main);
-      font-weight: 700;
-      font-size: 13px;
-      transition: transform 0.15s, border-color 0.15s;
-    }
-    .section-card:hover { transform: translateY(-2px); border-color: var(--accent); }
-    .section-icon {
-      width: 44px;
-      height: 44px;
-      border-radius: 50%;
-      background: var(--accent);
-      color: white;
-      display: grid;
-      place-items: center;
-      font-size: 20px;
-      margin: 0 auto 10px;
-    }
-
-    /* Information Blocks */
-    .info-block {
-      background: var(--sidebar-bg);
-      border: 1px solid var(--border);
-      border-radius: 16px;
-      padding: 20px;
-      margin-bottom: 20px;
-    }
-    .info-block h4 { margin: 0 0 8px; font-size: 15px; font-weight: 700; }
-    .info-block p { margin: 0 0 12px; color: var(--text-muted); font-size: 13px; }
-
-    .share-link-box {
-      display: flex;
-      align-items: center;
-      gap: 10px;
-      background: var(--bg);
-      border: 1px solid var(--border);
-      border-radius: 10px;
+      background: #f1f3f6;
+      border-radius: 8px;
       padding: 6px 12px;
     }
-    .share-link-input {
+    .tr-share-link-wrap input {
       flex: 1;
       border: none;
       background: transparent;
-      color: var(--accent);
-      font-family: monospace;
-      font-weight: 600;
-      font-size: 13px;
+      color: #3390ec;
+      font-weight: 700;
       outline: none;
     }
-    .btn-copy {
-      background: var(--accent);
+    .btn-copy-link {
+      background: #3390ec;
       color: white;
       border: none;
-      border-radius: 8px;
+      border-radius: 6px;
       padding: 6px 14px;
       font-weight: 700;
       font-size: 12px;
       cursor: pointer;
     }
-
-    .btn-action-primary {
-      display: inline-block;
-      padding: 12px 24px;
-      background: var(--accent);
-      color: white;
-      text-decoration: none;
-      font-weight: 700;
-      border-radius: 12px;
-      font-size: 14px;
-    }
-
-    /* Languages Modal Popup */
-    .modal-overlay {
-      position: fixed;
-      inset: 0;
-      background: rgba(0, 0, 0, 0.45);
-      backdrop-filter: blur(4px);
-      display: grid;
-      place-items: center;
-      z-index: 1000;
-    }
-    .popup {
-      background: var(--bg);
-      width: min(90%, 420px);
-      border-radius: 20px;
-      padding: 24px;
-      box-shadow: 0 12px 40px rgba(0, 0, 0, 0.2);
-    }
-    .popup h4 { margin: 0 0 16px; font-size: 18px; font-weight: 800; }
-    .popup-search {
-      width: 100%;
-      height: 40px;
-      border-radius: 12px;
-      border: 1px solid var(--border);
-      padding: 0 14px;
-      font-size: 14px;
-      outline: none;
-      margin-bottom: 16px;
-    }
-    .popup-lang-list {
-      max-height: 300px;
-      overflow-y: auto;
-      display: flex;
-      flex-direction: column;
-      gap: 4px;
-    }
-    .popup-lang-item {
-      display: flex;
-      justify-content: space-between;
-      padding: 10px 12px;
-      border-radius: 10px;
-      text-decoration: none;
-      color: var(--text-main);
-      font-size: 14px;
-      font-weight: 600;
-    }
-    .popup-lang-item:hover { background: rgba(51, 144, 236, 0.1); color: var(--accent); }
-    .popup-add-lang {
-      margin-top: 16px;
-      padding-top: 14px;
-      border-top: 1px solid var(--border);
-      text-align: center;
-    }
-    .popup-add-lang a {
-      color: var(--accent);
-      font-weight: 700;
-      text-decoration: none;
-      font-size: 13px;
-    }
-
-    @media(max-width: 768px) {
-      .container { grid-template-columns: 1fr; }
-      aside.sidebar { display: none; }
-    }
   </style>
 </head>
-<body>
+<body class="emoji_image">
 
-  <header>
-    <div class="header-left">
-      <a href="/" class="brand-logo">Z</a>
-      <nav class="breadcrumb">
-        <a href="/">Translations</a>
-        <span class="sep">/</span>
-        <span class="active" id="crumb-lang">Turkish</span>
-      </nav>
+  <div id="aj_progress" class="progress-bar" style="width: 100%; transition: none; position: fixed; z-index: 1000; top: 0px; height: 3px; box-shadow: inset 0 0 0 var(--accent-color, #3390ec);"></div>
+
+  <div id="aj_content">
+
+    <!-- Theme Toggle -->
+    <button type="button" class="tr-theme-toggle" onclick="toggleTheme()" aria-label="Switch theme" title="Toggle theme">
+      <canvas width="44" height="44"></canvas>
+    </button>
+
+    <div class="tr-container">
+
+      <!-- Top Search & Navigation Header -->
+      <header class="has-search">
+        <div class="container">
+
+          <section class="tr-search">
+            <div class="tr-search-field-wrap">
+              <div class="tr-search-filters">
+                <span class="tr-search-filters-label">Search in:</span>
+
+                <!-- Filter: Where -->
+                <span class="tr-search-filter-wrap tr-search-filter-where">
+                  <span class="tr-search-filter dropdown-toggle" data-toggle="dropdown" id="filter-where-label">All</span>
+                  <span class="dropdown-menu">
+                    <ul class="dropdown-menu">
+                      <li class="selected"><a class="tr-search-filter-item" onclick="setFilterWhere('All')">All</a></li>
+                      <li><a class="tr-search-filter-item" onclick="setFilterWhere('Key')">Key</a></li>
+                      <li><a class="tr-search-filter-item" onclick="setFilterWhere('Text')">Text</a></li>
+                    </ul>
+                  </span>
+                </span>
+
+                <!-- Filter: Language -->
+                <span class="tr-search-filter-wrap tr-search-filter-lang">
+                  <span class="tr-search-filter dropdown-toggle" data-toggle="dropdown" id="filter-lang-label">Turkish</span>
+                  <span class="dropdown-menu">
+                    <ul class="dropdown-menu" id="filter-lang-dropdown">
+                      <li><a class="tr-search-filter-item" onclick="setLang('en', 'English')">English</a></li>
+                      <li class="selected"><a class="tr-search-filter-item" onclick="setLang('tr', 'Turkish')">Turkish</a></li>
+                      <li><a class="tr-search-filter-item" onclick="setLang('ku', 'Kurdî')">Kurdî</a></li>
+                      <li><a class="tr-search-filter-item" onclick="setLang('de', 'German')">German</a></li>
+                      <li><a class="tr-search-filter-item" onclick="setLang('fr', 'French')">French</a></li>
+                      <li><a class="tr-search-filter-item" onclick="setLang('es', 'Spanish')">Spanish</a></li>
+                      <li><a class="tr-search-filter-item" onclick="setLang('ar', 'Arabic')">Arabic</a></li>
+                    </ul>
+                  </span>
+                </span>
+
+                <!-- Filter: Apps -->
+                <span class="tr-search-filter-wrap tr-search-filter-langpack">
+                  <span class="tr-search-filter dropdown-toggle" data-toggle="dropdown" id="filter-app-label">All Apps</span>
+                  <span class="dropdown-menu">
+                    <ul class="dropdown-menu">
+                      <li class="selected"><a class="tr-search-filter-item" onclick="setApp('All Apps')">All Apps</a></li>
+                      <li><a class="tr-search-filter-item" onclick="setApp('Android')">Android</a></li>
+                      <li><a class="tr-search-filter-item" onclick="setApp('iOS')">iOS</a></li>
+                      <li><a class="tr-search-filter-item" onclick="setApp('TDesktop')">TDesktop</a></li>
+                      <li><a class="tr-search-filter-item" onclick="setApp('macOS')">macOS</a></li>
+                      <li><a class="tr-search-filter-item" onclick="setApp('WebK')">WebK</a></li>
+                    </ul>
+                  </span>
+                </span>
+
+              </div>
+
+              <form class="tr-search-form" onsubmit="return false;">
+                <input class="form-control tr-search-field" placeholder="Search translations and keys" id="search-input" autocomplete="off" oninput="handleSearch()">
+              </form>
+            </div>
+          </section>
+
+          <div class="header-wrap">
+            <div id="header-panel" class="header-panel">
+              <div class="header-auth">
+                <div class="header-auth-item"><a class="header-auth-link login-link" href="/auth">Login</a></div>
+              </div>
+              <div class="header-breadcrumb header-breadcrumb-simple">
+                <ol id="breadcrumb" class="header-nav breadcrumb">
+                  <li><a href="/">Translations</a></li>
+                  <li class="active" id="crumb-lang-active">Turkish</li>
+                </ol>
+              </div>
+            </div>
+          </div>
+
+        </div>
+      </header>
+
+      <!-- Main Layout -->
+      <main class="container">
+
+        <!-- Left Sidebar Navigation -->
+        <nav class="tr-menu">
+
+          <div class="tr-menu-section tr-menu-has-selected">
+            <div class="tr-menu-header">
+              <div class="tr-menu-header-label">Languages</div>
+            </div>
+            <ul class="tr-menu-items" id="side-languages">
+              <li><a class="tr-menu-item" href="/en/"><span class="nav-label">English</span></a></li>
+              <li class="active" id="side-tr"><a class="tr-menu-item" href="/tr/"><span class="nav-label">Turkish</span></a></li>
+              <li><a class="tr-menu-item" href="/ku/"><span class="nav-label">Kurdî</span></a></li>
+              <li><a class="tr-menu-item" href="/de/"><span class="nav-label">German</span></a></li>
+              <li class="languages-link"><a class="tr-menu-item" onclick="openLangPopup()"><span class="nav-label" style="color:#3390ec;">Other languages…</span></a></li>
+            </ul>
+          </div>
+
+          <div class="tr-menu-section">
+            <div class="tr-menu-header">
+              <div class="tr-menu-header-label">Apps</div>
+            </div>
+            <ul class="tr-menu-items">
+              <li><a class="tr-menu-item" href="/tr/android/"><span class="nav-label">Android</span></a></li>
+              <li><a class="tr-menu-item" href="/tr/ios/"><span class="nav-label">iOS</span></a></li>
+              <li><a class="tr-menu-item" href="/tr/tdesktop/"><span class="nav-label">TDesktop</span></a></li>
+              <li><a class="tr-menu-item" href="/tr/macos/"><span class="nav-label">macOS</span></a></li>
+              <li><a class="tr-menu-item" href="/tr/webk/"><span class="nav-label">WebK</span></a></li>
+            </ul>
+          </div>
+
+        </nav>
+
+        <!-- Right Content Section -->
+        <section class="content clearfix">
+          <section class="tr-content">
+
+            <div class="mobile-view-skip">
+              <h3 class="tr-header">
+                <span class="tr-label-max-width" id="header-lang-name">Turkish</span>
+                <span class="tr-lang-native-name">(<span dir="auto" id="header-lang-native">Türkçe</span>)</span>
+
+                <div class="tr-header-tabs">
+                  <span class="tr-header-tab active"><a href="#">Translations</a></span>
+                  <span class="tr-header-tab"><a href="#">Suggestions</a></span>
+                  <span class="tr-header-tab"><a href="#">Comments</a></span>
+                </div>
+              </h3>
+
+              <!-- Platform Grid Cards -->
+              <section class="tr-section-rows clearfix">
+                <div class="tr-section-row"><div class="tr-section-wrap"><a href="/tr/android/" class="tr-section"><div class="tr-section-circle circle_android"></div><div class="tr-section-caption">Android</div></a></div></div>
+                <div class="tr-section-row"><div class="tr-section-wrap"><a href="/tr/ios/" class="tr-section"><div class="tr-section-circle circle_ios"></div><div class="tr-section-caption">iOS</div></a></div></div>
+                <div class="tr-section-row"><div class="tr-section-wrap"><a href="/tr/tdesktop/" class="tr-section"><div class="tr-section-circle circle_tdesktop"></div><div class="tr-section-caption">TDesktop</div></a></div></div>
+                <div class="tr-section-row"><div class="tr-section-wrap"><a href="/tr/macos/" class="tr-section"><div class="tr-section-circle circle_macos"></div><div class="tr-section-caption">macOS</div></a></div></div>
+                <div class="tr-section-row"><div class="tr-section-wrap"><a href="/tr/webk/" class="tr-section"><div class="tr-section-circle circle_webk"></div><div class="tr-section-caption">WebK</div></a></div></div>
+              </section>
+
+              <!-- Information Blocks -->
+              <section class="tr-section-block">
+                <h4 class="tr-subheader">Discussions <span class="tr-badge">NEW</span></h4>
+                <p><b>Feel free</b> to join the community discussion for this language pack. <a href="https://t.me/zpass_tr" target="_blank" class="arrow-link">View Discussion</a></p>
+              </section>
+
+              <section class="tr-section-block">
+                <h4 class="tr-subheader">Sharing Link <span class="tr-badge">NEW</span></h4>
+                <p>Anyone can switch their Z Pass interface to <b id="share-lang-title">Turkish</b> by following this link:</p>
+                <div class="tr-share-link-wrap">
+                  <input type="text" class="tr-share-link" id="share-input-val" value="https://zpas.org/setlanguage/tr" readonly>
+                  <button class="btn-copy-link" onclick="copyLink()">Copy Link</button>
+                </div>
+              </section>
+
+              <section class="tr-section-block">
+                <h4 class="tr-subheader">Actions</h4>
+                <div class="tr-actions">
+                  <div class="tr-action">
+                    <a class="tr-action-item action-share" id="use-action-btn" href="https://zpas.org/setlanguage/tr">
+                      <span class="tr-action-label">Use Z Pass in Turkish</span>
+                    </a>
+                  </div>
+                </div>
+              </section>
+
+            </div>
+
+          </section>
+        </section>
+
+      </main>
+
     </div>
 
-    <div class="search-wrap">
-      <span>⌕</span>
-      <input type="text" placeholder="Search translations and keys">
-    </div>
-
-    <div class="header-right">
-      <button class="theme-btn" onclick="toggleTheme()" title="Theme">🌙</button>
-      <a href="/auth" class="login-link login-btn">Login</a>
-    </div>
-  </header>
-
-  <div class="container">
-    <aside class="sidebar">
-      <div class="menu-section-label">Languages</div>
-      <ul class="menu-items" id="side-languages">
-        <li><a href="/en/"><span>English</span></a></li>
-        <li class="active"><a href="/tr/"><span>Turkish</span><small style="color:var(--text-muted)">Türkçe</small></a></li>
-        <li><a href="/ku/"><span>Kurdî</span><small style="color:var(--text-muted)">Kurdish</small></a></li>
-        <li><a href="/de/"><span>Deutsch</span></a></li>
-        <li><a href="#" onclick="openLangPopup(); return false;"><span style="color:var(--accent); font-weight:700;">Other languages…</span></a></li>
-      </ul>
-
-      <div class="menu-section-label">Apps</div>
-      <ul class="menu-items">
-        <li><a href="/tr/android/"><span>Android</span></a></li>
-        <li><a href="/tr/ios/"><span>iOS</span></a></li>
-        <li><a href="/tr/tdesktop/"><span>TDesktop</span></a></li>
-        <li><a href="/tr/macos/"><span>macOS</span></a></li>
-        <li><a href="/tr/webk/"><span>WebK</span></a></li>
-      </ul>
-    </aside>
-
-    <main class="main-content">
-      <div class="lang-header">
-        <div class="lang-title-group">
-          <h2 id="view-title">Turkish <span class="lang-native-name">(Türkçe)</span></h2>
+    <!-- Languages Popup Modal -->
+    <div class="popup-container languages-popup-container hide" id="languages-popup-container">
+      <div class="popup">
+        <div class="popup-body popup-has-footer">
+          <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:12px;">
+            <h4 style="margin:0;">Languages</h4>
+            <button onclick="closeLangPopup()" style="background:none; border:none; font-size:22px; cursor:pointer; color:var(--text-muted);">×</button>
+          </div>
+          <form class="tr-popup-search-form tr-languages-search-form" onsubmit="return false;">
+            <input class="form-control tr-popup-search-field tr-languages-search-field" placeholder="Search languages" id="popup-search" oninput="filterPopupLangs()">
+          </form>
+          <div class="tr-popup-search-results-wrap tr-languages-results-wrap">
+            <div class="tr-popup-search-results tr-languages-results" id="popup-lang-list"></div>
+          </div>
+          <div class="tr-languages-add"><a href="#" onclick="alert('Yeni dil talebiniz alındı!'); closeLangPopup(); return false;">Add a new language</a></div>
         </div>
       </div>
-
-      <h3 style="font-size:16px; font-weight:800; margin-bottom:16px;">Platforms & Apps</h3>
-      <div class="section-rows">
-        <a href="/tr/android/" class="section-card"><div class="section-icon">🤖</div><span>Android</span></a>
-        <a href="/tr/ios/" class="section-card"><div class="section-icon">🍎</div><span>iOS</span></a>
-        <a href="/tr/tdesktop/" class="section-card"><div class="section-icon">💻</div><span>TDesktop</span></a>
-        <a href="/tr/macos/" class="section-card"><div class="section-icon">🖥️</div><span>macOS</span></a>
-        <a href="/tr/android_x/" class="section-card"><div class="section-icon">⚡</div><span>Android X</span></a>
-        <a href="/tr/webk/" class="section-card"><div class="section-icon">🌐</div><span>WebK</span></a>
-      </div>
-
-      <div class="info-block">
-        <h4>Discussions <span style="background:var(--accent); color:white; font-size:10px; padding:2px 6px; border-radius:8px; margin-left:6px;">NEW</span></h4>
-        <p>Feel free to join the community discussion for this language pack.</p>
-        <a href="https://t.me/zpass_tr" target="_blank" style="color:var(--accent); font-weight:700; text-decoration:none;">View Discussion →</a>
-      </div>
-
-      <div class="info-block">
-        <h4>Sharing Link <span style="background:var(--accent); color:white; font-size:10px; padding:2px 6px; border-radius:8px; margin-left:6px;">NEW</span></h4>
-        <p>Anyone can switch their Z Pass interface to <b id="share-lang-name">Turkish</b> by following this link:</p>
-        <div class="share-link-box">
-          <input type="text" class="share-link-input" id="share-link-val" value="https://zpas.org/setlanguage/tr" readonly>
-          <button class="btn-copy" onclick="copyShareLink()">Copy Link</button>
-        </div>
-      </div>
-
-      <div class="info-block">
-        <h4>Actions</h4>
-        <a href="https://zpas.org/setlanguage/tr" id="action-use-btn" class="btn-action-primary">Use Z Pass in Turkish</a>
-      </div>
-    </main>
-  </div>
-
-  <!-- Languages Popup Modal -->
-  <div class="modal-overlay" id="lang-popup" hidden>
-    <div class="popup">
-      <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:12px;">
-        <h4>Languages</h4>
-        <button onclick="closeLangPopup()" style="background:none; border:none; font-size:20px; cursor:pointer; color:var(--text-muted);">×</button>
-      </div>
-      <input type="text" class="popup-search" placeholder="Search languages…" id="popup-search-input" oninput="filterLanguages()">
-      <div class="popup-lang-list" id="popup-list"></div>
-      <div class="popup-add-lang">
-        <a href="#" onclick="alert('Yeni dil talebiniz yöneticilere iletildi!'); closeLangPopup(); return false;">+ Add a new language</a>
-      </div>
     </div>
+
   </div>
+
+  <!-- Scripts -->
+  <script src="/js/jquery.min.js"></script>
+  <script src="/js/bootstrap.min.js"></script>
+  <script src="/js/translations-theme.js"></script>
 
   <script>
-    const languages = [
+    const langs = [
       { code: 'en', name: 'English', native: 'English' },
       { code: 'tr', name: 'Turkish', native: 'Türkçe' },
       { code: 'ku', name: 'Kurdî', native: 'Kurmancî' },
@@ -444,52 +284,58 @@
       { code: 'nl', name: 'Dutch', native: 'Nederlands' }
     ];
 
-    const path = location.pathname.toLowerCase().replace(/^\/+|\/+$/g, '');
-    const currentCode = path || 'tr';
-    const langObj = languages.find(l => l.code === currentCode) || { code: currentCode, name: currentCode.toUpperCase(), native: currentCode.toUpperCase() };
+    const currentPath = location.pathname.toLowerCase().replace(/^\/+|\/+$/g, '');
+    const pathCode = currentPath.split('/')[0] || 'tr';
+    const activeLang = langs.find(l => l.code === pathCode) || { code: pathCode, name: pathCode.toUpperCase(), native: pathCode.toUpperCase() };
 
-    document.getElementById('crumb-lang').textContent = langObj.name;
-    document.getElementById('view-title').innerHTML = `${langObj.name} <span class="lang-native-name">(${langObj.native})</span>`;
-    document.getElementById('share-lang-name').textContent = langObj.name;
-    document.getElementById('share-link-val').value = `https://zpas.org/setlanguage/${langObj.code}`;
-    document.getElementById('action-use-btn').href = `https://zpas.org/setlanguage/${langObj.code}`;
-    document.getElementById('action-use-btn').textContent = `Use Z Pass in ${langObj.name}`;
+    document.getElementById('crumb-lang-active').textContent = activeLang.name;
+    document.getElementById('header-lang-name').textContent = activeLang.name;
+    document.getElementById('header-lang-native').textContent = activeLang.native;
+    document.getElementById('share-lang-title').textContent = activeLang.name;
+    document.getElementById('share-input-val').value = `https://zpas.org/setlanguage/${activeLang.code}`;
+    document.getElementById('use-action-btn').href = `https://zpas.org/setlanguage/${activeLang.code}`;
+    document.getElementById('use-action-btn').innerHTML = `<span class="tr-action-label">Use Z Pass in ${activeLang.name}</span>`;
 
     function toggleTheme() {
-      const dark = document.documentElement.getAttribute('data-theme') === 'dark';
-      document.documentElement.setAttribute('data-theme', dark ? 'light' : 'dark');
+      const isDark = document.documentElement.getAttribute('data-theme') === 'dark';
+      document.documentElement.setAttribute('data-theme', isDark ? 'light' : 'dark');
     }
 
-    function copyShareLink() {
-      const val = document.getElementById('share-link-val').value;
+    function copyLink() {
+      const val = document.getElementById('share-input-val').value;
       navigator.clipboard.writeText(val);
       alert('Link Copied: ' + val);
     }
 
     function openLangPopup() {
-      document.getElementById('lang-popup').hidden = false;
-      renderPopupLangs(languages);
+      document.getElementById('languages-popup-container').classList.remove('hide');
+      renderLangs(langs);
     }
 
     function closeLangPopup() {
-      document.getElementById('lang-popup').hidden = true;
+      document.getElementById('languages-popup-container').classList.add('hide');
     }
 
-    function renderPopupLangs(list) {
-      const container = document.getElementById('popup-list');
-      container.innerHTML = list.map(l => `
-        <a href="/${l.code}" class="popup-lang-item">
-          <span>${l.name}</span>
+    function renderLangs(list) {
+      const el = document.getElementById('popup-lang-list');
+      el.innerHTML = list.map(l => `
+        <a href="/${l.code}/" class="tr-menu-item" style="padding:10px 14px; border-radius:8px; display:flex; justify-content:space-between; text-decoration:none; color:inherit;">
+          <span style="font-weight:600;">${l.name}</span>
           <span style="color:var(--text-muted); font-size:12px;">${l.native}</span>
         </a>
       `).join('');
     }
 
-    function filterLanguages() {
-      const q = document.getElementById('popup-search-input').value.toLowerCase();
-      const filtered = languages.filter(l => l.name.toLowerCase().includes(q) || l.native.toLowerCase().includes(q) || l.code.includes(q));
-      renderPopupLangs(filtered);
+    function filterPopupLangs() {
+      const q = document.getElementById('popup-search').value.toLowerCase();
+      const filtered = langs.filter(l => l.name.toLowerCase().includes(q) || l.native.toLowerCase().includes(q) || l.code.includes(q));
+      renderLangs(filtered);
     }
+
+    function setFilterWhere(val) { document.getElementById('filter-where-label').textContent = val; }
+    function setLang(code, name) { location.href = `/${code}/`; }
+    function setApp(val) { document.getElementById('filter-app-label').textContent = val; }
+    function handleSearch() {}
   </script>
 </body>
 </html>
