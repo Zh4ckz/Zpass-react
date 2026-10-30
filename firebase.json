@@ -19,33 +19,6 @@
       "**/*.exe",
       "**/*.zip"
     ],
-    "redirects": [
-      {
-        "source": "/translations",
-        "destination": "/",
-        "type": 301
-      },
-      {
-        "source": "/translations/**",
-        "destination": "/",
-        "type": 301
-      },
-      {
-        "source": "/translations.html",
-        "destination": "/",
-        "type": 301
-      },
-      {
-        "source": "/index",
-        "destination": "/",
-        "type": 301
-      },
-      {
-        "source": "/index.html",
-        "destination": "/",
-        "type": 301
-      }
-    ],
     "rewrites": [
       {
         "source": "/setlanguage",
