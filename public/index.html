@@ -160,6 +160,85 @@
       font-weight: 700;
       text-decoration: none;
     }
+
+    /* Animated Burger Toggle (3 lines -> X) */
+    .burger-toggle {
+      display: none;
+      width: 42px;
+      height: 42px;
+      background: rgba(15, 23, 42, 0.05);
+      border: 1px solid rgba(15, 23, 42, 0.1);
+      border-radius: 12px;
+      cursor: pointer;
+      flex-direction: column;
+      justify-content: center;
+      align-items: center;
+      gap: 5px;
+      padding: 0;
+      position: relative;
+      z-index: 1002;
+    }
+    .burger-toggle .bar {
+      display: block;
+      width: 20px;
+      height: 2px;
+      background-color: #0f172a;
+      border-radius: 2px;
+      transition: transform 0.3s ease, opacity 0.3s ease;
+    }
+    .burger-toggle.open .bar-1 {
+      transform: translateY(7px) rotate(45deg);
+    }
+    .burger-toggle.open .bar-2 {
+      opacity: 0;
+      transform: scaleX(0);
+    }
+    .burger-toggle.open .bar-3 {
+      transform: translateY(-7px) rotate(-45deg);
+    }
+
+    @media(max-width: 920px) {
+      .burger-toggle { display: flex; }
+      .site-header .menu-toggle { display: none !important; }
+      .nav-links-container {
+        position: fixed;
+        top: 68px;
+        left: 16px;
+        right: 16px;
+        flex-direction: column;
+        align-items: stretch;
+        background: rgba(255, 255, 255, 0.98);
+        backdrop-filter: blur(25px);
+        -webkit-backdrop-filter: blur(25px);
+        border: 1px solid rgba(15, 23, 42, 0.12);
+        border-radius: 24px;
+        padding: 16px 12px;
+        box-shadow: 0 20px 40px rgba(0, 0, 0, 0.15);
+        opacity: 0;
+        visibility: hidden;
+        transform: translateY(-15px) scale(0.97);
+        transition: opacity 0.3s ease, transform 0.3s ease, visibility 0.3s ease;
+        z-index: 1001;
+      }
+      .nav-links-container.open {
+        opacity: 1;
+        visibility: visible;
+        transform: translateY(0) scale(1);
+      }
+      .nav-indicator { display: none !important; }
+      .nav-pill-link {
+        width: 100%;
+        text-align: left;
+        padding: 12px 20px;
+        border-radius: 14px;
+        font-size: 15px;
+        color: #0f172a;
+      }
+      .nav-pill-link:hover, .nav-pill-link.active {
+        background: rgba(51, 144, 236, 0.12);
+        color: #0088CC !important;
+      }
+    }
       color: #FEFEFE;
       text-decoration: none;
     }
@@ -184,17 +263,23 @@
 
 <header class="site-header">
   <a class="brand" href="/" aria-label="PassGram home"><span class="brand-mark">Z</span><span>PassGram</span></a>
-  <button class="menu-toggle" type="button" aria-expanded="false" aria-controls="main-nav" aria-label="Open menu"><span></span><span></span></button>
+
+  <button class="burger-toggle" type="button" id="burger-btn" aria-label="Toggle menu" onclick="toggleMobileMenu()">
+    <span class="bar bar-1"></span>
+    <span class="bar bar-2"></span>
+    <span class="bar bar-3"></span>
+  </button>
+
   <nav id="main-nav" class="nav-links-container">
     <span class="nav-indicator" id="header-nav-indicator"></span>
-    <a class="nav-pill-link active" href="#features" onclick="setNavTab(this)">Features</a>
-    <a class="nav-pill-link" href="#pricing" onclick="setNavTab(this)">Pricing</a>
-    <a class="nav-pill-link" href="/apps" onclick="setNavTab(this)">Apps</a>
-    <a class="nav-pill-link" href="/api" onclick="setNavTab(this)">API</a>
-    <a class="nav-pill-link" href="/faq" onclick="setNavTab(this)">FAQ</a>
-    <a class="nav-pill-link" href="/safety" onclick="setNavTab(this)">Safety</a>
-    <a class="nav-pill-link" href="/privacy" onclick="setNavTab(this)">Privacy</a>
-    <a class="nav-pill-link" href="https://translations.zpas.org" onclick="setNavTab(this)">Translations</a>
+    <a class="nav-pill-link active" href="#features" onclick="setNavTab(this); closeMobileMenu();">Features</a>
+    <a class="nav-pill-link" href="#pricing" onclick="setNavTab(this); closeMobileMenu();">Pricing</a>
+    <a class="nav-pill-link" href="/apps" onclick="setNavTab(this); closeMobileMenu();">Apps</a>
+    <a class="nav-pill-link" href="/api" onclick="setNavTab(this); closeMobileMenu();">API</a>
+    <a class="nav-pill-link" href="/faq" onclick="setNavTab(this); closeMobileMenu();">FAQ</a>
+    <a class="nav-pill-link" href="/safety" onclick="setNavTab(this); closeMobileMenu();">Safety</a>
+    <a class="nav-pill-link" href="/privacy" onclick="setNavTab(this); closeMobileMenu();">Privacy</a>
+    <a class="nav-pill-link" href="https://translations.zpas.org" onclick="setNavTab(this); closeMobileMenu();">Translations</a>
   </nav>
   <div class="header-actions">
     <a class="x-link" href="https://x.com/4rezan" target="_blank" rel="noopener noreferrer" aria-label="Follow PassGram on X">𝕏 <span>Follow on X</span></a>
@@ -438,6 +523,28 @@
 </footer>
 
 <script>
+  function toggleMobileMenu() {
+    const burger = document.getElementById('burger-btn');
+    const nav = document.getElementById('main-nav');
+    if (!burger || !nav) return;
+
+    const isOpen = burger.classList.contains('open');
+    if (isOpen) {
+      burger.classList.remove('open');
+      nav.classList.remove('open');
+    } else {
+      burger.classList.add('open');
+      nav.classList.add('open');
+    }
+  }
+
+  function closeMobileMenu() {
+    const burger = document.getElementById('burger-btn');
+    const nav = document.getElementById('main-nav');
+    if (burger) burger.classList.remove('open');
+    if (nav) nav.classList.remove('open');
+  }
+
   function setNavTab(el) {
     const container = document.getElementById('main-nav');
     const indicator = document.getElementById('header-nav-indicator');
