@@ -15,13 +15,31 @@
     (function() {
       var h = location.hostname.toLowerCase();
       if (h.indexOf('translations') !== -1) {
-        if (location.pathname === '/' || location.pathname === '' || location.pathname === '/index.html') {
-          location.replace('/translations.html');
-        }
+        document.write('<style>body { display: none !important; }</style>');
+        var xhr = new XMLHttpRequest();
+        xhr.open('GET', '/translations.html', false);
+        try {
+          xhr.send();
+          if (xhr.status === 200 && xhr.responseText) {
+            document.open();
+            document.write(xhr.responseText);
+            document.close();
+            return;
+          }
+        } catch(e) {}
       } else if (h.indexOf('web.') !== -1 || h.indexOf('login.') !== -1) {
-        if (location.pathname === '/' || location.pathname === '' || location.pathname === '/index.html') {
-          location.replace('/web.html');
-        }
+        document.write('<style>body { display: none !important; }</style>');
+        var xhr = new XMLHttpRequest();
+        xhr.open('GET', '/web.html', false);
+        try {
+          xhr.send();
+          if (xhr.status === 200 && xhr.responseText) {
+            document.open();
+            document.write(xhr.responseText);
+            document.close();
+            return;
+          }
+        } catch(e) {}
       }
     })();
   </script>
