@@ -110,11 +110,12 @@
 </head>
 <body class="emoji_image">
 
-  <div id="aj_progress" class="progress-bar" style="width: 100%; transition: none; position: fixed; z-index: 1000; top: 0px; height: 3px; box-shadow: inset 0 0 0 var(--accent-color, #3390ec);"></div>
+  <!-- Telegram Top Progress Bar -->
+  <div id="aj_progress" class="progress-bar" style="width: 0px; transition: width 0.3s linear, box-shadow 0.2s; position: fixed; z-index: 1000; top: 0px; height: 3px; box-shadow: inset 0 0 0 var(--accent-color, #3390ec);"></div>
 
   <div id="aj_content">
 
-    <!-- Theme Toggle -->
+    <!-- Theme Toggle Button -->
     <button type="button" class="tr-theme-toggle" onclick="toggleTheme()" aria-label="Switch theme" title="Toggle theme">
       <canvas width="44" height="44"></canvas>
     </button>
@@ -405,12 +406,28 @@
 
   </div>
 
-  <!-- Scripts -->
+  <!-- Official Telegram Scripts -->
   <script src="/js/jquery.min.js"></script>
   <script src="/js/bootstrap.min.js"></script>
-  <script src="/js/translations-theme.js"></script>
+  <script src="/js/main-aj.js?76"></script>
+  <script src="/js/translations.js?113"></script>
+  <script src="/js/translations-theme.js?14"></script>
 
   <script>
+    // Initialize Official Telegram AJAX Engine (0ms progress bar & clean pushState)
+    if (window.ajInit) {
+      ajInit({
+        "version": 1221,
+        "apiUrl": "/api?hash=ad218cf7d0930300c0",
+        "unauth": true,
+        "state": {
+          "themeCookie": "stel_tr_theme",
+          "langList": ["en", "tr", "ku", "de", "fr", "es", "ar", "ru", "fa", "it", "nl"],
+          "curLang": "tr"
+        }
+      });
+    }
+
     const langs = [
       { code: 'en', name: 'English', native: 'English' },
       { code: 'tr', name: 'Turkish', native: 'Türkçe' },
@@ -428,7 +445,6 @@
     const devWrap = document.getElementById('dev_page_content_wrap');
     const langPanel = document.getElementById('lang_overview_panel');
     const keyPanel = document.getElementById('key_editor_panel');
-    const crumbActive = document.getElementById('crumb-active');
     const breadcrumbList = document.getElementById('breadcrumb');
 
     function routeView() {
@@ -437,10 +453,7 @@
       keyPanel.hidden = true;
 
       if (segments.length === 0 || segments[0] === 'translations' || segments[0] === 'index.html') {
-        // VIEW 1: HOME LANDING PAGE (https://translations.zpas.org/)
-        if (location.pathname !== '/' && location.pathname !== '') {
-          try { history.replaceState(null, '', '/'); } catch(e) {}
-        }
+        // VIEW 1: CLEAN ROOT LANDING PAGE (https://translations.zpas.org/)
         devWrap.hidden = false;
         breadcrumbList.innerHTML = `<li><a href="/">Translations</a></li>`;
       } else if (segments.length === 1) {
@@ -462,7 +475,7 @@
         const activeLi = document.getElementById(`side-${code}`);
         if (activeLi) activeLi.classList.add('active');
       } else {
-        // VIEW 3: KEY EDITOR PAGE (/tr/android/unsorted/KeyName)
+        // VIEW 3: KEY EDITOR PAGE (/tr/android/unsorted/AreYouSureClearHistoryChannel)
         keyPanel.hidden = false;
         const code = segments[0];
         const langObj = langs.find(l => l.code === code) || { code, name: code.toUpperCase() };
@@ -476,7 +489,11 @@
     routeView();
 
     function openSampleKey(code) {
-      location.href = `/${code}/android/unsorted/AreYouSureClearHistoryChannel`;
+      if (window.Aj && Aj.setLocation) {
+        Aj.setLocation(`/${code}/android/unsorted/AreYouSureClearHistoryChannel`);
+      } else {
+        location.href = `/${code}/android/unsorted/AreYouSureClearHistoryChannel`;
+      }
     }
 
     function toggleTheme() {
@@ -515,7 +532,13 @@
     }
 
     function setFilterWhere(val) { document.getElementById('filter-where-label').textContent = val; }
-    function navigateLang(code, name) { location.href = `/${code}/`; }
+    function navigateLang(code, name) {
+      if (window.Aj && Aj.setLocation) {
+        Aj.setLocation(`/${code}/`);
+      } else {
+        location.href = `/${code}/`;
+      }
+    }
     function setApp(val) { document.getElementById('filter-app-label').textContent = val; }
   </script>
 </body>
