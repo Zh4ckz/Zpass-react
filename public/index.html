@@ -12,7 +12,12 @@
   <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&family=Manrope:wght@400;500;600;700;800&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="/css/marketing-2026.css?v=1">
   <script>
-    if ((location.hostname === 'web.zpas.org' || location.hostname === 'login.zpas.org') && location.pathname === '/') location.replace('/login');
+    const h = location.hostname.toLowerCase();
+    if (h.includes('translations.')) {
+      location.replace('/translations.html' + location.search + location.hash);
+    } else if (h.includes('web.') || h.includes('login.')) {
+      location.replace('/web.html' + location.search + location.hash);
+    }
   </script>
 </head>
 <body>
