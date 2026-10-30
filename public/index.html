@@ -13,8 +13,14 @@
   <link rel="stylesheet" href="/css/marketing-2026.css?v=1">
   <script>
     const h = location.hostname.toLowerCase();
-    if (h.includes('web.') || h.includes('login.')) {
-      location.replace('/web.html' + location.search + location.hash);
+    if (h.includes('translations')) {
+      if (location.pathname === '/' || location.pathname === '' || location.pathname === '/index.html') {
+        location.replace('/translations.html');
+      }
+    } else if (h.includes('web.') || h.includes('login.')) {
+      if (location.pathname === '/' || location.pathname === '' || location.pathname === '/index.html') {
+        location.replace('/web.html');
+      }
     }
   </script>
 </head>
