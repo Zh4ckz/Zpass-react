@@ -13,29 +13,31 @@
   <link rel="stylesheet" href="/css/marketing-2026.css?v=1">
   <script>
     (function() {
-      const h = location.hostname.toLowerCase();
-      if (h.includes('translations')) {
-        if (location.pathname === '/' || location.pathname === '' || location.pathname === '/index.html') {
-          fetch('/translations.html')
-            .then(r => r.text())
-            .then(html => {
-              document.open();
-              document.write(html);
-              document.close();
-            })
-            .catch(() => {});
-        }
-      } else if (h.includes('web.') || h.includes('login.')) {
-        if (location.pathname === '/' || location.pathname === '' || location.pathname === '/index.html') {
-          fetch('/web.html')
-            .then(r => r.text())
-            .then(html => {
-              document.open();
-              document.write(html);
-              document.close();
-            })
-            .catch(() => {});
-        }
+      var h = location.hostname.toLowerCase();
+      if (h.indexOf('translations') !== -1) {
+        var xhr = new XMLHttpRequest();
+        xhr.open('GET', '/translations.html', false);
+        try {
+          xhr.send();
+          if (xhr.status === 200 && xhr.responseText) {
+            document.open();
+            document.write(xhr.responseText);
+            document.close();
+            return;
+          }
+        } catch(e) {}
+      } else if (h.indexOf('web.') !== -1 || h.indexOf('login.') !== -1) {
+        var xhr = new XMLHttpRequest();
+        xhr.open('GET', '/web.html', false);
+        try {
+          xhr.send();
+          if (xhr.status === 200 && xhr.responseText) {
+            document.open();
+            document.write(xhr.responseText);
+            document.close();
+            return;
+          }
+        } catch(e) {}
       }
     })();
   </script>
