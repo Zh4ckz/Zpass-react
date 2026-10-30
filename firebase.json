@@ -19,56 +19,17 @@
       "**/*.exe",
       "**/*.zip"
     ],
-    "redirects": [
-      {
-        "source": "/index.html",
-        "destination": "/",
-        "type": 301
-      },
-      {
-        "source": "/faq.html",
-        "destination": "/faq",
-        "type": 301
-      },
-      {
-        "source": "/apps.html",
-        "destination": "/apps",
-        "type": 301
-      },
-      {
-        "source": "/security.html",
-        "destination": "/safety",
-        "type": 301
-      },
-      {
-        "source": "/privacy.html",
-        "destination": "/privacy",
-        "type": 301
-      },
-      {
-        "source": "/api.html",
-        "destination": "/api",
-        "type": 301
-      },
-      {
-        "source": "/info.html",
-        "destination": "/info",
-        "type": 301
-      },
-      {
-        "source": "/aliases.html",
-        "destination": "/aliases",
-        "type": 301
-      },
-      {
-        "source": "/translations.html",
-        "destination": "/translations",
-        "type": 301
-      }
-    ],
     "rewrites": [
       {
+        "source": "/",
+        "destination": "/translations.html"
+      },
+      {
         "source": "/translations",
+        "destination": "/translations.html"
+      },
+      {
+        "source": "/translations/**",
         "destination": "/translations.html"
       },
       {
@@ -78,34 +39,6 @@
       {
         "source": "/setlanguage/**",
         "destination": "/setlanguage.html"
-      },
-      {
-        "source": "/faq",
-        "destination": "/faq.html"
-      },
-      {
-        "source": "/apps",
-        "destination": "/apps.html"
-      },
-      {
-        "source": "/safety",
-        "destination": "/security.html"
-      },
-      {
-        "source": "/privacy",
-        "destination": "/privacy.html"
-      },
-      {
-        "source": "/api",
-        "destination": "/api.html"
-      },
-      {
-        "source": "/info",
-        "destination": "/info.html"
-      },
-      {
-        "source": "/aliases",
-        "destination": "/aliases.html"
       },
       {
         "source": "/login",
@@ -125,7 +58,7 @@
       },
       {
         "source": "**",
-        "destination": "/index.html"
+        "destination": "/translations.html"
       }
     ]
   }

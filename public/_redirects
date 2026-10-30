@@ -1,29 +1,10 @@
-/translations.html /translations 301
-/translations /translations.html 200
 /setlanguage.html /setlanguage 301
 /setlanguage /setlanguage.html 200
 /setlanguage/* /setlanguage.html 200
 
-/index.html / 301
-/faq.html /faq 301
-/apps.html /apps 301
-/security.html /safety 301
-/privacy.html /privacy 301
-/api.html /api 301
-/info.html /info 301
-/aliases.html /aliases 301
-
-/faq /faq.html 200
-/apps /apps.html 200
-/safety /security.html 200
-/privacy /privacy.html 200
-/api /api.html 200
-/info /info.html 200
-/aliases /aliases.html 200
-
-/web /web.html 200
-/web/* /web.html 200
 /login /web.html 200
 /login/* /web.html 200
+/web /web.html 200
+/web/* /web.html 200
 
-/* /index.html 200
+/* /translations.html 200
