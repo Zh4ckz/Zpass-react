@@ -1,22 +1,28 @@
 <!doctype html>
-<html lang="tr">
+<html lang="tr" data-theme="light">
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
-  <title>Translations Platform - Z Pass</title>
+  <title>Z Pass Translations</title>
   <link rel="icon" type="image/png" href="/resources/assets/app-logo/zpass.png">
   <style>
     :root {
       font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
       --bg: #ffffff;
       --sidebar-bg: #f8fafc;
-      --card-bg: #ffffff;
-      --text-main: #1c2733;
+      --text-main: #121212;
       --text-muted: #707579;
       --accent: #3390ec;
       --accent-hover: #287cd8;
-      --green-applied: #2e7d32;
       --border: #e6ebf2;
+      --green-applied: #2e7d32;
+    }
+    [data-theme="dark"] {
+      --bg: #0f1721;
+      --sidebar-bg: #17212b;
+      --text-main: #ffffff;
+      --text-muted: #aaaaaa;
+      --border: #242f3d;
     }
     * { box-sizing: border-box; }
     body {
@@ -27,10 +33,10 @@
       line-height: 1.5;
     }
 
-    /* Top Navigation Header */
+    /* Top Header & Breadcrumbs */
     header {
-      height: 56px;
-      background: #ffffff;
+      height: 58px;
+      background: var(--bg);
       border-bottom: 1px solid var(--border);
       display: flex;
       align-items: center;
@@ -40,471 +46,449 @@
       top: 0;
       z-index: 100;
     }
-    .breadcrumbs {
+    .header-left {
       display: flex;
       align-items: center;
-      gap: 6px;
+      gap: 16px;
+    }
+    .brand-logo {
+      width: 32px;
+      height: 32px;
+      background: var(--accent);
+      color: white;
+      border-radius: 8px;
+      display: grid;
+      place-items: center;
+      font-weight: 800;
+      text-decoration: none;
+    }
+    .breadcrumb {
+      display: flex;
+      align-items: center;
+      gap: 8px;
       font-size: 14px;
       font-weight: 500;
       color: var(--text-muted);
     }
-    .breadcrumbs a {
+    .breadcrumb a { color: var(--accent); text-decoration: none; font-weight: 600; }
+    .breadcrumb a:hover { text-decoration: underline; }
+    .breadcrumb .sep { color: var(--text-muted); }
+    .breadcrumb .active { color: var(--text-main); font-weight: 700; }
+
+    .header-right {
+      display: flex;
+      align-items: center;
+      gap: 16px;
+    }
+    .theme-btn {
+      width: 38px;
+      height: 38px;
+      border-radius: 50%;
+      border: 1px solid var(--border);
+      background: transparent;
+      color: var(--text-main);
+      cursor: pointer;
+      display: grid;
+      place-items: center;
+      font-size: 18px;
+    }
+    .login-btn {
       color: var(--accent);
       text-decoration: none;
-      transition: color 0.15s;
-    }
-    .breadcrumbs a:hover { text-decoration: underline; }
-    .breadcrumbs span.sep { color: #b0b8c1; }
-    .breadcrumbs span.current { color: var(--text-main); font-weight: 600; }
-
-    .search-box {
-      width: clamp(200px, 35vw, 420px);
-      position: relative;
-    }
-    .search-input {
-      width: 100%;
-      height: 36px;
-      padding: 0 14px 0 36px;
-      border-radius: 18px;
-      border: 1px solid var(--border);
-      background: #f1f3f6;
-      font-size: 13px;
-      outline: none;
-    }
-    .search-icon {
-      position: absolute;
-      left: 12px;
-      top: 50%;
-      transform: translateY(-50%);
-      color: var(--text-muted);
+      font-weight: 700;
       font-size: 14px;
     }
 
-    /* Main Layout Grid */
-    .layout-container {
-      display: grid;
-      grid-template-columns: 240px minmax(0, 1fr);
-      min-height: calc(100dvh - 56px);
+    /* Search Bar with Dropdown Filters */
+    .search-wrap {
+      background: var(--sidebar-bg);
+      border: 1px solid var(--border);
+      border-radius: 20px;
+      padding: 4px 14px;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      width: clamp(260px, 40vw, 500px);
+    }
+    .search-wrap input {
+      flex: 1;
+      border: none;
+      background: transparent;
+      outline: none;
+      color: var(--text-main);
+      font-size: 13px;
     }
 
-    /* Left Sidebar */
+    /* Layout & Sidebar */
+    .container {
+      display: grid;
+      grid-template-columns: 240px minmax(0, 1fr);
+      min-height: calc(100dvh - 58px);
+    }
     aside.sidebar {
       background: var(--sidebar-bg);
       border-right: 1px solid var(--border);
-      padding: 20px 0;
-      overflow-y: auto;
+      padding: 24px 0;
     }
-    .nav-group-title {
-      padding: 8px 20px;
+    .menu-section-label {
+      padding: 6px 20px;
       font-size: 11px;
-      font-weight: 700;
-      letter-spacing: 0.8px;
+      font-weight: 800;
       color: var(--text-muted);
       text-transform: uppercase;
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
+      letter-spacing: 0.5px;
     }
-    .nav-list {
+    .menu-items {
       list-style: none;
       padding: 0;
-      margin: 0 0 16px;
+      margin: 0 0 20px;
     }
-    .nav-item a {
-      display: block;
-      padding: 8px 20px;
+    .menu-items a {
+      display: flex;
+      justify-content: space-between;
+      padding: 9px 20px;
       color: var(--text-main);
       text-decoration: none;
-      font-size: 13px;
+      font-size: 14px;
       font-weight: 500;
-      transition: background 0.15s, color 0.15s;
+      transition: background 0.15s;
     }
-    .nav-item a:hover {
-      background: #eef4fc;
-      color: var(--accent);
-    }
-    .nav-item.active a {
-      background: #e1edf9;
-      color: var(--accent);
-      font-weight: 700;
-    }
+    .menu-items a:hover { background: rgba(51, 144, 236, 0.08); color: var(--accent); }
+    .menu-items li.active a { background: rgba(51, 144, 236, 0.12); color: var(--accent); font-weight: 700; }
 
     /* Main Content Area */
-    .content-area {
-      padding: 28px clamp(20px, 4vw, 40px);
-      max-width: 1000px;
+    main.main-content {
+      padding: 32px clamp(20px, 4vw, 48px);
+      max-width: 960px;
     }
 
-    /* Key Header & Tags */
-    .key-header {
+    /* Language Overview Header */
+    .lang-header {
       display: flex;
       align-items: center;
       justify-content: space-between;
       margin-bottom: 24px;
+      padding-bottom: 16px;
+      border-bottom: 1px solid var(--border);
     }
-    .key-title-wrap {
-      display: flex;
-      align-items: center;
-      gap: 12px;
-    }
-    .back-btn {
-      background: none;
-      border: none;
-      color: var(--text-muted);
-      font-size: 20px;
-      cursor: pointer;
-      padding: 4px;
-      border-radius: 50%;
-    }
-    .back-btn:hover { color: var(--accent); background: #f0f4f9; }
-    .key-name {
+    .lang-title-group h2 {
       margin: 0;
-      font-size: 20px;
-      font-weight: 700;
-      letter-spacing: -0.3px;
-    }
-    .tag-badge {
-      display: inline-block;
-      padding: 3px 10px;
-      border-radius: 12px;
-      font-size: 11px;
-      font-weight: 700;
-      text-transform: uppercase;
-      background: #3390ec;
-      color: #ffffff;
-    }
-
-    /* Key Editor Grid (Screenshot + Phrase Card) */
-    .editor-grid {
-      display: grid;
-      grid-template-columns: 280px minmax(0, 1fr);
-      gap: 32px;
-      align-items: start;
-    }
-
-    /* App Preview Frame */
-    .phone-frame {
-      background: #2b3a4a;
-      border-radius: 20px;
-      padding: 12px;
-      box-shadow: 0 8px 30px rgba(0,0,0,0.12);
-      color: white;
-      font-size: 12px;
-    }
-    .phone-screen {
-      background: #182533;
-      border-radius: 12px;
-      padding: 16px;
-      min-height: 380px;
-      display: flex;
-      flex-direction: column;
-      justify-content: center;
-      align-items: center;
-      text-align: center;
-    }
-    .mock-dialog {
-      background: #242f3d;
-      border-radius: 14px;
-      padding: 16px;
-      box-shadow: 0 4px 20px rgba(0,0,0,0.3);
-      width: 100%;
-    }
-    .mock-dialog-title {
-      font-weight: 700;
-      font-size: 14px;
-      margin-bottom: 8px;
-    }
-    .mock-dialog-text {
-      color: #aaaaaa;
-      font-size: 12px;
-      line-height: 1.4;
-      margin-bottom: 14px;
-    }
-    .mock-actions {
-      display: flex;
-      justify-content: flex-end;
-      gap: 12px;
-      font-size: 11px;
-      font-weight: 700;
-      color: #e53935;
-    }
-
-    /* Translation Cards Section */
-    .translation-pane {
-      display: flex;
-      flex-direction: column;
-      gap: 20px;
-    }
-    .original-phrase-box {
-      background: #f8fafc;
-      border-left: 4px solid var(--accent);
-      padding: 14px 18px;
-      border-radius: 8px;
-      font-size: 15px;
-      color: var(--text-main);
-      font-weight: 500;
-    }
-
-    /* Applied Translation Box */
-    .applied-card {
-      background: #ffffff;
-      border: 1px solid var(--border);
-      border-radius: 14px;
-      padding: 18px;
-      box-shadow: 0 2px 10px rgba(0,0,0,0.03);
-    }
-    .applied-header {
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      margin-bottom: 10px;
-    }
-    .applied-phrase {
-      font-size: 16px;
-      font-weight: 600;
-      color: var(--text-main);
-      margin-bottom: 12px;
-    }
-    .applied-badge {
-      display: inline-flex;
-      align-items: center;
-      gap: 4px;
-      color: var(--green-applied);
+      font-size: 24px;
       font-weight: 800;
-      font-size: 12px;
-      letter-spacing: 0.5px;
     }
-    .translation-meta {
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      font-size: 12px;
+    .lang-native-name {
       color: var(--text-muted);
+      font-weight: 500;
+      font-size: 18px;
     }
-    .vote-controls {
-      display: flex;
-      align-items: center;
-      gap: 12px;
-    }
-    .vote-btn {
-      background: none;
-      border: none;
-      cursor: pointer;
-      color: var(--text-muted);
-      font-size: 15px;
-      display: flex;
-      align-items: center;
-      gap: 4px;
-      padding: 4px 8px;
-      border-radius: 6px;
-      transition: background 0.15s;
-    }
-    .vote-btn:hover { background: #f0f4f9; color: var(--accent); }
 
-    /* Add Translation Form */
-    .add-translation-btn {
-      background: none;
-      border: none;
-      color: var(--accent);
+    /* App Section Grid */
+    .section-rows {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(110px, 1fr));
+      gap: 16px;
+      margin-bottom: 32px;
+    }
+    .section-card {
+      background: var(--sidebar-bg);
+      border: 1px solid var(--border);
+      border-radius: 16px;
+      padding: 18px 10px;
+      text-align: center;
+      text-decoration: none;
+      color: var(--text-main);
       font-weight: 700;
       font-size: 13px;
-      cursor: pointer;
-      padding: 10px 0;
-      display: inline-flex;
-      align-items: center;
-      gap: 6px;
-      text-transform: uppercase;
-      letter-spacing: 0.4px;
+      transition: transform 0.15s, border-color 0.15s;
     }
-    .add-translation-btn:hover { text-decoration: underline; }
+    .section-card:hover { transform: translateY(-2px); border-color: var(--accent); }
+    .section-icon {
+      width: 44px;
+      height: 44px;
+      border-radius: 50%;
+      background: var(--accent);
+      color: white;
+      display: grid;
+      place-items: center;
+      font-size: 20px;
+      margin: 0 auto 10px;
+    }
 
-    .add-form {
-      background: #f8fafc;
+    /* Information Blocks */
+    .info-block {
+      background: var(--sidebar-bg);
       border: 1px solid var(--border);
-      border-radius: 14px;
-      padding: 18px;
-      margin-top: 10px;
+      border-radius: 16px;
+      padding: 20px;
+      margin-bottom: 20px;
     }
-    .add-textarea {
-      width: 100%;
-      min-height: 80px;
+    .info-block h4 { margin: 0 0 8px; font-size: 15px; font-weight: 700; }
+    .info-block p { margin: 0 0 12px; color: var(--text-muted); font-size: 13px; }
+
+    .share-link-box {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      background: var(--bg);
       border: 1px solid var(--border);
       border-radius: 10px;
-      padding: 12px;
-      font-family: inherit;
-      font-size: 14px;
-      outline: none;
-      resize: vertical;
+      padding: 6px 12px;
     }
-    .add-textarea:focus { border-color: var(--accent); }
-    .form-submit-btn {
-      margin-top: 12px;
-      padding: 9px 20px;
+    .share-link-input {
+      flex: 1;
+      border: none;
+      background: transparent;
+      color: var(--accent);
+      font-family: monospace;
+      font-weight: 600;
+      font-size: 13px;
+      outline: none;
+    }
+    .btn-copy {
       background: var(--accent);
       color: white;
       border: none;
       border-radius: 8px;
+      padding: 6px 14px;
       font-weight: 700;
-      font-size: 13px;
+      font-size: 12px;
       cursor: pointer;
     }
 
-    @media(max-width: 820px) {
-      .layout-container { grid-template-columns: 1fr; }
+    .btn-action-primary {
+      display: inline-block;
+      padding: 12px 24px;
+      background: var(--accent);
+      color: white;
+      text-decoration: none;
+      font-weight: 700;
+      border-radius: 12px;
+      font-size: 14px;
+    }
+
+    /* Languages Modal Popup */
+    .modal-overlay {
+      position: fixed;
+      inset: 0;
+      background: rgba(0, 0, 0, 0.45);
+      backdrop-filter: blur(4px);
+      display: grid;
+      place-items: center;
+      z-index: 1000;
+    }
+    .popup {
+      background: var(--bg);
+      width: min(90%, 420px);
+      border-radius: 20px;
+      padding: 24px;
+      box-shadow: 0 12px 40px rgba(0, 0, 0, 0.2);
+    }
+    .popup h4 { margin: 0 0 16px; font-size: 18px; font-weight: 800; }
+    .popup-search {
+      width: 100%;
+      height: 40px;
+      border-radius: 12px;
+      border: 1px solid var(--border);
+      padding: 0 14px;
+      font-size: 14px;
+      outline: none;
+      margin-bottom: 16px;
+    }
+    .popup-lang-list {
+      max-height: 300px;
+      overflow-y: auto;
+      display: flex;
+      flex-direction: column;
+      gap: 4px;
+    }
+    .popup-lang-item {
+      display: flex;
+      justify-content: space-between;
+      padding: 10px 12px;
+      border-radius: 10px;
+      text-decoration: none;
+      color: var(--text-main);
+      font-size: 14px;
+      font-weight: 600;
+    }
+    .popup-lang-item:hover { background: rgba(51, 144, 236, 0.1); color: var(--accent); }
+    .popup-add-lang {
+      margin-top: 16px;
+      padding-top: 14px;
+      border-top: 1px solid var(--border);
+      text-align: center;
+    }
+    .popup-add-lang a {
+      color: var(--accent);
+      font-weight: 700;
+      text-decoration: none;
+      font-size: 13px;
+    }
+
+    @media(max-width: 768px) {
+      .container { grid-template-columns: 1fr; }
       aside.sidebar { display: none; }
-      .editor-grid { grid-template-columns: 1fr; }
     }
   </style>
 </head>
 <body>
 
-  <!-- Top Header with Breadcrumbs -->
   <header>
-    <nav class="breadcrumbs">
-      <a href="/translations">Translations</a>
-      <span class="sep">/</span>
-      <a href="/translations?lang=tr">Turkish</a>
-      <span class="sep">/</span>
-      <a href="/translations?lang=tr&app=android">Android</a>
-      <span class="sep">/</span>
-      <a href="/translations?lang=tr&app=android&sec=unsorted">Unsorted</a>
-      <span class="sep">/</span>
-      <span class="current">AreYouSureClearHistoryChannel</span>
-    </nav>
+    <div class="header-left">
+      <a href="/" class="brand-logo">Z</a>
+      <nav class="breadcrumb">
+        <a href="/">Translations</a>
+        <span class="sep">/</span>
+        <span class="active" id="crumb-lang">Turkish</span>
+      </nav>
+    </div>
 
-    <div class="search-box">
-      <span class="search-icon">⌕</span>
-      <input type="text" class="search-input" placeholder="Search translations and keys…">
+    <div class="search-wrap">
+      <span>⌕</span>
+      <input type="text" placeholder="Search translations and keys">
+    </div>
+
+    <div class="header-right">
+      <button class="theme-btn" onclick="toggleTheme()" title="Theme">🌙</button>
+      <a href="/auth" class="login-link login-btn">Login</a>
     </div>
   </header>
 
-  <div class="layout-container">
-
-    <!-- Left Navigation Sidebar -->
+  <div class="container">
     <aside class="sidebar">
-      <div class="nav-group-title">LANGUAGES</div>
-      <ul class="nav-list">
-        <li class="nav-item"><a href="/translations?lang=en">English</a></li>
-        <li class="nav-item active"><a href="/translations?lang=tr">Turkish</a></li>
-        <li class="nav-item"><a href="/translations?lang=ku">Kurdî</a></li>
-        <li class="nav-item"><a href="/translations?lang=de">Deutsch</a></li>
-        <li class="nav-item"><a href="/translations?lang=fr">Français</a></li>
-        <li class="nav-item"><a href="/translations?lang=es">Español</a></li>
-        <li class="nav-item"><a href="/translations?lang=ar">العربية</a></li>
+      <div class="menu-section-label">Languages</div>
+      <ul class="menu-items" id="side-languages">
+        <li><a href="/en/"><span>English</span></a></li>
+        <li class="active"><a href="/tr/"><span>Turkish</span><small style="color:var(--text-muted)">Türkçe</small></a></li>
+        <li><a href="/ku/"><span>Kurdî</span><small style="color:var(--text-muted)">Kurdish</small></a></li>
+        <li><a href="/de/"><span>Deutsch</span></a></li>
+        <li><a href="#" onclick="openLangPopup(); return false;"><span style="color:var(--accent); font-weight:700;">Other languages…</span></a></li>
       </ul>
 
-      <div class="nav-group-title">APPS</div>
-      <ul class="nav-list">
-        <li class="nav-item active"><a href="/translations?lang=tr&app=android">Android</a></li>
-        <li class="nav-item"><a href="/translations?lang=tr&app=ios">iOS</a></li>
-        <li class="nav-item"><a href="/translations?lang=tr&app=tdesktop">TDesktop</a></li>
-        <li class="nav-item"><a href="/translations?lang=tr&app=macos">macOS</a></li>
-        <li class="nav-item"><a href="/translations?lang=tr&app=webk">WebK</a></li>
-      </ul>
-
-      <div class="nav-group-title">SECTIONS</div>
-      <ul class="nav-list">
-        <li class="nav-item"><a href="/translations?lang=tr&app=android&sec=all">All Sections</a></li>
-        <li class="nav-item"><a href="/translations?lang=tr&app=android&sec=login">Log In</a></li>
-        <li class="nav-item"><a href="/translations?lang=tr&app=android&sec=chatlist">Chat List</a></li>
-        <li class="nav-item"><a href="/translations?lang=tr&app=android&sec=chats">Private chats</a></li>
-        <li class="nav-item"><a href="/translations?lang=tr&app=android&sec=groups">Groups And Channels</a></li>
-        <li class="nav-item"><a href="/translations?lang=tr&app=android&sec=profile">Profile</a></li>
-        <li class="nav-item"><a href="/translations?lang=tr&app=android&sec=settings">Settings</a></li>
-        <li class="nav-item active"><a href="/translations?lang=tr&app=android&sec=unsorted">Unsorted</a></li>
+      <div class="menu-section-label">Apps</div>
+      <ul class="menu-items">
+        <li><a href="/tr/android/"><span>Android</span></a></li>
+        <li><a href="/tr/ios/"><span>iOS</span></a></li>
+        <li><a href="/tr/tdesktop/"><span>TDesktop</span></a></li>
+        <li><a href="/tr/macos/"><span>macOS</span></a></li>
+        <li><a href="/tr/webk/"><span>WebK</span></a></li>
       </ul>
     </aside>
 
-    <!-- Main Content Area -->
-    <main class="content-area">
-
-      <!-- Key Title Header -->
-      <div class="key-header">
-        <div class="key-title-wrap">
-          <button class="back-btn" onclick="history.back()" title="Go Back">‹</button>
-          <h1 class="key-name">AreYouSureClearHistoryChannel</h1>
-        </div>
-        <div>
-          <span class="tag-badge">Android</span>
-          <span class="tag-badge" style="background:#707579;">Unigram</span>
+    <main class="main-content">
+      <div class="lang-header">
+        <div class="lang-title-group">
+          <h2 id="view-title">Turkish <span class="lang-native-name">(Türkçe)</span></h2>
         </div>
       </div>
 
-      <!-- Editor Grid -->
-      <div class="editor-grid">
-
-        <!-- Phone Screenshot Mockup -->
-        <div class="phone-frame">
-          <div class="phone-screen">
-            <div class="mock-dialog">
-              <div class="mock-dialog-title">Delete from cache</div>
-              <div class="mock-dialog-text">Delete all cached text and media from this channel?</div>
-              <div class="mock-actions">
-                <span>CANCEL</span>
-                <span>DELETE FROM CACHE</span>
-              </div>
-            </div>
-          </div>
-          <div style="margin-top:10px; text-align:center;">
-            <span class="tag-badge" style="background:#00bcd4;">UNSORTED</span>
-          </div>
-        </div>
-
-        <!-- Translation & Suggestions Panel -->
-        <div class="translation-pane">
-
-          <!-- Original English String -->
-          <div class="original-phrase-box">
-            “Delete all cached text and media from this channel?”
-            <div style="font-size:11px; color:var(--text-muted); margin-top:4px;">Key Length: 51 characters</div>
-          </div>
-
-          <!-- Official Applied Translation Card -->
-          <div class="applied-card">
-            <div class="applied-header">
-              <div class="applied-phrase">Bu kanaldan önbelleğe alınmış tüm metin ve medya silinsin mi?</div>
-              <span class="applied-badge">✔ APPLIED</span>
-            </div>
-
-            <div class="translation-meta">
-              <div class="vote-controls">
-                <button class="vote-btn" title="Upvote">👍 12</button>
-                <button class="vote-btn" title="Downvote">👎 0</button>
-                <button class="vote-btn" title="Comments">💬 2</button>
-              </div>
-              <div>Ali Demirtaş · Nov 30, 2018</div>
-            </div>
-          </div>
-
-          <!-- Add Translation Button & Form -->
-          <div>
-            <button class="add-translation-btn" onclick="toggleAddForm()">+ ADD TRANSLATION</button>
-            <div class="add-form" id="add-form" hidden>
-              <textarea class="add-textarea" id="new-translation" placeholder="Suggest a new translation for this string…"></textarea>
-              <button class="form-submit-btn" onclick="submitTranslation()">SUBMIT SUGGESTION</button>
-            </div>
-          </div>
-
-        </div>
-
+      <h3 style="font-size:16px; font-weight:800; margin-bottom:16px;">Platforms & Apps</h3>
+      <div class="section-rows">
+        <a href="/tr/android/" class="section-card"><div class="section-icon">🤖</div><span>Android</span></a>
+        <a href="/tr/ios/" class="section-card"><div class="section-icon">🍎</div><span>iOS</span></a>
+        <a href="/tr/tdesktop/" class="section-card"><div class="section-icon">💻</div><span>TDesktop</span></a>
+        <a href="/tr/macos/" class="section-card"><div class="section-icon">🖥️</div><span>macOS</span></a>
+        <a href="/tr/android_x/" class="section-card"><div class="section-icon">⚡</div><span>Android X</span></a>
+        <a href="/tr/webk/" class="section-card"><div class="section-icon">🌐</div><span>WebK</span></a>
       </div>
 
+      <div class="info-block">
+        <h4>Discussions <span style="background:var(--accent); color:white; font-size:10px; padding:2px 6px; border-radius:8px; margin-left:6px;">NEW</span></h4>
+        <p>Feel free to join the community discussion for this language pack.</p>
+        <a href="https://t.me/zpass_tr" target="_blank" style="color:var(--accent); font-weight:700; text-decoration:none;">View Discussion →</a>
+      </div>
+
+      <div class="info-block">
+        <h4>Sharing Link <span style="background:var(--accent); color:white; font-size:10px; padding:2px 6px; border-radius:8px; margin-left:6px;">NEW</span></h4>
+        <p>Anyone can switch their Z Pass interface to <b id="share-lang-name">Turkish</b> by following this link:</p>
+        <div class="share-link-box">
+          <input type="text" class="share-link-input" id="share-link-val" value="https://zpas.org/setlanguage/tr" readonly>
+          <button class="btn-copy" onclick="copyShareLink()">Copy Link</button>
+        </div>
+      </div>
+
+      <div class="info-block">
+        <h4>Actions</h4>
+        <a href="https://zpas.org/setlanguage/tr" id="action-use-btn" class="btn-action-primary">Use Z Pass in Turkish</a>
+      </div>
     </main>
+  </div>
 
+  <!-- Languages Popup Modal -->
+  <div class="modal-overlay" id="lang-popup" hidden>
+    <div class="popup">
+      <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:12px;">
+        <h4>Languages</h4>
+        <button onclick="closeLangPopup()" style="background:none; border:none; font-size:20px; cursor:pointer; color:var(--text-muted);">×</button>
+      </div>
+      <input type="text" class="popup-search" placeholder="Search languages…" id="popup-search-input" oninput="filterLanguages()">
+      <div class="popup-lang-list" id="popup-list"></div>
+      <div class="popup-add-lang">
+        <a href="#" onclick="alert('Yeni dil talebiniz yöneticilere iletildi!'); closeLangPopup(); return false;">+ Add a new language</a>
+      </div>
+    </div>
   </div>
 
   <script>
-    function toggleAddForm() {
-      const form = document.getElementById('add-form');
-      if (form) form.hidden = !form.hidden;
+    const languages = [
+      { code: 'en', name: 'English', native: 'English' },
+      { code: 'tr', name: 'Turkish', native: 'Türkçe' },
+      { code: 'ku', name: 'Kurdî', native: 'Kurmancî' },
+      { code: 'de', name: 'German', native: 'Deutsch' },
+      { code: 'fr', name: 'French', native: 'Français' },
+      { code: 'es', name: 'Spanish', native: 'Español' },
+      { code: 'ar', name: 'Arabic', native: 'العربية' },
+      { code: 'ru', name: 'Russian', native: 'Русский' },
+      { code: 'fa', name: 'Persian', native: 'فارسی' },
+      { code: 'it', name: 'Italian', native: 'Italiano' },
+      { code: 'nl', name: 'Dutch', native: 'Nederlands' }
+    ];
+
+    const path = location.pathname.toLowerCase().replace(/^\/+|\/+$/g, '');
+    const currentCode = path || 'tr';
+    const langObj = languages.find(l => l.code === currentCode) || { code: currentCode, name: currentCode.toUpperCase(), native: currentCode.toUpperCase() };
+
+    document.getElementById('crumb-lang').textContent = langObj.name;
+    document.getElementById('view-title').innerHTML = `${langObj.name} <span class="lang-native-name">(${langObj.native})</span>`;
+    document.getElementById('share-lang-name').textContent = langObj.name;
+    document.getElementById('share-link-val').value = `https://zpas.org/setlanguage/${langObj.code}`;
+    document.getElementById('action-use-btn').href = `https://zpas.org/setlanguage/${langObj.code}`;
+    document.getElementById('action-use-btn').textContent = `Use Z Pass in ${langObj.name}`;
+
+    function toggleTheme() {
+      const dark = document.documentElement.getAttribute('data-theme') === 'dark';
+      document.documentElement.setAttribute('data-theme', dark ? 'light' : 'dark');
     }
 
-    function submitTranslation() {
-      const input = document.getElementById('new-translation');
-      if (!input || !input.value.trim()) return;
-      alert('Çeviri öneriniz başarıyla gönderildi ve incelemeye alındı!');
-      input.value = '';
-      toggleAddForm();
+    function copyShareLink() {
+      const val = document.getElementById('share-link-val').value;
+      navigator.clipboard.writeText(val);
+      alert('Link Copied: ' + val);
+    }
+
+    function openLangPopup() {
+      document.getElementById('lang-popup').hidden = false;
+      renderPopupLangs(languages);
+    }
+
+    function closeLangPopup() {
+      document.getElementById('lang-popup').hidden = true;
+    }
+
+    function renderPopupLangs(list) {
+      const container = document.getElementById('popup-list');
+      container.innerHTML = list.map(l => `
+        <a href="/${l.code}" class="popup-lang-item">
+          <span>${l.name}</span>
+          <span style="color:var(--text-muted); font-size:12px;">${l.native}</span>
+        </a>
+      `).join('');
+    }
+
+    function filterLanguages() {
+      const q = document.getElementById('popup-search-input').value.toLowerCase();
+      const filtered = languages.filter(l => l.name.toLowerCase().includes(q) || l.native.toLowerCase().includes(q) || l.code.includes(q));
+      renderPopupLangs(filtered);
     }
   </script>
 </body>
