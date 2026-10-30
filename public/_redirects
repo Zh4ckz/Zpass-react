@@ -1,7 +1,3 @@
-/setlanguage.html /setlanguage 301
-/setlanguage /setlanguage.html 200
-/setlanguage/* /setlanguage.html 200
-
 /login /web.html 200
 /login/* /web.html 200
 /web /web.html 200

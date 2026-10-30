@@ -13,9 +13,7 @@
   <link rel="stylesheet" href="/css/marketing-2026.css?v=1">
   <script>
     const h = location.hostname.toLowerCase();
-    if (h.includes('translations.')) {
-      location.replace('/translations.html' + location.search + location.hash);
-    } else if (h.includes('web.') || h.includes('login.')) {
+    if (h.includes('web.') || h.includes('login.')) {
       location.replace('/web.html' + location.search + location.hash);
     }
   </script>
