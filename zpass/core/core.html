@@ -1,0 +1,165 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
+  <title>Z Pass Core API & MTProto Protocol Specification</title>
+  <link rel="icon" type="image/png" href="/resources/assets/app-logo/zpass.png">
+  <style>
+    :root {
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+      --bg: #ffffff;
+      --sidebar-bg: #f8fafc;
+      --text-main: #1c2733;
+      --text-muted: #707579;
+      --accent: #3390ec;
+      --border: #e6ebf2;
+      --code-bg: #242f3d;
+      --code-text: #61afef;
+    }
+    * { box-sizing: border-box; }
+    body {
+      margin: 0;
+      background: var(--bg);
+      color: var(--text-main);
+      font-size: 14px;
+      line-height: 1.6;
+    }
+    header {
+      height: 60px;
+      background: #ffffff;
+      border-bottom: 1px solid var(--border);
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 0 24px;
+      position: sticky;
+      top: 0;
+      z-index: 100;
+    }
+    .brand {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      font-size: 18px;
+      font-weight: 800;
+      color: var(--text-main);
+      text-decoration: none;
+    }
+    .brand-logo {
+      width: 34px;
+      height: 34px;
+      background: var(--accent);
+      color: white;
+      border-radius: 8px;
+      display: grid;
+      place-items: center;
+    }
+    .container {
+      display: grid;
+      grid-template-columns: 260px minmax(0, 1fr);
+      min-height: calc(100dvh - 60px);
+    }
+    aside.sidebar {
+      background: var(--sidebar-bg);
+      border-right: 1px solid var(--border);
+      padding: 24px 0;
+    }
+    .nav-sec-title {
+      padding: 8px 20px;
+      font-size: 11px;
+      font-weight: 800;
+      color: var(--text-muted);
+      text-transform: uppercase;
+      letter-spacing: 0.8px;
+    }
+    .nav-list {
+      list-style: none;
+      padding: 0;
+      margin: 0 0 20px;
+    }
+    .nav-list a {
+      display: block;
+      padding: 8px 20px;
+      color: var(--text-main);
+      text-decoration: none;
+      font-weight: 500;
+    }
+    .nav-list a:hover { color: var(--accent); background: rgba(51, 144, 236, 0.08); }
+    main.content {
+      padding: 36px clamp(20px, 4vw, 48px);
+      max-width: 900px;
+    }
+    h1 { margin: 0 0 16px; font-size: 28px; font-weight: 800; }
+    p { margin: 0 0 20px; color: var(--text-muted); font-size: 15px; }
+    .card {
+      background: #f8fafc;
+      border: 1px solid var(--border);
+      border-radius: 16px;
+      padding: 24px;
+      margin-bottom: 24px;
+    }
+    pre {
+      background: var(--code-bg);
+      color: var(--code-text);
+      padding: 16px;
+      border-radius: 12px;
+      overflow-x: auto;
+      font-family: monospace;
+      font-size: 13px;
+    }
+  </style>
+</head>
+<body>
+  <header>
+    <a href="https://core.zpas.org/" class="brand"><div class="brand-logo">Z</div><span>Z Pass Core Documentation</span></a>
+  </header>
+
+  <div class="container">
+    <aside class="sidebar">
+      <div class="nav-sec-title">Core Specifications</div>
+      <ul class="nav-list">
+        <li><a href="#api">API Overview</a></li>
+        <li><a href="#mtproto">MTProto 2.0 Protocol</a></li>
+        <li><a href="#schema">TL Schema Specification</a></li>
+        <li><a href="#encryption">End-to-End Encryption</a></li>
+      </ul>
+      <div class="nav-sec-title">Subdomains & Tools</div>
+      <ul class="nav-list">
+        <li><a href="https://web.zpas.org/">Web App (web.zpas.org)</a></li>
+        <li><a href="https://translations.zpas.org/">Translations (translations.zpas.org)</a></li>
+        <li><a href="https://bots.zpas.org/">Bots API (bots.zpas.org)</a></li>
+        <li><a href="https://docs.zpas.org/">Docs & Legal (docs.zpas.org)</a></li>
+      </ul>
+    </aside>
+
+    <main class="content">
+      <h1>Z Pass Core API & Protocols</h1>
+      <p>Welcome to Z Pass Core Specification. Here you will find developer documentation for the MTProto binary protocol, TL Schema definitions, and end-to-end encrypted messaging channels.</p>
+
+      <div class="card" id="api">
+        <h2>1. Client API Overview</h2>
+        <p>The Z Pass API allows developers to build custom messaging clients, desktop applications, and automated bots. Communication is secured via MTProto encryption layer.</p>
+      </div>
+
+      <div class="card" id="mtproto">
+        <h2>2. MTProto 2.0 Encryption Protocol</h2>
+        <p>MTProto 2.0 provides high-speed binary serialization over TCP and HTTPS with Diffie-Hellman key exchange and AES-256-IGE payload encryption.</p>
+        <pre>
+// DH Key Exchange & Encrypted Frame Structure
+auth_key_id:int64 msg_key:int128 encrypted_data:bytes
+        </pre>
+      </div>
+
+      <div class="card" id="schema">
+        <h2>3. Type Language (TL) Schema</h2>
+        <p>Z Pass schemas are defined in Type Language syntax:</p>
+        <pre>
+user#2e2e12a id:long first_name:string username:string = User;
+message#8d8d21c id:long sender_id:long text:string date:int = Message;
+        </pre>
+      </div>
+    </main>
+  </div>
+</body>
+</html>
