@@ -64,7 +64,15 @@ Zpass/
 
 ---
 
-## ⚡ 4. Web Engine & URL Routing Rules
+## 📦 4. PassGram Android SDK Repositories
+
+- **Main Android App**: `C:/Users/rezan/AndroidStudioProjects/ZPassManager` (`com.zpass`)
+- **PassGram Login Android SDK**: [https://github.com/Zh4ckz/passgram-login-android](https://github.com/Zh4ckz/passgram-login-android)
+  - Telegram-style PassGram Login Widget and Credential Manager SDK for 3rd-party Android developers.
+
+---
+
+## ⚡ 5. Web Engine & URL Routing Rules
 
 1. **Clean URLs (Zero `.html` extensions)**:
    - All URLs use clean path syntax: `/apps`, `/api`, `/safety`, `/privacy`, `/faq`, `/translations`, `/setlanguage/ku`.
