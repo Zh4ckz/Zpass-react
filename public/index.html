@@ -3,7 +3,7 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width,initial-scale=1">
-  <meta name="theme-color" content="#010101">
+  <meta name="theme-color" content="#f7f9fc">
   <meta name="description" content="PassGram keeps passwords, passkeys and authenticator codes together across Android, Windows and web.">
   <title>PassGram — Your digital life, in one private space</title>
   <link rel="icon" href="/resources/assets/app-logo/zpass.png">
@@ -13,206 +13,46 @@
   <link rel="stylesheet" href="/css/marketing-2026.css?v=1">
 
   <style>
-    /* Liquid Glass Navbar & Pricing Styles */
-    .glass-navbar {
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      width: 100%;
-      max-width: 1200px;
-      margin: 16px auto 30px auto;
-      padding: 12px 24px;
-      box-sizing: border-box;
-      background: rgba(254, 254, 254, 0.04);
-      backdrop-filter: blur(20px);
-      -webkit-backdrop-filter: blur(20px);
-      border: 1px solid rgba(254, 254, 254, 0.1);
-      border-radius: 9999px;
-      box-shadow: 0 15px 35px rgba(1, 1, 1, 0.3);
-    }
-    .nav-brand {
-      display: flex;
-      align-items: center;
-      gap: 8px;
-      color: #FEFEFE;
-      font-weight: 800;
-      font-size: 20px;
-      text-decoration: none;
-      letter-spacing: -0.5px;
-    }
-    .nav-brand span { color: #0088CC; }
-
-    .nav-links-container {
-      position: relative;
-      display: inline-flex;
-      align-items: center;
-      background: rgba(254, 254, 254, 0.03);
-      backdrop-filter: blur(20px);
-      border: 1px solid rgba(254, 254, 254, 0.08);
-      border-radius: 9999px;
-      padding: 3px;
-      box-shadow: inset 0 2px 5px rgba(254, 254, 254, 0.05);
-    }
-    .nav-indicator {
-      position: absolute;
-      top: 3px;
-      bottom: 3px;
-      left: 3px;
-      width: 80px;
-      background: rgba(254, 254, 254, 0.12);
-      backdrop-filter: blur(16px);
-      border: 1px solid rgba(254, 254, 254, 0.2);
-      border-radius: 9999px;
-      transition: transform 0.35s cubic-bezier(0.4, 0, 0.2, 1), width 0.35s cubic-bezier(0.4, 0, 0.2, 1);
-      pointer-events: none;
-    }
-    .nav-links-container button {
-      position: relative;
-      z-index: 1;
-      background: transparent;
-      border: none;
-      color: rgba(254, 254, 254, 0.65);
-      font-size: 13px;
-      font-weight: 500;
-      padding: 8px 16px;
-      border-radius: 9999px;
-      cursor: pointer;
-      transition: color 0.3s ease;
-      white-space: nowrap;
-    }
-    .nav-links-container button.active {
-      color: #FEFEFE;
-      font-weight: 600;
-    }
-    .sign-in-btn {
-      background: rgba(0, 136, 204, 0.18);
-      color: #0088CC;
-      border: 1px solid rgba(0, 136, 204, 0.35);
-      border-radius: 9999px;
-      padding: 9px 22px;
-      font-size: 14px;
-      font-weight: 600;
-      cursor: pointer;
-      backdrop-filter: blur(10px);
-      transition: all 0.2s ease;
-    }
-    .sign-in-btn:hover {
-      background: #0088CC;
-      color: #FEFEFE;
-    }
-
-    /* Audience Toggle & Tabs */
-    .sp-glass-toggle {
-      position: relative;
-      display: inline-flex;
-      align-items: center;
-      background: rgba(254, 254, 254, 0.03);
-      backdrop-filter: blur(20px);
-      border: 1px solid rgba(254, 254, 254, 0.08);
-      border-radius: 9999px;
-      padding: 4px;
-      margin: 0 auto 20px auto;
-    }
-    .sp-glass-toggle span.indicator {
-      position: absolute;
-      top: 4px;
-      bottom: 4px;
-      left: 4px;
-      width: 50%;
-      background: rgba(254, 254, 254, 0.12);
-      border: 1px solid rgba(254, 254, 254, 0.2);
-      border-radius: 9999px;
-      transition: transform 0.35s cubic-bezier(0.4, 0, 0.2, 1);
-    }
-    .sp-glass-toggle button {
-      position: relative;
-      z-index: 1;
-      background: transparent;
-      border: none;
-      color: rgba(254, 254, 254, 0.6);
-      font-size: 14px;
-      font-weight: 600;
-      padding: 10px 30px;
-      border-radius: 9999px;
-      cursor: pointer;
-      width: 140px;
-      text-align: center;
-    }
-    .sp-glass-toggle button.active { color: #FEFEFE; }
-
-    .tab-list {
-      display: inline-flex;
-      align-items: center;
-      background: rgba(254, 254, 254, 0.02);
-      border: 1px solid rgba(254, 254, 254, 0.06);
-      border-radius: 16px;
-      padding: 5px;
-      margin: 0 auto 35px auto;
-    }
-    .tab-btn {
-      background: transparent;
-      border: none;
-      color: rgba(254, 254, 254, 0.5);
-      font-size: 14px;
-      font-weight: 500;
-      padding: 8px 20px;
-      border-radius: 12px;
-      cursor: pointer;
-      display: flex;
-      align-items: center;
-      gap: 10px;
-    }
-    .tab-btn.active {
-      background: rgba(254, 254, 254, 0.1);
-      color: #FEFEFE;
-      font-weight: 600;
-    }
-    .save-badge {
-      background: rgba(0, 136, 204, 0.18);
-      color: #0088CC;
-      border: 1px solid rgba(0, 136, 204, 0.35);
-      font-size: 11px;
-      padding: 2px 8px;
-      border-radius: 9999px;
-      font-weight: 600;
-    }
-
-    .pricing-container {
+    /* Liquid Glass Pricing Card Enhancements */
+    .glass-pricing-wrap {
       display: flex;
       gap: 24px;
       justify-content: center;
       align-items: stretch;
       max-width: 1100px;
-      width: 100%;
-      margin: 0 auto 50px auto;
+      margin: 32px auto 0 auto;
       flex-wrap: wrap;
     }
-    .glass-card {
+    .glass-price-card {
       background: rgba(254, 254, 254, 0.03);
       backdrop-filter: blur(25px);
+      -webkit-backdrop-filter: blur(25px);
       border: 1px solid rgba(254, 254, 254, 0.08);
       border-radius: 28px;
-      padding: 32px 28px;
+      padding: 36px 30px;
       width: min(100%, 340px);
       display: flex;
       flex-direction: column;
       position: relative;
-      transition: transform 0.3s ease, border-color 0.3s ease;
-      cursor: pointer;
+      transition: transform 0.3s ease, border-color 0.3s ease, background 0.3s ease;
+      box-shadow: 0 20px 40px rgba(1, 1, 1, 0.2);
     }
-    .glass-card:hover {
+    .glass-price-card:hover {
       transform: translateY(-6px);
-      background: rgba(254, 254, 254, 0.05);
+      background: rgba(254, 254, 254, 0.06);
       border-color: rgba(254, 254, 254, 0.2);
     }
-    .glass-card.featured {
-      background: rgba(0, 136, 204, 0.04);
-      border-color: rgba(0, 136, 204, 0.3);
+    .glass-price-card.featured {
+      background: rgba(0, 136, 204, 0.05);
+      border-color: rgba(0, 136, 204, 0.35);
     }
-    .popular-badge {
+    .glass-price-card.featured:hover {
+      border-color: rgba(0, 136, 204, 0.55);
+    }
+    .glass-badge {
       position: absolute;
-      top: 20px;
-      right: 20px;
+      top: 22px;
+      right: 22px;
       color: #0088CC;
       font-size: 11px;
       font-weight: 700;
@@ -221,54 +61,55 @@
       border-radius: 20px;
       border: 1px solid rgba(0, 136, 204, 0.25);
       text-transform: uppercase;
+      letter-spacing: 0.5px;
     }
-
-    /* Fixed Checkout Footer */
-    .checkout-footer {
-      position: fixed;
-      bottom: 0;
-      left: 0;
-      right: 0;
-      background: rgba(1, 1, 1, 0.85);
-      backdrop-filter: blur(25px);
-      -webkit-backdrop-filter: blur(25px);
-      border-top: 1px solid rgba(254, 254, 254, 0.08);
-      padding: 16px 40px;
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      z-index: 1000;
-      box-shadow: 0 -15px 35px rgba(1, 1, 1, 0.6);
-    }
-    .checkout-info .plan-name {
-      font-weight: 700;
-      font-size: 15px;
-      color: #FEFEFE;
-    }
-    .checkout-info .plan-cost {
-      font-size: 20px;
+    .glass-price-title {
+      font-size: 22px;
       font-weight: 800;
-      color: #FEFEFE;
+      margin-bottom: 8px;
     }
-    .checkout-info .plan-cost span {
+    .glass-price-desc {
       font-size: 13px;
-      color: rgba(254, 254, 254, 0.45);
-      font-weight: 400;
+      color: var(--text-muted, rgba(254,254,254,0.5));
+      margin-bottom: 24px;
+      min-height: 38px;
+      line-height: 1.4;
     }
-    .subscribe-btn {
-      background-color: #0088CC;
-      color: #FEFEFE;
-      font-weight: 700;
+    .glass-price-num {
+      font-size: 36px;
+      font-weight: 800;
+      margin-bottom: 4px;
+      letter-spacing: -1px;
+    }
+    .glass-price-num span {
       font-size: 14px;
-      border: none;
-      border-radius: 9999px;
-      padding: 12px 32px;
-      cursor: pointer;
-      transition: background-color 0.2s, transform 0.2s;
+      font-weight: 400;
+      opacity: 0.6;
     }
-    .subscribe-btn:hover {
-      background-color: #0077bb;
-      transform: scale(1.02);
+    .glass-price-billed {
+      font-size: 13px;
+      opacity: 0.5;
+      margin-bottom: 28px;
+    }
+    .glass-features {
+      list-style: none;
+      padding: 0;
+      margin: 0 0 32px 0;
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+      flex-grow: 1;
+    }
+    .glass-features li {
+      font-size: 14px;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+    .glass-features li::before {
+      content: "✓";
+      color: #0088CC;
+      font-weight: 800;
     }
   </style>
 
@@ -289,23 +130,21 @@
 </head>
 <body>
 
-<!-- Liquid Glass Sliding Pill Navbar -->
-<nav class="glass-navbar">
-  <a href="/" class="nav-brand">Z<span>Pass</span></a>
-
-  <div class="nav-links-container" id="nav-container">
-      <span class="nav-indicator" id="nav-indicator"></span>
-      <button class="active" onclick="setNavTab(this, 'Features')">Features</button>
-      <button onclick="setNavTab(this, 'Pricing')">Pricing</button>
-      <button onclick="setNavTab(this, 'Family')">Family</button>
-      <button onclick="setNavTab(this, 'Independent')">Independent</button>
-      <button onclick="setNavTab(this, 'Security')">Security</button>
+<header class="site-header">
+  <a class="brand" href="/" aria-label="PassGram home"><span class="brand-mark">Z</span><span>PassGram</span></a>
+  <button class="menu-toggle" type="button" aria-expanded="false" aria-controls="main-nav" aria-label="Open menu"><span></span><span></span></button>
+  <nav id="main-nav" class="main-nav">
+    <a href="/apps">Apps</a><a href="/api">API</a><a href="/faq">FAQ</a><a href="/safety">Safety</a><a href="/privacy">Privacy</a><a href="https://translations.zpas.org">Translations</a>
+  </nav>
+  <div class="header-actions">
+    <a class="x-link" href="https://x.com/4rezan" target="_blank" rel="noopener noreferrer" aria-label="Follow PassGram on X">𝕏 <span>Follow on X</span></a>
+    <a class="sign-in" href="https://web.zpas.org/login">Sign in</a>
+    <a class="button button-dark button-small" href="https://web.zpas.org/login">Get started <span aria-hidden="true">↗</span></a>
   </div>
-
-  <button class="sign-in-btn" onclick="location.href='https://web.zpas.org/login'">Sign in</button>
-</nav>
+</header>
 
 <main>
+  <!-- Hero Section -->
   <section class="hero section-wrap">
     <div class="hero-copy">
       <div class="eyebrow"><span class="live-dot"></span> ONE ACCOUNT. YOUR DEVICES.</div>
@@ -317,6 +156,7 @@
       </div>
       <div class="hero-footnote"><span class="tiny-check">✓</span> Your vault is protected with encryption</div>
     </div>
+
     <div class="hero-art" aria-label="Preview of the PassGram vault interface">
       <div class="art-glow"></div>
       <div class="vault-window">
@@ -337,228 +177,210 @@
     </div>
   </section>
 
-  <!-- Interactive Liquid Glass Pricing Section -->
-  <section id="pricing" class="section-wrap section-block pricing-section" style="text-align:center;">
-    <div class="section-title centered">
-      <div class="eyebrow">SIMPLE PLANS</div>
-      <h2>Choose Your Plan</h2>
-      <p>Experience total digital clarity with our liquid glass pricing models.</p>
+  <div class="platform-row">
+    <span>MADE FOR YOUR EVERYDAY</span>
+    <div><b>Android</b><i></i><b>Windows</b><i></i><b>Web</b></div>
+  </div>
+
+  <!-- Features Section -->
+  <section id="features" class="section-wrap section-block">
+    <div class="section-title">
+      <div class="eyebrow">LESS TO REMEMBER</div>
+      <h2>Everything important,<br>easy to reach.</h2>
+      <p>A clear home for the details you use every day, with security built into the experience.</p>
     </div>
-
-    <!-- Audience Toggle -->
-    <div class="sp-glass-toggle" role="group" aria-label="Individual or Family">
-      <span class="indicator" id="toggle-indicator"></span>
-      <button class="active" onclick="setAudience('individual', 0)">Individual</button>
-      <button onclick="setAudience('family', 140)">Family</button>
-    </div>
-
-    <!-- Billing Tabs -->
-    <div>
-      <div class="tab-list">
-        <button class="tab-btn active" onclick="setBilling('annual')">
-            Annually <span class="save-badge">SAVE 25%</span>
-        </button>
-        <button class="tab-btn" onclick="setBilling('monthly')">
-            Monthly
-        </button>
-      </div>
-    </div>
-
-    <!-- Pricing Cards -->
-    <div class="pricing-container">
-
-        <div class="glass-card" onclick="selectPlan('starter')">
-            <div style="font-size:20px; font-weight:700; margin-bottom:8px;" id="p1-title">Starter</div>
-            <div style="font-size:13px; color:rgba(254,254,254,0.45); margin-bottom:20px; min-height:36px;" id="p1-desc">Essential tools to get you started safely</div>
-            <div style="font-size:32px; font-weight:800; margin-bottom:4px;" id="p1-price">$0 <span style="font-size:14px; font-weight:400; color:rgba(254,254,254,0.45);">/ month</span></div>
-            <div style="font-size:13px; color:rgba(254,254,254,0.35); margin-bottom:24px;" id="p1-billed">Free forever</div>
-            <ul style="list-style:none; padding:0; text-align:left; margin-bottom:28px; display:flex; flex-direction:column; gap:12px;">
-                <li>✓ Basic digital access</li>
-                <li>✓ Secure glass storage</li>
-                <li>✓ Standard community support</li>
-            </ul>
-            <button class="button button-light" style="width:100%;">Get Started</button>
-        </div>
-
-        <div class="glass-card featured" onclick="selectPlan('pro')">
-            <div class="popular-badge">Most Popular</div>
-            <div style="font-size:20px; font-weight:700; margin-bottom:8px;" id="p2-title">Individual Pro</div>
-            <div style="font-size:13px; color:rgba(254,254,254,0.45); margin-bottom:20px; min-height:36px;" id="p2-desc">Advanced features for single power users</div>
-            <div style="font-size:32px; font-weight:800; margin-bottom:4px;" id="p2-price">$4.99 <span style="font-size:14px; font-weight:400; color:rgba(254,254,254,0.45);">/ month</span></div>
-            <div style="font-size:13px; color:rgba(254,254,254,0.35); margin-bottom:24px;" id="p2-billed">$59.88 billed annually</div>
-            <ul style="list-style:none; padding:0; text-align:left; margin-bottom:28px; display:flex; flex-direction:column; gap:12px;">
-                <li>✓ Full digital identity access</li>
-                <li>✓ Priority queue & fast service</li>
-                <li>✓ Advanced security tools</li>
-                <li>✓ 24/7 dedicated support</li>
-            </ul>
-            <button class="button button-dark" style="width:100%;">Choose Pro</button>
-        </div>
-
-        <div class="glass-card" onclick="selectPlan('family')">
-            <div style="font-size:20px; font-weight:700; margin-bottom:8px;" id="p3-title">Family Pass</div>
-            <div style="font-size:13px; color:rgba(254,254,254,0.45); margin-bottom:20px; min-height:36px;" id="p3-desc">Complete liquid coverage for your household</div>
-            <div style="font-size:32px; font-weight:800; margin-bottom:4px;" id="p3-price">$9.99 <span style="font-size:14px; font-weight:400; color:rgba(254,254,254,0.45);">/ month</span></div>
-            <div style="font-size:13px; color:rgba(254,254,254,0.35); margin-bottom:24px;" id="p3-billed">$119.88 billed annually</div>
-            <ul style="list-style:none; padding:0; text-align:left; margin-bottom:28px; display:flex; flex-direction:column; gap:12px;" id="p3-features">
-                <li>✓ Up to 5 family members</li>
-                <li>✓ Individual secure profiles</li>
-                <li>✓ Shared household dashboard</li>
-                <li>✓ Priority family support</li>
-            </ul>
-            <button class="button button-light" style="width:100%;">Choose Family</button>
-        </div>
+    <div class="feature-grid">
+      <article class="feature-card feature-blue">
+        <div class="feature-icon">▣</div>
+        <h3>Password vault</h3>
+        <p>Keep logins, notes and account details together. Find what you need without searching through old messages.</p>
+        <a href="https://web.zpas.org/login">Open your vault <span>↗</span></a>
+      </article>
+      <article class="feature-card feature-violet">
+        <div class="feature-icon">◉</div>
+        <h3>Authenticator</h3>
+        <p>Generate your sign-in codes in the same place you manage your accounts.</p>
+        <a href="/apps">See the apps <span>↗</span></a>
+      </article>
+      <article class="feature-card feature-mint">
+        <div class="feature-icon">⌁</div>
+        <h3>One account, more devices</h3>
+        <p>Use your PassGram account on Android, Windows and the web. Sign in at the official web app.</p>
+        <a href="https://web.zpas.org/login">Sign in to PassGram <span>↗</span></a>
+      </article>
     </div>
   </section>
 
-</main>
-
-<!-- Fixed Checkout Footer -->
-<div class="checkout-footer">
-    <div class="checkout-info">
-        <div class="plan-name" id="footer-plan">Individual Pro</div>
-        <div class="plan-cost" id="footer-cost">$59.88 <span>/ year</span> <span style="font-size:12px; color:rgba(254,254,254,0.45);" id="footer-billed">Billed annually</span></div>
+  <!-- Apps Band Section -->
+  <section class="apps-band">
+    <div class="section-wrap apps-layout">
+      <div>
+        <div class="eyebrow">YOUR DEVICES, YOUR CHOICE</div>
+        <h2>Take PassGram<br>where you are.</h2>
+        <p>Use the app that fits your day. Your web account is at <b>web.zpas.org</b>.</p>
+        <a class="button button-dark" href="/apps">View apps and downloads <span>↗</span></a>
+      </div>
+      <div class="device-cards">
+        <a class="device-card" href="/apps/android.html">
+          <span class="device-icon android">◉</span>
+          <span><b>Android</b><small>Get the Android app</small></span>
+          <span class="device-arrow">↗</span>
+        </a>
+        <a class="device-card" href="/apps/windows.html">
+          <span class="device-icon windows">⊞</span>
+          <span><b>Windows</b><small>Get the desktop app</small></span>
+          <span class="device-arrow">↗</span>
+        </a>
+        <a class="device-card" href="https://web.zpas.org/login">
+          <span class="device-icon web">◎</span>
+          <span><b>Web app</b><small>Sign in with your PassGram account</small></span>
+          <span class="device-arrow">↗</span>
+        </a>
+      </div>
     </div>
-    <button class="subscribe-btn" onclick="location.href='https://web.zpas.org/login'">Subscribe & Pay</button>
-</div>
+  </section>
+
+  <!-- API Panel Section -->
+  <section id="api" class="section-wrap api-panel">
+    <div class="api-copy">
+      <div class="eyebrow">FOR BUILDERS</div>
+      <h2>Build with PassGram.</h2>
+      <p>Explore the developer API and bot tools from one place. Bot creation and token management require the PassGram bot service to be enabled for your account.</p>
+      <a class="button button-white" href="/api">Explore the API <span>↗</span></a>
+    </div>
+    <div class="api-code">
+      <div class="code-top"><span></span><span></span><span></span><small>Bot API · preview</small></div>
+      <pre><code><i>POST</i> /bot&lt;token&gt;/sendMessage
+
+{
+  <em>"chat_id"</em>: "…",
+  <em>"text"</em>: "Hello from PassGram"
+}</code></pre>
+      <div class="api-status"><span></span> Developer documentation preview</div>
+    </div>
+  </section>
+
+  <!-- Pricing Section with Liquid Glass Cards (Plus & Pro) -->
+  <section id="pricing" class="section-wrap section-block pricing-section">
+    <div class="section-title centered">
+      <div class="eyebrow">SIMPLE PLANS</div>
+      <h2>Start free.<br>Choose more when you need it.</h2>
+      <p>Individual plans for your own account.</p>
+    </div>
+
+    <div class="glass-pricing-wrap">
+      <!-- Card 1: Free -->
+      <article class="glass-price-card">
+        <div class="glass-price-title">Free</div>
+        <div class="glass-price-desc">Start with the essential password and vault tools.</div>
+        <div class="glass-price-num">$0 <span>/ month</span></div>
+        <div class="glass-price-billed">Free forever</div>
+        <ul class="glass-features">
+          <li>Basic digital vault access</li>
+          <li>Encrypted glass storage</li>
+          <li>Standard community support</li>
+        </ul>
+        <a class="button button-light" href="https://web.zpas.org/login">Get started <span>↗</span></a>
+      </article>
+
+      <!-- Card 2: Plus ($4.99) -->
+      <article class="glass-price-card featured">
+        <div class="glass-badge">MOST POPULAR</div>
+        <div class="glass-price-title">Plus</div>
+        <div class="glass-price-desc">More room, cloud backup and priority features.</div>
+        <div class="glass-price-num">$4.99 <span>/ month</span></div>
+        <div class="glass-price-billed">$59.88 billed annually</div>
+        <ul class="glass-features">
+          <li>Full encrypted vault access</li>
+          <li>Real-time multi-device sync</li>
+          <li>Cloud backup & recovery</li>
+          <li>Priority fast customer service</li>
+        </ul>
+        <a class="button button-dark" href="/subscription.html">Choose Plus <span>↗</span></a>
+      </article>
+
+      <!-- Card 3: Pro ($9.00) -->
+      <article class="glass-price-card">
+        <div class="glass-price-title">Pro</div>
+        <div class="glass-price-desc">Advanced security & power tools for heavy users.</div>
+        <div class="glass-price-num">$9.00 <span>/ month</span></div>
+        <div class="glass-price-billed">$108.00 billed annually</div>
+        <ul class="glass-features">
+          <li>Unlimited vault storage & items</li>
+          <li>Advanced Passkey & 2FA tools</li>
+          <li>Dedicated 24/7 priority support</li>
+          <li>Developer API & Bot tokens</li>
+        </ul>
+        <a class="button button-light" href="/subscription.html">Choose Pro <span>↗</span></a>
+      </article>
+    </div>
+
+    <p class="stripe-note" style="margin-top:28px; text-align:center;"><span class="stripe-mark">S</span> Stripe checkout is enabled for web subscriptions.</p>
+  </section>
+
+  <!-- News Section -->
+  <section id="news" class="news-section">
+    <div class="section-wrap">
+      <div class="news-heading">
+        <div><div class="eyebrow">WHAT'S NEW</div><h2>Recent updates</h2></div>
+        <a href="/apps">All apps and releases <span>↗</span></a>
+      </div>
+      <div class="news-grid">
+        <article class="news-card">
+          <div class="news-meta"><span>ANDROID</span><span>VERSION 4.15</span></div>
+          <h3>A more connected PassGram</h3>
+          <p>Update the Android app to get the latest improvements and account features.</p>
+          <a href="/apps/android.html">Explore Android <span>↗</span></a>
+        </article>
+        <article class="news-card">
+          <div class="news-meta"><span>WINDOWS</span><span>VERSION 4.11</span></div>
+          <h3>Your desktop vault</h3>
+          <p>Keep your password vault close on your Windows PC.</p>
+          <a href="/apps/windows.html">Explore Windows <span>↗</span></a>
+        </article>
+        <article class="news-card news-card-dark">
+          <div class="news-meta"><span>WEB</span><span>NOW LIVE</span></div>
+          <h3>Your account, in the browser</h3>
+          <p>Sign in to the PassGram web app using the same account as the mobile app.</p>
+          <a href="https://web.zpas.org/login">Open web.zpas.org <span>↗</span></a>
+        </article>
+      </div>
+    </div>
+  </section>
+
+  <!-- FAQ Teaser -->
+  <section class="section-wrap faq-teaser">
+    <div>
+      <div class="eyebrow">NEED A HAND?</div>
+      <h2>Good questions.<br>Clear answers.</h2>
+      <p>Learn how PassGram works, where your account lives and how to get started.</p>
+    </div>
+    <a class="button button-light" href="/faq">Visit the FAQ <span>↗</span></a>
+  </section>
+</main>
 
 <footer class="site-footer">
   <div class="footer-main">
     <a class="brand" href="/"><span class="brand-mark">Z</span><span>PassGram</span></a>
     <p>Your digital life, in one private space.</p>
-    <nav><a href="/apps">Apps</a><a href="/api">API</a><a href="/faq">FAQ</a><a href="/privacy">Privacy</a></nav>
+    <nav>
+      <a href="/apps">Apps</a>
+      <a href="/api">API</a>
+      <a href="/faq">FAQ</a>
+      <a href="/privacy">Privacy</a>
+    </nav>
     <a class="footer-x" href="https://x.com/4rezan" target="_blank" rel="noopener noreferrer">𝕏 <span>Follow us on X</span> ↗</a>
   </div>
-  <div class="footer-bottom"><span>© 2026 PassGram</span><span>Designed for privacy. Made for everyday life.</span></div>
+  <div class="footer-bottom">
+    <span>© 2026 PassGram</span>
+    <span>Designed for privacy. Made for everyday life.</span>
+  </div>
 </footer>
 
 <script>
-    let currentAudience = 'individual';
-    let currentBilling = 'annual';
-    let selectedPlanKey = 'pro';
-
-    function setNavTab(btnElement, tabName) {
-        const container = document.getElementById('nav-container');
-        const indicator = document.getElementById('nav-indicator');
-        if (!container || !indicator) return;
-
-        const buttons = container.querySelectorAll('button');
-        buttons.forEach(b => b.classList.remove('active'));
-        btnElement.classList.add('active');
-
-        const btnRect = btnElement.getBoundingClientRect();
-        const containerRect = container.getBoundingClientRect();
-        const leftOffset = btnRect.left - containerRect.left;
-        const width = btnRect.width;
-
-        indicator.style.transform = `translateX(${leftOffset}px)`;
-        indicator.style.width = `${width}px`;
-    }
-
-    window.addEventListener('DOMContentLoaded', () => {
-        const firstBtn = document.querySelector('.nav-links-container button.active');
-        if (firstBtn) {
-            setNavTab(firstBtn, 'Features');
-        }
-    });
-
-    function setAudience(audience, translatePx) {
-        currentAudience = audience;
-        document.getElementById('toggle-indicator').style.transform = `translateX(${translatePx}px)`;
-        const buttons = document.querySelectorAll('.sp-glass-toggle button');
-        buttons.forEach(b => b.classList.remove('active'));
-        if (event && event.currentTarget) event.currentTarget.classList.add('active');
-        updateContent();
-    }
-
-    function setBilling(type) {
-        currentBilling = type;
-        document.querySelectorAll('.tab-list .tab-btn').forEach(b => b.classList.remove('active'));
-        if (event && event.currentTarget) event.currentTarget.classList.add('active');
-        updateContent();
-    }
-
-    function selectPlan(planKey) {
-        selectedPlanKey = planKey;
-        updateFooter();
-    }
-
-    function updateContent() {
-        if (currentAudience === 'individual') {
-            document.getElementById('p1-title').innerText = 'Starter';
-            document.getElementById('p2-title').innerText = 'Individual Pro';
-            document.getElementById('p3-title').innerText = 'Family Pass';
-
-            if (currentBilling === 'annual') {
-                document.getElementById('p1-price').innerHTML = '$0 <span style="font-size:14px; font-weight:400; color:rgba(254,254,254,0.45);">/ month</span>';
-                document.getElementById('p1-billed').innerText = 'Free forever';
-                document.getElementById('p2-price').innerHTML = '$4.99 <span style="font-size:14px; font-weight:400; color:rgba(254,254,254,0.45);">/ month</span>';
-                document.getElementById('p2-billed').innerText = '$59.88 billed annually';
-                document.getElementById('p3-price').innerHTML = '$9.99 <span style="font-size:14px; font-weight:400; color:rgba(254,254,254,0.45);">/ month</span>';
-                document.getElementById('p3-billed').innerText = '$119.88 billed annually';
-            } else {
-                document.getElementById('p1-price').innerHTML = '$0 <span style="font-size:14px; font-weight:400; color:rgba(254,254,254,0.45);">/ month</span>';
-                document.getElementById('p1-billed').innerText = 'Free forever';
-                document.getElementById('p2-price').innerHTML = '$6.99 <span style="font-size:14px; font-weight:400; color:rgba(254,254,254,0.45);">/ month</span>';
-                document.getElementById('p2-billed').innerText = 'Billed monthly';
-                document.getElementById('p3-price').innerHTML = '$12.99 <span style="font-size:14px; font-weight:400; color:rgba(254,254,254,0.45);">/ month</span>';
-                document.getElementById('p3-billed').innerText = 'Billed monthly';
-            }
-        } else {
-            document.getElementById('p1-title').innerText = 'Basic Team';
-            document.getElementById('p2-title').innerText = 'Business Standard';
-            document.getElementById('p3-title').innerText = 'Enterprise Team';
-
-            if (currentBilling === 'annual') {
-                document.getElementById('p1-price').innerHTML = '$9.00 <span style="font-size:14px; font-weight:400; color:rgba(254,254,254,0.45);">/ month</span>';
-                document.getElementById('p1-billed').innerText = '$108.00 billed annually';
-                document.getElementById('p2-price').innerHTML = '$14.99 <span style="font-size:14px; font-weight:400; color:rgba(254,254,254,0.45);">/ month</span>';
-                document.getElementById('p2-billed').innerText = '$179.88 billed annually per user';
-                document.getElementById('p3-price').innerHTML = '$29.99 <span style="font-size:14px; font-weight:400; color:rgba(254,254,254,0.45);">/ month</span>';
-                document.getElementById('p3-billed').innerText = '$359.88 billed annually per user';
-            } else {
-                document.getElementById('p1-price').innerHTML = '$11.00 <span style="font-size:14px; font-weight:400; color:rgba(254,254,254,0.45);">/ month</span>';
-                document.getElementById('p1-billed').innerText = 'Billed monthly';
-                document.getElementById('p2-price').innerHTML = '$19.99 <span style="font-size:14px; font-weight:400; color:rgba(254,254,254,0.45);">/ month</span>';
-                document.getElementById('p2-billed').innerText = 'Billed monthly';
-                document.getElementById('p3-price').innerHTML = '$34.99 <span style="font-size:14px; font-weight:400; color:rgba(254,254,254,0.45);">/ month</span>';
-                document.getElementById('p3-billed').innerText = 'Billed monthly';
-            }
-        }
-        updateFooter();
-    }
-
-    function updateFooter() {
-        let name = "";
-        let costHtml = "";
-        let billedText = "";
-
-        if (selectedPlanKey === 'starter') {
-            name = document.getElementById('p1-title').innerText;
-            costHtml = currentBilling === 'annual' ? '$0 <span>/ year</span>' : '$0 <span>/ month</span>';
-            billedText = 'Free forever';
-        } else if (selectedPlanKey === 'pro') {
-            name = document.getElementById('p2-title').innerText;
-            if (currentAudience === 'individual') {
-                costHtml = currentBilling === 'annual' ? '$59.88 <span>/ year</span>' : '$6.99 <span>/ month</span>';
-            } else {
-                costHtml = currentBilling === 'annual' ? '$179.88 <span>/ year</span>' : '$19.99 <span>/ month</span>';
-            }
-            billedText = currentBilling === 'annual' ? 'Billed annually' : 'Billed monthly';
-        } else if (selectedPlanKey === 'family') {
-            name = document.getElementById('p3-title').innerText;
-            if (currentAudience === 'individual') {
-                costHtml = currentBilling === 'annual' ? '$119.88 <span>/ year</span>' : '$12.99 <span>/ month</span>';
-            } else {
-                costHtml = currentBilling === 'annual' ? '$359.88 <span>/ year</span>' : '$34.99 <span>/ month</span>';
-            }
-            billedText = currentBilling === 'annual' ? 'Billed annually' : 'Billed monthly';
-        }
-
-        document.getElementById('footer-plan').innerText = name;
-        document.getElementById('footer-cost').innerHTML = costHtml;
-        document.getElementById('footer-billed').innerText = billedText;
-    }
+  const menu=document.querySelector('.menu-toggle'),nav=document.querySelector('.main-nav');
+  menu?.addEventListener('click',()=>{const open=menu.getAttribute('aria-expanded')!=='true';menu.setAttribute('aria-expanded',String(open));nav.classList.toggle('open',open)});
+  nav?.querySelectorAll('a').forEach(a=>a.addEventListener('click',()=>{menu?.setAttribute('aria-expanded','false');nav.classList.remove('open')}));
 </script>
 </body>
 </html>
