@@ -111,6 +111,51 @@
       color: #0088CC;
       font-weight: 800;
     }
+
+    /* Liquid Glass Pill Navbar */
+    .nav-links-container {
+      position: relative;
+      display: inline-flex;
+      align-items: center;
+      background: rgba(254, 254, 254, 0.04);
+      backdrop-filter: blur(20px);
+      -webkit-backdrop-filter: blur(20px);
+      border: 1px solid rgba(254, 254, 254, 0.08);
+      border-radius: 9999px;
+      padding: 3px 4px;
+      box-shadow: inset 0 2px 5px rgba(254, 254, 254, 0.05);
+    }
+    .nav-indicator {
+      position: absolute;
+      top: 3px;
+      bottom: 3px;
+      left: 4px;
+      width: 70px;
+      background: rgba(254, 254, 254, 0.12);
+      backdrop-filter: blur(16px);
+      border: 1px solid rgba(254, 254, 254, 0.2);
+      border-radius: 9999px;
+      transition: transform 0.35s cubic-bezier(0.4, 0, 0.2, 1), width 0.35s cubic-bezier(0.4, 0, 0.2, 1);
+      pointer-events: none;
+    }
+    .nav-pill-link {
+      position: relative;
+      z-index: 1;
+      background: transparent;
+      border: none;
+      color: rgba(254, 254, 254, 0.65);
+      font-size: 13px;
+      font-weight: 500;
+      padding: 8px 16px;
+      border-radius: 9999px;
+      text-decoration: none;
+      transition: color 0.3s ease;
+      white-space: nowrap;
+    }
+    .nav-pill-link:hover, .nav-pill-link.active {
+      color: #FEFEFE;
+      text-decoration: none;
+    }
   </style>
 
   <script>
@@ -133,8 +178,16 @@
 <header class="site-header">
   <a class="brand" href="/" aria-label="PassGram home"><span class="brand-mark">Z</span><span>PassGram</span></a>
   <button class="menu-toggle" type="button" aria-expanded="false" aria-controls="main-nav" aria-label="Open menu"><span></span><span></span></button>
-  <nav id="main-nav" class="main-nav">
-    <a href="/apps">Apps</a><a href="/api">API</a><a href="/faq">FAQ</a><a href="/safety">Safety</a><a href="/privacy">Privacy</a><a href="https://translations.zpas.org">Translations</a>
+  <nav id="main-nav" class="nav-links-container">
+    <span class="nav-indicator" id="header-nav-indicator"></span>
+    <a class="nav-pill-link active" href="#features" onclick="setNavTab(this)">Features</a>
+    <a class="nav-pill-link" href="#pricing" onclick="setNavTab(this)">Pricing</a>
+    <a class="nav-pill-link" href="/apps" onclick="setNavTab(this)">Apps</a>
+    <a class="nav-pill-link" href="/api" onclick="setNavTab(this)">API</a>
+    <a class="nav-pill-link" href="/faq" onclick="setNavTab(this)">FAQ</a>
+    <a class="nav-pill-link" href="/safety" onclick="setNavTab(this)">Safety</a>
+    <a class="nav-pill-link" href="/privacy" onclick="setNavTab(this)">Privacy</a>
+    <a class="nav-pill-link" href="https://translations.zpas.org" onclick="setNavTab(this)">Translations</a>
   </nav>
   <div class="header-actions">
     <a class="x-link" href="https://x.com/4rezan" target="_blank" rel="noopener noreferrer" aria-label="Follow PassGram on X">𝕏 <span>Follow on X</span></a>
@@ -378,6 +431,31 @@
 </footer>
 
 <script>
+  function setNavTab(el) {
+    const container = document.getElementById('main-nav');
+    const indicator = document.getElementById('header-nav-indicator');
+    if (!container || !indicator || !el) return;
+
+    const links = container.querySelectorAll('.nav-pill-link');
+    links.forEach(l => l.classList.remove('active'));
+    el.classList.add('active');
+
+    const btnRect = el.getBoundingClientRect();
+    const containerRect = container.getBoundingClientRect();
+    const leftOffset = btnRect.left - containerRect.left;
+    const width = btnRect.width;
+
+    indicator.style.transform = `translateX(${leftOffset}px)`;
+    indicator.style.width = `${width}px`;
+  }
+
+  window.addEventListener('DOMContentLoaded', () => {
+    const firstBtn = document.querySelector('.nav-links-container .nav-pill-link.active');
+    if (firstBtn) {
+      setNavTab(firstBtn);
+    }
+  });
+
   const menu=document.querySelector('.menu-toggle'),nav=document.querySelector('.main-nav');
   menu?.addEventListener('click',()=>{const open=menu.getAttribute('aria-expanded')!=='true';menu.setAttribute('aria-expanded',String(open));nav.classList.toggle('open',open)});
   nav?.querySelectorAll('a').forEach(a=>a.addEventListener('click',()=>{menu?.setAttribute('aria-expanded','false');nav.classList.remove('open')}));
