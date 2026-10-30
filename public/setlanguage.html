@@ -1,0 +1,176 @@
+<!doctype html>
+<html lang="tr">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
+  <title>Change Language - Z Pass Translations</title>
+  <link rel="icon" type="image/png" href="/resources/assets/app-logo/zpass.png">
+  <style>
+    :root {
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+      --bg-color: #72b27b;
+      --card-bg: #ffffff;
+      --text-primary: #000000;
+      --text-muted: #707579;
+      --accent-blue: #3390ec;
+      --accent-red: #e53935;
+    }
+    body.dark {
+      --bg-color: #0f1721;
+      --card-bg: #1c2733;
+      --text-primary: #ffffff;
+      --text-muted: #aaaaaa;
+    }
+    * { box-sizing: border-box; }
+    body {
+      margin: 0;
+      min-height: 100dvh;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      background-color: var(--bg-color);
+      background-image: url("/img/pattern-9.svg");
+      background-repeat: repeat;
+      background-position: center;
+      background-size: 480px auto;
+      color: var(--text-primary);
+      padding: 20px;
+    }
+    .dialog-card {
+      width: min(100%, 400px);
+      padding: 32px 28px;
+      background: var(--card-bg);
+      border-radius: 24px;
+      box-shadow: 0 12px 40px rgba(0, 0, 0, 0.16);
+      text-align: left;
+    }
+    .dialog-title {
+      margin: 0 0 14px;
+      font-size: 20px;
+      font-weight: 700;
+      letter-spacing: -0.3px;
+    }
+    .dialog-desc {
+      font-size: 15px;
+      line-height: 1.5;
+      color: var(--text-primary);
+      margin-bottom: 20px;
+    }
+    .progress-box {
+      margin-bottom: 24px;
+    }
+    .progress-label {
+      display: flex;
+      justify-content: space-between;
+      font-size: 13px;
+      color: var(--text-muted);
+      margin-bottom: 6px;
+    }
+    .progress-val {
+      font-weight: 700;
+      color: var(--accent-blue);
+    }
+    .progress-bar-bg {
+      width: 100%;
+      height: 6px;
+      border-radius: 3px;
+      background: rgba(51, 144, 236, 0.18);
+      overflow: hidden;
+    }
+    .progress-bar-fill {
+      height: 100%;
+      background: var(--accent-blue);
+      border-radius: 3px;
+      transition: width 0.4s ease;
+    }
+    .dialog-actions {
+      display: flex;
+      justify-content: flex-end;
+      gap: 12px;
+    }
+    .btn {
+      padding: 10px 20px;
+      border-radius: 12px;
+      font-size: 14px;
+      font-weight: 700;
+      cursor: pointer;
+      border: none;
+      letter-spacing: 0.5px;
+      text-transform: uppercase;
+    }
+    .btn-cancel {
+      background: transparent;
+      color: var(--accent-red);
+    }
+    .btn-cancel:hover {
+      background: rgba(229, 57, 53, 0.08);
+    }
+    .btn-change {
+      background: var(--accent-blue);
+      color: #ffffff;
+    }
+    .btn-change:hover {
+      background: #287cd8;
+    }
+  </style>
+</head>
+<body>
+  <div class="dialog-card">
+    <h2 class="dialog-title" id="title">Change Language?</h2>
+    <p class="dialog-desc" id="desc">Do you want to change your language to <b id="lang-name">English</b>?</p>
+
+    <div class="progress-box">
+      <div class="progress-label">
+        <span>Translation progress</span>
+        <span class="progress-val" id="progress-text">100%</span>
+      </div>
+      <div class="progress-bar-bg">
+        <div class="progress-bar-fill" id="progress-bar" style="width: 100%;"></div>
+      </div>
+    </div>
+
+    <div class="dialog-actions">
+      <button class="btn btn-cancel" id="btn-cancel" type="button">CANCEL</button>
+      <button class="btn btn-change" id="btn-change" type="button">CHANGE</button>
+    </div>
+  </div>
+
+  <script>
+    const languages = {
+      en: { name: 'English', percent: 100 },
+      tr: { name: 'Türkçe', percent: 100 },
+      de: { name: 'Deutsch', percent: 95 },
+      fr: { name: 'Français', percent: 95 },
+      es: { name: 'Español', percent: 92 },
+      ku: { name: 'Kurdî (Kurmancî)', percent: 85 },
+      ar: { name: 'العربية', percent: 95 },
+      ru: { name: 'Русский', percent: 95 },
+      fa: { name: 'فارسی', percent: 90 },
+      it: { name: 'Italiano', percent: 90 },
+      nl: { name: 'Nederlands', percent: 90 },
+      pt: { name: 'Português', percent: 90 }
+    };
+
+    const pathSegments = location.pathname.split('/').filter(Boolean);
+    const codeFromPath = pathSegments.length >= 2 ? pathSegments[1].toLowerCase() : 'en';
+    const lang = languages[codeFromPath] || { name: codeFromPath.toUpperCase(), percent: 75 };
+
+    document.getElementById('lang-name').textContent = lang.name;
+    document.getElementById('progress-text').textContent = lang.percent + '%';
+    document.getElementById('progress-bar').style.width = lang.percent + '%';
+
+    document.getElementById('btn-cancel').onclick = () => {
+      location.href = '/translations';
+    };
+
+    document.getElementById('btn-change').onclick = () => {
+      localStorage.setItem('zpass-lang', codeFromPath);
+      // Trigger deep link for Z Pass Android App
+      location.href = 'zpass://setlanguage?lang=' + codeFromPath;
+      setTimeout(() => {
+        location.href = '/translations';
+      }, 1200);
+    };
+  </script>
+</body>
+</html>

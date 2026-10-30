@@ -1,0 +1,345 @@
+<!doctype html>
+<html lang="tr">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
+  <title>Translations Platform - Z Pass</title>
+  <link rel="icon" type="image/png" href="/resources/assets/app-logo/zpass.png">
+  <style>
+    :root {
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+      --bg: #f4f6f9;
+      --card-bg: #ffffff;
+      --text-main: #222222;
+      --text-muted: #707579;
+      --accent: #3390ec;
+      --border: #e6ebf2;
+    }
+    * { box-sizing: border-box; }
+    body {
+      margin: 0;
+      background: var(--bg);
+      color: var(--text-main);
+      line-height: 1.6;
+    }
+    header {
+      height: 60px;
+      background: #ffffff;
+      border-bottom: 1px solid var(--border);
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 0 24px;
+      position: sticky;
+      top: 0;
+      z-index: 100;
+    }
+    .brand {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      font-size: 17px;
+      font-weight: 700;
+      color: var(--text-main);
+      text-decoration: none;
+    }
+    .brand-logo {
+      width: 32px;
+      height: 32px;
+      background: var(--accent);
+      color: white;
+      border-radius: 8px;
+      display: grid;
+      place-items: center;
+      font-weight: 800;
+    }
+    .search-box {
+      width: clamp(200px, 40vw, 420px);
+      position: relative;
+    }
+    .search-input {
+      width: 100%;
+      height: 38px;
+      padding: 0 14px 0 38px;
+      border-radius: 20px;
+      border: 1px solid var(--border);
+      background: #f1f3f6;
+      font-size: 14px;
+      outline: none;
+    }
+    .search-icon {
+      position: absolute;
+      left: 14px;
+      top: 50%;
+      transform: translateY(-50%);
+      color: var(--text-muted);
+    }
+    main {
+      max-width: 1100px;
+      margin: 32px auto;
+      padding: 0 20px;
+    }
+    .hero {
+      background: #ffffff;
+      border: 1px solid var(--border);
+      border-radius: 20px;
+      padding: 38px clamp(20px, 5vw, 48px);
+      margin-bottom: 32px;
+    }
+    .hero h1 {
+      margin: 0 0 12px;
+      font-size: 28px;
+      font-weight: 800;
+      letter-spacing: -0.5px;
+    }
+    .hero p {
+      margin: 0 0 24px;
+      font-size: 16px;
+      color: var(--text-muted);
+      max-width: 780px;
+    }
+    .btn-primary {
+      display: inline-flex;
+      align-items: center;
+      padding: 12px 28px;
+      background: var(--accent);
+      color: #ffffff;
+      font-weight: 700;
+      border-radius: 12px;
+      text-decoration: none;
+      font-size: 15px;
+      transition: background 0.2s;
+    }
+    .btn-primary:hover { background: #287cd8; }
+
+    .section-title {
+      font-size: 20px;
+      font-weight: 700;
+      margin: 32px 0 16px;
+    }
+    .platforms-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(130px, 1fr));
+      gap: 16px;
+      margin-bottom: 32px;
+    }
+    .platform-card {
+      background: #ffffff;
+      border: 1px solid var(--border);
+      border-radius: 16px;
+      padding: 20px 12px;
+      text-align: center;
+      text-decoration: none;
+      color: var(--text-main);
+      font-weight: 700;
+      font-size: 13px;
+      transition: transform 0.15s, box-shadow 0.15s;
+    }
+    .platform-card:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 6px 18px rgba(0, 0, 0, 0.06);
+    }
+    .platform-icon {
+      width: 48px;
+      height: 48px;
+      border-radius: 50%;
+      background: var(--accent);
+      color: white;
+      display: grid;
+      place-items: center;
+      margin: 0 auto 12px;
+      font-size: 22px;
+    }
+    .sections-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+      gap: 16px;
+      margin-bottom: 40px;
+    }
+    .sec-card {
+      background: #ffffff;
+      border: 1px solid var(--border);
+      border-radius: 16px;
+      padding: 20px;
+      text-decoration: none;
+      color: var(--text-main);
+      transition: border-color 0.2s;
+    }
+    .sec-card:hover { border-color: var(--accent); }
+    .sec-card b { display: block; font-size: 14px; text-transform: uppercase; margin-bottom: 4px; }
+    .sec-card small { color: var(--text-muted); font-size: 12px; }
+
+    .languages-card {
+      background: #ffffff;
+      border: 1px solid var(--border);
+      border-radius: 20px;
+      padding: 28px;
+      margin-bottom: 40px;
+    }
+    .lang-row {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 12px 0;
+      border-bottom: 1px solid var(--border);
+      text-decoration: none;
+      color: var(--text-main);
+    }
+    .lang-row:last-child { border-bottom: none; }
+    .lang-name { font-weight: 600; font-size: 15px; }
+    .lang-meta { display: flex; align-items: center; gap: 16px; }
+    .lang-percent { font-weight: 700; color: var(--accent); font-size: 14px; }
+    .btn-setlang {
+      padding: 6px 14px;
+      border-radius: 8px;
+      background: rgba(51, 144, 236, 0.1);
+      color: var(--accent);
+      font-size: 12px;
+      font-weight: 700;
+      text-decoration: none;
+    }
+
+    .style-guide {
+      background: #ffffff;
+      border: 1px solid var(--border);
+      border-radius: 20px;
+      padding: 36px;
+      margin-bottom: 40px;
+    }
+    .style-guide h2 { margin-top: 0; font-size: 22px; font-weight: 800; }
+    .guide-rule { margin-bottom: 20px; }
+    .guide-rule h3 { margin: 0 0 6px; font-size: 16px; font-weight: 700; color: var(--accent); }
+    .guide-rule p { margin: 0; color: var(--text-muted); font-size: 14px; }
+
+    .share-box {
+      background: #eef5fc;
+      border-radius: 16px;
+      padding: 20px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 16px;
+      margin-bottom: 32px;
+    }
+    .share-link { font-family: monospace; font-size: 14px; font-weight: 600; color: var(--accent); }
+    .btn-copy {
+      padding: 8px 18px;
+      background: var(--accent);
+      color: white;
+      border-radius: 8px;
+      border: none;
+      font-weight: 700;
+      cursor: pointer;
+    }
+  </style>
+</head>
+<body>
+  <header>
+    <a href="/translations" class="brand"><div class="brand-logo">Z</div><span>Translations Platform</span></a>
+    <div class="search-box">
+      <span class="search-icon">⌕</span>
+      <input type="text" class="search-input" placeholder="Search translations and keys…">
+    </div>
+  </header>
+
+  <main>
+    <section class="hero">
+      <h1>Translating Z Pass</h1>
+      <p>We work hard to make Z Pass's translations smooth and natural across all platforms. If you're a linguist, translator, or community language geek and want to help us reach perfection, you've come to the right place.</p>
+      <a href="#languages" class="btn-primary">Start Translating</a>
+    </section>
+
+    <div class="share-box">
+      <div>
+        <small style="color:var(--text-muted); display:block;">Sharing Link for Community Languages</small>
+        <span class="share-link" id="share-url">https://zpas.org/setlanguage/ku</span>
+      </div>
+      <button class="btn-copy" onclick="navigator.clipboard.writeText('https://zpas.org/setlanguage/ku'); alert('Link copied!');">Copy Link</button>
+    </div>
+
+    <h2 class="section-title">Official Platforms</h2>
+    <div class="platforms-grid">
+      <a href="#" class="platform-card"><div class="platform-icon">🤖</div><span>ANDROID</span></a>
+      <a href="#" class="platform-card"><div class="platform-icon">🍎</div><span>IOS</span></a>
+      <a href="#" class="platform-card"><div class="platform-icon">💻</div><span>TDESKTOP</span></a>
+      <a href="#" class="platform-card"><div class="platform-icon">🖥️</div><span>MACOS</span></a>
+      <a href="#" class="platform-card"><div class="platform-icon">⚡</div><span>ANDROID X</span></a>
+      <a href="#" class="platform-card"><div class="platform-icon">🌐</div><span>WEBK</span></a>
+    </div>
+
+    <h2 class="section-title">App Sections</h2>
+    <div class="sections-grid">
+      <a href="#" class="sec-card"><b>LOG IN</b><small>181 phrases</small></a>
+      <a href="#" class="sec-card"><b>CHAT LIST</b><small>365 phrases</small></a>
+      <a href="#" class="sec-card"><b>PRIVATE CHATS</b><small>670 phrases</small></a>
+      <a href="#" class="sec-card"><b>GROUPS AND CHANNELS</b><small>1914 phrases</small></a>
+      <a href="#" class="sec-card"><b>PROFILE</b><small>492 phrases</small></a>
+      <a href="#" class="sec-card"><b>SETTINGS</b><small>1548 phrases</small></a>
+      <a href="#" class="sec-card"><b>STORIES</b><small>536 phrases</small></a>
+      <a href="#" class="sec-card"><b>CAMERA AND MEDIA</b><small>222 phrases</small></a>
+      <a href="#" class="sec-card"><b>BOTS AND PAYMENTS</b><small>438 phrases</small></a>
+      <a href="#" class="sec-card"><b>GENERAL</b><small>2957 phrases</small></a>
+    </div>
+
+    <h2 class="section-title" id="languages">Community Languages</h2>
+    <div class="languages-card">
+      <div class="lang-row">
+        <span class="lang-name">English (English)</span>
+        <div class="lang-meta"><span class="lang-percent">100%</span><a href="/setlanguage/en" class="btn-setlang">Use in Z Pass</a></div>
+      </div>
+      <div class="lang-row">
+        <span class="lang-name">Türkçe (Turkish)</span>
+        <div class="lang-meta"><span class="lang-percent">100%</span><a href="/setlanguage/tr" class="btn-setlang">Use in Z Pass</a></div>
+      </div>
+      <div class="lang-row">
+        <span class="lang-name">Kurdî (Kurmancî - Kurdish)</span>
+        <div class="lang-meta"><span class="lang-percent">85%</span><a href="/setlanguage/ku" class="btn-setlang">Use in Z Pass</a></div>
+      </div>
+      <div class="lang-row">
+        <span class="lang-name">Deutsch (German)</span>
+        <div class="lang-meta"><span class="lang-percent">95%</span><a href="/setlanguage/de" class="btn-setlang">Use in Z Pass</a></div>
+      </div>
+      <div class="lang-row">
+        <span class="lang-name">Français (French)</span>
+        <div class="lang-meta"><span class="lang-percent">95%</span><a href="/setlanguage/fr" class="btn-setlang">Use in Z Pass</a></div>
+      </div>
+      <div class="lang-row">
+        <span class="lang-name">Español (Spanish)</span>
+        <div class="lang-meta"><span class="lang-percent">92%</span><a href="/setlanguage/es" class="btn-setlang">Use in Z Pass</a></div>
+      </div>
+      <div class="lang-row">
+        <span class="lang-name">العربية (Arabic)</span>
+        <div class="lang-meta"><span class="lang-percent">95%</span><a href="/setlanguage/ar" class="btn-setlang">Use in Z Pass</a></div>
+      </div>
+      <div class="lang-row">
+        <span class="lang-name">فارسی (Persian)</span>
+        <div class="lang-meta"><span class="lang-percent">90%</span><a href="/setlanguage/fa" class="btn-setlang">Use in Z Pass</a></div>
+      </div>
+    </div>
+
+    <section class="style-guide">
+      <h2>Style Guide for Translators</h2>
+      <div class="guide-rule">
+        <h3>1. Consistent</h3>
+        <p>The same features need to have the same names everywhere across Android, iOS, Windows, and macOS.</p>
+      </div>
+      <div class="guide-rule">
+        <h3>2. Natural</h3>
+        <p>Stick to what makes sense in your own language rather than literal English translations.</p>
+      </div>
+      <div class="guide-rule">
+        <h3>3. Default</h3>
+        <p>Use familiar terms people are used to seeing in relevant mobile context.</p>
+      </div>
+      <div class="guide-rule">
+        <h3>4. Beautiful</h3>
+        <p>Respect grammar, style, and typography. Make the app look as if it was natively built in your region.</p>
+      </div>
+      <div class="guide-rule">
+        <h3>5. And it MUST FIT</h3>
+        <p>Check in-app after editing. Text must fit into its allotted space without being cut off.</p>
+      </div>
+    </section>
+  </main>
+</body>
+</html>

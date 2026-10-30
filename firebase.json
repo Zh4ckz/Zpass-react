@@ -59,9 +59,26 @@
         "source": "/aliases.html",
         "destination": "/aliases",
         "type": 301
+      },
+      {
+        "source": "/translations.html",
+        "destination": "/translations",
+        "type": 301
       }
     ],
     "rewrites": [
+      {
+        "source": "/translations",
+        "destination": "/translations.html"
+      },
+      {
+        "source": "/setlanguage",
+        "destination": "/setlanguage.html"
+      },
+      {
+        "source": "/setlanguage/**",
+        "destination": "/setlanguage.html"
+      },
       {
         "source": "/faq",
         "destination": "/faq.html"
