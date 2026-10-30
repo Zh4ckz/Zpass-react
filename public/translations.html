@@ -145,11 +145,11 @@
 
                 <!-- Filter: Language -->
                 <span class="tr-search-filter-wrap tr-search-filter-lang">
-                  <span class="tr-search-filter dropdown-toggle" data-toggle="dropdown" id="filter-lang-label">Turkish</span>
+                  <span class="tr-search-filter dropdown-toggle" data-toggle="dropdown" id="filter-lang-label">English</span>
                   <span class="dropdown-menu">
                     <ul class="dropdown-menu" id="filter-lang-dropdown">
-                      <li><a class="tr-search-filter-item" onclick="navigateLang('en', 'English')">English</a></li>
-                      <li class="selected"><a class="tr-search-filter-item" onclick="navigateLang('tr', 'Turkish')">Turkish</a></li>
+                      <li class="selected"><a class="tr-search-filter-item" onclick="navigateLang('en', 'English')">English</a></li>
+                      <li><a class="tr-search-filter-item" onclick="navigateLang('tr', 'Turkish')">Turkish</a></li>
                       <li><a class="tr-search-filter-item" onclick="navigateLang('ku', 'Kurdî')">Kurdî</a></li>
                       <li><a class="tr-search-filter-item" onclick="navigateLang('de', 'German')">German</a></li>
                       <li><a class="tr-search-filter-item" onclick="navigateLang('fr', 'French')">French</a></li>
@@ -161,11 +161,11 @@
 
                 <!-- Filter: Apps -->
                 <span class="tr-search-filter-wrap tr-search-filter-langpack">
-                  <span class="tr-search-filter dropdown-toggle" data-toggle="dropdown" id="filter-app-label">All Apps</span>
+                  <span class="tr-search-filter dropdown-toggle" data-toggle="dropdown" id="filter-app-label">Android</span>
                   <span class="dropdown-menu">
                     <ul class="dropdown-menu">
-                      <li class="selected"><a class="tr-search-filter-item" onclick="setApp('All Apps')">All Apps</a></li>
-                      <li><a class="tr-search-filter-item" onclick="setApp('Android')">Android</a></li>
+                      <li><a class="tr-search-filter-item" onclick="setApp('All Apps')">All Apps</a></li>
+                      <li class="selected"><a class="tr-search-filter-item" onclick="setApp('Android')">Android</a></li>
                       <li><a class="tr-search-filter-item" onclick="setApp('iOS')">iOS</a></li>
                       <li><a class="tr-search-filter-item" onclick="setApp('TDesktop')">TDesktop</a></li>
                       <li><a class="tr-search-filter-item" onclick="setApp('macOS')">macOS</a></li>
@@ -190,7 +190,7 @@
               <div class="header-breadcrumb header-breadcrumb-simple">
                 <ol id="breadcrumb" class="header-nav breadcrumb">
                   <li><a href="/">Translations</a></li>
-                  <li class="active" id="crumb-active">Home</li>
+                  <li class="active" id="crumb-active">English</li>
                 </ol>
               </div>
             </div>
@@ -209,7 +209,7 @@
               <div class="tr-menu-header-label">Languages</div>
             </div>
             <ul class="tr-menu-items" id="tr-menu-language-items">
-              <li><a class="tr-menu-item" href="/en/"><span class="nav-label">English</span></a></li>
+              <li class="active" id="side-en"><a class="tr-menu-item" href="/en/"><span class="nav-label">English</span></a></li>
               <li id="side-tr"><a class="tr-menu-item" href="/tr/"><span class="nav-label">Turkish</span></a></li>
               <li id="side-ku"><a class="tr-menu-item" href="/ku/"><span class="nav-label">Kurdî</span></a></li>
               <li id="side-de"><a class="tr-menu-item" href="/de/"><span class="nav-label">German</span></a></li>
@@ -222,11 +222,33 @@
               <div class="tr-menu-header-label">Apps</div>
             </div>
             <ul class="tr-menu-items">
-              <li><a class="tr-menu-item" href="/tr/android/"><span class="nav-label">Android</span></a></li>
-              <li><a class="tr-menu-item" href="/tr/ios/"><span class="nav-label">iOS</span></a></li>
-              <li><a class="tr-menu-item" href="/tr/tdesktop/"><span class="nav-label">TDesktop</span></a></li>
-              <li><a class="tr-menu-item" href="/tr/macos/"><span class="nav-label">macOS</span></a></li>
-              <li><a class="tr-menu-item" href="/tr/webk/"><span class="nav-label">WebK</span></a></li>
+              <li class="active"><a class="tr-menu-item" href="/en/android/"><span class="nav-label">Android</span></a></li>
+              <li><a class="tr-menu-item" href="/en/ios/"><span class="nav-label">iOS</span></a></li>
+              <li><a class="tr-menu-item" href="/en/tdesktop/"><span class="nav-label">TDesktop</span></a></li>
+              <li><a class="tr-menu-item" href="/en/macos/"><span class="nav-label">macOS</span></a></li>
+              <li><a class="tr-menu-item" href="/en/webk/"><span class="nav-label">WebK</span></a></li>
+            </ul>
+          </div>
+
+          <div class="tr-menu-section" data-menu-section-id="2" id="side-sections-group" hidden>
+            <div class="tr-menu-header">
+              <div class="tr-menu-header-label">Sections</div>
+            </div>
+            <ul class="tr-menu-items">
+              <li class="active"><a class="tr-menu-item" href="/en/android/"><span class="nav-label">All Sections</span></a></li>
+              <li><a class="tr-menu-item" href="/en/android/unused/"><span class="nav-label">Unused</span></a></li>
+              <li><a class="tr-menu-item" href="/en/android/login/"><span class="nav-label">Log In</span></a></li>
+              <li><a class="tr-menu-item" href="/en/android/chat_list/"><span class="nav-label">Chat List</span></a></li>
+              <li><a class="tr-menu-item" href="/en/android/private_chats/"><span class="nav-label">Private chats</span></a></li>
+              <li><a class="tr-menu-item" href="/en/android/groups_and_channels/"><span class="nav-label">Groups And Channels</span></a></li>
+              <li><a class="tr-menu-item" href="/en/android/profile/"><span class="nav-label">Profile</span></a></li>
+              <li><a class="tr-menu-item" href="/en/android/settings/"><span class="nav-label">Settings</span></a></li>
+              <li><a class="tr-menu-item" href="/en/android/stories/"><span class="nav-label">Stories</span></a></li>
+              <li><a class="tr-menu-item" href="/en/android/camera_and_media/"><span class="nav-label">Camera And Media</span></a></li>
+              <li><a class="tr-menu-item" href="/en/android/bots_and_payments/"><span class="nav-label">Bots And Payments</span></a></li>
+              <li><a class="tr-menu-item" href="/en/android/passport/"><span class="nav-label">Passport</span></a></li>
+              <li><a class="tr-menu-item" href="/en/android/general/"><span class="nav-label">General</span></a></li>
+              <li><a class="tr-menu-item" href="/en/android/unsorted/"><span class="nav-label">Unsorted</span></a></li>
             </ul>
           </div>
         </nav>
@@ -236,7 +258,7 @@
           <section class="tr-content">
 
             <!-- VIEW 1: ROOT LANDING VIEW (https://translations.zpas.org/) -->
-            <div id="dev_page_content_wrap" class="view-panel">
+            <div id="dev_page_content_wrap" class="view-panel" hidden>
               <h1 id="dev_page_title">Translating Z Pass</h1>
 
               <div id="dev_page_content">
@@ -270,12 +292,12 @@
               </div>
             </div>
 
-            <!-- VIEW 2: LANGUAGE OVERVIEW VIEW (/tr/, /ku/, /de/...) -->
+            <!-- VIEW 2: LANGUAGE OVERVIEW VIEW (/en/, /tr/, /ku/...) -->
             <div id="lang_overview_panel" class="view-panel" hidden>
               <div class="mobile-view-skip">
                 <h3 class="tr-header">
-                  <span class="tr-label-max-width" id="header-lang-name">Turkish</span>
-                  <span class="tr-lang-native-name">(<span dir="auto" id="header-lang-native">Türkçe</span>)</span>
+                  <span class="tr-label-max-width" id="header-lang-name">English</span>
+                  <span class="tr-lang-native-name">(<span dir="auto" id="header-lang-native">English</span>)</span>
                   <div class="tr-header-tabs">
                     <span class="tr-header-tab active"><a href="#">Translations</a></span>
                     <span class="tr-header-tab"><a href="#">Suggestions</a></span>
@@ -285,11 +307,11 @@
 
                 <!-- Platform Section Circles -->
                 <section class="tr-section-rows clearfix">
-                  <div class="tr-section-row"><div class="tr-section-wrap"><a href="#" onclick="openSampleKey('tr'); return false;" class="tr-section"><div class="tr-section-circle circle_android"></div><div class="tr-section-caption">Android</div></a></div></div>
-                  <div class="tr-section-row"><div class="tr-section-wrap"><a href="#" onclick="openSampleKey('tr'); return false;" class="tr-section"><div class="tr-section-circle circle_ios"></div><div class="tr-section-caption">iOS</div></a></div></div>
-                  <div class="tr-section-row"><div class="tr-section-wrap"><a href="#" onclick="openSampleKey('tr'); return false;" class="tr-section"><div class="tr-section-circle circle_tdesktop"></div><div class="tr-section-caption">TDesktop</div></a></div></div>
-                  <div class="tr-section-row"><div class="tr-section-wrap"><a href="#" onclick="openSampleKey('tr'); return false;" class="tr-section"><div class="tr-section-circle circle_macos"></div><div class="tr-section-caption">macOS</div></a></div></div>
-                  <div class="tr-section-row"><div class="tr-section-wrap"><a href="#" onclick="openSampleKey('tr'); return false;" class="tr-section"><div class="tr-section-circle circle_webk"></div><div class="tr-section-caption">WebK</div></a></div></div>
+                  <div class="tr-section-row"><div class="tr-section-wrap"><a href="/en/android/" onclick="openAppSections('en', 'android'); return false;" class="tr-section"><div class="tr-section-circle circle_android"></div><div class="tr-section-caption">Android</div></a></div></div>
+                  <div class="tr-section-row"><div class="tr-section-wrap"><a href="/en/ios/" onclick="openAppSections('en', 'ios'); return false;" class="tr-section"><div class="tr-section-circle circle_ios"></div><div class="tr-section-caption">iOS</div></a></div></div>
+                  <div class="tr-section-row"><div class="tr-section-wrap"><a href="/en/tdesktop/" onclick="openAppSections('en', 'tdesktop'); return false;" class="tr-section"><div class="tr-section-circle circle_tdesktop"></div><div class="tr-section-caption">TDesktop</div></a></div></div>
+                  <div class="tr-section-row"><div class="tr-section-wrap"><a href="/en/macos/" onclick="openAppSections('en', 'macos'); return false;" class="tr-section"><div class="tr-section-circle circle_macos"></div><div class="tr-section-caption">macOS</div></a></div></div>
+                  <div class="tr-section-row"><div class="tr-section-wrap"><a href="/en/webk/" onclick="openAppSections('en', 'webk'); return false;" class="tr-section"><div class="tr-section-circle circle_webk"></div><div class="tr-section-caption">WebK</div></a></div></div>
                 </section>
 
                 <section class="tr-section-block">
@@ -299,9 +321,9 @@
 
                 <section class="tr-section-block">
                   <h4 class="tr-subheader">Sharing Link <span class="tr-badge">NEW</span></h4>
-                  <p>Anyone can switch their Z Pass interface to <b id="share-lang-title">Turkish</b> by following this link:</p>
+                  <p>Anyone can switch their Z Pass interface to <b id="share-lang-title">English</b> by following this link:</p>
                   <div class="tr-share-link-wrap">
-                    <input type="text" class="tr-share-link" id="share-input-val" value="https://zpas.org/setlanguage/tr" readonly>
+                    <input type="text" class="tr-share-link" id="share-input-val" value="https://zpas.org/setlanguage/en" readonly>
                     <button class="btn-copy-link" onclick="copyLink()">Copy Link</button>
                   </div>
                 </section>
@@ -310,8 +332,8 @@
                   <h4 class="tr-subheader">Actions</h4>
                   <div class="tr-actions">
                     <div class="tr-action">
-                      <a class="tr-action-item action-share" id="use-action-btn" href="https://zpas.org/setlanguage/tr">
-                        <span class="tr-action-label">Use Z Pass in Turkish</span>
+                      <a class="tr-action-item action-share" id="use-action-btn" href="https://zpas.org/setlanguage/en">
+                        <span class="tr-action-label">Use Z Pass in English</span>
                       </a>
                     </div>
                   </div>
@@ -319,7 +341,95 @@
               </div>
             </div>
 
-            <!-- VIEW 3: KEY EDITOR VIEW (/tr/android/unsorted/KeyName) -->
+            <!-- VIEW 3: APP SECTIONS GRID VIEW (/en/android/, /tr/android/...) -->
+            <div id="app_sections_panel" class="view-panel" hidden>
+              <h3 class="tr-header">
+                <a href="#" onclick="history.back(); return false;" class="tr-back"></a>
+                <span id="app-sections-title">Android</span> <span class="tr-header-counter">11670</span>
+                <div class="tr-header-tabs">
+                  <span class="tr-header-tab active"><a href="#">Translations</a></span>
+                  <span class="tr-header-tab"><a href="#">Suggestions</a></span>
+                  <span class="tr-header-tab"><a href="#">Comments</a></span>
+                </div>
+              </h3>
+
+              <section class="tr-sections clearfix">
+                <div class="tr-section-col col-lg-4 col-xs-6">
+                  <div class="tr-section-wrap"><a href="/en/android/login/" onclick="openSampleKey('en'); return false;" class="tr-section">
+                    <div class="tr-section-cover cover2"></div>
+                    <div class="tr-section-caption">Log In (181)</div>
+                  </a></div>
+                </div>
+                <div class="tr-section-col col-lg-4 col-xs-6">
+                  <div class="tr-section-wrap"><a href="/en/android/chat_list/" onclick="openSampleKey('en'); return false;" class="tr-section">
+                    <div class="tr-section-cover cover3"></div>
+                    <div class="tr-section-caption">Chat List (365)</div>
+                  </a></div>
+                </div>
+                <div class="tr-section-col col-lg-4 col-xs-6">
+                  <div class="tr-section-wrap"><a href="/en/android/private_chats/" onclick="openSampleKey('en'); return false;" class="tr-section">
+                    <div class="tr-section-cover cover4"></div>
+                    <div class="tr-section-caption">Private chats (670)</div>
+                  </a></div>
+                </div>
+                <div class="tr-section-col col-lg-4 col-xs-6">
+                  <div class="tr-section-wrap"><a href="/en/android/groups_and_channels/" onclick="openSampleKey('en'); return false;" class="tr-section">
+                    <div class="tr-section-cover cover8"></div>
+                    <div class="tr-section-caption">Groups And Channels (1914)</div>
+                  </a></div>
+                </div>
+                <div class="tr-section-col col-lg-4 col-xs-6">
+                  <div class="tr-section-wrap"><a href="/en/android/profile/" onclick="openSampleKey('en'); return false;" class="tr-section">
+                    <div class="tr-section-cover cover5"></div>
+                    <div class="tr-section-caption">Profile (492)</div>
+                  </a></div>
+                </div>
+                <div class="tr-section-col col-lg-4 col-xs-6">
+                  <div class="tr-section-wrap"><a href="/en/android/settings/" onclick="openSampleKey('en'); return false;" class="tr-section">
+                    <div class="tr-section-cover cover7"></div>
+                    <div class="tr-section-caption">Settings (1548)</div>
+                  </a></div>
+                </div>
+                <div class="tr-section-col col-lg-4 col-xs-6">
+                  <div class="tr-section-wrap"><a href="/en/android/stories/" onclick="openSampleKey('en'); return false;" class="tr-section">
+                    <div class="tr-section-cover cover11"></div>
+                    <div class="tr-section-caption">Stories (536)</div>
+                  </a></div>
+                </div>
+                <div class="tr-section-col col-lg-4 col-xs-6">
+                  <div class="tr-section-wrap"><a href="/en/android/camera_and_media/" onclick="openSampleKey('en'); return false;" class="tr-section">
+                    <div class="tr-section-cover cover6"></div>
+                    <div class="tr-section-caption">Camera And Media (222)</div>
+                  </a></div>
+                </div>
+                <div class="tr-section-col col-lg-4 col-xs-6">
+                  <div class="tr-section-wrap"><a href="/en/android/bots_and_payments/" onclick="openSampleKey('en'); return false;" class="tr-section">
+                    <div class="tr-section-cover cover9"></div>
+                    <div class="tr-section-caption">Bots And Payments (438)</div>
+                  </a></div>
+                </div>
+                <div class="tr-section-col col-lg-4 col-xs-6">
+                  <div class="tr-section-wrap"><a href="/en/android/passport/" onclick="openSampleKey('en'); return false;" class="tr-section">
+                    <div class="tr-section-cover cover10"></div>
+                    <div class="tr-section-caption">Passport (177)</div>
+                  </a></div>
+                </div>
+                <div class="tr-section-col col-lg-4 col-xs-6">
+                  <div class="tr-section-wrap"><a href="/en/android/general/" onclick="openSampleKey('en'); return false;" class="tr-section">
+                    <div class="tr-section-cover cover1"></div>
+                    <div class="tr-section-caption">General (2957)</div>
+                  </a></div>
+                </div>
+                <div class="tr-section-col col-lg-4 col-xs-6">
+                  <div class="tr-section-wrap"><a href="/en/android/unsorted/" onclick="openSampleKey('en'); return false;" class="tr-section">
+                    <div class="tr-section-cover cover0"></div>
+                    <div class="tr-section-caption">Unsorted (2900)</div>
+                  </a></div>
+                </div>
+              </section>
+            </div>
+
+            <!-- VIEW 4: KEY EDITOR VIEW (/en/android/unsorted/AreYouSureClearHistoryChannel) -->
             <div id="key_editor_panel" class="view-panel" hidden>
               <div style="display:flex; align-items:center; justify-content:space-between; margin-bottom:16px;">
                 <div style="display:flex; align-items:center; gap:12px;">
@@ -354,7 +464,7 @@
 
                   <div class="applied-box">
                     <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:8px;">
-                      <div style="font-size:16px; font-weight:600;">Bu kanaldan önbelleğe alınmış tüm metin ve medya silinsin mi?</div>
+                      <div style="font-size:16px; font-weight:600;" id="applied-translation-text">Delete all cached text and media from this channel?</div>
                       <span class="badge-applied">✔ APPLIED</span>
                     </div>
                     <div style="display:flex; justify-content:space-between; align-items:center; font-size:12px; color:var(--text-muted);">
@@ -423,7 +533,7 @@
         "state": {
           "themeCookie": "stel_tr_theme",
           "langList": ["en", "tr", "ku", "de", "fr", "es", "ar", "ru", "fa", "it", "nl"],
-          "curLang": "tr"
+          "curLang": "en"
         }
       });
     }
@@ -444,20 +554,24 @@
 
     const devWrap = document.getElementById('dev_page_content_wrap');
     const langPanel = document.getElementById('lang_overview_panel');
+    const sectionsPanel = document.getElementById('app_sections_panel');
     const keyPanel = document.getElementById('key_editor_panel');
     const breadcrumbList = document.getElementById('breadcrumb');
+    const sideSectionsGroup = document.getElementById('side-sections-group');
 
     function routeView() {
       devWrap.hidden = true;
       langPanel.hidden = true;
+      sectionsPanel.hidden = true;
       keyPanel.hidden = true;
+      sideSectionsGroup.hidden = true;
 
       if (segments.length === 0 || segments[0] === 'translations' || segments[0] === 'index.html') {
         // VIEW 1: CLEAN ROOT LANDING PAGE (https://translations.zpas.org/)
         devWrap.hidden = false;
         breadcrumbList.innerHTML = `<li><a href="/">Translations</a></li>`;
       } else if (segments.length === 1) {
-        // VIEW 2: LANGUAGE OVERVIEW PAGE (/tr/, /ku/, /de/...)
+        // VIEW 2: LANGUAGE OVERVIEW PAGE (/en/, /tr/, /ku/...)
         const code = segments[0];
         const langObj = langs.find(l => l.code === code) || { code, name: code.toUpperCase(), native: code.toUpperCase() };
         langPanel.hidden = false;
@@ -471,22 +585,47 @@
 
         breadcrumbList.innerHTML = `<li><a href="/">Translations</a></li><li class="active">${langObj.name}</li>`;
 
-        document.querySelectorAll('.menu-items li').forEach(li => li.classList.remove('active'));
+        document.querySelectorAll('#tr-menu-language-items li').forEach(li => li.classList.remove('active'));
         const activeLi = document.getElementById(`side-${code}`);
         if (activeLi) activeLi.classList.add('active');
+      } else if (segments.length === 2) {
+        // VIEW 3: APP SECTIONS GRID PAGE (/en/android/, /tr/android/...)
+        const code = segments[0];
+        const appName = segments[1].toUpperCase();
+        const langObj = langs.find(l => l.code === code) || { code, name: code.toUpperCase() };
+        sectionsPanel.hidden = false;
+        sideSectionsGroup.hidden = false;
+
+        document.getElementById('app-sections-title').textContent = appName === 'ANDROID' ? 'Android' : appName;
+        breadcrumbList.innerHTML = `<li><a href="/">Translations</a></li><li><a href="/${code}/">${langObj.name}</a></li><li class="active">${appName === 'ANDROID' ? 'Android' : appName}</li>`;
       } else {
-        // VIEW 3: KEY EDITOR PAGE (/tr/android/unsorted/AreYouSureClearHistoryChannel)
+        // VIEW 4: KEY EDITOR PAGE (/en/android/unsorted/AreYouSureClearHistoryChannel)
         keyPanel.hidden = false;
+        sideSectionsGroup.hidden = false;
         const code = segments[0];
         const langObj = langs.find(l => l.code === code) || { code, name: code.toUpperCase() };
         const keyName = segments[segments.length - 1] || 'AreYouSureClearHistoryChannel';
         document.getElementById('key-title').textContent = keyName;
+
+        if (code === 'tr') {
+          document.getElementById('applied-translation-text').textContent = "Bu kanaldan önbelleğe alınmış tüm metin ve medya silinsin mi?";
+        } else {
+          document.getElementById('applied-translation-text').textContent = "Delete all cached text and media from this channel?";
+        }
 
         breadcrumbList.innerHTML = `<li><a href="/">Translations</a></li><li><a href="/${code}/">${langObj.name}</a></li><li><a href="/${code}/android/">Android</a></li><li class="active">${keyName}</li>`;
       }
     }
 
     routeView();
+
+    function openAppSections(code, app) {
+      if (window.Aj && Aj.setLocation) {
+        Aj.setLocation(`/${code}/${app}/`);
+      } else {
+        location.href = `/${code}/${app}/`;
+      }
+    }
 
     function openSampleKey(code) {
       if (window.Aj && Aj.setLocation) {
