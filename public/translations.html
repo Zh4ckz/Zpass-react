@@ -8,11 +8,14 @@
   <style>
     :root {
       font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
-      --bg: #f4f6f9;
+      --bg: #ffffff;
+      --sidebar-bg: #f8fafc;
       --card-bg: #ffffff;
-      --text-main: #222222;
+      --text-main: #1c2733;
       --text-muted: #707579;
       --accent: #3390ec;
+      --accent-hover: #287cd8;
+      --green-applied: #2e7d32;
       --border: #e6ebf2;
     }
     * { box-sizing: border-box; }
@@ -20,10 +23,13 @@
       margin: 0;
       background: var(--bg);
       color: var(--text-main);
-      line-height: 1.6;
+      font-size: 14px;
+      line-height: 1.5;
     }
+
+    /* Top Navigation Header */
     header {
-      height: 60px;
+      height: 56px;
       background: #ffffff;
       border-bottom: 1px solid var(--border);
       display: flex;
@@ -34,312 +40,472 @@
       top: 0;
       z-index: 100;
     }
-    .brand {
+    .breadcrumbs {
       display: flex;
       align-items: center;
-      gap: 10px;
-      font-size: 17px;
-      font-weight: 700;
-      color: var(--text-main);
+      gap: 6px;
+      font-size: 14px;
+      font-weight: 500;
+      color: var(--text-muted);
+    }
+    .breadcrumbs a {
+      color: var(--accent);
       text-decoration: none;
+      transition: color 0.15s;
     }
-    .brand-logo {
-      width: 32px;
-      height: 32px;
-      background: var(--accent);
-      color: white;
-      border-radius: 8px;
-      display: grid;
-      place-items: center;
-      font-weight: 800;
-    }
+    .breadcrumbs a:hover { text-decoration: underline; }
+    .breadcrumbs span.sep { color: #b0b8c1; }
+    .breadcrumbs span.current { color: var(--text-main); font-weight: 600; }
+
     .search-box {
-      width: clamp(200px, 40vw, 420px);
+      width: clamp(200px, 35vw, 420px);
       position: relative;
     }
     .search-input {
       width: 100%;
-      height: 38px;
-      padding: 0 14px 0 38px;
-      border-radius: 20px;
+      height: 36px;
+      padding: 0 14px 0 36px;
+      border-radius: 18px;
       border: 1px solid var(--border);
       background: #f1f3f6;
-      font-size: 14px;
+      font-size: 13px;
       outline: none;
     }
     .search-icon {
       position: absolute;
-      left: 14px;
+      left: 12px;
       top: 50%;
       transform: translateY(-50%);
       color: var(--text-muted);
+      font-size: 14px;
     }
-    main {
-      max-width: 1100px;
-      margin: 32px auto;
-      padding: 0 20px;
-    }
-    .hero {
-      background: #ffffff;
-      border: 1px solid var(--border);
-      border-radius: 20px;
-      padding: 38px clamp(20px, 5vw, 48px);
-      margin-bottom: 32px;
-    }
-    .hero h1 {
-      margin: 0 0 12px;
-      font-size: 28px;
-      font-weight: 800;
-      letter-spacing: -0.5px;
-    }
-    .hero p {
-      margin: 0 0 24px;
-      font-size: 16px;
-      color: var(--text-muted);
-      max-width: 780px;
-    }
-    .btn-primary {
-      display: inline-flex;
-      align-items: center;
-      padding: 12px 28px;
-      background: var(--accent);
-      color: #ffffff;
-      font-weight: 700;
-      border-radius: 12px;
-      text-decoration: none;
-      font-size: 15px;
-      transition: background 0.2s;
-    }
-    .btn-primary:hover { background: #287cd8; }
 
-    .section-title {
+    /* Main Layout Grid */
+    .layout-container {
+      display: grid;
+      grid-template-columns: 240px minmax(0, 1fr);
+      min-height: calc(100dvh - 56px);
+    }
+
+    /* Left Sidebar */
+    aside.sidebar {
+      background: var(--sidebar-bg);
+      border-right: 1px solid var(--border);
+      padding: 20px 0;
+      overflow-y: auto;
+    }
+    .nav-group-title {
+      padding: 8px 20px;
+      font-size: 11px;
+      font-weight: 700;
+      letter-spacing: 0.8px;
+      color: var(--text-muted);
+      text-transform: uppercase;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+    .nav-list {
+      list-style: none;
+      padding: 0;
+      margin: 0 0 16px;
+    }
+    .nav-item a {
+      display: block;
+      padding: 8px 20px;
+      color: var(--text-main);
+      text-decoration: none;
+      font-size: 13px;
+      font-weight: 500;
+      transition: background 0.15s, color 0.15s;
+    }
+    .nav-item a:hover {
+      background: #eef4fc;
+      color: var(--accent);
+    }
+    .nav-item.active a {
+      background: #e1edf9;
+      color: var(--accent);
+      font-weight: 700;
+    }
+
+    /* Main Content Area */
+    .content-area {
+      padding: 28px clamp(20px, 4vw, 40px);
+      max-width: 1000px;
+    }
+
+    /* Key Header & Tags */
+    .key-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-bottom: 24px;
+    }
+    .key-title-wrap {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+    .back-btn {
+      background: none;
+      border: none;
+      color: var(--text-muted);
+      font-size: 20px;
+      cursor: pointer;
+      padding: 4px;
+      border-radius: 50%;
+    }
+    .back-btn:hover { color: var(--accent); background: #f0f4f9; }
+    .key-name {
+      margin: 0;
       font-size: 20px;
       font-weight: 700;
-      margin: 32px 0 16px;
+      letter-spacing: -0.3px;
     }
-    .platforms-grid {
+    .tag-badge {
+      display: inline-block;
+      padding: 3px 10px;
+      border-radius: 12px;
+      font-size: 11px;
+      font-weight: 700;
+      text-transform: uppercase;
+      background: #3390ec;
+      color: #ffffff;
+    }
+
+    /* Key Editor Grid (Screenshot + Phrase Card) */
+    .editor-grid {
       display: grid;
-      grid-template-columns: repeat(auto-fill, minmax(130px, 1fr));
-      gap: 16px;
-      margin-bottom: 32px;
+      grid-template-columns: 280px minmax(0, 1fr);
+      gap: 32px;
+      align-items: start;
     }
-    .platform-card {
+
+    /* App Preview Frame */
+    .phone-frame {
+      background: #2b3a4a;
+      border-radius: 20px;
+      padding: 12px;
+      box-shadow: 0 8px 30px rgba(0,0,0,0.12);
+      color: white;
+      font-size: 12px;
+    }
+    .phone-screen {
+      background: #182533;
+      border-radius: 12px;
+      padding: 16px;
+      min-height: 380px;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      align-items: center;
+      text-align: center;
+    }
+    .mock-dialog {
+      background: #242f3d;
+      border-radius: 14px;
+      padding: 16px;
+      box-shadow: 0 4px 20px rgba(0,0,0,0.3);
+      width: 100%;
+    }
+    .mock-dialog-title {
+      font-weight: 700;
+      font-size: 14px;
+      margin-bottom: 8px;
+    }
+    .mock-dialog-text {
+      color: #aaaaaa;
+      font-size: 12px;
+      line-height: 1.4;
+      margin-bottom: 14px;
+    }
+    .mock-actions {
+      display: flex;
+      justify-content: flex-end;
+      gap: 12px;
+      font-size: 11px;
+      font-weight: 700;
+      color: #e53935;
+    }
+
+    /* Translation Cards Section */
+    .translation-pane {
+      display: flex;
+      flex-direction: column;
+      gap: 20px;
+    }
+    .original-phrase-box {
+      background: #f8fafc;
+      border-left: 4px solid var(--accent);
+      padding: 14px 18px;
+      border-radius: 8px;
+      font-size: 15px;
+      color: var(--text-main);
+      font-weight: 500;
+    }
+
+    /* Applied Translation Box */
+    .applied-card {
       background: #ffffff;
       border: 1px solid var(--border);
-      border-radius: 16px;
-      padding: 20px 12px;
-      text-align: center;
-      text-decoration: none;
+      border-radius: 14px;
+      padding: 18px;
+      box-shadow: 0 2px 10px rgba(0,0,0,0.03);
+    }
+    .applied-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-bottom: 10px;
+    }
+    .applied-phrase {
+      font-size: 16px;
+      font-weight: 600;
       color: var(--text-main);
+      margin-bottom: 12px;
+    }
+    .applied-badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 4px;
+      color: var(--green-applied);
+      font-weight: 800;
+      font-size: 12px;
+      letter-spacing: 0.5px;
+    }
+    .translation-meta {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      font-size: 12px;
+      color: var(--text-muted);
+    }
+    .vote-controls {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+    .vote-btn {
+      background: none;
+      border: none;
+      cursor: pointer;
+      color: var(--text-muted);
+      font-size: 15px;
+      display: flex;
+      align-items: center;
+      gap: 4px;
+      padding: 4px 8px;
+      border-radius: 6px;
+      transition: background 0.15s;
+    }
+    .vote-btn:hover { background: #f0f4f9; color: var(--accent); }
+
+    /* Add Translation Form */
+    .add-translation-btn {
+      background: none;
+      border: none;
+      color: var(--accent);
       font-weight: 700;
       font-size: 13px;
-      transition: transform 0.15s, box-shadow 0.15s;
-    }
-    .platform-card:hover {
-      transform: translateY(-2px);
-      box-shadow: 0 6px 18px rgba(0, 0, 0, 0.06);
-    }
-    .platform-icon {
-      width: 48px;
-      height: 48px;
-      border-radius: 50%;
-      background: var(--accent);
-      color: white;
-      display: grid;
-      place-items: center;
-      margin: 0 auto 12px;
-      font-size: 22px;
-    }
-    .sections-grid {
-      display: grid;
-      grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
-      gap: 16px;
-      margin-bottom: 40px;
-    }
-    .sec-card {
-      background: #ffffff;
-      border: 1px solid var(--border);
-      border-radius: 16px;
-      padding: 20px;
-      text-decoration: none;
-      color: var(--text-main);
-      transition: border-color 0.2s;
-    }
-    .sec-card:hover { border-color: var(--accent); }
-    .sec-card b { display: block; font-size: 14px; text-transform: uppercase; margin-bottom: 4px; }
-    .sec-card small { color: var(--text-muted); font-size: 12px; }
-
-    .languages-card {
-      background: #ffffff;
-      border: 1px solid var(--border);
-      border-radius: 20px;
-      padding: 28px;
-      margin-bottom: 40px;
-    }
-    .lang-row {
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      padding: 12px 0;
-      border-bottom: 1px solid var(--border);
-      text-decoration: none;
-      color: var(--text-main);
-    }
-    .lang-row:last-child { border-bottom: none; }
-    .lang-name { font-weight: 600; font-size: 15px; }
-    .lang-meta { display: flex; align-items: center; gap: 16px; }
-    .lang-percent { font-weight: 700; color: var(--accent); font-size: 14px; }
-    .btn-setlang {
-      padding: 6px 14px;
-      border-radius: 8px;
-      background: rgba(51, 144, 236, 0.1);
-      color: var(--accent);
-      font-size: 12px;
-      font-weight: 700;
-      text-decoration: none;
-    }
-
-    .style-guide {
-      background: #ffffff;
-      border: 1px solid var(--border);
-      border-radius: 20px;
-      padding: 36px;
-      margin-bottom: 40px;
-    }
-    .style-guide h2 { margin-top: 0; font-size: 22px; font-weight: 800; }
-    .guide-rule { margin-bottom: 20px; }
-    .guide-rule h3 { margin: 0 0 6px; font-size: 16px; font-weight: 700; color: var(--accent); }
-    .guide-rule p { margin: 0; color: var(--text-muted); font-size: 14px; }
-
-    .share-box {
-      background: #eef5fc;
-      border-radius: 16px;
-      padding: 20px;
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      gap: 16px;
-      margin-bottom: 32px;
-    }
-    .share-link { font-family: monospace; font-size: 14px; font-weight: 600; color: var(--accent); }
-    .btn-copy {
-      padding: 8px 18px;
-      background: var(--accent);
-      color: white;
-      border-radius: 8px;
-      border: none;
-      font-weight: 700;
       cursor: pointer;
+      padding: 10px 0;
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      text-transform: uppercase;
+      letter-spacing: 0.4px;
+    }
+    .add-translation-btn:hover { text-decoration: underline; }
+
+    .add-form {
+      background: #f8fafc;
+      border: 1px solid var(--border);
+      border-radius: 14px;
+      padding: 18px;
+      margin-top: 10px;
+    }
+    .add-textarea {
+      width: 100%;
+      min-height: 80px;
+      border: 1px solid var(--border);
+      border-radius: 10px;
+      padding: 12px;
+      font-family: inherit;
+      font-size: 14px;
+      outline: none;
+      resize: vertical;
+    }
+    .add-textarea:focus { border-color: var(--accent); }
+    .form-submit-btn {
+      margin-top: 12px;
+      padding: 9px 20px;
+      background: var(--accent);
+      color: white;
+      border: none;
+      border-radius: 8px;
+      font-weight: 700;
+      font-size: 13px;
+      cursor: pointer;
+    }
+
+    @media(max-width: 820px) {
+      .layout-container { grid-template-columns: 1fr; }
+      aside.sidebar { display: none; }
+      .editor-grid { grid-template-columns: 1fr; }
     }
   </style>
 </head>
 <body>
+
+  <!-- Top Header with Breadcrumbs -->
   <header>
-    <a href="/translations" class="brand"><div class="brand-logo">Z</div><span>Translations Platform</span></a>
+    <nav class="breadcrumbs">
+      <a href="/translations">Translations</a>
+      <span class="sep">/</span>
+      <a href="/translations?lang=tr">Turkish</a>
+      <span class="sep">/</span>
+      <a href="/translations?lang=tr&app=android">Android</a>
+      <span class="sep">/</span>
+      <a href="/translations?lang=tr&app=android&sec=unsorted">Unsorted</a>
+      <span class="sep">/</span>
+      <span class="current">AreYouSureClearHistoryChannel</span>
+    </nav>
+
     <div class="search-box">
       <span class="search-icon">⌕</span>
       <input type="text" class="search-input" placeholder="Search translations and keys…">
     </div>
   </header>
 
-  <main>
-    <section class="hero">
-      <h1>Translating Z Pass</h1>
-      <p>We work hard to make Z Pass's translations smooth and natural across all platforms. If you're a linguist, translator, or community language geek and want to help us reach perfection, you've come to the right place.</p>
-      <a href="#languages" class="btn-primary">Start Translating</a>
-    </section>
+  <div class="layout-container">
 
-    <div class="share-box">
-      <div>
-        <small style="color:var(--text-muted); display:block;">Sharing Link for Community Languages</small>
-        <span class="share-link" id="share-url">https://translations.zpas.org/setlanguage/ku</span>
-      </div>
-      <button class="btn-copy" onclick="navigator.clipboard.writeText('https://translations.zpas.org/setlanguage/ku'); alert('Link copied!');">Copy Link</button>
-    </div>
+    <!-- Left Navigation Sidebar -->
+    <aside class="sidebar">
+      <div class="nav-group-title">LANGUAGES</div>
+      <ul class="nav-list">
+        <li class="nav-item"><a href="/translations?lang=en">English</a></li>
+        <li class="nav-item active"><a href="/translations?lang=tr">Turkish</a></li>
+        <li class="nav-item"><a href="/translations?lang=ku">Kurdî</a></li>
+        <li class="nav-item"><a href="/translations?lang=de">Deutsch</a></li>
+        <li class="nav-item"><a href="/translations?lang=fr">Français</a></li>
+        <li class="nav-item"><a href="/translations?lang=es">Español</a></li>
+        <li class="nav-item"><a href="/translations?lang=ar">العربية</a></li>
+      </ul>
 
-    <h2 class="section-title">Official Platforms</h2>
-    <div class="platforms-grid">
-      <a href="#" class="platform-card"><div class="platform-icon">🤖</div><span>ANDROID</span></a>
-      <a href="#" class="platform-card"><div class="platform-icon">🍎</div><span>IOS</span></a>
-      <a href="#" class="platform-card"><div class="platform-icon">💻</div><span>TDESKTOP</span></a>
-      <a href="#" class="platform-card"><div class="platform-icon">🖥️</div><span>MACOS</span></a>
-      <a href="#" class="platform-card"><div class="platform-icon">⚡</div><span>ANDROID X</span></a>
-      <a href="#" class="platform-card"><div class="platform-icon">🌐</div><span>WEBK</span></a>
-    </div>
+      <div class="nav-group-title">APPS</div>
+      <ul class="nav-list">
+        <li class="nav-item active"><a href="/translations?lang=tr&app=android">Android</a></li>
+        <li class="nav-item"><a href="/translations?lang=tr&app=ios">iOS</a></li>
+        <li class="nav-item"><a href="/translations?lang=tr&app=tdesktop">TDesktop</a></li>
+        <li class="nav-item"><a href="/translations?lang=tr&app=macos">macOS</a></li>
+        <li class="nav-item"><a href="/translations?lang=tr&app=webk">WebK</a></li>
+      </ul>
 
-    <h2 class="section-title">App Sections</h2>
-    <div class="sections-grid">
-      <a href="#" class="sec-card"><b>LOG IN</b><small>181 phrases</small></a>
-      <a href="#" class="sec-card"><b>CHAT LIST</b><small>365 phrases</small></a>
-      <a href="#" class="sec-card"><b>PRIVATE CHATS</b><small>670 phrases</small></a>
-      <a href="#" class="sec-card"><b>GROUPS AND CHANNELS</b><small>1914 phrases</small></a>
-      <a href="#" class="sec-card"><b>PROFILE</b><small>492 phrases</small></a>
-      <a href="#" class="sec-card"><b>SETTINGS</b><small>1548 phrases</small></a>
-      <a href="#" class="sec-card"><b>STORIES</b><small>536 phrases</small></a>
-      <a href="#" class="sec-card"><b>CAMERA AND MEDIA</b><small>222 phrases</small></a>
-      <a href="#" class="sec-card"><b>BOTS AND PAYMENTS</b><small>438 phrases</small></a>
-      <a href="#" class="sec-card"><b>GENERAL</b><small>2957 phrases</small></a>
-    </div>
+      <div class="nav-group-title">SECTIONS</div>
+      <ul class="nav-list">
+        <li class="nav-item"><a href="/translations?lang=tr&app=android&sec=all">All Sections</a></li>
+        <li class="nav-item"><a href="/translations?lang=tr&app=android&sec=login">Log In</a></li>
+        <li class="nav-item"><a href="/translations?lang=tr&app=android&sec=chatlist">Chat List</a></li>
+        <li class="nav-item"><a href="/translations?lang=tr&app=android&sec=chats">Private chats</a></li>
+        <li class="nav-item"><a href="/translations?lang=tr&app=android&sec=groups">Groups And Channels</a></li>
+        <li class="nav-item"><a href="/translations?lang=tr&app=android&sec=profile">Profile</a></li>
+        <li class="nav-item"><a href="/translations?lang=tr&app=android&sec=settings">Settings</a></li>
+        <li class="nav-item active"><a href="/translations?lang=tr&app=android&sec=unsorted">Unsorted</a></li>
+      </ul>
+    </aside>
 
-    <h2 class="section-title" id="languages">Community Languages</h2>
-    <div class="languages-card">
-      <div class="lang-row">
-        <span class="lang-name">English (English)</span>
-        <div class="lang-meta"><span class="lang-percent">100%</span><a href="/setlanguage/en" class="btn-setlang">Use in Z Pass</a></div>
-      </div>
-      <div class="lang-row">
-        <span class="lang-name">Türkçe (Turkish)</span>
-        <div class="lang-meta"><span class="lang-percent">100%</span><a href="/setlanguage/tr" class="btn-setlang">Use in Z Pass</a></div>
-      </div>
-      <div class="lang-row">
-        <span class="lang-name">Kurdî (Kurmancî - Kurdish)</span>
-        <div class="lang-meta"><span class="lang-percent">85%</span><a href="/setlanguage/ku" class="btn-setlang">Use in Z Pass</a></div>
-      </div>
-      <div class="lang-row">
-        <span class="lang-name">Deutsch (German)</span>
-        <div class="lang-meta"><span class="lang-percent">95%</span><a href="/setlanguage/de" class="btn-setlang">Use in Z Pass</a></div>
-      </div>
-      <div class="lang-row">
-        <span class="lang-name">Français (French)</span>
-        <div class="lang-meta"><span class="lang-percent">95%</span><a href="/setlanguage/fr" class="btn-setlang">Use in Z Pass</a></div>
-      </div>
-      <div class="lang-row">
-        <span class="lang-name">Español (Spanish)</span>
-        <div class="lang-meta"><span class="lang-percent">92%</span><a href="/setlanguage/es" class="btn-setlang">Use in Z Pass</a></div>
-      </div>
-      <div class="lang-row">
-        <span class="lang-name">العربية (Arabic)</span>
-        <div class="lang-meta"><span class="lang-percent">95%</span><a href="/setlanguage/ar" class="btn-setlang">Use in Z Pass</a></div>
-      </div>
-      <div class="lang-row">
-        <span class="lang-name">فارسی (Persian)</span>
-        <div class="lang-meta"><span class="lang-percent">90%</span><a href="/setlanguage/fa" class="btn-setlang">Use in Z Pass</a></div>
-      </div>
-    </div>
+    <!-- Main Content Area -->
+    <main class="content-area">
 
-    <section class="style-guide">
-      <h2>Style Guide for Translators</h2>
-      <div class="guide-rule">
-        <h3>1. Consistent</h3>
-        <p>The same features need to have the same names everywhere across Android, iOS, Windows, and macOS.</p>
+      <!-- Key Title Header -->
+      <div class="key-header">
+        <div class="key-title-wrap">
+          <button class="back-btn" onclick="history.back()" title="Go Back">‹</button>
+          <h1 class="key-name">AreYouSureClearHistoryChannel</h1>
+        </div>
+        <div>
+          <span class="tag-badge">Android</span>
+          <span class="tag-badge" style="background:#707579;">Unigram</span>
+        </div>
       </div>
-      <div class="guide-rule">
-        <h3>2. Natural</h3>
-        <p>Stick to what makes sense in your own language rather than literal English translations.</p>
+
+      <!-- Editor Grid -->
+      <div class="editor-grid">
+
+        <!-- Phone Screenshot Mockup -->
+        <div class="phone-frame">
+          <div class="phone-screen">
+            <div class="mock-dialog">
+              <div class="mock-dialog-title">Delete from cache</div>
+              <div class="mock-dialog-text">Delete all cached text and media from this channel?</div>
+              <div class="mock-actions">
+                <span>CANCEL</span>
+                <span>DELETE FROM CACHE</span>
+              </div>
+            </div>
+          </div>
+          <div style="margin-top:10px; text-align:center;">
+            <span class="tag-badge" style="background:#00bcd4;">UNSORTED</span>
+          </div>
+        </div>
+
+        <!-- Translation & Suggestions Panel -->
+        <div class="translation-pane">
+
+          <!-- Original English String -->
+          <div class="original-phrase-box">
+            “Delete all cached text and media from this channel?”
+            <div style="font-size:11px; color:var(--text-muted); margin-top:4px;">Key Length: 51 characters</div>
+          </div>
+
+          <!-- Official Applied Translation Card -->
+          <div class="applied-card">
+            <div class="applied-header">
+              <div class="applied-phrase">Bu kanaldan önbelleğe alınmış tüm metin ve medya silinsin mi?</div>
+              <span class="applied-badge">✔ APPLIED</span>
+            </div>
+
+            <div class="translation-meta">
+              <div class="vote-controls">
+                <button class="vote-btn" title="Upvote">👍 12</button>
+                <button class="vote-btn" title="Downvote">👎 0</button>
+                <button class="vote-btn" title="Comments">💬 2</button>
+              </div>
+              <div>Ali Demirtaş · Nov 30, 2018</div>
+            </div>
+          </div>
+
+          <!-- Add Translation Button & Form -->
+          <div>
+            <button class="add-translation-btn" onclick="toggleAddForm()">+ ADD TRANSLATION</button>
+            <div class="add-form" id="add-form" hidden>
+              <textarea class="add-textarea" id="new-translation" placeholder="Suggest a new translation for this string…"></textarea>
+              <button class="form-submit-btn" onclick="submitTranslation()">SUBMIT SUGGESTION</button>
+            </div>
+          </div>
+
+        </div>
+
       </div>
-      <div class="guide-rule">
-        <h3>3. Default</h3>
-        <p>Use familiar terms people are used to seeing in relevant mobile context.</p>
-      </div>
-      <div class="guide-rule">
-        <h3>4. Beautiful</h3>
-        <p>Respect grammar, style, and typography. Make the app look as if it was natively built in your region.</p>
-      </div>
-      <div class="guide-rule">
-        <h3>5. And it MUST FIT</h3>
-        <p>Check in-app after editing. Text must fit into its allotted space without being cut off.</p>
-      </div>
-    </section>
-  </main>
+
+    </main>
+
+  </div>
+
+  <script>
+    function toggleAddForm() {
+      const form = document.getElementById('add-form');
+      if (form) form.hidden = !form.hidden;
+    }
+
+    function submitTranslation() {
+      const input = document.getElementById('new-translation');
+      if (!input || !input.value.trim()) return;
+      alert('Çeviri öneriniz başarıyla gönderildi ve incelemeye alındı!');
+      input.value = '';
+      toggleAddForm();
+    }
+  </script>
 </body>
 </html>
