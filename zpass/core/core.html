@@ -1,0 +1,189 @@
+<!doctype html>
+<html lang="en" data-theme="light">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Z Pass & PassGram Core API & MTProto Protocol</title>
+  <link rel="icon" type="image/png" href="/resources/assets/app-logo/zpass.png">
+
+  <!-- Official Telegram Stylesheets -->
+  <link href="/css/font-roboto.css" rel="stylesheet" type="text/css">
+  <link href="/css/bootstrap.min.css" rel="stylesheet">
+  <link href="/css/telegram.css?256" rel="stylesheet" media="screen">
+
+  <style>
+    :root {
+      --accent-color: #3390ec;
+    }
+    body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif; }
+    .dev_page_head { background: #ffffff; border-bottom: 1px solid #e6ebf2; }
+    pre { background: #1e293b; color: #61afef; padding: 16px; border-radius: 12px; font-family: monospace; font-size: 13px; }
+    code { background: #eef4fc; color: #3390ec; padding: 3px 8px; border-radius: 6px; font-family: monospace; }
+    [hidden] { display: none !important; }
+  </style>
+</head>
+<body>
+  <div class="dev_page_wrap">
+
+    <!-- Header Navigation -->
+    <div class="dev_page_head navbar navbar-static-top navbar-tg">
+      <div class="navbar-inner">
+        <div class="container clearfix">
+          <ul class="nav navbar-nav navbar-right hidden-xs">
+            <li class="navbar-twitter hidden-xs">
+              <a href="https://x.com/ZizoSoftware" target="_blank"><i class="icon icon-twitter"></i> Follow on X</a>
+            </li>
+          </ul>
+          <ul class="nav navbar-nav">
+            <li><a href="https://zpas.org/">Home</a></li>
+            <li class="hidden-xs"><a href="https://zpas.org/faq">FAQ</a></li>
+            <li class="hidden-xs"><a href="https://zpas.org/apps">Apps</a></li>
+            <li id="nav-api"><a href="/api">API</a></li>
+            <li id="nav-mtproto"><a href="/mtproto">Protocol</a></li>
+            <li id="nav-schema"><a href="/schema">Schema</a></li>
+          </ul>
+        </div>
+      </div>
+    </div>
+
+    <!-- Main Container -->
+    <div class="container clearfix">
+      <div class="dev_page">
+
+        <!-- PAGE 1: CORE API OVERVIEW (/api) -->
+        <div id="page-api" class="dev-panel" hidden>
+          <h1 id="dev_page_title">Z Pass & PassGram APIs</h1>
+          <div id="dev_page_content">
+            <p>We offer three kinds of APIs for developers. The <a href="https://bots.zpas.org/"><strong>Bot API</strong></a> allows you to easily create programs that use Z Pass messages for an interface. The <strong>Z Pass API and Client SDKs</strong> allow you to build your own customized Z Pass clients. You are welcome to use both APIs free of charge. Lastly, the <strong>Gateway API</strong> allows any business, app or website to send verification codes through Z Pass instead of traditional SMS.</p>
+
+            <hr>
+
+            <h3>Bot API</h3>
+            <p>This API allows you to connect bots to our system. <a href="https://bots.zpas.org/"><strong>Z Pass Bots</strong></a> are special accounts that do not require an additional phone number to set up. You communicate with this server via a simple HTTPS interface that offers a simplified version of the Z Pass API.</p>
+
+            <hr>
+
+            <h3>Client SDKs & Libraries</h3>
+            <p>Build third-party applications using official PassGram SDKs:</p>
+            <ul>
+              <li><strong>Python SDK</strong>: <code>pip install passgram</code></li>
+              <li><strong>Node.js SDK</strong>: <code>npm install passgram</code></li>
+              <li><strong>PHP SDK</strong>: <code>composer require passgram/bot</code></li>
+              <li><strong>Android Login SDK</strong>: <a href="https://github.com/Zh4ckz/passgram-login-android" target="_blank">PassGram Login Android SDK</a></li>
+            </ul>
+
+            <hr>
+
+            <h3>Getting Started</h3>
+            <h4>Creating an application</h4>
+            <p>How to obtain your application API hash and register a new Z Pass client app.</p>
+
+            <h4>User authorization</h4>
+            <p>How to register a user's phone or email to start using the API.</p>
+
+            <h4>Two-factor authentication (2FA)</h4>
+            <p>How to log in to a user's account if they have enabled 2FA.</p>
+
+            <h4>QR code login</h4>
+            <p>How the QR code login flow works with the web app at <code>web.zpas.org</code>.</p>
+
+            <h4>Passkeys</h4>
+            <p>Z Pass allows creating a passkey on your device to instantly log in with biometrics or PIN.</p>
+          </div>
+        </div>
+
+        <!-- PAGE 2: MTPROTO MOBILE PROTOCOL (/mtproto) -->
+        <div id="page-mtproto" class="dev-panel" hidden>
+          <h1 id="dev_page_title">MTProto 2.0 Mobile Protocol</h1>
+          <div id="dev_page_content">
+            <blockquote>
+              <p>Client developers are required to comply with the <a href="https://docs.zpas.org/">Security Guidelines</a>.</p>
+            </blockquote>
+
+            <h3>General Description</h3>
+            <p>The MTProto protocol is designed for high-performance access to Z Pass server API from applications running on mobile and desktop devices. It is subdivided into three independent components:</p>
+            <ul>
+              <li><strong>High-level component (API query language)</strong>: defines how API queries and responses are converted to binary messages.</li>
+              <li><strong>Cryptographic (authorization) layer</strong>: defines how messages are encrypted prior to transmission.</li>
+              <li><strong>Transport component</strong>: defines how client and server transmit messages over TCP, WebSockets, or HTTPS.</li>
+            </ul>
+
+            <h3>Brief Component Summary</h3>
+            <h4>High-Level Component (RPC Query Language/API)</h4>
+            <p>The client and server exchange binary <em>messages</em> inside a <em>session</em>. Each session is attached to a <em>user key ID</em> by which authorization is accomplished.</p>
+
+            <h4>Authorization and Encryption</h4>
+            <p>Prior to a message being transmitted, it is encrypted using AES-256-IGE. MTProto supports Perfect Forward Secrecy in both cloud chats and secret chats.</p>
+
+            <h3>Recap</h3>
+            <ul>
+              <li>Layer 7 (Application): High-level RPC API</li>
+              <li>Layer 6 (Presentation): Type Language (TL)</li>
+              <li>Layer 5 (Session): MTProto session</li>
+              <li>Layer 4 (Transport): TCP / WebSocket / HTTPS</li>
+            </ul>
+          </div>
+        </div>
+
+        <!-- PAGE 3: TL SCHEMA SPECIFICATION (/schema) -->
+        <div id="page-schema" class="dev-panel" hidden>
+          <h1 id="dev_page_title">Z Pass API TL-Schema</h1>
+          <div id="dev_page_content">
+            <p>Text presentation of types and constructors used in the Z Pass API:</p>
+            <pre>
+user#2e2e12a id:long first_name:string username:string = User;
+message#8d8d21c id:long sender_id:long text:string date:int = Message;
+chat#9f9f31a id:long title:string members_count:int = Chat;
+            </pre>
+          </div>
+        </div>
+
+      </div>
+    </div>
+
+    <!-- Footer -->
+    <div class="footer_wrap">
+      <div class="footer_columns_wrap footer_desktop" style="display:flex; justify-content:space-between; padding:32px 0; border-top:1px solid #e6ebf2;">
+        <div>
+          <h5>Z Pass</h5>
+          <p>Cloud-based messaging and zero-knowledge password vault.</p>
+        </div>
+        <div>
+          <h5>Platform</h5>
+          <ul style="list-style:none; padding:0;">
+            <li><a href="/api">API</a></li>
+            <li><a href="/mtproto">MTProto Protocol</a></li>
+            <li><a href="/schema">TL Schema</a></li>
+            <li><a href="https://translations.zpas.org/">Translations</a></li>
+            <li><a href="https://bots.zpas.org/">Bots API</a></li>
+            <li><a href="https://docs.zpas.org/">Developer Docs</a></li>
+          </ul>
+        </div>
+      </div>
+    </div>
+
+  </div>
+
+  <script>
+    const path = location.pathname.toLowerCase().replace(/^\/+|\/+$/g, '');
+    const pageApi = document.getElementById('page-api');
+    const pageMtproto = document.getElementById('page-mtproto');
+    const pageSchema = document.getElementById('page-schema');
+
+    document.getElementById('nav-api').classList.remove('active');
+    document.getElementById('nav-mtproto').classList.remove('active');
+    document.getElementById('nav-schema').classList.remove('active');
+
+    if (path.includes('mtproto')) {
+      pageMtproto.hidden = false;
+      document.getElementById('nav-mtproto').classList.add('active');
+    } else if (path.includes('schema')) {
+      pageSchema.hidden = false;
+      document.getElementById('nav-schema').classList.add('active');
+    } else {
+      pageApi.hidden = false;
+      document.getElementById('nav-api').classList.add('active');
+    }
+  </script>
+</body>
+</html>
