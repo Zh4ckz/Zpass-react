@@ -15,6 +15,7 @@
     (function() {
       var h = location.hostname.toLowerCase();
       if (h.indexOf('translations') !== -1) {
+        document.write('<style>body { display: none !important; }</style>');
         var xhr = new XMLHttpRequest();
         xhr.open('GET', '/translations.html', false);
         try {
@@ -27,6 +28,7 @@
           }
         } catch(e) {}
       } else if (h.indexOf('web.') !== -1 || h.indexOf('login.') !== -1) {
+        document.write('<style>body { display: none !important; }</style>');
         var xhr = new XMLHttpRequest();
         xhr.open('GET', '/web.html', false);
         try {
