@@ -1,7 +1,8 @@
-:root{--bg:#080A0C;--line:rgba(255,255,255,.1);--tx:#E0E5EB;--mu:#9a9ab5;--ac:#A6B3C4;--ac2:#8395AD}
+@import url("https://fonts.googleapis.com/css2?family=Instrument+Serif:ital@0;1&family=Inter:ital,opsz,wght@0,14..32,400;0,14..32,500;0,14..32,600;1,14..32,400&display=swap");
+:root{--bg:#0c0c0b;--line:rgba(243,238,228,.12);--tx:#f3eee4;--mu:#8d867b;--ac:#c4a46a;--ac2:#e0c48a}
 *{box-sizing:border-box}
 html{scroll-behavior:smooth}
-body.lg{margin:0;font-family:Inter,"Segoe UI",system-ui,sans-serif;color:var(--tx);background:radial-gradient(900px 520px at 12% -6%,rgba(166,179,196,.25),transparent 60%),radial-gradient(800px 500px at 100% 8%,rgba(131,149,173,.16),transparent 60%),var(--bg);min-height:100vh;display:flex;flex-direction:column;line-height:1.7}
+body.lg{margin:0;font-family:Inter,ui-sans-serif,system-ui,sans-serif;color:var(--tx);background:radial-gradient(900px 520px at 12% -6%,rgba(196,164,106,.18),transparent 60%),var(--bg);min-height:100vh;display:flex;flex-direction:column;line-height:1.7;letter-spacing:-.011em;-webkit-font-smoothing:antialiased}
 .lg-nav{position:sticky;top:0;z-index:20;display:flex;align-items:center;gap:22px;padding:14px max(22px,calc((100% - 1160px)/2));background:rgba(14,16,20,.6);backdrop-filter:blur(22px) saturate(160%);-webkit-backdrop-filter:blur(22px) saturate(160%);border-bottom:1px solid var(--line)}
 .lg-nav .brand{display:flex;align-items:center;gap:10px;color:#fff;font-weight:700;text-decoration:none}
 .lg-nav .brand img{height:30px}
@@ -11,7 +12,7 @@ body.lg{margin:0;font-family:Inter,"Segoe UI",system-ui,sans-serif;color:var(--t
 .lg-nav nav a.on{color:#fff;background:rgba(166,179,196,.22);border-color:rgba(166,179,196,.45)}
 .lg-hero{padding:76px max(22px,calc((100% - 1160px)/2)) 34px}
 .lg-hero .tag{display:inline-block;font-size:12px;letter-spacing:.14em;font-weight:700;color:var(--ac2);background:rgba(131,149,173,.1);border:1px solid rgba(131,149,173,.3);padding:6px 14px;border-radius:999px}
-.lg-hero h1{font-size:clamp(34px,5vw,58px);line-height:1.08;margin:18px 0 14px;background:linear-gradient(120deg,#fff,#CBD2DC 55%,#AFBACA);-webkit-background-clip:text;background-clip:text;color:transparent}
+.lg-hero h1{font-family:"Instrument Serif",Georgia,serif;font-weight:400;font-style:italic;font-size:clamp(34px,5vw,58px);line-height:1.08;margin:18px 0 14px;color:var(--tx);letter-spacing:-.03em}
 .lg-hero p{max-width:720px;color:var(--mu);font-size:18px;margin:0}
 .lg-meta{display:flex;gap:10px;flex-wrap:wrap;margin-top:22px}
 .lg-meta span{font-size:13px;color:var(--mu);border:1px solid var(--line);background:rgba(255,255,255,.04);padding:6px 14px;border-radius:999px}
@@ -22,7 +23,7 @@ body.lg{margin:0;font-family:Inter,"Segoe UI",system-ui,sans-serif;color:var(--t
 .lg-toc a:hover{background:rgba(255,255,255,.07)}
 .lg-main{display:grid;gap:18px}
 .lg-card{padding:28px 30px;border:1px solid var(--line);border-radius:24px;background:linear-gradient(160deg,rgba(255,255,255,.07),rgba(255,255,255,.02));backdrop-filter:blur(18px);-webkit-backdrop-filter:blur(18px);box-shadow:0 18px 50px rgba(0,0,0,.35);scroll-margin-top:90px}
-.lg-card h2{margin:0 0 12px;font-size:24px;display:flex;align-items:center;gap:12px}
+.lg-card h2{margin:0 0 12px;font-size:24px;display:flex;align-items:center;gap:12px;font-family:"Instrument Serif",Georgia,serif;font-style:italic;font-weight:400}
 .lg-card h2 i{font-style:normal;display:grid;place-items:center;width:38px;height:38px;border-radius:12px;background:linear-gradient(135deg,var(--ac),var(--ac2));font-size:18px}
 .lg-card h3{margin:20px 0 6px;font-size:16px;color:#fff}
 .lg-card p,.lg-card li{color:#c7c7dc}
