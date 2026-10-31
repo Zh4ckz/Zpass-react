@@ -353,7 +353,7 @@ function drawLoginQr(value) {
   if (loading) loading.hidden = true;
 }
 
-function startWebQrLogin() {
+async function startWebQrLogin() {
   stopQrLogin();
   const retryBtn = $('qr-login-retry');
   const loading = $('qr-loading');
@@ -364,87 +364,77 @@ function startWebQrLogin() {
   if (canvas) canvas.getContext('2d').clearRect(0, 0, 240, 240);
   const countdown = $('qr-login-countdown');
 
-  // 1. Generate Request ID and Secrets INSTANTLY (0ms delay)
+  qrLoginStatus('Güvenli QR kod oluşturuluyor…');
+
   const qrSecret = randomSecret(), pollSecret = randomSecret();
-  const requestId = 'qr_' + randomSecret().slice(0, 28);
-  const expiresAt = Date.now() + 300000; // 5 Minutes!
 
-  qrLoginRequest = { requestId, qrSecret, pollSecret, expiresAt };
-
-  // 2. Build Payload and Draw QR Code IMMEDIATELY
-  const payload = new URL('zpass://web-login');
-  payload.searchParams.set('requestId', requestId);
-  payload.searchParams.set('secret', qrSecret);
-
-  drawLoginQr(payload.toString());
-  qrLoginStatus('PassGram uygulamasından tara; telefonda web girişini onayla.');
-
-  // 3. Start 5-Minute Countdown Timer IMMEDIATELY
-  const updateCountdown = () => {
-    const remain = Math.max(0, expiresAt - Date.now());
-    if (countdown) {
-      const mins = String(Math.floor(remain / 60000)).padStart(2, '0');
-      const secs = String(Math.floor((remain % 60000) / 1000)).padStart(2, '0');
-      countdown.textContent = `${mins}:${secs}`;
-    }
-    if (remain <= 0) {
-      stopQrLogin();
-      if (loading) loading.hidden = true;
-      if (retryBtn) retryBtn.hidden = false;
-      qrLoginStatus('QR kodunun süresi doldu. Yeni bir kod oluştur.', true);
-    }
-  };
-
-  updateCountdown();
-  qrCountdownTimer = setInterval(updateCountdown, 500);
-
-  // 4. Save to Firestore in Background (non-blocking)
-  sha256Hex(qrSecret).then(qrSecretHash => {
-    sha256Hex(pollSecret).then(pollSecretHash => {
-      setDoc(doc(db, 'webQrLogins', requestId), {
-        requestId,
-        qrSecretHash,
-        pollSecretHash,
-        status: 'pending',
-        deviceName: `PassGram Web · ${navigator.platform || 'Web'}`,
-        createdAt: serverTimestamp(),
-        expiresAt: Timestamp.fromMillis(expiresAt)
-      }).catch(err => {
-        console.warn('Background Firestore webQrLogins save note:', err);
-      });
+  try {
+    const res = await createWebQrLogin({
+      qrSecret,
+      pollSecret,
+      deviceName: `PassGram Web · ${navigator.platform || 'Web'}`
     });
-  });
 
-  // 5. Firestore Realtime Listener for Instant Approval & Auto-Deletion
-  qrUnsubscribe = onSnapshot(doc(db, 'webQrLogins', requestId), async (snap) => {
-    if (!snap.exists()) return;
-    const state = snap.data();
-    if (state.status === 'expired' || state.status === 'cancelled') {
-      stopQrLogin();
-      if (retryBtn) retryBtn.hidden = false;
-      qrLoginStatus('Bu QR isteği sona erdi. Yeni kod oluştur.', true);
-      return;
-    }
-    if (state.status === 'approved') {
-      stopQrLogin();
-      qrLoginStatus('Telefon onayladı! Güvenli oturum açılıyor…');
-      try {
-        if (state.customToken) {
-          await signInWithCustomToken(auth, state.customToken);
-        }
-      } catch (err) {
-        console.error('Custom token signin error:', err);
+    const { requestId, expiresAt: expTime } = res.data;
+    const expiresAt = Number(expTime) || (Date.now() + 120000);
+
+    qrLoginRequest = { requestId, qrSecret, pollSecret, expiresAt };
+
+    const payload = new URL('zpass://web-login');
+    payload.searchParams.set('requestId', requestId);
+    payload.searchParams.set('secret', qrSecret);
+
+    drawLoginQr(payload.toString());
+    qrLoginStatus('PassGram uygulamasından tara; telefonda web girişini onayla.');
+
+    const updateCountdown = () => {
+      const remain = Math.max(0, expiresAt - Date.now());
+      if (countdown) {
+        const mins = String(Math.floor(remain / 60000)).padStart(2, '0');
+        const secs = String(Math.floor((remain % 60000) / 1000)).padStart(2, '0');
+        countdown.textContent = `${mins}:${secs}`;
       }
-      // Delete document completely after login so 0 trace remains
-      try {
-        await deleteDoc(doc(db, 'webQrLogins', requestId));
-      } catch (e) {}
-    }
-  });
+      if (remain <= 0) {
+        stopQrLogin();
+        if (loading) loading.hidden = true;
+        if (retryBtn) retryBtn.hidden = false;
+        qrLoginStatus('QR kodunun süresi doldu. Yeni bir kod oluştur.', true);
+      }
+    };
 
-  // 6. Cloud Function Fallback in Background
-  createWebQrLogin({ qrSecret, pollSecret, deviceName: `PassGram Web · ${navigator.platform || 'Web'}` })
-    .catch(() => { /* handled by Firestore fallback */ });
+    updateCountdown();
+    qrCountdownTimer = setInterval(updateCountdown, 500);
+
+    qrUnsubscribe = onSnapshot(doc(db, 'webQrLogins', requestId), async (snap) => {
+      if (!snap.exists()) return;
+      const state = snap.data();
+      if (state.status === 'expired' || state.status === 'cancelled') {
+        stopQrLogin();
+        if (retryBtn) retryBtn.hidden = false;
+        qrLoginStatus('Bu QR isteği sona erdi. Yeni kod oluştur.', true);
+        return;
+      }
+      if (state.status === 'approved') {
+        stopQrLogin();
+        qrLoginStatus('Telefon onayladı! Güvenli oturum açılıyor…');
+        try {
+          if (state.customToken) {
+            await signInWithCustomToken(auth, state.customToken);
+          }
+        } catch (err) {
+          console.error('Custom token signin error:', err);
+        }
+        try {
+          await deleteDoc(doc(db, 'webQrLogins', requestId));
+        } catch (e) {}
+      }
+    });
+  } catch (err) {
+    console.error('Web QR login creation failed:', err);
+    if (loading) loading.hidden = true;
+    if (retryBtn) retryBtn.hidden = false;
+    qrLoginStatus(err.message || 'QR kod oluşturulamadı. Tekrar deneyin.', true);
+  }
 }
 
 $('qr-login-retry')?.addEventListener('click', startWebQrLogin);
