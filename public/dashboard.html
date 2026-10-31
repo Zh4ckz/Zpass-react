@@ -31,7 +31,7 @@
   <header class="topbar">
     <a class="topbar-back" id="topbarBack" href="./" aria-label="Go back" title="Go back"><span aria-hidden="true">←</span><span>Back</span></a>
     <a class="brand" href="./" aria-label="PassGram home"><span>PassGram</span></a>
-    <nav class="marketing-nav"><a href="#features">Features</a><a href="#pricing">Pricing</a><a href="#security">Security</a><a href="apps.html">Download</a></nav>
+    <nav class="marketing-nav"><a href="#features">Features</a><a href="#security">Security</a><a href="apps.html">Download</a></nav>
     <a class="nav-login" href="#login">Sign in</a>
   </header>
 
@@ -109,31 +109,7 @@
       <div class="security-orbit reveal"><div><svg width="42" height="42" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3l7 3v6c0 4.5-3 7.5-7 9-4-1.5-7-4.5-7-9V6l7-3z"/><rect x="9.5" y="11" width="5" height="4" rx="1"/><path d="M10.2 11v-1.3a1.8 1.8 0 0 1 3.6 0V11"/></svg></div><span>END-TO-END<br>ENCRYPTED</span></div>
     </section>
 
-    <section id="pricing" class="pricing-section">
-      <div class="section-copy centered reveal"><p class="eyebrow">SIMPLE PRICING</p><h2>Choose your PassGram plan</h2><p>Start free and upgrade to Pro when you need more space.</p></div>
-<div class="billing-toggle tab-list sp-glass-toggle" id="pricingBillingToggle" role="group" aria-label="Monthly or yearly">
-        <span class="indicator" aria-hidden="true"></span>
-        <button type="button" class="tab-btn active" data-billing="MONTHLY" aria-pressed="true">Monthly</button>
-        <button type="button" class="tab-btn" data-billing="YEARLY" aria-pressed="false"><em class="save-badge" id="yearlySavingsBadge">%17</em><span>Yearly</span></button>
-      </div>
-      <div id="personalPlans">
-        <div class="pricing-grid">
-          <article class="price-card reveal" data-plan-card="FREE"><h3>PassGram Free</h3><p>Secure essentials for your personal account</p><div class="price">$0<small>/month</small></div><button class="plan-select-button" type="button" data-select-plan="FREE">Select Free</button><ul><li>Up to 3 saved logins</li><li>Up to 15 vaults</li><li>10 authenticator codes</li><li>10 aliases</li><li>Share each vault with 3 people</li></ul></article>
-          <article class="price-card recommended reveal" data-plan-card="PLUS"><div class="recommend">MOST POPULAR</div><h3>PassGram Plus</h3><p>Premium essentials for one account</p><div class="price" id="marketingPlusPrice">$4.99<small>/month</small></div><p class="billed-note" id="marketingPlusBilledNote"></p><button class="plan-select-button" type="button" data-select-plan="PLUS">Select Plus</button><ul><li>Up to 5 saved logins</li><li>Up to 50 vaults</li><li>Unlimited authenticator codes and aliases</li><li>Custom app icons</li><li>Share each vault with 10 people</li><li>Priority support</li></ul></article>
-          <article class="price-card reveal" data-plan-card="PRO"><h3>PassGram Pro</h3><p>More capacity for your personal account</p><div class="price" id="marketingProPrice">$9<small>/month</small></div><p class="billed-note" id="marketingProBilledNote"></p><button class="plan-select-button" type="button" data-select-plan="PRO">Select Pro</button><ul><li>Up to 10 saved logins</li><li>Unlimited vaults</li><li>Voice message transcription</li><li>Custom app icons</li><li>Expanded sharing and recovery tools</li><li>Priority support</li></ul></article>
-        </div>
-      </div>
-      <p class="pricing-disclaimer">Pricing shown in USD. Annual plans are billed once per year. Taxes not included.</p>
-    </section>
-    <div class="checkout-footer" id="pricingCheckoutBar" aria-live="polite">
-      <div class="checkout-info">
-        <div class="plan-name" id="pricingCheckoutPlan">PassGram Plus</div>
-        <div class="plan-cost" id="pricingCheckoutCost">$5 <span>/ month</span></div>
-        <div class="checkout-billed" id="pricingCheckoutBilled">Billed monthly</div>
-      </div>
-      <a class="subscribe-btn" id="pricingCheckoutCta" href="/checkout.html?product=zpass&amp;plan=PLUS&amp;billing=MONTHLY">Continue</a>
-    </div>
-
+    
     <section id="comparison" class="comparison" aria-labelledby="comparison-heading">
       <div class="section-copy centered reveal">
         <p class="eyebrow">A CLEARER WAY TO PROTECT WHAT MATTERS</p>
@@ -224,7 +200,7 @@
           <a class="footer-download" href="apps.html">Explore PassGram apps <span aria-hidden="true">→</span></a>
         </div>
         <nav class="footer-link-group" aria-label="Product">
-          <h2>Product</h2><a href="#features">Features</a><a href="#pricing">Plans &amp; pricing</a><a href="#security">Security</a><a href="apps.html">Download apps</a>
+          <h2>Product</h2><a href="#features">Features</a><a href="#security">Security</a><a href="apps.html">Download apps</a>
         </nav>
         <nav class="footer-link-group" aria-label="Guides">
           <h2>Guides</h2><a href="2fa.html">Authenticator guide</a><a href="aliases.html">Email aliases</a><a href="info.html">Info &amp; legal</a>
@@ -267,7 +243,7 @@
         <div class="mobile-head"><div class="brand"><img class="brand-logo" src="/resources/assets/app-logo/zpass.png" alt="">PassGram</div><button id="mobileLogout">Sign out</button></div>
         <div class="vault-toolbar"><div class="vault-search">⌕ <input id="vaultSearch" type="search" placeholder="Search all items…"></div><select id="vaultSort" class="vault-sort" aria-label="Sort vault"><option value="newest">Newest</option><option value="oldest">Oldest</option><option value="az">A–Z</option><option value="za">Z–A</option></select><button id="openUpgrade" class="upgrade-button">Upgrade</button><button id="createItemTop" class="create-button" disabled>＋ New item</button></div>
         <section class="web-panel active" data-panel-view="overview"><div class="desktop-page-title"><h2 id="vaultPageTitle">All vaults</h2><p class="muted">Passwords, cards and encrypted accounts.</p></div>
-        <div class="welcome"><div><p class="eyebrow">SECURE WEB VAULT</p><h2>Welcome, <span id="welcomeName" data-private>PassGram User</span></h2><p class="muted">Your account and encrypted vault are protected.</p></div><div class="secure-badge">● Secure session</div></div>
+        <div class="welcome"><div><p class="eyebrow">SECURE WEB VAULT</p><h2>Welcome, <span id="welcomeName" data-private>PassGram User</span></h2><p class="muted">Your account and encrypted vault are protected.</p></div><div class="secure-badge">● Secure session</div><button class="settings-primary" id="openSubscription" type="button">Subscribe ↗</button></div>
 
         <div class="stats">
           <article><div class="stat-icon purple">☁</div><div><small>Cloud Vault</small><b id="vaultStatus">Checking…</b></div></article>

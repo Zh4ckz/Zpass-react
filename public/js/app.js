@@ -612,6 +612,7 @@ function openRemoteSection(){const tab=location.hash.slice(1);if(['support','sub
 window.addEventListener('hashchange',openRemoteSection);
 openRemoteSection();
 document.querySelectorAll("[data-settings-tab]").forEach((button) => button.addEventListener("click", () => openSettingsTab(button.dataset.settingsTab)));
+document.getElementById("openSubscription")?.addEventListener("click", () => { showPanel("settings"); openSettingsTab("subscription"); });
 $("settingsBack").addEventListener("click", () => showPanel("overview"));
 $("autoLockMinutes").value = String(Math.round(vaultUnlockDurationMs / 60000));
 $("autoLockMinutes").addEventListener("change", (event) => {
