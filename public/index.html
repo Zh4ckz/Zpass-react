@@ -294,6 +294,17 @@
     menu?.setAttribute('aria-expanded', 'false');
     nav?.classList.remove('open');
   }));
+
+  // Open external links, subdomains, and separate pages in a new browser tab
+  document.addEventListener('click', function(e) {
+    const a = e.target.closest('a');
+    if (!a || !a.href || a.getAttribute('href').startsWith('#')) return;
+    const url = new URL(a.href, location.origin);
+    if (url.origin !== location.origin || url.pathname.endsWith('.html') || (url.pathname !== '/' && url.pathname !== location.pathname)) {
+      a.target = '_blank';
+      a.rel = 'noopener noreferrer';
+    }
+  });
 </script>
 </body>
 </html>
