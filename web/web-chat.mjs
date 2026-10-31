@@ -1,6 +1,6 @@
 import { initializeApp, getApps } from 'https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js';
 import { getAuth, onAuthStateChanged, GoogleAuthProvider, signInWithPopup, signInWithEmailAndPassword, signInWithPhoneNumber, RecaptchaVerifier, signOut, getAdditionalUserInfo, deleteUser, signInWithCustomToken } from 'https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js';
-import { getFirestore, doc, getDoc, getDocs, setDoc, addDoc, collection, query, where, orderBy, limitToLast, onSnapshot, updateDoc, deleteDoc, serverTimestamp } from 'https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js';
+import { getFirestore, doc, getDoc, getDocs, setDoc, addDoc, collection, query, where, orderBy, limitToLast, onSnapshot, updateDoc, deleteDoc, serverTimestamp, Timestamp } from 'https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js';
 import { getFunctions, httpsCallable } from 'https://www.gstatic.com/firebasejs/10.12.2/firebase-functions.js';
 import { firebaseConfig } from './firebase-config.mjs';
 
@@ -273,6 +273,10 @@ $('tab-code')?.addEventListener('click', () => setAuthMethod('phone'));
 setAuthMethod('email');
 
 // QR Code Helpers
+async function sha256Hex(str) {
+  const buf = await crypto.subtle.digest('SHA-256', new TextEncoder().encode(str));
+  return Array.from(new Uint8Array(buf), b => b.toString(16).padStart(2, '0')).join('');
+}
 function randomSecret() {
   const bytes = crypto.getRandomValues(new Uint8Array(32));
   return Array.from(bytes, b => b.toString(16).padStart(2, '0')).join('');
@@ -395,16 +399,20 @@ function startWebQrLogin() {
   qrCountdownTimer = setInterval(updateCountdown, 500);
 
   // 4. Save to Firestore in Background (non-blocking)
-  setDoc(doc(db, 'webQrLogins', requestId), {
-    requestId,
-    qrSecret,
-    pollSecret,
-    status: 'pending',
-    deviceName: `PassGram Web · ${navigator.platform || 'Web'}`,
-    createdAt: serverTimestamp(),
-    expiresAt
-  }).catch(err => {
-    console.warn('Background Firestore webQrLogins save note:', err);
+  sha256Hex(qrSecret).then(qrSecretHash => {
+    sha256Hex(pollSecret).then(pollSecretHash => {
+      setDoc(doc(db, 'webQrLogins', requestId), {
+        requestId,
+        qrSecretHash,
+        pollSecretHash,
+        status: 'pending',
+        deviceName: `PassGram Web · ${navigator.platform || 'Web'}`,
+        createdAt: serverTimestamp(),
+        expiresAt: Timestamp.fromMillis(expiresAt)
+      }).catch(err => {
+        console.warn('Background Firestore webQrLogins save note:', err);
+      });
+    });
   });
 
   // 5. Firestore Realtime Listener for Instant Approval & Auto-Deletion
