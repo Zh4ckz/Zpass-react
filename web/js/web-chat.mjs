@@ -625,7 +625,7 @@ async function startWebQrLogin() {
 
     drawLoginQr(issued.qrPayload);
     if (retryBtn) retryBtn.hidden = false;
-    qrLoginStatus('Scan from the PassGram app and approve the web sign-in on your phone.');
+    qrLoginStatus('');
 
     const updateCountdown = () => {
       const remain = Math.max(0, expiresAt - Date.now());
