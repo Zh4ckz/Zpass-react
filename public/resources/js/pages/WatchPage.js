@@ -938,7 +938,7 @@ class WatchPage {
         if (!this.content) return;
 
         const isChannel = this.content.type === 'channel' || !this.content.type; // Default to channel if unknown
-        const fallback = isChannel ? '/img/placeholder.png' : '/img/poster-placeholder.jpg';
+        const fallback = isChannel ? '/resources/img/placeholder.png' : '/resources/img/poster-placeholder.jpg';
 
         this.posterEl.onerror = () => {
             this.posterEl.onerror = null;
@@ -1038,9 +1038,9 @@ class WatchPage {
 
         this.recommendedGrid.innerHTML = movies.map(movie => `
             <div class="watch-recommended-card" data-id="${movie.stream_id}" data-source="${sourceId}">
-                <img src="${movie.stream_icon || movie.cover || '/img/placeholder.png'}" 
+                <img src="${movie.stream_icon || movie.cover || '/resources/img/placeholder.png'}" 
                      alt="${movie.name}" 
-                     onerror="this.onerror=null;this.src='/img/placeholder.png'" loading="lazy">
+                     onerror="this.onerror=null;this.src='/resources/img/placeholder.png'" loading="lazy">
                 <p>${movie.name}</p>
             </div>
         `).join('');

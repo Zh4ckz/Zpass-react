@@ -1,7 +1,7 @@
 import { getApps, initializeApp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
 import { getAuth, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js";
 import { doc, getFirestore, onSnapshot } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
-import { firebaseConfig } from "/js/firebase-config.mjs";
+import { firebaseConfig } from "/resources/js/firebase-config.mjs";
 
 const DISMISSED_KEY = "zpassPremiumCampaignDismissed";
 const app = getApps()[0] || initializeApp(firebaseConfig);
@@ -72,7 +72,7 @@ function renderCampaign() {
 
 const styleLink = document.createElement("link");
 styleLink.rel = "stylesheet";
-styleLink.href = "/css/web-ads.css?v=1";
+styleLink.href = "/resources/css/web-ads.css?v=1";
 document.head.append(styleLink);
 
 onSnapshot(doc(db, "web_site_config", "web_ads"), snapshot => {

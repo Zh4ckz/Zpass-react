@@ -1,7 +1,7 @@
-import { paymentPlans } from "/js/payment-plans.mjs";
+import { paymentPlans } from "/resources/js/payment-plans.mjs";
 import { getApps, initializeApp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
 import { getAuth, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js";
-import { firebaseConfig } from "/js/firebase-config.mjs";
+import { firebaseConfig } from "/resources/js/firebase-config.mjs";
 
 const app = getApps()[0] || initializeApp(firebaseConfig);
 const auth = getAuth(app);

@@ -5,7 +5,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no, shrink-to-fit=no">
   <title>PassGram Web — Private Messaging</title>
   <link rel="icon" type="image/png" href="/resources/assets/app-logo/zpass.png">
-  <link rel="stylesheet" href="/css/web-chat.css?v=14">
+  <link rel="stylesheet" href="/resources/css/web-chat.css?v=14">
 </head>
 <body class="pg-theme">
 
@@ -233,7 +233,7 @@
     <button id="accept-call" class="button button-primary" hidden>Answer call</button>
   </dialog>
   <div id="toast" class="toast" role="status"></div>
-  <script src="/js/vendor/qrcode-generator.js"></script>
+  <script src="/resources/js/vendor/qrcode-generator.js"></script>
   <script>
     const startupScreen = document.getElementById('startup-screen');
     window.addEventListener('passgram:ready', () => {
@@ -243,7 +243,7 @@
     document.getElementById('startup-retry')?.addEventListener('click', () => window.location.reload());
   </script>
   <script type="module">
-    import('/js/web-chat.mjs?v=15').catch((error) => {
+    import('/resources/js/web-chat.mjs?v=15').catch((error) => {
       console.error('PassGram Web could not start:', error);
       const status = document.getElementById('startup-status');
       const retry = document.getElementById('startup-error');

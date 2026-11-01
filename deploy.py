@@ -38,8 +38,15 @@ def sync_modules():
             for item in os.listdir(mod_dir):
                 s = os.path.join(mod_dir, item)
                 d = os.path.join(public_dir, item)
-                if os.path.isfile(s):
+                if not os.path.isfile(s):
+                    continue
+                ext = os.path.splitext(item)[1].lower()
+                if ext == ".html":
                     shutil.copy2(s, d)
+                elif ext == ".js" and not item.startswith("web-"):
+                    shutil.copy2(s, os.path.join(public_dir, "resources", "js", item))
+                elif ext == ".css" and not item.startswith("web-"):
+                    shutil.copy2(s, os.path.join(public_dir, "resources", "css", item))
 
 
 def _short_name(path):
@@ -58,19 +65,22 @@ def build_web():
     if not os.path.exists(esbuild):
         raise SystemExit("esbuild missing. Run: npm install")
 
-    for old in os.listdir(public_dir):
-        if re.fullmatch(r"[a-z0-9]{10}\.(js|css)", old):
-            os.remove(os.path.join(public_dir, old))
+    js_dir = os.path.join(public_dir, "resources", "js")
+    css_dir = os.path.join(public_dir, "resources", "css")
+    for folder in (js_dir, css_dir):
+        for old in os.listdir(folder):
+            if re.fullmatch(r"[a-z0-9]{10}\.(js|css)", old):
+                os.remove(os.path.join(folder, old))
 
     work = os.path.join(ROOT, ".build-web")
     shutil.rmtree(work, ignore_errors=True)
     os.makedirs(work)
     shutil.copy2(os.path.join(ROOT, "web", "web-chat.mjs"), work)
     shutil.copy2(os.path.join(ROOT, "web", "web-i18n.mjs"), work)
-    shutil.copy2(os.path.join(public_dir, "js", "firebase-config.mjs"), work)
+    shutil.copy2(os.path.join(js_dir, "firebase-config.mjs"), work)
     jobs = {
         "app": [os.path.join(work, "web-chat.mjs"), "--bundle", "--format=esm", "--external:https://*"],
-        "qr": [os.path.join(public_dir, "js", "vendor", "qrcode-generator.js")],
+        "qr": [os.path.join(js_dir, "vendor", "qrcode-generator.js")],
         "css": [os.path.join(ROOT, "web", "web-chat.css")],
     }
     names = {}
@@ -80,18 +90,18 @@ def build_web():
         subprocess.run([esbuild, *args, "--minify", "--legal-comments=none", f"--outfile={tmp}"],
                        check=True, capture_output=True, cwd=ROOT)
         names[key] = f"{_short_name(tmp)}.{ext}"
-        shutil.copy2(tmp, os.path.join(public_dir, names[key]))
+        shutil.copy2(tmp, os.path.join(css_dir if ext == "css" else js_dir, names[key]))
     shutil.rmtree(work, ignore_errors=True)
 
     html_path = os.path.join(ROOT, "web", "web.html")
     html = open(html_path, encoding="utf-8").read()
-    html = re.sub(r"/css/web-chat\.css\?v=\d+", "/" + names["css"], html)
-    html = html.replace("/js/vendor/qrcode-generator.js", "/" + names["qr"])
-    html = re.sub(r"/js/web-chat\.mjs\?v=\d+", "/" + names["app"], html)
+    html = re.sub(r"/resources/css/web-chat\.css\?v=\d+", "/resources/css/" + names["css"], html)
+    html = html.replace("/resources/js/vendor/qrcode-generator.js", "/resources/js/" + names["qr"])
+    html = re.sub(r"/resources/js/web-chat\.mjs\?v=\d+", "/resources/js/" + names["app"], html)
     with open(os.path.join(public_dir, "web.html"), "w", encoding="utf-8", newline="") as fh:
         fh.write(html)
 
-    for leftover in ("js/web-chat.mjs", "web-chat.mjs", "css/web-chat.css", "web-chat.css"):
+    for leftover in ("resources/js/web-chat.mjs", "resources/css/web-chat.css"):
         try:
             os.remove(os.path.join(public_dir, *leftover.split("/")))
         except FileNotFoundError:

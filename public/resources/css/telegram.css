@@ -886,7 +886,7 @@ a.tl_main_download_link:hover:after {
 .tl_main_download_link_tdesktop {
   display: none;
   min-width: 320px;
-  background: url('/img/SiteTDesktop.webp') 50% 0 no-repeat;
+  background: url('/resources/img/SiteTDesktop.webp') 50% 0 no-repeat;
 }
 
 .tl_main_download_image__ios,
@@ -908,13 +908,13 @@ a.tl_main_download_link:hover:after {
   margin: -150px 0 0 -152px;
   width: 304px;
   height: 240px;
-  background: url('/img/SiteiOS.webp') 50% 0 no-repeat;
+  background: url('/resources/img/SiteiOS.webp') 50% 0 no-repeat;
 }
 .tl_main_download_image__android {
   margin: -150px 0 0 -152px;
   width: 304px;
   height: 240px;
-  background: url('/img/SiteAndroid.webp') 50% 0 no-repeat;
+  background: url('/resources/img/SiteAndroid.webp') 50% 0 no-repeat;
 }
 
 .tl_main_video_player {
@@ -1002,7 +1002,7 @@ a.tl_main_download_link:hover:after {
   left: 0;
   right: 0;
   min-width: 804px;
-  background: url(/img/SiteDesktop.webp) 50% 19px no-repeat;
+  background: url(/resources/img/SiteDesktop.webp) 50% 19px no-repeat;
   /*overflow: hidden;*/
 }
 
@@ -1122,25 +1122,25 @@ a:hover .icon-twitter {
   margin-left: 7px;
 }
 .app-icon-android {
-  background-image: url(/img/app_icon_android.svg);
+  background-image: url(/resources/img/app_icon_android.svg);
 }
 .app-icon-ios {
-  background-image: url(/img/app_icon_ios.svg);
+  background-image: url(/resources/img/app_icon_ios.svg);
 }
 .app-icon-macos {
-  background-image: url(/img/app_icon_macos.svg);
+  background-image: url(/resources/img/app_icon_macos.svg);
 }
 .app-icon-desktop {
-  background-image: url(/img/app_icon_desktop.svg);
+  background-image: url(/resources/img/app_icon_desktop.svg);
 }
 .app-icon-webk {
-  background-image: url(/img/app_icon_webk.svg);
+  background-image: url(/resources/img/app_icon_webk.svg);
 }
 .app-icon-webz {
-  background-image: url(/img/app_icon_webz.svg);
+  background-image: url(/resources/img/app_icon_webz.svg);
 }
 .app-icon-weba {
-  background-image: url(/img/app_icon_weba.svg);
+  background-image: url(/resources/img/app_icon_weba.svg);
 }
 
 
@@ -2352,7 +2352,7 @@ body.preload .top_lang_select > .dropdown-menu,
   margin: 16px 10px 0;
   width: 14px;
   height: 9px;
-  background: url(/img/rc_icons.png?1) no-repeat -3px -144px;
+  background: url(/resources/img/rc_icons.png?1) no-repeat -3px -144px;
   right: 0;
   top: 0;
 }
@@ -2408,7 +2408,7 @@ body.preload .top_lang_select > .dropdown-menu,
   margin: 16px 10px;
   width: 14px;
   height: 9px;
-  background: url(/img/rc_icons.png?1) no-repeat -3px -144px;
+  background: url(/resources/img/rc_icons.png?1) no-repeat -3px -144px;
   vertical-align: top;
 }
 .form-control-dropdown-list {
@@ -2710,7 +2710,7 @@ body.rtl .checkbox-item .checkbox-input + .checkbox-label {
   vertical-align: top;
   margin-right: 11px;
   padding: 0;
-  background: url(/img/rc_icons.png?1) no-repeat;
+  background: url(/resources/img/rc_icons.png?1) no-repeat;
   cursor: pointer;
 }
 .radio-item input.radio + .radio-label:before {
@@ -2886,16 +2886,16 @@ button.dropdown-toggle:active:focus {
   -webkit-filter: brightness(94%);
 }
 .dev_page_widget_thumb_share {
-  background-image: url(/img/Widget_Share.svg?1);
+  background-image: url(/resources/img/Widget_Share.svg?1);
 }
 .dev_page_widget_thumb_post {
-  background-image: url(/img/Widget_Post.svg?1);
+  background-image: url(/resources/img/Widget_Post.svg?1);
 }
 .dev_page_widget_thumb_login {
-  background-image: url(/img/Widget_Login.svg?1);
+  background-image: url(/resources/img/Widget_Login.svg?1);
 }
 .dev_page_widget_thumb_comments {
-  background-image: url(/img/Widget_Comments.svg?1);
+  background-image: url(/resources/img/Widget_Comments.svg?1);
 }
 .dev_page_widget_title {
   font-size: 15px;
@@ -3372,7 +3372,7 @@ video.smartphone_video_player {
 }
 .tgme_background_pattern.default {
   opacity: 0.3;
-  background-image: url('/img/tgme/pattern.svg?1');
+  background-image: url('/resources/img/tgme/pattern.svg?1');
 }
 html.theme_dark .tgme_background,
 body.bg_dark .tgme_background {
@@ -3384,7 +3384,7 @@ body.bg_dark .tgme_background {
 html.theme_dark .tgme_background.default,
 body.bg_dark .tgme_background.default {
   opacity: 0.3;
-  -webkit-mask-image: url('/img/tgme/pattern.svg?1');
+  -webkit-mask-image: url('/resources/img/tgme/pattern.svg?1');
 }
 body.bg_light .tgme_background,
 body.bg_light .tgme_background.default {
@@ -3484,7 +3484,7 @@ a.tgme_head_dl_button:active,
 }
 .tgme_icon_arrow {
   display: inline-block;
-  background: url(/img/tgme/Arrow_1x.png) 0 0 no-repeat;
+  background: url(/resources/img/tgme/Arrow_1x.png) 0 0 no-repeat;
   width: 8px;
   height: 12px;
   background-size: 8px 12px;
@@ -4338,7 +4338,7 @@ html.theme_dark .tgme_page_embed_code {
 }
 .tlb_blog_logo {
   display: inline-block;
-  background: url(/img/blog/BlogLogo1x.png?1) 0 0 no-repeat;
+  background: url(/resources/img/blog/BlogLogo1x.png?1) 0 0 no-repeat;
   width: 146px;
   height: 20px;
   background-size: 146px 20px;
@@ -4753,13 +4753,13 @@ i.tl_telegram_share_icon {
 }
 
 .td_screenshot_macos {
-  background: url(/img/macos.png) 50% 0 no-repeat;
+  background: url(/resources/img/macos.png) 50% 0 no-repeat;
   background-size: 420px 280px;
   height: 280px;
 }
 
 .td_screenshot_tdirect {
-  background: url(/img/tdirect.jpg?1) 50% 0 no-repeat;
+  background: url(/resources/img/tdirect.jpg?1) 50% 0 no-repeat;
   background-size: 300px 360px;
   height: 360px;
   margin: 40px 20px;
@@ -4832,20 +4832,20 @@ i.tl_telegram_share_icon {
     background-size: 6px 11px;
   }
   .tl_main_download_desktop {
-    background-image: url('/img/SiteDesktop_2x.webp');
+    background-image: url('/resources/img/SiteDesktop_2x.webp');
     background-size: 1246px 260px;
   }
 
   .tl_main_download_image__android {
-    background-image: url('/img/SiteAndroid_2x.webp');
+    background-image: url('/resources/img/SiteAndroid_2x.webp');
     background-size: 290px 270px;
   }
   .tl_main_download_image__ios {
-    background-image: url('/img/SiteiOS_2x.webp');
+    background-image: url('/resources/img/SiteiOS_2x.webp');
     background-size: 442px 270px;
   }
   .tl_main_download_link_tdesktop {
-    background-image: url('/img/SiteTDesktop_2x.webp');
+    background-image: url('/resources/img/SiteTDesktop_2x.webp');
     background-size: 320px 157px;
   }
 
@@ -4856,48 +4856,48 @@ i.tl_telegram_share_icon {
   }
 
   .tgme_icon_arrow {
-    background-image: url(/img/tgme/Arrow_2x.png);
+    background-image: url(/resources/img/tgme/Arrow_2x.png);
   }
 
   .tgme_page_widget_actions a.tgme_action_web_button:before {
-    background-image: url(/img/tgme/web_icon_2x.png);
+    background-image: url(/resources/img/tgme/web_icon_2x.png);
     background-size: 24px 24px;
   }
   .tgme_page_copy_action a.tgme_action_button_new:before {
-    background-image: url(/img/tgme/embed_copy_2x.png);
+    background-image: url(/resources/img/tgme/embed_copy_2x.png);
     background-size: 24px 24px;
   }
 
   .tlb_blog_logo {
-    background-image: url(/img/blog/BlogLogo2x.png?1);
+    background-image: url(/resources/img/blog/BlogLogo2x.png?1);
     background-size: 146px 20px;
   }
 
   .radio-item input.radio + .radio-label:before,
   .checkbox-item input.checkbox + .checkbox-label:before,
   .form-control-dropdown-button:before {
-    background-image: url(/img/rc_icons_2x.png?1);
+    background-image: url(/resources/img/rc_icons_2x.png?1);
     background-size: 20px 152px;
   }
 
   .form-control-dropdown.has-items:before {
-    background-image: url(/img/rc_icons_2x.png?1);
+    background-image: url(/resources/img/rc_icons_2x.png?1);
     background-size: 20px 152px;
   }
   .td_screenshot_macos {
-    background-image: url(/img/macos_2x.png);
+    background-image: url(/resources/img/macos_2x.png);
     background-size: 420px 280px;
     height: 280px;
   }
   .td_screenshot_tdirect {
-    background-image: url(/img/tdirect_2x.jpg?1);
+    background-image: url(/resources/img/tdirect_2x.jpg?1);
   }
 }
 
 @media only screen and (-webkit-min-device-pixel-ratio: 2.5), only screen and (-o-min-device-pixel-ratio: 3/2), only screen and (min--moz-device-pixel-ratio: 2.5), only screen and (min-device-pixel-ratio: 2.5) {
 
   .tlb_blog_logo {
-    background-image: url(/img/blog/BlogLogo3x.png);
+    background-image: url(/resources/img/blog/BlogLogo3x.png);
     background-size: 146px 20px;
   }
 }

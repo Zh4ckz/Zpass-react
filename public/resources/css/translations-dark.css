@@ -59,7 +59,7 @@
 .tr-theme-toggle--static:before {
   content: '';
   background-size: contain;
-  background-image: url('/img/themeMoon.webp');
+  background-image: url('/resources/img/themeMoon.webp');
 }
 
 /* Keep the header contents clear of the fixed toggle. */
@@ -204,7 +204,7 @@ html[data-theme="dark"] .tr-container {
 }
 
 html[data-theme="dark"] .tr-theme-toggle--static:before {
-  background-image: url('/img/themeSun.webp');
+  background-image: url('/resources/img/themeSun.webp');
 }
 html[data-theme="dark"] .tr-theme-toggle {
   color: #c2cbd4;

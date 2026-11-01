@@ -1,6 +1,6 @@
 import { getApps, initializeApp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
 import { getAuth, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js";
-import { firebaseConfig } from "/js/firebase-config.mjs";
+import { firebaseConfig } from "/resources/js/firebase-config.mjs";
 
 const path = location.pathname.replace(/\/index\.html$/, "/");
 const skip = window.top !== window || /^\/(premium|admin|checkout|app-verify)/.test(path);

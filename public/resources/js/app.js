@@ -1324,7 +1324,7 @@ function renderCards(cards) {
     if (detectedBrand) {
       const logo = document.createElement("img");
       logo.className = "card-network-logo";
-      logo.src = `/images/ui/cards/${detectedBrand.asset}.png`;
+      logo.src = `/resources/images/ui/cards/${detectedBrand.asset}.png`;
       logo.alt = detectedBrand.label;
       logo.loading = "lazy";
       network.append(logo);
@@ -1387,7 +1387,7 @@ function setCountryWithFlag(element, countryCode) {
     .replace(/^-|-$/g, "");
   const flag = document.createElement("img");
   flag.className = "country-flag";
-  flag.src = `/images/ui/flags-svg/${code.toLowerCase()}.svg`;
+  flag.src = `/resources/images/ui/flags-svg/${code.toLowerCase()}.svg`;
   flag.alt = "";
   flag.loading = "lazy";
   flag.addEventListener("error", () => flag.remove(), { once: true });
@@ -1536,7 +1536,7 @@ function openDrawer(kind) {
       preview.replaceChildren();
       if (detected) {
         const logo = document.createElement("img");
-        logo.src = `/images/ui/cards/${detected.asset}.png`;
+        logo.src = `/resources/images/ui/cards/${detected.asset}.png`;
         logo.alt = "";
         preview.append(logo, document.createTextNode(detected.label));
       } else {

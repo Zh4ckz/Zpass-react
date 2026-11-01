@@ -12,7 +12,7 @@
       "**/.*",
       "**/node_modules/**",
       "apps/**",
-      "js/vendor/qrcode-generator.js",
+      "resources/js/vendor/qrcode-generator.js",
       "**/*.tmp*",
       "**/*.old",
       "**/*.bin",
@@ -21,6 +21,10 @@
       "**/*.zip"
     ],
     "rewrites": [
+      {
+        "source": "/favicon.ico",
+        "destination": "/resources/img/favicon.ico"
+      },
       {
         "source": "/setlanguage",
         "destination": "/setlanguage.html"

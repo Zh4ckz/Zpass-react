@@ -6,7 +6,7 @@
   <meta name="theme-color" content="#010101">
   <meta name="robots" content="noindex">
   <title>Manage Subscription · PassGram</title>
-  <link rel="icon" href="images/zpass.png">
+  <link rel="icon" href="resources/images/zpass.png">
   <style>
     :root{color-scheme:dark;font-family:Inter,ui-sans-serif,system-ui,-apple-system,Segoe UI,sans-serif;--bg:#010101;--panel:#292F33;--panel2:#292F33;--line:#292F33;--text:#FEFEFE;--muted:#A6B3C4;--brand:#8F9EB4;--brand2:#A6B3C4;--green:#8999B0}
     *{box-sizing:border-box}
@@ -39,13 +39,13 @@
     .empty a{color:var(--brand2);font-weight:700}
     .skeleton{opacity:.5}
   </style>
-  <link rel="stylesheet" href="css/zpass-glass-theme.css?v=101">
-  <link rel="stylesheet" href="/css/site-responsive.css?v=102"><link rel="stylesheet" href="/css/mobile-nav.css?v=102">
-<link rel="stylesheet" href="/css/footer-modern.css?v=106"><link rel="stylesheet" href="/css/pages-modern.css?v=101"><script src="/js/zpass-theme.js?v=3"></script><link rel="stylesheet" href="/css/zpass-app-theme.css?v=109"><link rel="stylesheet" href="/css/performance.css">
-<link rel="stylesheet" href="/css/zpass-design-system.css">
-<link rel="stylesheet" href="/css/unified-2026.css?v=414"></head>
+  <link rel="stylesheet" href="resources/css/zpass-glass-theme.css?v=101">
+  <link rel="stylesheet" href="/resources/css/site-responsive.css?v=102"><link rel="stylesheet" href="/resources/css/mobile-nav.css?v=102">
+<link rel="stylesheet" href="/resources/css/footer-modern.css?v=106"><link rel="stylesheet" href="/resources/css/pages-modern.css?v=101"><script src="/resources/js/zpass-theme.js?v=3"></script><link rel="stylesheet" href="/resources/css/zpass-app-theme.css?v=109"><link rel="stylesheet" href="/resources/css/performance.css">
+<link rel="stylesheet" href="/resources/css/zpass-design-system.css">
+<link rel="stylesheet" href="/resources/css/unified-2026.css?v=414"></head>
 <body class="pm">
-  <header class="top"><a href="/"><img src="images/zpass.png" alt="">PassGram</a></header>
+  <header class="top"><a href="/"><img src="resources/images/zpass.png" alt="">PassGram</a></header>
   <main>
     <div id="signedOut" class="empty" style="display:none">
       <p>Sign in to manage your subscription.</p>
@@ -71,7 +71,7 @@
       </div>
     </div>
   </main>
-  <script src="/js/payment-endpoint.js?v=1"></script>
+  <script src="/resources/js/payment-endpoint.js?v=1"></script>
 <script type="module">
     import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
     import { getAuth, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js";
@@ -79,7 +79,7 @@
 
     if(window.top!==window.self)window.top.location.replace("/dashboard.html#subscription");
 
-    import {firebaseConfig} from "/js/firebase-config.mjs";
+    import {firebaseConfig} from "/resources/js/firebase-config.mjs";
     const app = initializeApp(firebaseConfig);
     const auth = getAuth(app);
     const db = getFirestore(app);
@@ -168,5 +168,5 @@
       $("content").classList.remove("skeleton");
     });
   </script>
-<script type="module" src="/js/mobile-nav.mjs?v=4"></script><script src="/js/site-footer.js"></script><script src="/js/hide-links.js?v=1"></script><script type="module" src="/js/wallpapers.mjs?v=414"></script></body>
+<script type="module" src="/resources/js/mobile-nav.mjs?v=4"></script><script src="/resources/js/site-footer.js"></script><script src="/resources/js/hide-links.js?v=1"></script><script type="module" src="/resources/js/wallpapers.mjs?v=414"></script></body>
 </html>

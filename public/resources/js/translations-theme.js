@@ -156,7 +156,7 @@ var TrThemeToggle = (function () {
         if (gen !== generation) return;
         onFrame(frameNo, pixels);
       });
-      player.loadFromUrl('/img/sun_outline.tgs');
+      player.loadFromUrl('/resources/img/sun_outline.tgs');
     });
   }
 
