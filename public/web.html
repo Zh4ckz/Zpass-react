@@ -6,6 +6,7 @@
   <title>PassGram Web — Private Messaging</title>
   <link rel="icon" type="image/png" href="/resources/assets/app-logo/zpass.png">
   <link rel="stylesheet" href="/resources/css/p4xqke08ig.css">
+  <link rel="stylesheet" href="/resources/css/0kl0me28kq.css">
 </head>
 <body class="pg-theme">
 
@@ -197,41 +198,177 @@
     </section>
   </main>
 
-  <!-- MAIN CHAT APPLICATION -->
-  <main id="chat-app" class="chat-app" hidden>
-    <aside class="sidebar">
-      <header class="side-head"><div class="brand-small"><img src="/resources/assets/app-logo/zpass.png" alt=""></div><div><b>PassGram</b><small>Secure messaging</small></div><button id="signout" class="icon-button icon-signout" title="Sign out" aria-label="Sign out"></button></header>
-      <div class="search-wrap"><span class="icon-mask icon-search" aria-hidden="true"></span><input id="search" placeholder="Search username" autocomplete="off"><button id="clear-search" class="icon-button" hidden aria-label="Clear">×</button></div>
-      <div id="search-results" class="result-list" hidden></div>
-      <div class="list-label">CHATS</div>
-      <div id="chat-list" class="chat-list"></div>
-      <div class="side-foot"><span class="secure-dot"></span><span>End-to-end encrypted</span><button id="pair-device" class="text-button">Pair browser</button></div>
+  <!-- APP SHELL (after sign-in) -->
+  <div id="chat-app" class="ap" hidden>
+    <div id="ap-backdrop" class="ap-backdrop"></div>
+    <aside id="ap-side" class="ap-side" aria-label="Menu">
+      <div class="ap-cover">
+        <button id="ap-close" class="ap-iconbtn ap-close" type="button" aria-label="Close menu"><svg viewBox="0 0 24 24"><path d="M6 6l12 12M18 6L6 18"/></svg></button>
+        <div class="ap-brand"><img src="/resources/assets/app-logo/zpass.png" alt=""><span>PassGram</span></div>
+        <div id="ap-avatar" class="ap-avatar">Z</div>
+      </div>
+      <div class="ap-who">
+        <b id="ap-name">PassGram</b>
+        <span id="ap-handle"></span>
+      </div>
+      <nav class="ap-nav">
+        <button type="button" data-view="home" class="on"><svg viewBox="0 0 24 24"><path d="M3 11l9-8 9 8"/><path d="M5 10v10h14V10"/><path d="M10 20v-6h4v6"/></svg><span>Home</span></button>
+        <button type="button" data-view="vault"><svg viewBox="0 0 24 24"><rect x="4" y="10" width="16" height="11" rx="3"/><path d="M8 10V7a4 4 0 018 0v3"/></svg><span>Vault</span></button>
+        <button type="button" data-view="chats"><svg viewBox="0 0 24 24"><path d="M4 5h16v11H9l-5 4z"/></svg><span>Chats</span><em id="ap-chats-count" hidden>0</em></button>
+        <button type="button" data-view="auth"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 2"/></svg><span>Authenticator</span></button>
+        <button type="button" data-view="secure"><svg viewBox="0 0 24 24"><path d="M12 3l8 3v6c0 4.5-3.2 7.8-8 9-4.8-1.2-8-4.5-8-9V6z"/><path d="M9 12l2 2 4-4"/></svg><span>Secure</span></button>
+        <button type="button" data-view="settings"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="3"/><path d="M19 12a7 7 0 00-.1-1.2l2-1.5-2-3.4-2.3.9a7 7 0 00-2-1.2L14 3h-4l-.6 2.6a7 7 0 00-2 1.2l-2.3-.9-2 3.4 2 1.5A7 7 0 005 12c0 .4 0 .8.1 1.2l-2 1.5 2 3.4 2.3-.9c.6.5 1.3.9 2 1.2L10 21h4l.6-2.6c.7-.3 1.4-.7 2-1.2l2.3.9 2-3.4-2-1.5c.1-.4.1-.8.1-1.2z"/></svg><span>Settings</span></button>
+      </nav>
+      <div class="ap-side-foot">
+        <div class="ap-row">
+          <svg viewBox="0 0 24 24"><path d="M20 14.5A8 8 0 019.5 4a8 8 0 1010.5 10.5z"/></svg>
+          <span>Night mode</span>
+          <button id="ap-night" class="ap-switch" type="button" role="switch" aria-checked="false" aria-label="Night mode"><i></i></button>
+        </div>
+        <button id="ap-signout" class="ap-signout" type="button"><svg viewBox="0 0 24 24"><path d="M9 4H5v16h4"/><path d="M16 8l4 4-4 4M20 12H9"/></svg><span>Sign out</span></button>
+      </div>
     </aside>
-    <section id="empty-state" class="empty-state"><div class="empty-orb"><span class="icon-mask icon-message" aria-hidden="true"></span></div><h2>Your chats</h2><p>Search a username to start a private chat.</p><span class="secure-label"><span class="icon-mask icon-shield"></span> END-TO-END ENCRYPTED · REAL-TIME</span></section>
-    <section id="conversation" class="conversation" hidden>
-      <header class="chat-head"><button id="back-list" class="icon-button back-button" aria-label="Back to chats"><span class="icon-mask icon-back"></span></button><div id="peer-avatar" class="avatar">Z</div><div class="peer-head"><b id="peer-name">—</b><small id="peer-status">End-to-end encrypted</small></div><div class="chat-actions"><button id="audio-call" class="icon-button icon-call" title="Voice call" aria-label="Voice call"></button><button id="video-call" class="icon-button icon-video" title="Video call" aria-label="Video call"></button></div></header>
-      <div id="e2e-banner" class="e2e-banner"><span class="icon-mask icon-shield"></span> End-to-end encrypted · only you and the person you chat with can read messages</div>
-      <div id="messages" class="messages" role="log" aria-live="polite"></div>
-      <form id="composer" class="composer"><textarea id="message-input" rows="1" maxlength="4096" placeholder="Type a message…" aria-label="Type a message"></textarea><button id="send-message" class="send-button" type="submit" aria-label="Send message"><span class="icon-mask icon-send"></span></button></form>
+
+    <section class="ap-main">
+      <header class="ap-top">
+        <button id="ap-menu" class="ap-iconbtn ap-burger" type="button" aria-label="Open menu"><svg viewBox="0 0 24 24"><path d="M4 7h16M4 12h16M4 17h16"/></svg></button>
+        <h1 id="ap-title">Home</h1>
+        <div class="ap-top-end"><span id="ap-plan-chip" class="ap-chip" hidden></span></div>
+      </header>
+
+      <div class="ap-views">
+        <!-- HOME -->
+        <div id="ap-v-home" class="ap-view">
+          <div class="ap-hero">
+            <div>
+              <p class="ap-eyebrow">Welcome back</p>
+              <h2 id="ap-hello">PassGram</h2>
+              <p>Your account is protected by end-to-end encryption. Passwords and chat keys never leave your devices.</p>
+            </div>
+            <div class="ap-hero-art" aria-hidden="true"><img src="/resources/assets/app-logo/zpass.png" alt=""></div>
+          </div>
+          <div class="ap-stats">
+            <div class="ap-stat"><span>Active devices</span><b id="ap-stat-devices">0</b></div>
+            <div class="ap-stat"><span>Chats</span><b id="ap-stat-chats">0</b></div>
+            <div class="ap-stat"><span>Plan</span><b id="ap-stat-plan">Free</b></div>
+            <div class="ap-stat"><span>Security</span><b class="ok"><i></i>Protected</b></div>
+          </div>
+          <div class="ap-grid2">
+            <div class="ap-card">
+              <h3>Quick actions</h3>
+              <div class="ap-actions">
+                <button type="button" data-go="chats"><svg viewBox="0 0 24 24"><path d="M4 5h16v11H9l-5 4z"/></svg><span>Open chats</span></button>
+                <button type="button" data-go="secure"><svg viewBox="0 0 24 24"><path d="M12 3l8 3v6c0 4.5-3.2 7.8-8 9-4.8-1.2-8-4.5-8-9V6z"/></svg><span>Manage devices</span></button>
+                <button type="button" data-go="settings"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="3"/><path d="M12 3v3M12 18v3M3 12h3M18 12h3"/></svg><span>Settings</span></button>
+                <a href="/apps#android"><svg viewBox="0 0 24 24"><path d="M12 4v11M7 11l5 5 5-5M5 20h14"/></svg><span>Get the app</span></a>
+              </div>
+            </div>
+            <div class="ap-card">
+              <h3>Recent security activity</h3>
+              <ul id="ap-home-events" class="ap-list"></ul>
+            </div>
+          </div>
+        </div>
+
+        <!-- VAULT -->
+        <div id="ap-v-vault" class="ap-view" hidden>
+          <div class="ap-empty">
+            <div class="ap-empty-ic"><svg viewBox="0 0 24 24"><rect x="4" y="10" width="16" height="11" rx="3"/><path d="M8 10V7a4 4 0 018 0v3"/></svg></div>
+            <h2>Your vault stays on your phone</h2>
+            <p>Passwords are encrypted on your device and the web app never sees them. Open PassGram on your phone to view or edit your vault.</p>
+            <div class="ap-empty-actions">
+              <a class="ap-btn" href="/apps#android">Get the app</a>
+              <button class="ap-btn ghost" type="button" data-go="secure">Review security</button>
+            </div>
+          </div>
+        </div>
+
+        <!-- CHATS -->
+        <div id="ap-v-chats" class="ap-view ap-chats" hidden>
+          <div class="ap-chat-list">
+            <div class="ap-search"><svg viewBox="0 0 24 24"><circle cx="11" cy="11" r="7"/><path d="M20 20l-4-4"/></svg><input id="ap-chat-search" type="search" placeholder="Search chats" autocomplete="off"></div>
+            <div id="ap-chat-items" class="ap-chat-items"></div>
+          </div>
+          <div id="ap-thread" class="ap-thread">
+            <div id="ap-thread-empty" class="ap-empty small">
+              <div class="ap-empty-ic"><svg viewBox="0 0 24 24"><path d="M4 5h16v11H9l-5 4z"/></svg></div>
+              <h2>Your chats</h2>
+              <p>Select a conversation to see its details.</p>
+            </div>
+            <div id="ap-thread-open" hidden>
+              <header class="ap-thread-head">
+                <button id="ap-thread-back" class="ap-iconbtn" type="button" aria-label="Back"><svg viewBox="0 0 24 24"><path d="M15 5l-7 7 7 7"/></svg></button>
+                <div id="ap-thread-avatar" class="ap-avatar sm">Z</div>
+                <div><b id="ap-thread-name">Chat</b><small id="ap-thread-handle"></small></div>
+              </header>
+              <div class="ap-empty small">
+                <div class="ap-empty-ic"><svg viewBox="0 0 24 24"><rect x="4" y="10" width="16" height="11" rx="3"/><path d="M8 10V7a4 4 0 018 0v3"/></svg></div>
+                <h2>End-to-end encrypted</h2>
+                <p>Messages in this chat are encrypted on your devices. Open PassGram on your phone to read and reply.</p>
+                <div class="ap-empty-actions"><a class="ap-btn" href="/apps#android">Get the app</a></div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- AUTHENTICATOR -->
+        <div id="ap-v-auth" class="ap-view" hidden>
+          <div class="ap-empty">
+            <div class="ap-empty-ic"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 2"/></svg></div>
+            <h2>Authenticator codes stay on your phone</h2>
+            <p>One-time codes are generated on your device so they remain safe even if this browser is compromised.</p>
+            <div class="ap-empty-actions"><a class="ap-btn" href="/apps#android">Get the app</a></div>
+          </div>
+        </div>
+
+        <!-- SECURE -->
+        <div id="ap-v-secure" class="ap-view" hidden>
+          <div class="ap-card">
+            <h3>Devices and active sessions</h3>
+            <ul id="ap-devices" class="ap-list"></ul>
+          </div>
+          <div class="ap-card">
+            <h3>Recent security activity</h3>
+            <ul id="ap-events" class="ap-list"></ul>
+          </div>
+        </div>
+
+        <!-- SETTINGS -->
+        <div id="ap-v-settings" class="ap-view" hidden>
+          <div class="ap-card ap-profile">
+            <div id="ap-set-avatar" class="ap-avatar lg">Z</div>
+            <div class="ap-profile-info">
+              <b id="ap-set-name">PassGram</b>
+              <span id="ap-set-handle"></span>
+              <button id="ap-copy-id" class="ap-link" type="button">Copy account ID</button>
+            </div>
+          </div>
+          <div class="ap-card">
+            <h3>Appearance</h3>
+            <div class="ap-row big">
+              <span>Night mode</span>
+              <button id="ap-night2" class="ap-switch" type="button" role="switch" aria-checked="false" aria-label="Night mode"><i></i></button>
+            </div>
+            <div class="ap-row big">
+              <span>Language</span>
+              <div class="ap-seg" role="group" aria-label="Language">
+                <button type="button" data-lang="en">English</button>
+                <button type="button" data-lang="tr">Türkçe</button>
+              </div>
+            </div>
+          </div>
+          <div class="ap-card">
+            <h3>Account</h3>
+            <div class="ap-row big"><span>Sign out of this browser</span><button id="ap-signout2" class="ap-btn danger" type="button">Sign out</button></div>
+          </div>
+          <p class="ap-foot">PassGram Web · web.zpas.org</p>
+        </div>
+      </div>
     </section>
-  </main>
+    <div id="ap-toast" class="ap-toast" role="status"></div>
+    <iframe id="ap-mobile" class="ap-mobile" title="PassGram" hidden></iframe>
+  </div>
 
-  <dialog id="pair-dialog" class="modal">
-    <form method="dialog"><button class="modal-close" aria-label="Close">×</button></form>
-    <div class="modal-icon"><span class="icon-mask icon-link"></span></div><p class="eyebrow">SECURE DEVICE PAIRING</p><h2>Approve from your phone</h2>
-    <p class="muted">Open PassGram on your phone and confirm the same two-digit code. Your current chat key is transferred over a one-time encrypted channel.</p>
-    <div id="pair-code" class="pair-code">··</div><p id="pair-status" class="status" role="status">Waiting for phone approval…</p>
-    <button id="pair-start" class="button button-primary" type="button">Request phone approval</button>
-    <p class="privacy-note">Do not approve any code if you did not start this. The browser key stays in this browser's protected local storage.</p>
-  </dialog>
-
-  <dialog id="call-dialog" class="call-modal">
-    <div class="call-title"><b id="call-peer">Call</b><span id="call-state">Connecting…</span></div>
-    <div id="call-videos" class="call-videos"><video id="remote-video" autoplay playsinline></video><video id="local-video" autoplay muted playsinline></video></div><audio id="remote-audio" autoplay></audio>
-    <div id="audio-call-art" class="audio-call-art"><img src="/resources/assets/app-logo/zpass.png" alt=""></div>
-    <div class="call-controls"><button id="toggle-mic" class="icon-button" aria-label="Mute microphone">Microphone</button><button id="hangup" class="hangup">End call</button><button id="toggle-camera" class="icon-button" aria-label="Toggle camera">Camera</button></div>
-    <button id="accept-call" class="button button-primary" hidden>Answer call</button>
-  </dialog>
   <div id="toast" class="toast" role="status"></div>
   <script src="/resources/js/gjbeiis59q.js"></script>
   <script>
@@ -243,7 +380,7 @@
     document.getElementById('startup-retry')?.addEventListener('click', () => window.location.reload());
   </script>
   <script type="module">
-    import('/resources/js/3wa6kb7xb5.js').catch((error) => {
+    import('/resources/js/q0qt3jcy0k.js').catch((error) => {
       console.error('PassGram Web could not start:', error);
       const status = document.getElementById('startup-status');
       const retry = document.getElementById('startup-error');

@@ -28,7 +28,8 @@ DEPLOYMENTS = (
 # Each site module is self-contained: <module>/<module>.html plus its own css/, js/ and lang/ folders.
 # Entry files are bundled and minified into opaque hashed names under public/resources.
 MODULES = {
-    "web": {"css": ["css/web-chat.css"], "js": ["js/web-chat.mjs", "js/vendor/qrcode-generator.js"]},
+    "web": {"css": ["css/web-chat.css", "css/web-app.css"], "js": ["js/web-chat.mjs", "js/vendor/qrcode-generator.js"]},
+    "mobile": {"css": ["css/mobile.css"], "js": ["js/classic/mobile-app.js"]},
     "docs": {"css": ["css/docs.css"], "js": ["js/docs.js"]},
     "core": {"css": ["css/core.css"], "js": []},
     "bots": {"css": ["css/bots.css"], "js": []},
@@ -70,7 +71,7 @@ def build_modules():
         for kind in ("css", "js"):
             for rel in spec[kind]:
                 args = [os.path.join(mod_dir, *rel.split("/"))]
-                if kind == "js" and "vendor/" not in rel:
+                if kind == "js" and "vendor/" not in rel and "classic/" not in rel:
                     args += ["--bundle", "--format=esm", "--external:https://*"]
                 ext = kind
                 tmp = os.path.join(work, f"{mod}-{kind}-{len(names)}.{ext}")

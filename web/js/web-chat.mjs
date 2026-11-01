@@ -4,6 +4,7 @@ import { getFirestore, doc, getDoc, getDocs, setDoc, addDoc, collection, query, 
 import { getFunctions, httpsCallable } from 'https://www.gstatic.com/firebasejs/10.12.2/firebase-functions.js';
 import { firebaseConfig } from './firebase-config.mjs';
 import { t, initI18n } from './web-i18n.mjs';
+import './web-app.mjs';
 
 initI18n();
 

@@ -1,0 +1,103 @@
+
+    * { -webkit-tap-highlight-color: transparent; }
+    html, body { height: 100%; }
+    body { font-family: -apple-system, BlinkMacSystemFont, "SF Pro Display", Inter, "Segoe UI", sans-serif; letter-spacing: -0.02em; }
+    .no-scrollbar::-webkit-scrollbar { display: none; }
+    .no-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
+    ::selection { background: rgba(102,117,127,.25); }
+
+    @keyframes meshDrift { 0%,100% { transform: translate(0,0) scale(1); } 50% { transform: translate(40px,-30px) scale(1.08); } }
+    .mesh-blob { animation: meshDrift 14s ease-in-out infinite; filter: blur(90px); }
+
+    @keyframes screenIn { from { opacity: 0; transform: translateY(12px) scale(.997); } to { opacity: 1; transform: none; } }
+    .app-screen:not(.hidden) { animation: screenIn .3s ease both; }
+    @keyframes rise { from { opacity: 0; transform: translateY(20px); } to { opacity: 1; transform: none; } }
+    .rise { animation: rise .55s cubic-bezier(.22,.9,.3,1) both; }
+    @keyframes popIn { 0% { opacity: 0; transform: translateY(8px) scale(.94); } 100% { opacity: 1; transform: none; } }
+    .msg-pop { animation: popIn .24s cubic-bezier(.3,1.4,.5,1); }
+    @keyframes pulseDot { 0%,100% { opacity: 1; transform: scale(1); } 50% { opacity: .4; transform: scale(.8); } }
+    .live-dot { animation: pulseDot 2s ease-in-out infinite; }
+    @keyframes floaty { 0%,100% { transform: translateY(0); } 50% { transform: translateY(-10px); } }
+    @keyframes shake { 0%,100% { transform: translateX(0); } 20%,60% { transform: translateX(-7px); } 40%,80% { transform: translateX(7px); } }
+    .shake { animation: shake .4s; }
+    /* ─── Liquid-glass toggle (Log in / Sign up) — backup_index.html'deki gibi, açık tema ─── */
+    .sp-glass-toggle { position: relative; display: inline-flex; align-items: center; width: 100%; background: rgba(255,255,255,.8); backdrop-filter: blur(20px); -webkit-backdrop-filter: blur(20px); border: 1px solid rgba(15,23,42,.08); border-radius: 9999px; padding: 4px; margin-bottom: 1rem; box-shadow: 0 10px 30px rgba(47,58,65,.12); }
+    .sp-glass-toggle span.indicator { position: absolute; top: 4px; bottom: 4px; left: 4px; width: calc(50% - 4px); background: #292F33; border-radius: 9999px; transition: transform .35s cubic-bezier(.4,0,.2,1); box-shadow: 0 4px 15px rgba(47,58,65,.35); }
+    .sp-glass-toggle.signup span.indicator { transform: translateX(100%); }
+    /* ─── Biyometrik tarama animasyonu ─── */
+    @keyframes bioPulse { 0%,100% { transform: scale(1); opacity: .7; } 50% { transform: scale(1.25); opacity: .3; } }
+    .bio-pulse { animation: bioPulse 1.2s ease-in-out infinite; }
+    /* ─── Chats: aşağı kaydırınca story'ler küçülüp kaybolur, arama barı kompakt kalır ─── */
+    .chats-collapsible { max-height: 170px; overflow: hidden; transform-origin: top center; visibility: visible; transition: max-height .38s cubic-bezier(.4,0,.2,1), opacity .25s ease, transform .38s cubic-bezier(.4,0,.2,1), margin .38s ease, visibility 0s; }
+    #stories-row.chats-collapsible, #folder-tabs.chats-collapsible { overflow-x: auto; overflow-y: hidden; }
+    #screen-chats.chats-collapsed .chats-collapsible { max-height: 0; opacity: 0; transform: scale(.88); margin-top: 0; margin-bottom: 0; pointer-events: none; visibility: hidden; transition: max-height .38s cubic-bezier(.4,0,.2,1), opacity .25s ease, transform .38s cubic-bezier(.4,0,.2,1), margin .38s ease, visibility 0s linear .3s; }
+    #chats-search { transition: padding .3s ease, font-size .3s ease; }
+    #screen-chats.chats-collapsed #chats-search { padding-top: .55rem; padding-bottom: .55rem; font-size: 12px; }
+    #chat-list { overflow-anchor: none; }
+    /* ─── Şifre kuralları: hepsi tik olunca liste animasyonla kapanır (direkt kaybolmaz) ─── */
+    #pw-reqs { overflow: hidden; max-height: 220px; transition: opacity .45s ease, max-height .45s ease, transform .45s ease, padding .45s ease; }
+    #pw-reqs.pw-reqs-done { opacity: 0; max-height: 0; padding-top: 0; padding-bottom: 0; transform: translateY(-6px); pointer-events: none; }
+    .sp-glass-toggle button { position: relative; z-index: 1; background: transparent; border: none; color: #64748b; font-size: 13px; font-weight: 700; padding: 10px 0; border-radius: 9999px; cursor: pointer; transition: color .3s ease; width: 50%; text-align: center; }
+    .sp-glass-toggle button.active { color: #fff; }
+    .floaty { animation: floaty 7s ease-in-out infinite; }
+    @keyframes barPress { 0% { transform: scale(1); } 40% { transform: scale(.86); } 100% { transform: scale(1); } }
+    .tab-press { animation: barPress .38s cubic-bezier(.3,1.6,.5,1); }
+    @keyframes sheetUp { from { transform: translateY(100%); } to { transform: translateY(0); } }
+        .sheet-up { animation: sheetUp .32s cubic-bezier(.32,.9,.35,1); }
+        .call-pulse { animation: callPulse 2s ease-in-out infinite; }
+        @keyframes callPulse { 0%,100% { opacity:.5; transform:scale(1);} 50% { opacity:.9; transform:scale(1.12);} }
+        .heads-up-in { animation: headsUpIn .35s cubic-bezier(.32,.9,.35,1); }
+        @keyframes headsUpIn { from { transform: translateY(-130%); opacity: 0; } to { transform: none; opacity: 1; } }
+        #phone.dark { background: #0f1722 !important; }
+        #phone.dark .bg-\[\#f4f4f1\] { background: #0f1722 !important; }
+        #phone.dark .card-soft { background: rgba(255,255,255,.07) !important; box-shadow: none !important; }
+        #phone.dark .bg-white { background: #17212b !important; }
+        #phone.dark .bg-slate-50 { background: rgba(255,255,255,.05) !important; }
+        #phone.dark .hover\:bg-white:hover { background: rgba(255,255,255,.06) !important; }
+        #phone.dark .text-slate-900 { color: #f1f5f9 !important; }
+        #phone.dark .text-slate-800 { color: #e2e8f0 !important; }
+        #phone.dark .text-slate-700 { color: #cbd5e1 !important; }
+        #phone.dark .text-slate-600 { color: #94a3b8 !important; }
+        #phone.dark .text-slate-500 { color: #94a3b8 !important; }
+        #phone.dark .text-slate-400 { color: #64748b !important; }
+        #phone.dark input, #phone.dark textarea { background: rgba(255,255,255,.07) !important; color: #f1f5f9 !important; border-color: rgba(255,255,255,.1) !important; }
+        #phone.dark .border-slate-900\/10 { border-color: rgba(255,255,255,.08) !important; }
+    @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
+    .fade-in { animation: fadeIn .25s ease both; }
+    @keyframes ringPulse { 0% { box-shadow: 0 0 0 0 rgba(16,185,129,.35); } 100% { box-shadow: 0 0 0 14px rgba(16,185,129,0); } }
+    .shield-pulse { animation: ringPulse 2.4s ease-out infinite; }
+    @keyframes scanLine { 0% { top: 8%; } 50% { top: 88%; } 100% { top: 8%; } }
+    .scan-line { animation: scanLine 2.2s ease-in-out infinite; }
+
+    .glass { background: linear-gradient(165deg, rgba(255,255,255,.20), rgba(255,255,255,.06)); border: 1px solid rgba(255,255,255,.28); backdrop-filter: blur(22px); -webkit-backdrop-filter: blur(22px); }
+    .liquid-glass { position: relative; background: linear-gradient(135deg, rgba(255,255,255,.62), rgba(255,255,255,.18) 42%, rgba(255,255,255,.08)); border: 1px solid rgba(255,255,255,.65); backdrop-filter: blur(24px) saturate(180%); -webkit-backdrop-filter: blur(24px) saturate(180%); box-shadow: 0 10px 26px -10px rgba(15,23,42,.30), inset 0 1px 0 rgba(255,255,255,.75), inset 0 -1px 0 rgba(255,255,255,.18); overflow: hidden; }
+    .liquid-glass::before { content: ''; position: absolute; inset: 0; border-radius: inherit; background: linear-gradient(180deg, rgba(255,255,255,.55), rgba(255,255,255,0) 46%); pointer-events: none; }
+    .liquid-glass > * { position: relative; z-index: 1; }
+    .composer-clear { background: transparent; border: 1px solid rgba(255,255,255,.65); }
+    /* V42: voice waveform bars + chat media viewer + loading spinner */
+    .voice-bars { display: flex; align-items: center; gap: 2px; height: 24px; }
+    .voice-bars span { display: block; width: 3px; border-radius: 99px; background: currentColor; opacity: .85; }
+    .voice-bars.playing span, .voice-bars.voice-live span { animation: voiceBar .7s ease-in-out infinite alternate; }
+    .voice-bars.playing span:nth-child(odd), .voice-bars.voice-live span:nth-child(odd) { animation-delay: .15s; }
+    .voice-bars.playing span:nth-child(3n), .voice-bars.voice-live span:nth-child(3n) { animation-delay: .3s; }
+    @keyframes voiceBar { from { transform: scaleY(.45); } to { transform: scaleY(1.1); } }
+    .chat-media-img { transition: transform .12s ease; touch-action: none; user-select: none; -webkit-user-drag: none; }
+    .spin { animation: spin 1s linear infinite; }
+    @keyframes spin { to { transform: rotate(360deg); } }
+    .glass-dark { background: linear-gradient(165deg, rgba(52,58,63,.92), rgba(30,34,37,.88)); border: 1px solid rgba(255,255,255,.14); backdrop-filter: blur(22px); -webkit-backdrop-filter: blur(22px); }
+    .card-soft { background: #fff; border: 1px solid rgba(15,23,42,.06); box-shadow: 0 10px 30px -12px rgba(15,23,42,.12); }
+    .pressable { transition: transform .14s ease; }
+    .pressable:active { transform: scale(.95); }
+    input:focus { outline: none; }
+    .toggle { width: 46px; height: 27px; border-radius: 999px; background: #d7dadb; position: relative; transition: background .25s; flex-shrink: 0; cursor: pointer; }
+    .toggle::after { content: ''; position: absolute; top: 3px; left: 3px; width: 21px; height: 21px; border-radius: 50%; background: #fff; box-shadow: 0 2px 6px rgba(0,0,0,.25); transition: left .25s cubic-bezier(.3,1.4,.5,1); }
+    .toggle.on { background: #10b981; }
+    .toggle.on::after { left: 22px; }
+    .seg-btn { transition: all .25s; }
+
+/* PassGram Web: full-screen mobile layout */
+body { display: block !important; background: #f4f4f1 !important; }
+body > .absolute.inset-0 { display: none !important; }
+#phone { width: 100vw !important; height: 100dvh !important; max-height: none !important; border-radius: 0 !important; padding: 0 !important; box-shadow: none !important; background: transparent !important; }
+#phone > div { border-radius: 0 !important; padding-bottom: env(safe-area-inset-bottom); }
+#phone > div > div:first-child { display: none !important; }
