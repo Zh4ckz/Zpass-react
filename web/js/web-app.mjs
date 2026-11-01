@@ -19,7 +19,7 @@ const ICON = {
 };
 
 let uid = null, current = 'home';
-let profile = {}, plan = null, devices = [], events = [], chats = [];
+let media = {}, profile = {}, plan = null, devices = [], events = [], chats = [];
 const peers = new Map();
 let stops = [];
 let activeChat = null;
@@ -68,13 +68,13 @@ function renderIdentity() {
   ['ap-name', 'ap-set-name'].forEach(id => { $(id).textContent = name; });
   ['ap-handle', 'ap-set-handle'].forEach(id => { $(id).textContent = handle; });
   $('ap-hello').textContent = name;
-  const photo = blobUrl(profile.photo);
+  const photo = blobUrl(media.photo);
   ['ap-avatar', 'ap-set-avatar'].forEach(id => {
     const node = $(id);
     node.textContent = photo ? '' : initial(name);
     node.style.background = photo ? `center / cover url(${photo})` : `linear-gradient(135deg, ${colorFor(uid || name)}, #339af0)`;
   });
-  const banner = blobUrl(profile.banner);
+  const banner = blobUrl(media.banner);
   document.querySelector('.ap-cover').style.backgroundImage = banner ? `url(${banner})` : '';
   document.querySelector('.ap-cover').classList.toggle('has-banner', !!banner);}
 
@@ -351,6 +351,7 @@ function start(user) {
     if (firstProfile) { firstProfile = false; mountMobile(); }
   });
   mobileTimer = setTimeout(mountMobile, 1500);
+  listen(doc(db, 'chat_media_profiles', uid), s => { media = s.data() || {}; renderIdentity(); });
   listen(doc(db, 'subscriptions', uid), s => { plan = s.data() || null; renderPlan(); });
   listen(collection(db, 'users', uid, 'devices'), s => { devices = s.docs.map(d => ({ id: d.id, ...d.data() })); renderDevices(); });
   listen(query(collection(db, 'users', uid, 'securityEvents'), orderBy('createdAt', 'desc'), limit(10)), s => { events = s.docs.map(d => d.data()); renderEvents(); });
@@ -375,6 +376,7 @@ function stop() {
   clearTimeout(mobileTimer);
   stops.splice(0).forEach(fn => { try { fn(); } catch { /* listener already closed */ } });
   unlockedUntil = 0; clearUnlockReq(true); gateState = 'idle';
+  media = {};
   uid = null; profile = {}; plan = null; devices = []; events = []; chats = [];
   setMenu(false);
   mountMobile();
