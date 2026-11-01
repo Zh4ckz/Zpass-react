@@ -19,7 +19,7 @@ const ICON = {
 };
 
 let uid = null, current = 'home';
-let media = {}, profile = {}, plan = null, devices = [], events = [], chats = [];
+let account = {}, media = {}, profile = {}, plan = null, devices = [], events = [], chats = [];
 const peers = new Map();
 let stops = [];
 let activeChat = null;
@@ -55,8 +55,10 @@ function showView(name) {
 }
 
 function displayName() {
-  return profile.displayName || profile.username || auth.currentUser?.displayName || '';
+  return profile.displayName || profile.username || account.displayName || auth.currentUser?.displayName || '';
 }
+
+function safeUrl(u) { return /^https:\/\/[\w.-]+\.googleusercontent\.com\//.test(String(u || '')) ? String(u).replace(/[()'\"\s]/g, '') : ''; }
 
 function blobUrl(value) {
   try { return value?.toBase64 ? 'data:image/jpeg;base64,' + value.toBase64() : ''; } catch { return ''; }
@@ -68,7 +70,7 @@ function renderIdentity() {
   ['ap-name', 'ap-set-name'].forEach(id => { $(id).textContent = name; });
   ['ap-handle', 'ap-set-handle'].forEach(id => { $(id).textContent = handle; });
   $('ap-hello').textContent = name;
-  const photo = blobUrl(media.photo);
+  const photo = blobUrl(media.photo) || safeUrl(account.photoUrl);
   ['ap-avatar', 'ap-set-avatar'].forEach(id => {
     const node = $(id);
     node.textContent = photo ? '' : initial(name);
@@ -351,6 +353,7 @@ function start(user) {
     if (firstProfile) { firstProfile = false; mountMobile(); }
   });
   mobileTimer = setTimeout(mountMobile, 1500);
+  listen(doc(db, 'users', uid), s => { account = s.data() || {}; renderIdentity(); });
   listen(doc(db, 'chat_media_profiles', uid), s => { media = s.data() || {}; renderIdentity(); });
   listen(doc(db, 'subscriptions', uid), s => { plan = s.data() || null; renderPlan(); });
   listen(collection(db, 'users', uid, 'devices'), s => { devices = s.docs.map(d => ({ id: d.id, ...d.data() })); renderDevices(); });
@@ -376,7 +379,7 @@ function stop() {
   clearTimeout(mobileTimer);
   stops.splice(0).forEach(fn => { try { fn(); } catch { /* listener already closed */ } });
   unlockedUntil = 0; clearUnlockReq(true); gateState = 'idle';
-  media = {};
+  media = {}; account = {};
   uid = null; profile = {}; plan = null; devices = []; events = []; chats = [];
   setMenu(false);
   mountMobile();
