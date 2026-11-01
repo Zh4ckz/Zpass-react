@@ -198,5 +198,6 @@
   "Unlock with your phone to open this section. It locks again after 15 minutes of inactivity.": "Bu bölümü açmak için telefonunla kilidi aç. 15 dakika işlem yapılmazsa tekrar kilitlenir.",
   "Unlock for 15 minutes": "15 dakikalığına aç",
   "Unlocked": "Kilit açık",
-  "Lock now": "Şimdi kilitle"
+  "Lock now": "Şimdi kilitle",
+  "Ends from phone only": "Sadece telefondan sonlandırılır"
 }

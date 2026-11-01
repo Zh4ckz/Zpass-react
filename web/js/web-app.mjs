@@ -111,11 +111,13 @@ function renderDevices() {
   $('ap-devices').innerHTML = sorted.length ? sorted.map(d => {
     const isWeb = String(d.platform).toUpperCase() === 'WEB';
     const here = d.id === mine;
+    const isPhone = ['ANDROID', 'IOS'].includes(String(d.platform).toUpperCase());
     const seen = fmt(tsDate(d.lastSeenAt));
     const meta = [d.platform, d.appVersion].filter(Boolean).join(' · ');
     const action = d.revoked
       ? `<span class="ap-badge off">${esc(t('Revoked'))}</span>`
       : here ? `<span class="ap-badge">${esc(t('This browser'))}</span>`
+        : isPhone ? `<span class="ap-badge off">${esc(t('Ends from phone only'))}</span>`
         : `<button class="ap-btn ghost small" type="button" data-revoke="${esc(d.id)}">${esc(t('Terminate'))}</button>`;
     return `<li><span class="ap-li-ic">${isWeb ? ICON.web : ICON.device}</span><div class="ap-li-main"><b>${esc(d.deviceName || d.platform || t('Device'))}</b><small>${esc(meta)}${seen ? ' · ' + esc(seen) : ''}</small></div>${action}</li>`;
   }).join('') : `<li class="none">${esc(t('No devices yet.'))}</li>`;
@@ -187,6 +189,7 @@ function toggleNight() {
 }
 
 async function terminate(id) {
+  if (['ANDROID', 'IOS'].includes(String(devices.find(d => d.id === id)?.platform).toUpperCase())) return;
   if (!window.confirm(t('Terminate this session?'))) return;
   const data = { revoked: true, revokedAt: serverTimestamp() };
   try {
