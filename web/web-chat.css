@@ -15,7 +15,7 @@
 
 * { box-sizing: border-box; }
 
-body.telegram-theme {
+body.pg-theme {
   margin: 0;
   min-height: 100dvh;
   display: flex;
@@ -73,7 +73,7 @@ button { cursor: pointer; }
   background: rgba(255, 255, 255, 0.5);
 }
 
-/* Auth Container & Telegram Web K Card */
+/* Auth container & card */
 .auth-view, .setup-view {
   width: 100%;
   min-height: 100dvh;
@@ -104,7 +104,7 @@ button { cursor: pointer; }
   box-shadow: 0 12px 40px rgba(0, 0, 0, 0.45);
 }
 
-/* Telegram QR Container & Sticker Frame */
+/* QR container & frame */
 ._container_16kfa_1 {
   display: flex;
   flex-direction: column;
@@ -174,7 +174,7 @@ button { cursor: pointer; }
   line-height: 1.5;
 }
 
-/* Telegram Numbered Description List */
+/* Numbered description list */
 ._qrDescription_140gf_198 {
   list-style: none;
   padding: 0;
@@ -244,7 +244,7 @@ button { cursor: pointer; }
 .app-login-panel .qr-expiry-text { margin-top: 5px; }
 .app-login-panel .tg-link-btn { width: 100%; }
 
-/* Telegram Action Link Buttons */
+/* Action link buttons */
 .tg-link-btn {
   background: none;
   border: none;
@@ -780,7 +780,7 @@ button { cursor: pointer; }
   --line: #e7ebef;
 }
 
-body.telegram-theme {
+body.pg-theme {
   display: block;
   min-width: 320px;
   min-height: 100dvh;
@@ -792,7 +792,7 @@ body.telegram-theme {
   text-rendering: optimizeLegibility;
 }
 
-body.telegram-theme::before {
+body.pg-theme::before {
   position: fixed;
   inset: 0;
   z-index: -1;
@@ -1177,7 +1177,7 @@ body.dark-theme {
   ._qrDescription_140gf_198 { margin-block: 12px; gap: 7px; }
 }
 @media (max-height: 740px) {
-  body.telegram-theme { overflow-y: auto; }
+  body.pg-theme { overflow-y: auto; }
 }
 @media (prefers-reduced-motion: reduce) {
   *, *::before, *::after { scroll-behavior: auto !important; animation-duration: .01ms !important; transition-duration: .01ms !important; }

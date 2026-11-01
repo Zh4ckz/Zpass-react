@@ -12,6 +12,7 @@
       "**/.*",
       "**/node_modules/**",
       "apps/**",
+      "js/vendor/qrcode-generator.js",
       "**/*.tmp*",
       "**/*.old",
       "**/*.bin",

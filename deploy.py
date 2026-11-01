@@ -1,6 +1,8 @@
 #!/usr/bin/env python3
 """Deploy Z Pass Web application automatically to Firebase Hosting (passgram-org) and GitHub."""
+import hashlib
 import os
+import re
 import subprocess
 import sys
 import shutil
@@ -40,6 +42,62 @@ def sync_modules():
                     shutil.copy2(s, d)
 
 
+def _short_name(path):
+    digest = int(hashlib.sha256(open(path, "rb").read()).hexdigest()[:16], 16)
+    chars, out = "0123456789abcdefghijklmnopqrstuvwxyz", ""
+    while digest and len(out) < 10:
+        digest, rem = divmod(digest, 36)
+        out += chars[rem]
+    return out.rjust(10, "x")
+
+
+def build_web():
+    """Bundle and minify the web app into files with opaque names, then point web.html at them."""
+    public_dir = os.path.join(ROOT, "public")
+    esbuild = os.path.join(ROOT, "node_modules", ".bin", "esbuild.cmd" if os.name == "nt" else "esbuild")
+    if not os.path.exists(esbuild):
+        raise SystemExit("esbuild missing. Run: npm install")
+
+    for old in os.listdir(public_dir):
+        if re.fullmatch(r"[a-z0-9]{10}\.(js|css)", old):
+            os.remove(os.path.join(public_dir, old))
+
+    work = os.path.join(ROOT, ".build-web")
+    shutil.rmtree(work, ignore_errors=True)
+    os.makedirs(work)
+    shutil.copy2(os.path.join(ROOT, "web", "web-chat.mjs"), work)
+    shutil.copy2(os.path.join(public_dir, "js", "firebase-config.mjs"), work)
+    jobs = {
+        "app": [os.path.join(work, "web-chat.mjs"), "--bundle", "--format=esm", "--external:https://*"],
+        "qr": [os.path.join(public_dir, "js", "vendor", "qrcode-generator.js")],
+        "css": [os.path.join(ROOT, "web", "web-chat.css")],
+    }
+    names = {}
+    for key, args in jobs.items():
+        ext = "css" if key == "css" else "js"
+        tmp = os.path.join(work, f"{key}.out.{ext}")
+        subprocess.run([esbuild, *args, "--minify", "--legal-comments=none", f"--outfile={tmp}"],
+                       check=True, capture_output=True, cwd=ROOT)
+        names[key] = f"{_short_name(tmp)}.{ext}"
+        shutil.copy2(tmp, os.path.join(public_dir, names[key]))
+    shutil.rmtree(work, ignore_errors=True)
+
+    html_path = os.path.join(ROOT, "web", "web.html")
+    html = open(html_path, encoding="utf-8").read()
+    html = re.sub(r"/css/web-chat\.css\?v=\d+", "/" + names["css"], html)
+    html = html.replace("/js/vendor/qrcode-generator.js", "/" + names["qr"])
+    html = re.sub(r"/js/web-chat\.mjs\?v=\d+", "/" + names["app"], html)
+    with open(os.path.join(public_dir, "web.html"), "w", encoding="utf-8", newline="") as fh:
+        fh.write(html)
+
+    for leftover in ("js/web-chat.mjs", "web-chat.mjs", "css/web-chat.css", "web-chat.css"):
+        try:
+            os.remove(os.path.join(public_dir, *leftover.split("/")))
+        except FileNotFoundError:
+            pass
+    print(f"Web build: {names}", flush=True)
+
+
 def main():
     print("=" * 50)
     print("🚀 Z Pass Auto-Deployer: Firebase & GitHub")
@@ -48,6 +106,7 @@ def main():
     # 0. Sync modular folders into public
     print("\n[0/2] Syncing modular folders (web, translations, core, bots, docs)...", flush=True)
     sync_modules()
+    build_web()
 
     # 1. Deploy to Firebase Hosting
     firebase_cmd = shutil.which("firebase.cmd") or shutil.which("firebase") or "firebase"

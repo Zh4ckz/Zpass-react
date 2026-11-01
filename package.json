@@ -1,5 +1,8 @@
 {
   "dependencies": {
     "firebase": "^13.1.0"
+  },
+  "devDependencies": {
+    "esbuild": "^0.28.2"
   }
 }
