@@ -289,3 +289,26 @@ h1 em, h2 em { font-style: normal; color: var(--blue); }
   .founder-body .founder-quote { font-size: 1.04rem; }
   .founder-sign .x-link { margin-left: 0; }
 }
+
+/* White footer with a "+ ------ +" divider */
+.site-footer { position: relative; background: #fff !important; color: #0b0b0f !important; border-top: 0 !important; margin-top: 56px; padding-top: 56px; }
+.site-footer a, .site-footer p, .site-footer span { color: rgba(0,0,0,.68) !important; }
+.site-footer a:hover { color: #1769ff !important; }
+.site-footer .brand span:last-child, .site-footer .footer-main p em { color: #000 !important; }
+.site-footer .footer-x { color: #000 !important; font-weight: 600; }
+.site-footer .footer-bottom { border-top: 1px solid rgba(0,0,0,.08); }
+.site-footer::before {
+  content: ""; position: absolute; top: -8px; height: 17px;
+  left: max(24px, calc((100% - 1180px) / 2)); right: max(24px, calc((100% - 1180px) / 2));
+  background:
+    linear-gradient(#000,#000) left center / 17px 1.5px no-repeat,
+    linear-gradient(#000,#000) left 8px center / 1.5px 17px no-repeat,
+    linear-gradient(#000,#000) right center / 17px 1.5px no-repeat,
+    linear-gradient(#000,#000) right 8px center / 1.5px 17px no-repeat,
+    linear-gradient(rgba(0,0,0,.22),rgba(0,0,0,.22)) center / calc(100% - 34px) 1px no-repeat;
+}
+.footer-legal { display: flex; flex-wrap: wrap; align-items: center; gap: 6px 22px; padding-top: 18px; }
+.footer-legal a, .footer-legal button { font-size: 1rem; color: rgba(0,0,0,.6) !important; background: none; border: 0; padding: 4px 0; cursor: pointer; }
+.footer-legal a:hover, .footer-legal button:hover { color: #000 !important; text-decoration: none; }
+.footer-legal .choices { display: inline-flex; align-items: center; gap: 8px; }
+.footer-legal .choices svg { width: 26px; height: 12px; }
