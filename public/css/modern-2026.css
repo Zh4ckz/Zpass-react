@@ -408,3 +408,4 @@ h1 em, h2 em { font-style: normal; color: var(--blue); }
 .rez-note a { color: #1769ff; font-weight: 600; }
 @media (max-width: 960px) { .rez-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); } }
 @media (max-width: 860px) { .rez { margin: 48px auto; } .rez-grid { grid-template-columns: 1fr; display: flex; overflow-x: auto; scroll-snap-type: x mandatory; gap: 14px; padding-bottom: 8px; } .rez-card { flex: 0 0 82%; scroll-snap-align: start; } }
+@media (min-width: 861px) { .main-nav { height: 100vh; height: 100dvh; bottom: auto; } }
