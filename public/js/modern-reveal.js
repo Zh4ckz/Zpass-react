@@ -18,6 +18,18 @@
     });
   }
 
+  var sideNav = document.querySelector('.main-nav');
+  if (sideNav && toggle) {
+    var foot = document.createElement('div');
+    foot.className = 'nav-side-foot';
+    foot.innerHTML = '<a class="button button-dark" href="https://web.zpas.org/login">Open PassGram Web</a><a class="button button-light" href="https://x.com/4rezan" target="_blank" rel="noopener" style="color:#000!important">Follow on X</a>';
+    sideNav.appendChild(foot);
+    var back = document.createElement('div');
+    back.className = 'nav-backdrop';
+    back.addEventListener('click', function () { if (toggle.getAttribute('aria-expanded') === 'true') toggle.click(); });
+    document.body.appendChild(back);
+    document.addEventListener('keydown', function (e) { if (e.key === 'Escape' && toggle.getAttribute('aria-expanded') === 'true') toggle.click(); });
+  }
   if (document.querySelector('.site-header')) {
     var p = location.pathname;
     var icon = function (d) { return '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">' + d + '</svg>'; };
@@ -35,5 +47,22 @@
       return '<a href="' + t[0] + '" class="' + (t[3] ? 'on ' : '') + (t[4] || '') + '">' + t[2] + '<span>' + t[1] + '</span></a>';
     }).join('');
     document.body.appendChild(nav);
+  }
+
+  // On phones the account lives in the app, so "Open" launches it instead of the web login.
+  var ua = navigator.userAgent || '';
+  if (/Android.+Mobile|iPhone|iPod/i.test(ua)) {
+    var fallback = location.origin + '/apps/android.html';
+    document.addEventListener('click', function (e) {
+      var a = e.target.closest && e.target.closest('a[href]');
+      if (!a || !/^https:\/\/web\.zpas\.org\/login/.test(a.href)) return;
+      e.preventDefault();
+      e.stopImmediatePropagation();
+      if (/Android/i.test(ua)) {
+        location.href = 'intent://web.zpas.org/login#Intent;scheme=https;package=com.zpass;S.browser_fallback_url=' + encodeURIComponent(fallback) + ';end';
+      } else {
+        location.href = '/apps.html';
+      }
+    }, true);
   }
 })();

@@ -233,3 +233,32 @@ h1 em, h2 em { font-style: normal; color: var(--blue); }
   .story-card { flex: 0 0 86%; scroll-snap-align: center; padding: 24px; }
   .story-card:hover { transform: none; }
 }
+
+/* Desktop: hamburger on the left opens a left sidebar */
+@media (min-width: 861px) {
+  .menu-toggle { display: flex !important; order: -1; margin: 0 !important; width: 44px; height: 44px; border-radius: 50%; background: #f5f7fb; border: 0; }
+  .menu-toggle:hover { background: var(--blue-soft); }
+  .menu-toggle span { transition: transform .2s; }
+  .menu-toggle[aria-expanded="true"] span:first-child { transform: translateY(3.25px) rotate(45deg); }
+  .menu-toggle[aria-expanded="true"] span:last-child { transform: translateY(-3.25px) rotate(-45deg); }
+  .site-header { z-index: 80; }
+  .main-nav {
+    position: fixed; top: 0; left: 0; bottom: 0; width: 340px; max-width: 86vw; margin: 0;
+    display: flex; flex-direction: column; align-items: stretch; gap: 4px;
+    padding: 96px 20px 24px; background: #fff; border-right: 1px solid rgba(0,0,0,.08);
+    box-shadow: 24px 0 60px rgba(0,0,0,.12); overflow-y: auto; z-index: 70;
+    transform: translateX(-102%); visibility: hidden; transition: transform .3s cubic-bezier(.2,.8,.2,1), visibility 0s .3s;
+  }
+  .main-nav.open { transform: none; visibility: visible; transition: transform .3s cubic-bezier(.2,.8,.2,1), visibility 0s; }
+  .main-nav a { font-size: 1.15rem; font-weight: 600; padding: 14px 16px; border-radius: 14px; color: #000; }
+  .main-nav a:hover { background: var(--blue-soft); color: var(--blue); text-decoration: none; }
+  .nav-side-foot { margin-top: auto; display: grid; gap: 10px; padding-top: 24px; }
+  .nav-side-foot .button { width: 100%; padding: 14px 20px; color: #fff !important; }
+  .nav-side-foot .button:hover { text-decoration: none; }
+  .nav-backdrop { position: fixed; inset: 0; z-index: 60; background: rgba(0,0,0,.35); opacity: 0; pointer-events: none; transition: opacity .3s; }
+  body.nav-open .nav-backdrop { opacity: 1; pointer-events: auto; }
+  .header-actions { margin-left: auto; }
+  .site-header .brand { margin-right: auto; }
+  .m-tabbar { display: none !important; }
+}
+@media (max-width: 860px) { .nav-backdrop, .nav-side-foot { display: none; } }
