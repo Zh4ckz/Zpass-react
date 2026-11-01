@@ -203,3 +203,33 @@ h1 em, h2 em { font-style: normal; color: var(--blue); }
   .m-tabbar a.go { background: var(--blue); color: #fff; }
   body.nav-open .m-tabbar { display: none; }
 }
+
+/* X logo */
+.x-link, .footer-x { display: inline-flex; align-items: center; gap: 10px; font-weight: 600; }
+.x-link { color: #000 !important; text-decoration: none !important; padding: 0 16px 0 12px; height: 44px; border-radius: 999px; background: #000; color: #fff !important; }
+.x-link:hover { background: #1769ff; }
+.x-icon { width: 22px; height: 22px; flex: none; }
+.footer-x .x-icon { width: 22px; height: 22px; }
+@media (max-width: 860px) {
+  .x-link { width: 44px; padding: 0; justify-content: center; }
+  .x-link .x-icon { width: 22px; height: 22px; }
+}
+
+/* Story cards */
+.story-row { display: grid; gap: 20px; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); }
+.story-card { display: flex; flex-direction: column; gap: 18px; padding: 30px; border: 1px solid rgba(0,0,0,.08); border-radius: var(--radius); background: #fff; box-shadow: 0 12px 32px rgba(0,0,0,.04); transition: transform .25s, box-shadow .25s, border-color .25s; }
+.story-card:hover { transform: translateY(-4px); border-color: rgba(23,105,255,.35); box-shadow: 0 20px 50px rgba(23,105,255,.12); }
+.story-badge { width: 52px; height: 52px; border-radius: 50%; display: grid; place-items: center; background: #000; color: #fff; }
+.story-badge svg { width: 24px; height: 24px; }
+.story-card q { quotes: none; font-size: 1.18rem; line-height: 1.6; font-weight: 600; letter-spacing: -.02em; color: #000; }
+.story-card .story-who { font-size: .95rem; color: rgba(0,0,0,.62); line-height: 1.5; }
+.story-card .story-who b { color: #000; display: block; }
+.story-link { font-weight: 600; display: inline-flex; align-items: center; gap: 8px; margin-top: auto; }
+.story-link svg { width: 8px; height: 12px; transition: transform .2s; }
+.story-link:hover svg { transform: translateX(4px); }
+@media (max-width: 860px) {
+  .story-row { display: flex; overflow-x: auto; scroll-snap-type: x mandatory; gap: 14px; margin-inline: -16px; padding: 4px 16px 18px; scrollbar-width: none; }
+  .story-row::-webkit-scrollbar { display: none; }
+  .story-card { flex: 0 0 86%; scroll-snap-align: center; padding: 24px; }
+  .story-card:hover { transform: none; }
+}
