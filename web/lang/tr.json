@@ -187,5 +187,16 @@
   "Free": "Ücretsiz",
   "Plus": "Plus",
   "Pro": "Pro",
-  "Family": "Aile"
+  "Family": "Aile",
+  "Approve on your phone": "Telefonundan onayla",
+  "Open PassGram on your phone and tap this number to unlock.": "Telefonunda PassGram'i aç ve kilidi açmak için bu sayıya dokun.",
+  "Cancel": "İptal",
+  "Locked": "Kilitli",
+  "The request was denied.": "İstek reddedildi.",
+  "The request expired.": "İsteğin süresi doldu.",
+  "Could not start the request.": "İstek başlatılamadı.",
+  "Unlock with your phone to open this section. It locks again after 15 minutes of inactivity.": "Bu bölümü açmak için telefonunla kilidi aç. 15 dakika işlem yapılmazsa tekrar kilitlenir.",
+  "Unlock for 15 minutes": "15 dakikalığına aç",
+  "Unlocked": "Kilit açık",
+  "Lock now": "Şimdi kilitle"
 }

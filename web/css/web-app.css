@@ -280,3 +280,9 @@ body.dark-theme .ap-cover { background: linear-gradient(135deg, #1a73e8, #0b3a85
 .ap-who { padding-top: 14px; }
 .ap-cover { background-size: cover; background-position: center; }
 .ap-cover.has-banner::before, .ap-cover.has-banner::after { display: none; }
+/* Lock gate */
+.ap-gate-code { font-size: 72px; font-weight: 800; letter-spacing: .08em; color: var(--ap-blue); line-height: 1; margin-bottom: 10px; font-variant-numeric: tabular-nums; }
+.ap-unlocked { display: flex; align-items: center; justify-content: space-between; gap: 12px; padding: 12px 16px; margin-bottom: 14px; border: 1px solid var(--ap-line); border-radius: 12px; background: var(--ap-soft); font-size: 14px; font-weight: 600; }
+.ap-unlocked span { display: inline-flex; align-items: center; gap: 8px; }
+.ap-unlocked svg { width: 18px; height: 18px; stroke: var(--ap-blue); fill: none; stroke-width: 2; }
+.ap-unlocked[hidden], .ap-gate[hidden] { display: none; }

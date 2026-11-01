@@ -1,6 +1,6 @@
 import { initializeApp, getApps } from 'https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js';
 import { getAuth, onAuthStateChanged, signOut } from 'https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js';
-import { getFirestore, doc, getDoc, collection, query, where, orderBy, limit, onSnapshot, updateDoc, serverTimestamp } from 'https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js';
+import { getFirestore, doc, getDoc, collection, query, where, orderBy, limit, onSnapshot, updateDoc, addDoc, deleteDoc, serverTimestamp } from 'https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js';
 import { firebaseConfig } from './firebase-config.mjs';
 import { t, getLanguage, setLanguage } from './web-i18n.mjs';
 
@@ -222,6 +222,120 @@ window.addEventListener('message', event => {
   if (event.origin === location.origin && event.data?.type === 'zpass-signout') signOut(auth).catch(() => {});
 });
 
+// Vault and Authenticator stay locked until the phone approves a 2-digit number; 15 minutes of inactivity relocks them.
+const LOCK_MS = 15 * 60 * 1000;
+const PROTECTED = ['vault', 'auth'];
+let unlockedUntil = 0, lockTick = 0, unlockReq = null, gateState = 'idle';
+const isUnlocked = () => Date.now() < unlockedUntil;
+
+function randomCodes() {
+  const buf = new Uint32Array(8);
+  crypto.getRandomValues(buf);
+  const set = [];
+  for (const n of buf) { const c = String(10 + (n % 90)); if (!set.includes(c)) set.push(c); if (set.length === 3) break; }
+  return set;
+}
+
+function clearUnlockReq(remove) {
+  if (!unlockReq) return;
+  clearTimeout(unlockReq.timer);
+  try { unlockReq.unsub(); } catch { /* already closed */ }
+  if (remove) deleteDoc(unlockReq.ref).catch(() => {});
+  unlockReq = null;
+}
+
+function lockNow() {
+  unlockedUntil = 0;
+  clearUnlockReq(true);
+  gateState = 'idle';
+  renderGates();
+}
+
+async function requestUnlock() {
+  if (!uid || unlockReq) return;
+  const codes = randomCodes();
+  const displayCode = codes[0];
+  const shuffled = [...codes].sort(() => Math.random() - 0.5);
+  gateState = 'waiting';
+  try {
+    const ref = await addDoc(collection(db, 'loginRequests'), {
+      uid, purpose: 'CARD_VIEW', status: 'pending', deviceLabel: 'web.zpas.org',
+      displayCode, candidateCodes: shuffled.join(','), createdAt: serverTimestamp()
+    });
+    const timer = setTimeout(() => { clearUnlockReq(true); gateState = 'expired'; renderGates(); }, 62000);
+    const unsub = onSnapshot(ref, s => {
+      const status = s.data()?.status;
+      if (status === 'approved') {
+        clearUnlockReq(true);
+        unlockedUntil = Date.now() + LOCK_MS;
+        gateState = 'idle';
+        renderGates();
+      } else if (status === 'denied') {
+        clearUnlockReq(true);
+        gateState = 'denied';
+        renderGates();
+      }
+    }, () => { clearUnlockReq(false); gateState = 'error'; renderGates(); });
+    unlockReq = { ref, timer, unsub, code: displayCode };
+  } catch {
+    gateState = 'error';
+  }
+  renderGates();
+}
+
+function gateHtml() {
+  if (gateState === 'waiting' && unlockReq) {
+    return `<div class="ap-gate-code">${esc(unlockReq.code)}</div><h2>${esc(t('Approve on your phone'))}</h2><p>${esc(t('Open PassGram on your phone and tap this number to unlock.'))}</p><div class="ap-empty-actions"><button class="ap-btn ghost" type="button" data-gate="cancel">${esc(t('Cancel'))}</button></div>`;
+  }
+  const msg = { denied: 'The request was denied.', expired: 'The request expired.', error: 'Could not start the request.' }[gateState];
+  return `<div class="ap-empty-ic">${ICON.lock}</div><h2>${esc(t('Locked'))}</h2><p>${esc(t(msg || 'Unlock with your phone to open this section. It locks again after 15 minutes of inactivity.'))}</p><div class="ap-empty-actions"><button class="ap-btn" type="button" data-gate="start">${esc(t('Unlock for 15 minutes'))}</button></div>`;
+}
+
+function renderGates() {
+  const open = isUnlocked();
+  PROTECTED.forEach(name => {
+    const view = $(`ap-v-${name}`);
+    let gate = view.querySelector('.ap-gate');
+    let bar = view.querySelector('.ap-unlocked');
+    if (!gate) {
+      gate = document.createElement('div');
+      gate.className = 'ap-empty ap-gate';
+      view.prepend(gate);
+      bar = document.createElement('div');
+      bar.className = 'ap-unlocked';
+      view.prepend(bar);
+    }
+    view.querySelectorAll(':scope > .ap-empty:not(.ap-gate)').forEach(n => { n.hidden = !open; });
+    gate.hidden = open;
+    bar.hidden = !open;
+    if (!open) gate.innerHTML = gateHtml();
+  });
+  tickLock();
+}
+
+function tickLock() {
+  if (isUnlocked()) {
+    const left = Math.max(0, unlockedUntil - Date.now());
+    const label = `${Math.floor(left / 60000)}:${String(Math.floor(left / 1000) % 60).padStart(2, '0')}`;
+    document.querySelectorAll('.ap-unlocked').forEach(bar => {
+      bar.innerHTML = `<span>${ICON.lock}${esc(t('Unlocked'))} · <b>${label}</b></span><button class="ap-link" type="button" data-gate="lock">${esc(t('Lock now'))}</button>`;
+    });
+  } else if (unlockedUntil) {
+    lockNow();
+  }
+}
+
+['pointerdown', 'keydown', 'wheel', 'touchstart'].forEach(ev => document.addEventListener(ev, () => {
+  if (isUnlocked()) unlockedUntil = Date.now() + LOCK_MS;
+}, { passive: true }));
+lockTick = setInterval(tickLock, 1000);
+document.addEventListener('click', e => {
+  const g = e.target.closest('[data-gate]');
+  if (!g) return;
+  if (g.dataset.gate === 'start') requestUnlock();
+  if (g.dataset.gate === 'cancel') { clearUnlockReq(true); gateState = 'idle'; renderGates(); }
+  if (g.dataset.gate === 'lock') lockNow();
+});
 function start(user) {
   uid = user.uid;
   peers.clear();
@@ -248,6 +362,7 @@ function start(user) {
   });
   let saved = 'home';
   try { saved = sessionStorage.getItem('zpass-app-view') || 'home'; } catch { /* storage unavailable */ }
+  lockNow();
   showView(saved);
   syncNight();
   syncLang();
@@ -256,6 +371,7 @@ function start(user) {
 function stop() {
   clearTimeout(mobileTimer);
   stops.splice(0).forEach(fn => { try { fn(); } catch { /* listener already closed */ } });
+  unlockedUntil = 0; clearUnlockReq(true); gateState = 'idle';
   uid = null; profile = {}; plan = null; devices = []; events = []; chats = [];
   setMenu(false);
   mountMobile();
