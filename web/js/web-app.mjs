@@ -281,7 +281,8 @@ $('ap-chat-search').addEventListener('input', renderChats);
 $('ap-thread-back').addEventListener('click', closeChat);
 ['ap-signout', 'ap-signout2'].forEach(id => $(id).addEventListener('click', () => signOut(auth).catch(() => toast('Could not sign out.'))));
 $('ap-copy-id').addEventListener('click', async () => {
-  try { await navigator.clipboard.writeText(uid || ''); toast('Account ID copied.'); } catch { toast('Could not copy.'); }
+  if (!profile.username) { toast('Could not copy.'); return; }
+  try { await navigator.clipboard.writeText('@' + profile.username); toast('Username copied.'); } catch { toast('Could not copy.'); }
 });
 document.addEventListener('keydown', e => { if (e.key === 'Escape') setMenu(false); });
 
