@@ -442,3 +442,29 @@ h1 em, h2 em { font-style: normal; color: var(--blue); }
   .main-nav { padding-top: 104px; }
   .main-nav::after { content: none; }
 }
+/* Single, refined close control: the header toggle hides while the sidebar is open */
+@media (min-width: 861px) {
+  .menu-toggle { transition: opacity .25s ease, transform .35s cubic-bezier(.22,1,.36,1), background .2s; }
+  body.nav-open .menu-toggle { opacity: 0; transform: scale(.6) rotate(90deg); pointer-events: none; }
+  .main-nav .nav-close {
+    width: 42px; height: 42px;
+    background: #fff;
+    color: #0b0b0f;
+    border: 1px solid rgba(17, 17, 17, .1);
+    box-shadow: 0 6px 18px rgba(11, 11, 15, .08);
+    opacity: 0; transform: scale(.6) rotate(-90deg);
+    transition: opacity .3s ease .15s, transform .5s cubic-bezier(.22,1,.36,1) .15s, background .2s, color .2s, border-color .2s, box-shadow .2s;
+  }
+  .main-nav.open .nav-close { opacity: 1; transform: none; }
+  .main-nav.open .nav-close:hover {
+    background: var(--blue); color: #fff; border-color: var(--blue);
+    box-shadow: 0 10px 24px rgba(23, 105, 255, .35);
+    transform: rotate(90deg);
+  }
+  .main-nav.open .nav-close:active { transform: rotate(90deg) scale(.92); }
+  .main-nav .nav-close:focus-visible { outline: 3px solid rgba(23, 105, 255, .35); outline-offset: 2px; }
+  .main-nav .nav-close svg { width: 18px; height: 18px; }
+}
+@media (prefers-reduced-motion: reduce) {
+  .main-nav .nav-close, .menu-toggle { transition: none !important; }
+}
