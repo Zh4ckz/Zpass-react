@@ -55,7 +55,11 @@ function showView(name) {
 }
 
 function displayName() {
-  return profile.displayName || profile.username || auth.currentUser?.displayName || 'PassGram';
+  return profile.displayName || profile.username || auth.currentUser?.displayName || '';
+}
+
+function blobUrl(value) {
+  try { return value?.toBase64 ? 'data:image/jpeg;base64,' + value.toBase64() : ''; } catch { return ''; }
 }
 
 function renderIdentity() {
@@ -64,12 +68,15 @@ function renderIdentity() {
   ['ap-name', 'ap-set-name'].forEach(id => { $(id).textContent = name; });
   ['ap-handle', 'ap-set-handle'].forEach(id => { $(id).textContent = handle; });
   $('ap-hello').textContent = name;
+  const photo = blobUrl(profile.photo);
   ['ap-avatar', 'ap-set-avatar'].forEach(id => {
     const node = $(id);
-    node.textContent = initial(name);
-    node.style.background = `linear-gradient(135deg, ${colorFor(uid || name)}, #339af0)`;
+    node.textContent = photo ? '' : initial(name);
+    node.style.background = photo ? `center / cover url(${photo})` : `linear-gradient(135deg, ${colorFor(uid || name)}, #339af0)`;
   });
-}
+  const banner = blobUrl(profile.banner);
+  document.querySelector('.ap-cover').style.backgroundImage = banner ? `url(${banner})` : '';
+  document.querySelector('.ap-cover').classList.toggle('has-banner', !!banner);}
 
 function planLabel() {
   const raw = String(plan?.plan || 'FREE').toUpperCase();

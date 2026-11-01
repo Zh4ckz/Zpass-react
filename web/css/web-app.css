@@ -278,3 +278,5 @@ body.dark-theme .ap-cover { background: linear-gradient(135deg, #1a73e8, #0b3a85
 .ap-brand { color: #fff; }
 .ap-cover .ap-avatar { bottom: 16px; left: 18px; background: #fff; color: var(--ap-blue); border-color: #fff; }
 .ap-who { padding-top: 14px; }
+.ap-cover { background-size: cover; background-position: center; }
+.ap-cover.has-banner::before, .ap-cover.has-banner::after { display: none; }
