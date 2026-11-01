@@ -33,7 +33,7 @@ let webSessionUnsubscribe = null;
 const themeBtn = $('theme-toggle');
 function initTheme() {
   const saved = localStorage.getItem('zpass-theme');
-  const isDark = saved === 'dark' || (!saved && window.matchMedia('(prefers-color-scheme: dark)').matches);
+  const isDark = saved === 'dark';
   if (isDark) {
     document.body.classList.add('dark-theme');
   } else {

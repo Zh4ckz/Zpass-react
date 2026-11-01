@@ -233,3 +233,48 @@ body.dark-theme .ap {
 @media (prefers-reduced-motion: reduce) {
   .ap *, .ap-side, .ap-view { animation: none !important; transition: none !important; }
 }
+
+/* Minimal three-colour theme: white, black, blue */
+.ap {
+  --ap-bg1: #fff; --ap-bg2: #fff; --ap-card: #fff; --ap-solid: #fff;
+  --ap-line: #e6e8ec; --ap-text: #0a0a0a; --ap-muted: #5f6672; --ap-soft: #f3f6fb;
+  --ap-blue: #1a73e8; --ap-blue2: #1a73e8; --ap-shadow: none;
+  background: #fff;
+}
+body.dark-theme .ap {
+  --ap-bg1: #000; --ap-bg2: #000; --ap-card: #0b0b0c; --ap-solid: #000;
+  --ap-line: #202226; --ap-text: #fff; --ap-muted: #9aa0aa; --ap-soft: #121316; --ap-shadow: none;
+  background: #000;
+}
+.ap-cover { background: #fff; border-bottom: 1px solid var(--ap-line); height: 96px; }
+body.dark-theme .ap-cover { background: #000; }
+.ap-cover::before, .ap-cover::after { display: none; }
+.ap-brand { color: var(--ap-text); }
+.ap-brand img { border: 1px solid var(--ap-line); }
+.ap-avatar { background: var(--ap-blue); border-color: var(--ap-solid); box-shadow: none; }
+.ap-who { padding-top: 34px; }
+.ap-who b, .ap h1, .ap h2, .ap h3 { font-weight: 800; color: var(--ap-text); }
+.ap-nav button { font-weight: 700; border-radius: 10px; }
+.ap-nav button.on { background: var(--ap-soft); color: var(--ap-blue); box-shadow: none; }
+.ap-nav button.on svg { color: var(--ap-blue); }
+.ap-nav button.on em { background: var(--ap-blue); color: #fff; }
+.ap-card, .ap-stat { border-radius: 14px; box-shadow: none; }
+.ap-hero { background: #fff; color: var(--ap-text); border: 1px solid var(--ap-line); border-radius: 16px; }
+body.dark-theme .ap-hero { background: #0b0b0c; }
+.ap-hero::before { display: none; }
+.ap-hero-art { background: var(--ap-soft); backdrop-filter: none; }
+.ap-hero p, .ap-hero small { color: var(--ap-muted); }
+.ap-hero h2 { color: var(--ap-text); }
+.ap-chip, .ap-seg button.on { background: var(--ap-blue); }
+.ap-actions a, .ap-actions button { border-radius: 10px; font-weight: 600; background: #fff; border: 1px solid var(--ap-blue); color: var(--ap-blue); }
+body.dark-theme .ap-actions a, body.dark-theme .ap-actions button { background: #000; }
+.ap-actions svg { color: var(--ap-blue); }
+.ap button.primary, .ap .ap-btn { background: #fff; color: var(--ap-blue); border: 1px solid var(--ap-blue); box-shadow: none; border-radius: 10px; font-weight: 600; }
+.ap a { color: var(--ap-blue); }
+/* Taller banner, avatar fully inside it */
+.ap-cover { height: 170px; background: linear-gradient(135deg, #1a73e8, #0b4db3); border-bottom: 0; }
+body.dark-theme .ap-cover { background: linear-gradient(135deg, #1a73e8, #0b3a85); }
+.ap-cover::before, .ap-cover::after { display: block; }
+.ap-brand { color: #fff; }
+.ap-cover .ap-avatar { bottom: 16px; left: 18px; background: #fff; color: var(--ap-blue); border-color: #fff; }
+.ap-who { padding-top: 14px; }
