@@ -70,7 +70,7 @@ def build_modules():
         for kind in ("css", "js"):
             for rel in spec[kind]:
                 args = [os.path.join(mod_dir, *rel.split("/"))]
-                if kind == "js":
+                if kind == "js" and "vendor/" not in rel:
                     args += ["--bundle", "--format=esm", "--external:https://*"]
                 ext = kind
                 tmp = os.path.join(work, f"{mod}-{kind}-{len(names)}.{ext}")
