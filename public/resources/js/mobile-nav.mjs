@@ -26,15 +26,14 @@ const outTabs = [
   { id: "home", label: "Home", icon: I.home, href: "/" },
   { id: "pricing", label: "Pricing", icon: I.tag, href: "/#pricing" },
   { id: "apps", label: "Apps", icon: I.grid, href: "/apps.html" },
-  { id: "info", label: "Info", icon: I.info, href: "/info.html" },
-  { id: "signin", label: "Sign in", icon: I.user, href: "/dashboard.html" }
+  { id: "info", label: "Info", icon: I.info, href: "/info.html" }
 ];
 const inSite = [
   { id: "home", label: "Home", icon: I.home, href: "/" },
-  { id: "vault", label: "Vault", icon: I.vault, href: "/dashboard.html" },
+  { id: "vault", label: "Vault", icon: I.vault, href: "/web" },
   { id: "plans", label: "Plans", icon: I.bag, href: "/subscription.html" },
   { id: "apps", label: "Apps", icon: I.grid, href: "/apps.html" },
-  { id: "profile", label: "Profile", icon: I.user, href: "/dashboard.html#general" }
+  { id: "profile", label: "Profile", icon: I.user, href: "/web" }
 ];
 const inDash = [
   { id: "overview", label: "Vault", icon: I.vault, panel: "overview" },

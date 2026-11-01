@@ -13,7 +13,7 @@
     '<a href="https://t.me/ZizoSoftware" target="_blank" rel="noopener" aria-label="Telegram"><img src="/resources/images/telegram-mark.svg" alt=""></a>' +
     '</div></div><nav class="lf-cols">' +
     '<div><h4>Product</h4><a href="/apps">Downloads</a><a href="/2fa">Authenticator</a></div>' +
-    '<div><h4>Account</h4><a href="/dashboard#login">Sign in</a><a href="/subscription">Subscription</a><a href="/checkout">Checkout</a></div>' +
+    '<div><h4>Account</h4><a href="/subscription">Subscription</a><a href="/checkout">Checkout</a></div>' +
     '<div><h4>Company</h4><a href="/info">About</a><a href="/privacy">Privacy</a><a href="/security">Security</a><a href="/legal/terms">Terms</a></div>' +
     '</nav></div><div class="lf-bottom"><span>Copyright &copy; 2026 <b>PassGram</b></span><span>All rights reserved.</span></div>';
   document.body.appendChild(f);

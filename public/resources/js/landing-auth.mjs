@@ -4,5 +4,5 @@ import {firebaseConfig} from './firebase-config.mjs';
 import {takeCheckout} from './navigation.mjs';
 const auth=getAuth(getApps()[0] || initializeApp(firebaseConfig));
 onAuthStateChanged(auth,user=>{
-  if(user)location.replace(takeCheckout(sessionStorage,location.origin) || '/dashboard.html');
+  if(user)location.replace(takeCheckout(sessionStorage,location.origin) || '/');
 });

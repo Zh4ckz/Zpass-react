@@ -105,8 +105,8 @@ onAuthStateChanged(auth, user => {
   const returnTo = new URLSearchParams(location.search).has("campaign")
     ? "/premium/?campaign=1"
     : "/premium/";
-  location.replace(`/dashboard.html?returnTo=${encodeURIComponent(returnTo)}`);
+  location.replace("/");
 }, error => {
   console.error("Could not verify the signed-in account for premium access:", error);
-  location.replace("/dashboard.html?returnTo=%2Fpremium%2F");
+  location.replace("/");
 });
