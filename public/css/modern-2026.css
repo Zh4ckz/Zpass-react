@@ -375,3 +375,9 @@ h1 em, h2 em { font-style: normal; color: var(--blue); }
 .fb-links a { color: rgba(0,0,0,.6); text-decoration: none; display: inline-flex; align-items: center; gap: 8px; }
 .fb-links a:hover { color: #000; }
 .fb-choices svg { width: 26px; height: 12px; }
+
+.founder-id .id-links { display: flex; gap: 10px; }
+.g-link { display: inline-flex; align-items: center; justify-content: center; width: 40px; height: 40px; border-radius: 999px; background: #000; color: #fff !important; text-decoration: none !important; }
+.g-link:hover { background: #1769ff; }
+.g-link .x-icon { width: 20px; height: 20px; }
+.founder-id .x-link, .founder-id .g-link { display: inline-flex; }
