@@ -10,7 +10,7 @@ import shutil
 ROOT = os.path.dirname(os.path.abspath(__file__))
 DEPLOYMENTS = (
     (
-        "passgram.web.app / web.zpas.org / translations.zpas.org",
+        "passgram.web.app / web.zpas.org",
         [
             "deploy",
             "--only",
@@ -31,7 +31,7 @@ def sync_modules():
     if not os.path.exists(public_dir):
         os.makedirs(public_dir, exist_ok=True)
 
-    modules = ["web", "translations", "core", "bots", "docs"]
+    modules = ["web", "core", "bots", "docs"]
     for mod in modules:
         mod_dir = os.path.join(ROOT, mod)
         if os.path.exists(mod_dir):
@@ -115,7 +115,7 @@ def main():
     print("=" * 50)
 
     # 0. Sync modular folders into public
-    print("\n[0/2] Syncing modular folders (web, translations, core, bots, docs)...", flush=True)
+    print("\n[0/2] Syncing modular folders (web, core, bots, docs)...", flush=True)
     sync_modules()
     build_web()
 
@@ -148,7 +148,6 @@ def main():
     print("\n" + "=" * 50)
     print("🎉 ALL DEPLOYMENTS COMPLETE!")
     print("🌐 Live Web App: https://web.zpas.org")
-    print("🌐 Translations: https://translations.zpas.org")
     print("🌐 Core Docs: https://core.zpas.org")
     print("🌐 Firebase URL: https://passgram.web.app")
     print("=" * 50)

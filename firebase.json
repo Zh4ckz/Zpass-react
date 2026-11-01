@@ -26,14 +26,6 @@
         "destination": "/resources/img/favicon.ico"
       },
       {
-        "source": "/setlanguage",
-        "destination": "/setlanguage.html"
-      },
-      {
-        "source": "/setlanguage/**",
-        "destination": "/setlanguage.html"
-      },
-      {
         "source": "/login",
         "destination": "/web.html"
       },
@@ -48,10 +40,6 @@
       {
         "source": "/web/**",
         "destination": "/web.html"
-      },
-      {
-        "source": "**",
-        "destination": "/translations.html"
       }
     ]
   }

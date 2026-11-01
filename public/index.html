@@ -17,11 +17,7 @@
     <script src="/resources/js/modern-reveal.js?v=8" defer></script>  <script>
     (function() {
       var h = location.hostname.toLowerCase();
-      if (h.indexOf('translations') !== -1) {
-        if (location.pathname === '/' || location.pathname === '' || location.pathname === '/index.html') {
-          location.replace('/translations.html');
-        }
-      } else if (h.indexOf('web.') !== -1 || h.indexOf('login.') !== -1) {
+      if (h.indexOf('web.') !== -1 || h.indexOf('login.') !== -1) {
         if (location.pathname === '/' || location.pathname === '' || location.pathname === '/index.html') {
           location.replace('/web.html');
         }

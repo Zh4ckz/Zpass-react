@@ -10,8 +10,49 @@ const closeButton = document.getElementById("closePremium");
 const formatter = new Intl.NumberFormat("en-US", { style: "currency", currency: "USD", maximumFractionDigits: 2 });
 let period = "MONTHLY";
 
+// Page card id -> pricing tier
+const cardTier = { PRO: "PLUS", FAMILY: "PRO" };
+const reduceMotion = matchMedia("(prefers-reduced-motion: reduce)");
+
+// Renders text as per-character columns; changed characters slide up (value rose) or down (value fell).
+function rollText(el, text, direction) {
+  const previous = el.dataset.value;
+  if (previous === text) return;
+  el.dataset.value = text;
+  el.setAttribute("aria-label", text);
+  if (previous === undefined || reduceMotion.matches) {
+    el.textContent = text;
+    return;
+  }
+  const old = [...previous];
+  const next = [...text];
+  el.textContent = "";
+  el.classList.add("roll");
+  next.forEach((char, index) => {
+    const cell = document.createElement("span");
+    cell.className = "roll-cell";
+    cell.setAttribute("aria-hidden", "true");
+    const unchanged = old[old.length - next.length + index] === char;
+    const face = document.createElement("span");
+    face.className = "roll-face";
+    face.textContent = char;
+    if (unchanged || !/\d/.test(char)) {
+      cell.appendChild(face);
+    } else {
+      const from = document.createElement("span");
+      from.className = "roll-face roll-from";
+      from.textContent = old[old.length - next.length + index] ?? "";
+      cell.classList.add(direction > 0 ? "roll-up" : "roll-down");
+      cell.style.setProperty("--roll-delay", `${index * 45}ms`);
+      cell.append(from, face);
+    }
+    el.appendChild(cell);
+  });
+}
+
 function renderPrices() {
   const key = period.toLowerCase();
+  const direction = period === "YEARLY" ? 1 : -1;
   const savings = ["PLUS", "PRO"].map(tier => {
     const monthly = paymentPlans[tier].monthly.price;
     const yearly = paymentPlans[tier].yearly.price;
@@ -19,14 +60,14 @@ function renderPrices() {
   });
   const bestSavings = Math.max(...savings);
   document.getElementById("savePill").textContent = bestSavings ? `SAVE UP TO ${bestSavings}%` : "YEARLY";
-  for (const tier of ["PLUS", "PRO"]) {
+  for (const [card, tier] of Object.entries(cardTier)) {
     const price = paymentPlans[tier][key].price;
-    document.querySelector(`[data-price="${tier}"]`).textContent = formatter.format(price);
-    document.querySelector(`[data-price-period="${tier}"]`).textContent = period === "YEARLY" ? "/ year" : "/ month";
-    document.querySelector(`[data-billed="${tier}"]`).textContent = period === "YEARLY"
+    rollText(document.querySelector(`[data-price="${card}"]`), formatter.format(price), direction);
+    document.querySelector(`[data-price-period="${card}"]`).textContent = period === "YEARLY" ? "/ year" : "/ month";
+    document.querySelector(`[data-billed="${card}"]`).textContent = period === "YEARLY"
       ? `Billed yearly · ${formatter.format(price)} total`
       : "Billed monthly";
-    document.querySelector(`[data-checkout="${tier}"]`).href = `/checkout?plan=${tier}&billing=${period}`;
+    document.querySelector(`[data-checkout="${card}"]`).href = `/checkout?plan=${tier}&billing=${period}`;
   }
 }
 

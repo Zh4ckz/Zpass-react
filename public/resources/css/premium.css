@@ -64,3 +64,16 @@ body{background:radial-gradient(ellipse at 70% 0%,rgba(88,106,131,.11),transpare
   .mobile-dock svg{width:20px;height:20px;fill:none;stroke:currentColor;stroke-width:1.8;stroke-linecap:round;stroke-linejoin:round}
   .mobile-dock .dock-active{color:#B4BECD;background:#4388ff1b}
 }
+
+.roll{display:inline-flex}
+.roll-cell{position:relative;display:inline-block;height:1.15em;line-height:1.15em;overflow:hidden;font-variant-numeric:tabular-nums}
+.roll-face{display:block;height:1.15em}
+.roll-cell.roll-up .roll-face,.roll-cell.roll-down .roll-face{animation:var(--roll-in) .55s cubic-bezier(.2,.8,.2,1) var(--roll-delay,0ms) both}
+.roll-cell.roll-up .roll-from,.roll-cell.roll-down .roll-from{position:absolute;inset:0 auto auto 0;animation:var(--roll-out) .55s cubic-bezier(.2,.8,.2,1) var(--roll-delay,0ms) both}
+.roll-cell.roll-up{--roll-in:roll-in-below;--roll-out:roll-out-above}
+.roll-cell.roll-down{--roll-in:roll-in-above;--roll-out:roll-out-below}
+@keyframes roll-in-below{from{transform:translateY(100%)}to{transform:none}}
+@keyframes roll-in-above{from{transform:translateY(-100%)}to{transform:none}}
+@keyframes roll-out-above{to{transform:translateY(-100%)}}
+@keyframes roll-out-below{to{transform:translateY(100%)}}
+@media (prefers-reduced-motion:reduce){.roll-face{animation:none!important}}
