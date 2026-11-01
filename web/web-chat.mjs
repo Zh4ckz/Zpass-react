@@ -362,6 +362,19 @@ $('app-login-resend')?.addEventListener('click', async () => {
   }
 });
 
+function flagImage(iso) {
+  const img = document.createElement('img');
+  img.className = 'country-flag';
+  img.alt = '';
+  img.width = 24;
+  img.height = 18;
+  img.loading = 'lazy';
+  img.decoding = 'async';
+  img.src = `/resources/assets/flags/${(iso || '').toLowerCase()}.svg`;
+  img.addEventListener('error', () => img.remove(), { once: true });
+  return img;
+}
+
 function renderCountryOptions(filter = '') {
   const select = $('country-select'), list = $('country-options'), empty = $('country-empty');
   if (!select || !list) return;
@@ -379,7 +392,7 @@ function renderCountryOptions(filter = '') {
     button.setAttribute('aria-selected', String(index === select.selectedIndex));
     const name = document.createElement('span');
     name.className = 'country-option-name';
-    name.textContent = `${option.dataset.flag ? `${option.dataset.flag} ` : ''}${option.dataset.name || option.textContent}`;
+    name.append(flagImage(option.dataset.iso), document.createTextNode(option.dataset.name || option.textContent));
     const code = document.createElement('span');
     code.className = 'country-option-code';
     code.textContent = `+${option.dataset.callingCode || option.value.replace(/^\+/, '')}`;
@@ -396,7 +409,7 @@ function syncCountryTrigger() {
   const option = select?.options[select.selectedIndex];
   if (!option) return;
   const callingCode = option.dataset.callingCode || option.value.replace(/\D/g, '');
-  if (current) current.textContent = `${option.dataset.flag ? `${option.dataset.flag} ` : ''}${option.dataset.name || option.textContent} (+${callingCode})`;
+  if (current) current.replaceChildren(flagImage(option.dataset.iso), document.createTextNode(`${option.dataset.name || option.textContent} (+${callingCode})`));
   const input = $('login-identifier');
   if (input) {
     const nationalFormat = (option.dataset.format || '').replace(/^[\d\s()+-]+/, '').trim();
@@ -451,13 +464,12 @@ async function loadPhoneCountries() {
     if (!response.ok) throw new Error(`Country list request failed: ${response.status}`);
     const rows = (await response.text()).split(/\r?\n/).filter(Boolean);
     const countries = rows.map((row) => {
-      const [callingCode = '', iso = '', name = '', format = '', length = '', flag = ''] = row.split(';');
+      const [callingCode = '', iso = '', name = '', format = '', length = ''] = row.split(';');
       const digits = callingCode.replace(/\D/g, '');
       if (!digits || !name.trim()) return null;
       const option = document.createElement('option');
       option.value = `+${digits}`;
-      option.textContent = `${flag.trim() ? `${flag.trim()} ` : ''}${name.trim()} (+${callingCode.trim()})`;
-      option.dataset.flag = flag.trim();
+      option.textContent = `${name.trim()} (+${callingCode.trim()})`;
       option.dataset.name = name.trim();
       option.dataset.callingCode = digits;
       option.dataset.format = format.trim();

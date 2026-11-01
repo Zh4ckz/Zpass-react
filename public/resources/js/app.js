@@ -1387,7 +1387,7 @@ function setCountryWithFlag(element, countryCode) {
     .replace(/^-|-$/g, "");
   const flag = document.createElement("img");
   flag.className = "country-flag";
-  flag.src = `/resources/images/ui/flags-svg/${code.toLowerCase()}.svg`;
+  flag.src = `/resources/assets/flags/${code.toLowerCase()}.svg`;
   flag.alt = "";
   flag.loading = "lazy";
   flag.addEventListener("error", () => flag.remove(), { once: true });
