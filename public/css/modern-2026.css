@@ -366,3 +366,6 @@ h1 em, h2 em { font-style: normal; color: var(--blue); }
   .lg-toc b { display: none; }
   .lg-sec h2 { font-size: 1.4rem; }
 }
+.footer-mini { display: flex; justify-content: center; gap: 18px; padding: 14px 20px 22px; font-size: .78rem; border-top: 1px solid rgba(0,0,0,.08); }
+.footer-mini a { color: rgba(0,0,0,.5); text-decoration: none; }
+.footer-mini a:hover { color: #1769ff; }
