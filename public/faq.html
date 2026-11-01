@@ -5,11 +5,15 @@
   <meta name="viewport" content="width=device-width,initial-scale=1">
   <meta name="description" content="Answers to common questions about PassGram accounts, apps and security.">
   <title>FAQ — PassGram</title>
-  <link rel="icon" href="/resources/assets/app-logo/zpass.png">
+  <link rel="icon" type="image/x-icon" href="/favicon.ico?v=1">
+  <link rel="icon" type="image/png" sizes="512x512" href="/resources/assets/app-logo/zpass.png">
+  <link rel="apple-touch-icon" href="/resources/assets/app-logo/zpass.png">
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500&family=Instrument+Serif:ital@0;1&family=Inter:ital,opsz,wght@0,14..32,400;0,14..32,500;0,14..32,600;1,14..32,400&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="/css/marketing-2026.css?v=2">
+  <link rel="stylesheet" href="/css/marketing-2026.css?v=5">
+  <link rel="stylesheet" href="/css/modern-2026.css?v=1">
+  <script src="/js/modern-reveal.js?v=1" defer></script>
 </head>
 <body>
 <header class="site-header">
@@ -23,7 +27,7 @@
   </nav>
   <div class="header-actions">
     <a class="x-link" href="https://x.com/4rezan" target="_blank" rel="noopener">𝕏 <span>Follow</span></a>
-    <a class="button button-dark button-small" href="https://web.zpas.org/login">Sign in ↗</a>
+    <a class="button button-dark button-small" href="https://web.zpas.org/login">Sign in</a>
   </div>
 </header>
 <main class="section-wrap">
@@ -57,8 +61,36 @@
       <summary>Does PassGram require my PC to stay on?</summary>
       <p>No. The public website and web app are served from Firebase Hosting.</p>
     </details>
+    <details>
+      <summary>How does QR sign-in work, and is it safe?</summary>
+      <p>When you open the web app it shows a QR code. You scan it with PassGram on your phone, check the browser and location details that appear, and approve. The code is valid for ten minutes and can be used only once; after that it is consumed on the server and cannot be replayed. If you never approve it, it simply expires.</p>
+    </details>
+    <details>
+      <summary>Why do I get a code in the app instead of an SMS?</summary>
+      <p>SMS messages can be intercepted or redirected through SIM swapping. PassGram delivers the six-digit code to the app that is already signed in on your phone, and only reveals it after you confirm with biometrics or your device PIN. The code expires after one minute and is locked after a few wrong attempts.</p>
+    </details>
+    <details>
+      <summary>What happens if I see a login I do not recognise?</summary>
+      <p>Open the app, go to Settings and then Devices, and end the session you do not recognise. Then change your password and consider turning on two-step verification. The security activity list shows the device name, approximate location and time for every new login so you can spot problems early.</p>
+    </details>
+    <details>
+      <summary>Do you see my exact location?</summary>
+      <p>No. If you allow location in your browser, only a rounded position is used to show a city and country on the login notice. We do not send it to third-party map services. If you decline, the notice shows that the location is unavailable and sign-in still works.</p>
+    </details>
+    <details>
+      <summary>How do I sign out of a browser I used on a shared computer?</summary>
+      <p>Use Sign out in the web app. If you forgot, open Settings and then Devices in the mobile app and end that session remotely; the browser will be signed out shortly afterwards.</p>
+    </details>
+    <details>
+      <summary>Which phone number format should I use?</summary>
+      <p>Pick your country from the list and type only the national number. For example, in the United States type the ten digits, and in Turkey type the number starting with 5. You do not need to add the country code yourself.</p>
+    </details>
+    <details>
+      <summary>How can I contact the team or follow updates?</summary>
+      <p>Follow <a href="https://x.com/4rezan" target="_blank" rel="noopener"><b>@4rezan on X</b></a> for announcements, releases and the status of the developer API.</p>
+    </details>
   </div>
-  <a class="back-link" href="/">← Back to PassGram</a>
+  <a class="back-link" href="/">Back to PassGram</a>
 </main>
 <footer class="site-footer">
   <div class="footer-main">
@@ -71,7 +103,7 @@
       <a href="/api.html">API</a>
       <a href="/faq.html">FAQ</a>
     </nav>
-    <a class="footer-x" href="https://x.com/4rezan" target="_blank" rel="noopener">𝕏 Follow on X ↗</a>
+    <a class="footer-x" href="https://x.com/4rezan" target="_blank" rel="noopener">𝕏 Follow on X</a>
   </div>
   <div class="footer-bottom"><span>© 2026 PassGram</span><span>Designed for privacy.</span></div>
 </footer>

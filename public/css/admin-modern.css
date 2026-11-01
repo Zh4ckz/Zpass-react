@@ -76,6 +76,27 @@ section.card table{display:block;overflow-x:auto;white-space:nowrap}
 
 /* updates */
 .upd-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(260px,1fr));gap:14px;margin-top:16px}
+
+/* 2026 light theme: white, black and blue */
+:root{--bg:#fff;--panel:#fff;--panel-2:#f5f7fb;--border:rgba(0,0,0,.1);--line:rgba(0,0,0,.1);--text:#0b0b0f;--muted:rgba(0,0,0,.6);--accent:#1769ff;--a1:#1769ff;--a2:#0b4fd6;--a3:#1769ff;--glass:#f5f7fb;--good:#1769ff;--bad:#0b0b0f;--warn:#0b0b0f}
+body{background:#fff!important;color:#0b0b0f!important}
+body::before,body::after{display:none!important}
+#adminApp>header{background:rgba(255,255,255,.85)!important}
+#adminApp>header h1{background:none!important;color:#000!important;-webkit-text-fill-color:#000}
+.admin-nav{background:linear-gradient(#fff,rgba(255,255,255,0))}
+.admin-nav a{color:#111;background:#f5f7fb}
+.admin-nav a:hover{color:#fff;background:#1769ff;box-shadow:0 8px 24px rgba(23,105,255,.28)}
+section.card{background:#fff!important;box-shadow:0 1px 2px rgba(0,0,0,.04),0 14px 36px rgba(0,0,0,.05)!important}
+section.card::before{background:#1769ff;opacity:1;height:3px}
+section.card h2{color:#000}
+.form-row input,.form-row select,.auth-wrap input{background:#f5f7fb!important;color:#000!important}
+.form-row button,.row-actions button,section.card>button{color:#0b0b0f!important;background:#fff!important}
+.form-row button.primary,.auth-wrap button.primary{color:#fff!important;background:#1769ff!important;box-shadow:0 8px 22px rgba(23,105,255,.28)!important}
+.row-actions button.approve{color:#1769ff!important;background:rgba(23,105,255,.06)!important;border-color:rgba(23,105,255,.4)!important}
+.row-actions button.reject,.form-row button.reject{color:#000!important;background:#fff!important;border-color:rgba(0,0,0,.3)!important}
+.auth-wrap{background:#fff!important;box-shadow:0 24px 60px rgba(0,0,0,.08)}
+.auth-wrap h2,th,td{color:#0b0b0f}
+th{color:#1769ff!important}
 .upd-tile{display:grid;gap:10px;align-content:start;padding:16px;border-radius:18px;border:1px solid var(--line);background:rgba(255,255,255,.03)}
 .upd-tile>small{font-size:11px;letter-spacing:.1em;text-transform:uppercase;font-weight:800;background:linear-gradient(90deg,var(--a1),var(--a3));-webkit-background-clip:text;background-clip:text;color:transparent}
 .upd-tile label{display:grid;gap:5px;font-size:12px;color:#A9B5C6}

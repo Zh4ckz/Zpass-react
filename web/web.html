@@ -3,44 +3,74 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no, shrink-to-fit=no">
-  <title>PassGram Web</title>
+  <title>PassGram Web — Özel Mesajlaşma</title>
   <link rel="icon" type="image/png" href="/resources/assets/app-logo/zpass.png">
-  <link rel="stylesheet" href="/css/web-chat.css?v=11">
+  <link rel="stylesheet" href="/css/web-chat.css?v=14">
 </head>
 <body class="telegram-theme">
 
-  <!-- Floating Theme Toggle Button -->
+  <div id="startup-screen" class="startup-screen" role="status" aria-live="polite">
+    <div class="splash-brand">
+      <span class="splash-mark"><img src="/resources/assets/app-logo/zpass.png" alt=""></span>
+      <span>PassGram</span>
+    </div>
+    <div class="splash-progress"><span class="splash-spinner"></span><span id="startup-status">Güvenli bağlantı hazırlanıyor</span></div>
+    <div id="startup-error" class="startup-error" hidden>
+      <p>Bağlantı kurulamadı. İnternet bağlantını kontrol edip tekrar deneyebilirsin.</p>
+      <button id="startup-retry" type="button">Yeniden dene</button>
+    </div>
+  </div>
+
   <button id="theme-toggle" class="rp btn-icon darkmode_filled _themeButton_140gf_39" type="button" title="Temayı değiştir" aria-label="Temayı değiştir">
-    <span id="theme-icon">🌙</span>
+    <span id="theme-icon" class="theme-symbol" aria-hidden="true"></span>
   </button>
 
   <main id="auth-view" class="auth-view">
-    <div class="_cardsContainer_140gf_90">
+    <div class="auth-shell">
+      <aside class="auth-brand-panel">
+        <a class="auth-brand" href="/" aria-label="PassGram ana sayfa">
+          <img src="/resources/assets/app-logo/zpass.png" alt="">
+          <span>PassGram</span>
+        </a>
+        <span class="auth-eyebrow">ÖZEL MESAJLAŞMA</span>
+        <h2>Bağlantıda kal.<br><span>Güvende kal.</span></h2>
+        <p>Sohbetlerini tek bir sade alanda buluştur. Hesabın ve konuşmaların senin kontrolünde.</p>
+        <div class="auth-art" aria-hidden="true">
+          <span class="auth-art-orbit"></span>
+          <span class="auth-art-orbit"></span>
+          <span class="auth-art-core"><img src="/resources/assets/app-logo/zpass.png" alt=""></span>
+          <span class="auth-art-node auth-art-node-one"></span>
+          <span class="auth-art-node auth-art-node-two"></span>
+          <span class="auth-art-node auth-art-node-three"></span>
+        </div>
+        <div class="auth-privacy"><span class="icon-mask icon-shield"></span> Özel. Güvenli. Sana ait.</div>
+      </aside>
+      <div class="_cardsContainer_140gf_90">
 
       <!-- VIEW 1: LOG IN BY QR CODE (DEFAULT) -->
       <div id="view-qr" class="_card_140gf_90 _pageSignQR_140gf_259">
         <div class="_container_16kfa_1">
           <div class="_sticker_16kfa_21 _qrContainer_140gf_230">
             <canvas id="web-login-qr" width="240" height="240" class="_qrCanvas_140gf_237"></canvas>
-            <div class="qr-logo-badge">Z</div>
+            <div class="qr-logo-badge"><img src="/resources/assets/app-logo/zpass.png" alt=""></div>
             <div id="qr-loading" class="qr-loading">Güvenli QR kod hazırlanıyor…</div>
           </div>
-          <h1 class="_title_16kfa_11 text-center"><span class="i18n">Log in by QR Code</span></h1>
-          <div class="_subtitle_16kfa_12 secondary"><span class="i18n">Scan with PassGram app on your phone</span></div>
+          <h1 class="_title_16kfa_11 text-center"><span class="i18n">QR kod ile giriş yap</span></h1>
+          <div class="_subtitle_16kfa_12 secondary"><span class="i18n">Telefonundaki PassGram uygulamasıyla tara</span></div>
         </div>
 
         <ol class="_qrDescription_140gf_198">
           <li class="_qrDescriptionItem_140gf_222">
             <span class="_qrDescriptionMarker_140gf_208">1</span>
-            <span class="i18n">Open <b>PassGram</b> on your phone</span>
+            <span class="i18n">Telefonunda <b>PassGram</b> uygulamasını aç</span>
           </li>
           <li class="_qrDescriptionItem_140gf_222">
             <span class="_qrDescriptionMarker_140gf_208">2</span>
-            <span class="i18n">Go to <b>Settings</b> › <b>Devices</b> › <b>Add Device</b></span>
+            <span class="i18n"><b>Ayarlar</b> › <b>Cihazlar</b> › <b>Cihaz ekle</b> bölümüne git</span>
           </li>
           <li class="_qrDescriptionItem_140gf_222">
             <span class="_qrDescriptionMarker_140gf_208">3</span>
-            <span class="i18n">Point your phone at this screen to confirm login</span>
+            <span class="i18n">Girişi onaylamak için kameranı bu ekrana tut</span>
           </li>
         </ol>
 
@@ -49,10 +79,10 @@
         <button id="qr-login-retry" class="button button-primary tg-btn-submit" type="button" hidden>Yeni QR Kodu Oluştur</button>
 
         <button id="switch-to-phone" class="rp btn-primary btn-secondary btn-primary-transparent primary tg-link-btn" type="button">
-          <span class="i18n">Log in by phone number or email <span class="inline-icon">›</span></span>
+          <span class="i18n">E-posta veya telefonla giriş <span class="inline-icon" aria-hidden="true"></span></span>
         </button>
         <button id="switch-to-passkey-from-qr" class="rp btn-primary btn-secondary btn-primary-transparent primary tg-link-btn" type="button">
-          <span class="i18n">Log in by passkey <span class="inline-icon">›</span></span>
+          <span class="i18n">Passkey ile giriş <span class="inline-icon" aria-hidden="true"></span></span>
         </button>
       </div>
 
@@ -76,20 +106,21 @@
             <label class="tg-label" for="country-select">Ülke</label>
             <div class="country-picker" id="country-picker">
               <button class="country-trigger" id="country-picker-button" type="button" aria-haspopup="listbox" aria-expanded="false">
-                <span id="country-current">🇹🇷 Turkey (+90)</span><span class="country-chevron" aria-hidden="true">⌄</span>
+                <span id="country-current">🇹🇷 Turkey (+90)</span><span class="country-chevron" aria-hidden="true"></span>
               </button>
               <div class="country-menu" id="country-menu" hidden>
-                <label class="country-search"><span aria-hidden="true">⌕</span><input id="country-search" type="search" placeholder="Ülke veya kod ara" autocomplete="off"></label>
+                <label class="country-search"><span aria-hidden="true"></span><input id="country-search" type="search" placeholder="Ülke veya kod ara" autocomplete="off"></label>
                 <div class="country-options" id="country-options" role="listbox" aria-label="Ülke ve telefon kodu"></div>
                 <p class="country-empty" id="country-empty" hidden>Ülke bulunamadı.</p>
               </div>
-              <select id="country-select" class="country-value" aria-hidden="true" tabindex="-1"><option value="+90">Turkey (+90)</option></select>
+              <select id="country-select" class="country-value" aria-hidden="true" tabindex="-1"><option value="+90" data-calling-code="90" data-length="12" data-iso="TR">Turkey (+90)</option></select>
             </div>
           </div>
 
           <div class="form-group">
             <label class="tg-label" id="login-identifier-label" for="login-identifier">E-posta</label>
             <input id="login-identifier" class="tg-input" type="email" autocomplete="username" placeholder="ornek@email.com" required>
+            <small id="phone-input-hint" class="field-hint" hidden>Seçtiğin ülkenin kodu zaten seçili. Yalnızca telefon numaranı yaz.</small>
           </div>
 
           <button id="email-submit" class="button button-primary tg-btn-submit" type="submit">PassGram uygulamasına kod gönder</button>
@@ -98,47 +129,70 @@
         <div id="recaptcha-container"></div>
         <p id="auth-status" class="status-msg" role="status"></p>
         <section id="app-login-panel" class="app-login-panel" hidden aria-live="polite">
-          <div class="app-login-code" id="app-login-code">--</div>
-          <p id="app-login-status" class="status-msg">Telefonunda açılan PassGram isteğinde aynı kodu seçip onayla.</p>
-          <p class="qr-expiry-text">Kod <strong id="app-login-countdown">60</strong> saniye geçerli.</p>
-          <button id="app-login-cancel" class="tg-link-btn" type="button">İptal</button>
+          <div class="otp-panel-heading">
+            <span class="icon-mask icon-shield" aria-hidden="true"></span>
+            <div>
+              <strong id="app-login-account">PassGram hesabın</strong>
+              <p>6 haneli giriş kodunu kayıtlı PassGram uygulamanda bulabilirsin.</p>
+            </div>
+          </div>
+          <div class="otp-request-details">
+            <div><span>Cihaz</span><strong id="app-login-device">Web tarayıcısı</strong></div>
+            <div><span>Konum</span><strong id="app-login-location">Konum alınamadı</strong></div>
+          </div>
+          <form id="app-login-otp-form" class="app-login-otp-form" novalidate>
+            <div id="app-login-otp-inputs" class="app-login-otp-inputs" role="group" aria-label="6 haneli doğrulama kodu">
+              <input class="otp-input" type="text" inputmode="numeric" pattern="[0-9]*" maxlength="1" autocomplete="one-time-code" aria-label="1. rakam" required>
+              <input class="otp-input" type="text" inputmode="numeric" pattern="[0-9]*" maxlength="1" aria-label="2. rakam" required>
+              <input class="otp-input" type="text" inputmode="numeric" pattern="[0-9]*" maxlength="1" aria-label="3. rakam" required>
+              <input class="otp-input" type="text" inputmode="numeric" pattern="[0-9]*" maxlength="1" aria-label="4. rakam" required>
+              <input class="otp-input" type="text" inputmode="numeric" pattern="[0-9]*" maxlength="1" aria-label="5. rakam" required>
+              <input class="otp-input" type="text" inputmode="numeric" pattern="[0-9]*" maxlength="1" aria-label="6. rakam" required>
+            </div>
+            <button id="app-login-verify" class="button button-primary tg-btn-submit" type="submit" disabled>Kodu doğrula</button>
+          </form>
+          <p id="app-login-status" class="status-msg" role="status">Uygulama bildirimini kontrol et.</p>
+          <p class="qr-expiry-text">Kodun geçerliliği: <strong id="app-login-countdown">60</strong> saniye</p>
+          <button id="app-login-resend" class="tg-link-btn" type="button" disabled>Yeni kod iste <span id="app-login-resend-countdown">30</span></button>
+          <button id="app-login-cancel" class="tg-link-btn" type="button">Giriş isteğini iptal et</button>
         </section>
 
         <button id="switch-to-qr" class="rp btn-primary btn-secondary btn-primary-transparent primary tg-link-btn" type="button">
-          <span class="i18n">QR kod ile giriş <span class="inline-icon">›</span></span>
+          <span class="i18n">QR kod ile giriş <span class="inline-icon" aria-hidden="true"></span></span>
         </button>
         <button id="switch-to-passkey-from-phone" class="rp btn-primary btn-secondary btn-primary-transparent primary tg-link-btn" type="button">
-          <span class="i18n">Passkey ile giriş <span class="inline-icon">›</span></span>
+          <span class="i18n">Passkey ile giriş <span class="inline-icon" aria-hidden="true"></span></span>
         </button>
       </div>
 
       <!-- VIEW 3: LOG IN BY PASSKEY -->
       <div id="view-passkey" class="_card_140gf_90 _pageSignQR_140gf_259" hidden>
         <div class="brand-avatar-badge passkey-badge">
-          <span>🔑</span>
+          <span class="icon-mask icon-key" aria-hidden="true"></span>
         </div>
 
-        <h1 class="_title_16kfa_11 text-center">Log in by Passkey</h1>
-        <div class="_subtitle_16kfa_12 secondary">Use your device biometric or hardware security key to sign in.</div>
+        <h1 class="_title_16kfa_11 text-center">Passkey ile giriş yap</h1>
+        <div class="_subtitle_16kfa_12 secondary">Cihazının biyometrik doğrulamasını veya güvenlik anahtarını kullan.</div>
 
-        <button id="passkey-login-btn" class="button button-primary tg-btn-submit" type="button">CONTINUE WITH PASSKEY</button>
+        <button id="passkey-login-btn" class="button button-primary tg-btn-submit" type="button">Passkey ile devam et</button>
         <p id="passkey-status" class="status-msg" role="status"></p>
 
         <button id="switch-to-qr-from-passkey" class="rp btn-primary btn-secondary btn-primary-transparent primary tg-link-btn" type="button">
-          <span class="i18n">Log in by QR Code <span class="inline-icon">›</span></span>
+          <span class="i18n">QR kod ile giriş <span class="inline-icon" aria-hidden="true"></span></span>
         </button>
         <button id="switch-to-phone-from-passkey" class="rp btn-primary btn-secondary btn-primary-transparent primary tg-link-btn" type="button">
-          <span class="i18n">Log in by phone number or email <span class="inline-icon">›</span></span>
+          <span class="i18n">E-posta veya telefonla giriş <span class="inline-icon" aria-hidden="true"></span></span>
         </button>
       </div>
 
+      </div>
     </div>
   </main>
 
   <!-- SETUP / APP DOWNLOAD VIEW -->
   <main id="setup-view" class="setup-view" hidden>
     <section class="setup-card">
-      <div class="brand-mark">Z</div><p class="eyebrow">PASSGRAM ANDROID</p>
+      <div class="brand-mark"><img src="/resources/assets/app-logo/zpass.png" alt=""></div><p class="eyebrow">PASSGRAM ANDROID</p>
       <h1>Hesabını uygulamada oluştur</h1><p class="muted">Yeni hesap açmak ve sohbet kimliğini kurmak için Android uygulamasını indir. Ardından burada hesabına giriş yapıp telefonunu eşleştirebilirsin.</p>
       <a class="button button-primary" href="/apps.html#android">APK’yı indir</a>
       <p id="profile-status" class="status" role="status"></p>
@@ -148,25 +202,25 @@
   <!-- MAIN CHAT APPLICATION -->
   <main id="chat-app" class="chat-app" hidden>
     <aside class="sidebar">
-      <header class="side-head"><div class="brand-small">Z</div><div><b>PassGram</b><small>Güvenli mesajlaşma</small></div><button id="signout" class="icon-button" title="Çıkış yap" aria-label="Çıkış yap">↗</button></header>
-      <div class="search-wrap"><span>⌕</span><input id="search" placeholder="Kullanıcı adı ara" autocomplete="off"><button id="clear-search" class="icon-button" hidden aria-label="Temizle">×</button></div>
+      <header class="side-head"><div class="brand-small"><img src="/resources/assets/app-logo/zpass.png" alt=""></div><div><b>PassGram</b><small>Güvenli mesajlaşma</small></div><button id="signout" class="icon-button icon-signout" title="Çıkış yap" aria-label="Çıkış yap"></button></header>
+      <div class="search-wrap"><span class="icon-mask icon-search" aria-hidden="true"></span><input id="search" placeholder="Kullanıcı adı ara" autocomplete="off"><button id="clear-search" class="icon-button" hidden aria-label="Temizle">×</button></div>
       <div id="search-results" class="result-list" hidden></div>
       <div class="list-label">SOHBETLER</div>
       <div id="chat-list" class="chat-list"></div>
       <div class="side-foot"><span class="secure-dot"></span><span>Uçtan uca şifreli</span><button id="pair-device" class="text-button">Tarayıcıyı eşleştir</button></div>
     </aside>
-    <section id="empty-state" class="empty-state"><div class="empty-orb">✦</div><h2>Sohbetlerin</h2><p>Özel bir sohbet başlatmak için kullanıcı adı ara.</p><span class="secure-label">UÇTAN UCA ŞİFRELİ · ANLIK</span></section>
+    <section id="empty-state" class="empty-state"><div class="empty-orb"><span class="icon-mask icon-message" aria-hidden="true"></span></div><h2>Sohbetlerin</h2><p>Özel bir sohbet başlatmak için kullanıcı adı ara.</p><span class="secure-label"><span class="icon-mask icon-shield"></span> UÇTAN UCA ŞİFRELİ · ANLIK</span></section>
     <section id="conversation" class="conversation" hidden>
-      <header class="chat-head"><button id="back-list" class="icon-button back-button" aria-label="Sohbetlere dön">‹</button><div id="peer-avatar" class="avatar">Z</div><div class="peer-head"><b id="peer-name">—</b><small id="peer-status">Uçtan uca şifreli</small></div><div class="chat-actions"><button id="audio-call" class="icon-button" title="Sesli ara" aria-label="Sesli ara">⌕</button><button id="video-call" class="icon-button" title="Görüntülü ara" aria-label="Görüntülü ara">▣</button></div></header>
-      <div id="e2e-banner" class="e2e-banner"><span>♢</span> Uçtan uca şifreli · mesajları yalnızca sen ve sohbet ettiğin kişi okuyabilir</div>
+      <header class="chat-head"><button id="back-list" class="icon-button back-button" aria-label="Sohbetlere dön"><span class="icon-mask icon-back"></span></button><div id="peer-avatar" class="avatar">Z</div><div class="peer-head"><b id="peer-name">—</b><small id="peer-status">Uçtan uca şifreli</small></div><div class="chat-actions"><button id="audio-call" class="icon-button icon-call" title="Sesli ara" aria-label="Sesli ara"></button><button id="video-call" class="icon-button icon-video" title="Görüntülü ara" aria-label="Görüntülü ara"></button></div></header>
+      <div id="e2e-banner" class="e2e-banner"><span class="icon-mask icon-shield"></span> Uçtan uca şifreli · mesajları yalnızca sen ve sohbet ettiğin kişi okuyabilir</div>
       <div id="messages" class="messages" role="log" aria-live="polite"></div>
-      <form id="composer" class="composer"><textarea id="message-input" rows="1" maxlength="4096" placeholder="Mesaj yaz…" aria-label="Mesaj yaz"></textarea><button id="send-message" class="send-button" type="submit" aria-label="Mesajı gönder">↑</button></form>
+      <form id="composer" class="composer"><textarea id="message-input" rows="1" maxlength="4096" placeholder="Mesaj yaz…" aria-label="Mesaj yaz"></textarea><button id="send-message" class="send-button" type="submit" aria-label="Mesajı gönder"><span class="icon-mask icon-send"></span></button></form>
     </section>
   </main>
 
   <dialog id="pair-dialog" class="modal">
     <form method="dialog"><button class="modal-close" aria-label="Close">×</button></form>
-    <div class="modal-icon">⌑</div><p class="eyebrow">GÜVENLİ CİHAZ EŞLEŞTİRME</p><h2>Telefonundan onayla</h2>
+    <div class="modal-icon"><span class="icon-mask icon-link"></span></div><p class="eyebrow">GÜVENLİ CİHAZ EŞLEŞTİRME</p><h2>Telefonundan onayla</h2>
     <p class="muted">Telefonunda PassGram'i aç ve aynı iki haneli kodu onayla. Mevcut sohbet anahtarın tek kullanımlık şifreli bir kanalla aktarılır.</p>
     <div id="pair-code" class="pair-code">··</div><p id="pair-status" class="status" role="status">Telefon onayı bekleniyor…</p>
     <button id="pair-start" class="button button-primary" type="button">Telefon onayı iste</button>
@@ -176,12 +230,28 @@
   <dialog id="call-dialog" class="call-modal">
     <div class="call-title"><b id="call-peer">Arama</b><span id="call-state">Bağlanıyor…</span></div>
     <div id="call-videos" class="call-videos"><video id="remote-video" autoplay playsinline></video><video id="local-video" autoplay muted playsinline></video></div><audio id="remote-audio" autoplay></audio>
-    <div id="audio-call-art" class="audio-call-art">Z</div>
+    <div id="audio-call-art" class="audio-call-art"><img src="/resources/assets/app-logo/zpass.png" alt=""></div>
     <div class="call-controls"><button id="toggle-mic" class="icon-button" aria-label="Mikrofonu kapat">Mikrofon</button><button id="hangup" class="hangup">Aramayı bitir</button><button id="toggle-camera" class="icon-button" aria-label="Kamerayı aç veya kapat">Kamera</button></div>
     <button id="accept-call" class="button button-primary" hidden>Aramayı yanıtla</button>
   </dialog>
   <div id="toast" class="toast" role="status"></div>
   <script src="/js/vendor/qrcode-generator.js"></script>
-  <script type="module" src="/js/web-chat.mjs?v=11"></script>
+  <script>
+    const startupScreen = document.getElementById('startup-screen');
+    window.addEventListener('passgram:ready', () => {
+      startupScreen?.classList.add('startup-screen-ready');
+      window.setTimeout(() => { if (startupScreen) startupScreen.hidden = true; }, 320);
+    }, { once: true });
+    document.getElementById('startup-retry')?.addEventListener('click', () => window.location.reload());
+  </script>
+  <script type="module">
+    import('/js/web-chat.mjs?v=14').catch((error) => {
+      console.error('PassGram Web could not start:', error);
+      const status = document.getElementById('startup-status');
+      const retry = document.getElementById('startup-error');
+      if (status) status.textContent = 'Uygulama başlatılamadı.';
+      if (retry) retry.hidden = false;
+    });
+  </script>
 </body>
 </html>

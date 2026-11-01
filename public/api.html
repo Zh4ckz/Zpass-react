@@ -5,12 +5,15 @@
   <meta name="viewport" content="width=device-width,initial-scale=1">
   <meta name="description" content="Developer information and Bot API preview for PassGram.">
   <title>Developer API — PassGram</title>
-  <link rel="icon" href="/resources/assets/app-logo/zpass.png">
+  <link rel="icon" type="image/x-icon" href="/favicon.ico?v=1">
+  <link rel="icon" type="image/png" sizes="512x512" href="/resources/assets/app-logo/zpass.png">
+  <link rel="apple-touch-icon" href="/resources/assets/app-logo/zpass.png">
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500&family=Instrument+Serif:ital@0;1&family=Inter:ital,opsz,wght@0,14..32,400;0,14..32,500;0,14..32,600;1,14..32,400&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="/css/marketing-2026.css?v=2">
-</head>
+  <link rel="stylesheet" href="/css/marketing-2026.css?v=5">
+    <link rel="stylesheet" href="/css/modern-2026.css?v=1">
+    <script src="/js/modern-reveal.js?v=1" defer></script></head>
 <body>
 <header class="site-header">
   <a class="brand" href="/"><span class="brand-mark">P</span><span>PassGram</span></a>
@@ -24,7 +27,7 @@
   </nav>
   <div class="header-actions">
     <a class="x-link" href="https://x.com/4rezan" target="_blank" rel="noopener">𝕏 <span>Follow</span></a>
-    <a class="button button-dark button-small" href="https://web.zpas.org/login">Sign in ↗</a>
+    <a class="button button-dark button-small" href="https://web.zpas.org/login">Sign in</a>
   </div>
 </header>
 <main class="section-wrap">
@@ -45,7 +48,7 @@
 /mybots
 /token
 /revoke</pre>
-      <a href="https://web.zpas.org/login">Sign in to PassGram ↗</a>
+      <a href="https://web.zpas.org/login">Sign in to PassGram</a>
     </article>
     <article class="api-doc-card">
       <h2>Bot API request format</h2>
@@ -56,7 +59,7 @@
   "chat_id": "…",
   "text": "Hello"
 }</pre>
-      <a href="/faq.html">Read the FAQ ↗</a>
+      <a href="/faq.html">Read the FAQ</a>
     </article>
     <article class="api-doc-card">
       <h2>Protect your token</h2>
@@ -65,10 +68,60 @@
     <article class="api-doc-card">
       <h2>Service status</h2>
       <p>The site is hosted on Firebase and does not depend on a PC being left on. Bot creation still needs the serverless gateway before it goes live.</p>
-      <a href="https://x.com/4rezan" target="_blank" rel="noopener">Follow launch updates on X ↗</a>
+      <a href="https://x.com/4rezan" target="_blank" rel="noopener">Follow launch updates on X</a>
     </article>
   </div>
-  <a class="back-link" href="/">← Back to PassGram</a>
+  <a class="back-link" href="/">Back to PassGram</a>
+  <section class="m-section" style="width:100%">
+    <div class="m-head reveal">
+      <div class="eyebrow">Guide</div>
+      <h2>Understand the API<br><em>before you build.</em></h2>
+      <p>This page explains how PassGram bots are expected to work, how to keep them secure, and which parts exist today. We mark every planned feature as planned, so you can decide what to build on without surprises.</p>
+    </div>
+    <div class="m-grid">
+      <article class="m-card reveal"><div class="m-num">1</div><h3>Authentication</h3><p>Every bot receives a secret token when it is created. The token is part of the request path and identifies your bot. Treat it exactly like a password: store it in an environment variable or a secrets manager, never inside a web page, mobile app or public repository.</p><p>If a token leaks, revoke it and issue a new one immediately. Rotating a token invalidates the old one at once.</p></article>
+      <article class="m-card reveal"><div class="m-num">2</div><h3>Requests and responses</h3><p>Methods are called with HTTPS POST and a JSON body. Successful calls return a JSON object with an ok flag and a result, while failures return ok set to false together with an error code and a short human-readable description.</p></article>
+      <article class="m-card reveal"><div class="m-num">3</div><h3>Rate limits</h3><p>To keep the service fast for everyone, bots will be limited in how many messages they can send per second and per chat. When a limit is reached the response tells you how many seconds to wait, and well-behaved clients should back off instead of retrying immediately.</p></article>
+      <article class="m-card reveal"><div class="m-num">4</div><h3>Webhooks and polling</h3><p>You will be able to receive updates either by asking for them on a schedule or by giving us an HTTPS address to call. Webhooks are faster and use fewer resources, while polling is easier to test from a laptop.</p></article>
+    </div>
+  </section>
+
+  <section class="m-section" style="width:100%">
+    <div class="m-head reveal"><div class="eyebrow">Reference</div><h2>Planned methods</h2>
+      <p>The table lists the first methods we intend to offer. Names and fields may still change before the gateway is published.</p></div>
+    <div class="reveal" style="overflow:auto">
+      <table class="m-table">
+        <thead><tr><th>Method</th><th>Purpose</th><th>Main fields</th></tr></thead>
+        <tbody>
+          <tr><td><code>getMe</code></td><td>Returns basic information about your bot, useful for checking that a token works.</td><td>none</td></tr>
+          <tr><td><code>sendMessage</code></td><td>Sends a text message to a chat the bot is allowed to write in.</td><td><code>chat_id</code>, <code>text</code></td></tr>
+          <tr><td><code>getUpdates</code></td><td>Fetches new messages and events addressed to your bot.</td><td><code>offset</code>, <code>limit</code></td></tr>
+          <tr><td><code>setWebhook</code></td><td>Registers an HTTPS address that receives updates as they happen.</td><td><code>url</code></td></tr>
+        </tbody>
+      </table>
+    </div>
+    <div class="m-code reveal" style="margin-top:20px"><b>POST</b> https://api.zpas.org/bot&lt;TOKEN&gt;/sendMessage
+Content-Type: application/json
+
+{
+  "chat_id": "123456789",
+  "text": "Hello from my bot"
+}</div>
+  </section>
+
+  <section class="m-section" style="width:100%">
+    <div class="m-head reveal"><div class="eyebrow">Best practice</div><h2>Ship it <em>safely.</em></h2></div>
+    <div class="m-prose reveal">
+      <p>Always call the API from a server you control. Browsers expose every line of script to the person using the page, so any token placed there can be copied in seconds. A small backend that holds the token and exposes only the actions your page needs is the safest pattern.</p>
+      <p>Validate everything that reaches your bot. Messages and webhook payloads are input from the outside world, so check their shape, limit their length and never run them as commands. Log failures without writing tokens into your logs.</p>
+      <p>Finally, be transparent with the people who talk to your bot. Say what it does, what it stores and how they can stop using it. Trust is the most valuable feature any integration can have.</p>
+    </div>
+  </section>
+  <div class="m-cta reveal">
+    <h2>Questions about the API?</h2>
+    <p>Read the FAQ for the current status, or follow the project on X to hear when the gateway goes live.</p>
+    <a class="button button-dark" href="/faq.html">Read the FAQ</a>
+  </div>
 </main>
 <footer class="site-footer">
   <div class="footer-main">
@@ -81,7 +134,7 @@
       <a href="/api.html">API</a>
       <a href="/faq.html">FAQ</a>
     </nav>
-    <a class="footer-x" href="https://x.com/4rezan" target="_blank" rel="noopener">𝕏 Follow on X ↗</a>
+    <a class="footer-x" href="https://x.com/4rezan" target="_blank" rel="noopener">𝕏 Follow on X</a>
   </div>
   <div class="footer-bottom"><span>© 2026 PassGram</span><span>Designed for privacy.</span></div>
 </footer>
