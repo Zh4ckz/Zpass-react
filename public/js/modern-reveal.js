@@ -22,7 +22,7 @@
   if (sideNav && toggle) {
     var foot = document.createElement('div');
     foot.className = 'nav-side-foot';
-    foot.innerHTML = '<a class="button button-dark" href="https://web.zpas.org/login">Open PassGram Web</a><a class="button button-light" href="https://x.com/4rezan" target="_blank" rel="noopener" style="color:#000!important">Follow on X</a>';
+    foot.innerHTML = '<a class="button button-dark" href="/apps.html">Download the apps</a><a class="button button-light" href="https://x.com/4rezan" target="_blank" rel="noopener" style="color:#000!important">Follow on X</a>';
     sideNav.appendChild(foot);
     var closeBtn = document.createElement('button');
     closeBtn.type = 'button';

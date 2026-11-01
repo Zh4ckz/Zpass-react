@@ -7,9 +7,6 @@ import { firebaseConfig } from './firebase-config.mjs';
 const app = getApps()[0] || initializeApp(firebaseConfig);
 const auth = getAuth(app), db = getFirestore(app);
 const functions = getFunctions(app, 'us-central1');
-const createWebQrLogin = httpsCallable(functions, 'createWebQrLogin');
-const pollWebQrLogin = httpsCallable(functions, 'pollWebQrLogin');
-const completeWebQrLogin = httpsCallable(functions, 'completeWebQrLogin');
 const registerWebLoginSession = httpsCallable(functions, 'registerWebLoginSession');
 const requestAppLoginOtp = httpsCallable(functions, 'requestAppLoginOtp');
 const verifyAppLoginOtp = httpsCallable(functions, 'verifyAppLoginOtp');
@@ -22,6 +19,7 @@ const viewQr = $('view-qr'), viewPhone = $('view-phone'), viewPasskey = $('view-
 
 let me = null, profile = null;
 let qrPollTimer = null, qrCountdownTimer = null, qrLoginRequest = null, qrLoginGeneration = 0;
+const qrUnsubscribers = [];
 let authMethod = 'email', phoneConfirmation = null, recaptchaVerifier = null;
 let appLoginTimer = null, appLoginCountdown = null, appLoginGeneration = 0;
 let appLoginRequest = null;
@@ -486,6 +484,10 @@ async function sha256Hex(str) {
   const buf = await crypto.subtle.digest('SHA-256', new TextEncoder().encode(str));
   return Array.from(new Uint8Array(buf), b => b.toString(16).padStart(2, '0')).join('');
 }
+function randomRequestId() {
+  const bytes = crypto.getRandomValues(new Uint8Array(24));
+  return btoa(String.fromCharCode(...bytes)).replace(/\+/g, '-').replace(/\//g, '_').replace(/=+$/, '');
+}
 function randomSecret() {
   const bytes = crypto.getRandomValues(new Uint8Array(32));
   return Array.from(bytes, b => b.toString(16).padStart(2, '0')).join('');
@@ -506,6 +508,7 @@ function stopQrLogin() {
   qrPollTimer = null;
   qrCountdownTimer = null;
   qrLoginRequest = null;
+  qrUnsubscribers.splice(0).forEach(stop => { try { stop(); } catch { /* listener already closed */ } });
 }
 
 function drawLoginQr(value) {
@@ -572,29 +575,40 @@ async function startWebQrLogin() {
 
   qrLoginStatus('Güvenli QR kod oluşturuluyor…');
 
-  const qrSecret = randomSecret(), pollSecret = randomSecret();
+  const pollSecret = randomSecret();
 
   try {
+    const pollHash = await sha256Hex(pollSecret);
+    const requestId = randomRequestId();
     const coordinates = await getPreviouslyGrantedBrowserCoordinates();
     if (generation !== qrLoginGeneration) return;
-    const res = await createWebQrLogin({
-      qrSecret,
-      pollSecret,
-      deviceName: getWebDeviceName(),
-      ...(coordinates || {})
+    const requestRef = doc(db, 'webQrRequests', requestId);
+    await setDoc(requestRef, {
+      status: 'requested',
+      pollHash,
+      deviceId: getWebSessionId(),
+      deviceName: getWebDeviceName().slice(0, 80),
+      ...(coordinates ? { locationLabel: `${Number(coordinates.latitude).toFixed(3)}, ${Number(coordinates.longitude).toFixed(3)}` } : {}),
+      createdAt: serverTimestamp()
     });
     if (generation !== qrLoginGeneration) return;
 
-    const { requestId, expiresAt: expTime } = res.data;
-    const expiresAt = Number(expTime) || (Date.now() + 600000);
+    // The local PassGram bot answers with the one-time QR payload.
+    const issued = await new Promise((resolve, reject) => {
+      let stop = () => {};
+      const timer = setTimeout(() => reject(new Error('Giriş servisi şu an çevrimdışı. Biraz sonra tekrar dene.')), 15000);
+      qrUnsubscribers.push(() => { clearTimeout(timer); stop(); });
+      stop = onSnapshot(requestRef, snap => {
+        const data = snap.data();
+        if (data?.status === 'pending' && data.qrPayload && data.expiresAt) { clearTimeout(timer); resolve(data); }
+      }, error => { clearTimeout(timer); reject(error); });
+    });
+    if (generation !== qrLoginGeneration) return;
 
-    qrLoginRequest = { requestId, qrSecret, pollSecret, expiresAt };
+    const expiresAt = issued.expiresAt.toMillis();
+    qrLoginRequest = { requestId, pollSecret, expiresAt };
 
-    const payload = new URL('zpass://web-login');
-    payload.searchParams.set('requestId', requestId);
-    payload.searchParams.set('secret', qrSecret);
-
-    drawLoginQr(payload.toString());
+    drawLoginQr(issued.qrPayload);
     qrLoginStatus('PassGram uygulamasından tara; telefonda web girişini onayla.');
 
     const updateCountdown = () => {
@@ -615,50 +629,38 @@ async function startWebQrLogin() {
     updateCountdown();
     qrCountdownTimer = setInterval(updateCountdown, 500);
 
-    let pollInFlight = false;
-    qrPollTimer = setInterval(async () => {
-      if (pollInFlight || qrLoginRequest?.requestId !== requestId) return;
-      pollInFlight = true;
-      try {
-        const state = (await pollWebQrLogin({ requestId, pollSecret })).data;
-        if (qrLoginRequest?.requestId !== requestId) return;
-        if (state.status === 'approved' && state.customToken) {
-          stopQrLogin();
-          qrLoginStatus('Telefon onayladı! Güvenli oturum açılıyor…');
-          try {
-            await signInWithCustomToken(auth, state.customToken);
-          } catch (error) {
-            console.error('Custom token sign-in failed:', error);
-            if (retryBtn) retryBtn.hidden = false;
-            qrLoginStatus(error.message || 'Oturum açılamadı. Yeni QR kod oluşturup tekrar deneyin.', true);
-            return;
-          }
-          try {
-            await completeWebQrLogin({ requestId, pollSecret, deviceId: getWebSessionId() });
-          } catch (error) {
-            console.error('Could not complete QR login request:', error);
-            qrLoginStatus(error.message || 'Giriş oturumu güvenlik merkezine kaydedilemedi.', true);
-            await signOut(auth);
-          }
-        } else if (['expired', 'cancelled', 'consumed'].includes(state.status)) {
-          stopQrLogin();
+    const resultRef = doc(db, 'webQrResults', pollHash);
+    qrUnsubscribers.push(onSnapshot(resultRef, async snap => {
+      if (!snap.exists() || qrLoginRequest?.requestId !== requestId) return;
+      const state = snap.data();
+      if (state.status === 'approved' && state.customToken) {
+        stopQrLogin();
+        qrLoginStatus('Telefon onayladı! Güvenli oturum açılıyor…');
+        try {
+          await signInWithCustomToken(auth, state.customToken);
+        } catch (error) {
+          console.error('Custom token sign-in failed:', error);
           if (retryBtn) retryBtn.hidden = false;
-          if (loading) loading.hidden = true;
-          qrLoginStatus('Bu QR isteği sona erdi. Yeni kod oluştur.', true);
+          qrLoginStatus(error.message || 'Oturum açılamadı. Yeni QR kod oluşturup tekrar deneyin.', true);
         }
-      } catch (err) {
-        if (generation !== qrLoginGeneration) return;
-        if (qrLoginRequest?.requestId === requestId) {
-          console.error('Web QR login polling failed:', err);
-          stopQrLogin();
-          if (loading) loading.hidden = true;
-          if (retryBtn) retryBtn.hidden = false;
-          qrLoginStatus(err.message || 'QR isteği kontrol edilemiyor. Tekrar deneyin.', true);
-        }
-      } finally {
-        pollInFlight = false;
+        deleteDoc(resultRef).catch(() => {});
+      } else if (state.status === 'denied') {
+        stopQrLogin();
+        if (loading) loading.hidden = true;
+        if (retryBtn) retryBtn.hidden = false;
+        deleteDoc(resultRef).catch(() => {});
+        qrLoginStatus(state.reason === 'revoked'
+          ? 'Bu tarayıcı oturumu sonlandırılmıştı. Yeni bir QR kod oluştur.'
+          : 'Giriş onaylanamadı. Yeni bir QR kod oluştur.', true);
       }
-    }, 1400);
+    }, error => {
+      if (qrLoginRequest?.requestId !== requestId) return;
+      console.error('Web QR login listener failed:', error);
+      stopQrLogin();
+      if (loading) loading.hidden = true;
+      if (retryBtn) retryBtn.hidden = false;
+      qrLoginStatus(error.message || 'QR isteği kontrol edilemiyor. Tekrar deneyin.', true);
+    }));
   } catch (err) {
     console.error('Web QR login creation failed:', err);
     if (loading) loading.hidden = true;
