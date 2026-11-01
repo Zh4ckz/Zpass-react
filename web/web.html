@@ -75,7 +75,6 @@
         </ol>
 
         <p id="qr-login-status" class="status-msg" role="status">Kod hazırlanıyor…</p>
-        <p class="qr-expiry-text">Kodun geçerliliği: <strong id="qr-login-countdown">--:--</strong></p>
         <button id="qr-login-retry" class="button button-primary tg-btn-submit" type="button" hidden>Yeni QR Kodu Oluştur</button>
 
         <button id="switch-to-phone" class="rp btn-primary btn-secondary btn-primary-transparent primary tg-link-btn" type="button">
@@ -152,7 +151,6 @@
             <button id="app-login-verify" class="button button-primary tg-btn-submit" type="submit" disabled>Kodu doğrula</button>
           </form>
           <p id="app-login-status" class="status-msg" role="status">Uygulama bildirimini kontrol et.</p>
-          <p class="qr-expiry-text">Kodun geçerliliği: <strong id="app-login-countdown">60</strong> saniye</p>
           <button id="app-login-resend" class="tg-link-btn" type="button" disabled>Yeni kod iste <span id="app-login-resend-countdown">30</span></button>
           <button id="app-login-cancel" class="tg-link-btn" type="button">Giriş isteğini iptal et</button>
         </section>
@@ -245,7 +243,7 @@
     document.getElementById('startup-retry')?.addEventListener('click', () => window.location.reload());
   </script>
   <script type="module">
-    import('/js/web-chat.mjs?v=14').catch((error) => {
+    import('/js/web-chat.mjs?v=15').catch((error) => {
       console.error('PassGram Web could not start:', error);
       const status = document.getElementById('startup-status');
       const retry = document.getElementById('startup-error');

@@ -613,16 +613,11 @@ async function startWebQrLogin() {
 
     const updateCountdown = () => {
       const remain = Math.max(0, expiresAt - Date.now());
-      if (countdown) {
-        const mins = String(Math.floor(remain / 60000)).padStart(2, '0');
-        const secs = String(Math.floor((remain % 60000) / 1000)).padStart(2, '0');
-        countdown.textContent = `${mins}:${secs}`;
-      }
       if (remain <= 0) {
         stopQrLogin();
         if (loading) loading.hidden = true;
         if (retryBtn) retryBtn.hidden = false;
-        qrLoginStatus('QR kodunun süresi doldu. Yeni bir kod oluştur.', true);
+        qrLoginStatus('QR kodu yenilenmeli. Yeni bir kod oluştur.', true);
       }
     };
 
@@ -641,7 +636,7 @@ async function startWebQrLogin() {
         } catch (error) {
           console.error('Custom token sign-in failed:', error);
           if (retryBtn) retryBtn.hidden = false;
-          qrLoginStatus(error.message || 'Oturum açılamadı. Yeni QR kod oluşturup tekrar deneyin.', true);
+          qrLoginStatus('Oturum açılamadı. Yeni bir QR kod oluştur.', true);
         }
         deleteDoc(resultRef).catch(() => {});
       } else if (state.status === 'denied') {
@@ -659,13 +654,13 @@ async function startWebQrLogin() {
       stopQrLogin();
       if (loading) loading.hidden = true;
       if (retryBtn) retryBtn.hidden = false;
-      qrLoginStatus(error.message || 'QR isteği kontrol edilemiyor. Tekrar deneyin.', true);
+      qrLoginStatus('QR kod şu an kullanılamıyor. Yeni bir kod oluştur.', true);
     }));
   } catch (err) {
     console.error('Web QR login creation failed:', err);
     if (loading) loading.hidden = true;
     if (retryBtn) retryBtn.hidden = false;
-    qrLoginStatus(err.message || 'QR kod oluşturulamadı. Tekrar deneyin.', true);
+    qrLoginStatus(/çevrimdışı/.test(err?.message || '') ? err.message : 'QR kod şu an oluşturulamadı. Tekrar dene.', true);
   }
 }
 
