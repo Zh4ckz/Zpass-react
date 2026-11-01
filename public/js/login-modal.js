@@ -12,7 +12,7 @@
   const open=()=>{if(modal.open)return;trigger=document.activeElement;frame.src='/dashboard.html?embedded=login&v=20261017#login';modal.showModal();document.body.classList.add('login-modal-open');back.focus();};
   back.addEventListener('click',close);
   modal.addEventListener('cancel',event=>{event.preventDefault();close();});
-  document.addEventListener('click',event=>{const link=event.target.closest('a[href="/dashboard.html#login"]');if(!link)return;event.preventDefault();if(matchMedia('(max-width:700px)').matches){location.href='/dashboard.html';return;}history.pushState(null,'','#login');open();});
+  document.addEventListener('click',event=>{const link=event.target.closest('a[href="/dashboard#login"]');if(!link)return;event.preventDefault();if(matchMedia('(max-width:700px)').matches){location.href='/dashboard';return;}history.pushState(null,'','#login');open();});
   addEventListener('hashchange',()=>location.hash==='#login'?open():modal.open&&close());
   if(location.hash==='#login')open();
 })();

@@ -12,9 +12,9 @@
     '<a href="https://x.com/ZizoSoftware" target="_blank" rel="noopener" aria-label="X"><img src="/images/x-mark.svg?v=2" alt=""></a>' +
     '<a href="https://t.me/ZizoSoftware" target="_blank" rel="noopener" aria-label="Telegram"><img src="/images/telegram-mark.svg" alt=""></a>' +
     '</div></div><nav class="lf-cols">' +
-    '<div><h4>Product</h4><a href="/apps.html">Downloads</a><a href="/2fa.html">Authenticator</a><a href="/aliases.html">Aliases</a></div>' +
-    '<div><h4>Account</h4><a href="/dashboard.html#login">Sign in</a><a href="/subscription.html">Subscription</a><a href="/checkout.html">Checkout</a></div>' +
-    '<div><h4>Company</h4><a href="/info.html">About</a><a href="/privacy.html">Privacy</a><a href="/security.html">Security</a><a href="/legal/terms.html">Terms</a></div>' +
+    '<div><h4>Product</h4><a href="/apps">Downloads</a><a href="/2fa">Authenticator</a><a href="/aliases">Aliases</a></div>' +
+    '<div><h4>Account</h4><a href="/dashboard#login">Sign in</a><a href="/subscription">Subscription</a><a href="/checkout">Checkout</a></div>' +
+    '<div><h4>Company</h4><a href="/info">About</a><a href="/privacy">Privacy</a><a href="/security">Security</a><a href="/legal/terms">Terms</a></div>' +
     '</nav></div><div class="lf-bottom"><span>Copyright &copy; 2026 <b>PassGram</b></span><span>All rights reserved.</span></div>';
   document.body.appendChild(f);
 })();
