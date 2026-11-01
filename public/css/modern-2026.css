@@ -262,3 +262,8 @@ h1 em, h2 em { font-style: normal; color: var(--blue); }
   .m-tabbar { display: none !important; }
 }
 @media (max-width: 860px) { .nav-backdrop, .nav-side-foot { display: none; } }
+
+/* Mobile uses the bottom tab bar, so no hamburger there */
+@media (max-width: 860px) {
+  .menu-toggle, .main-nav { display: none !important; }
+}
