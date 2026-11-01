@@ -312,3 +312,23 @@ h1 em, h2 em { font-style: normal; color: var(--blue); }
 .footer-legal a:hover, .footer-legal button:hover { color: #000 !important; text-decoration: none; }
 .footer-legal .choices { display: inline-flex; align-items: center; gap: 8px; }
 .footer-legal .choices svg { width: 26px; height: 12px; }
+/* Founder: compact boxed card, heading on top, small photo */
+.founder { display: block; margin: 80px auto 48px; }
+.founder-card { border: 1px solid rgba(0,0,0,.1); border-radius: 28px; padding: clamp(24px, 4vw, 48px); background: #fff; box-shadow: 0 1px 2px rgba(0,0,0,.03), 0 18px 48px rgba(0,0,0,.06); }
+.founder-card h2 { font-size: clamp(1.8rem, 3.6vw, 2.8rem); line-height: 1.1; margin: 12px 0 30px; max-width: 18ch; }
+.founder-grid { display: grid; grid-template-columns: 240px 1fr; gap: clamp(24px, 4vw, 56px); align-items: start; }
+.founder-id { display: flex; flex-direction: column; align-items: flex-start; gap: 14px; padding: 20px; border-radius: 20px; background: #f5f7fb; }
+.founder-id img { width: 88px; height: 88px; border-radius: 50%; object-fit: cover; object-position: center top; box-shadow: 0 0 0 3px #fff, 0 0 0 5px rgba(23,105,255,.45); }
+.founder-id b { display: block; font-size: 1.2rem; letter-spacing: -.02em; color: #000; }
+.founder-id span { display: block; font-size: .9rem; color: rgba(0,0,0,.62); line-height: 1.5; }
+.founder-id .x-link { height: 40px; width: 40px; padding: 0; justify-content: center; }
+.founder-id .x-link .x-icon { width: 18px; height: 18px; }
+.founder-body .founder-quote { font-size: 1.05rem; line-height: 1.8; margin: 0 0 1em; }
+.founder-body .founder-quote:first-of-type::first-letter { all: unset; }
+.x-link span { color: #fff !important; }
+@media (max-width: 860px) {
+  .founder-grid { grid-template-columns: 1fr; gap: 22px; }
+  .founder-id { flex-direction: row; align-items: center; gap: 14px; }
+  .founder-id .x-link { margin-left: auto; }
+  .founder-card { border-radius: 24px; }
+}
