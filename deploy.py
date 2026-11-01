@@ -25,28 +25,14 @@ DEPLOYMENTS = (
 )
 
 
-def sync_modules():
-    """Copy modular top-level folders into public/ for hosting deployment."""
-    public_dir = os.path.join(ROOT, "public")
-    if not os.path.exists(public_dir):
-        os.makedirs(public_dir, exist_ok=True)
-
-    modules = ["web", "core", "bots", "docs"]
-    for mod in modules:
-        mod_dir = os.path.join(ROOT, mod)
-        if os.path.exists(mod_dir):
-            for item in os.listdir(mod_dir):
-                s = os.path.join(mod_dir, item)
-                d = os.path.join(public_dir, item)
-                if not os.path.isfile(s):
-                    continue
-                ext = os.path.splitext(item)[1].lower()
-                if ext == ".html":
-                    shutil.copy2(s, d)
-                elif ext == ".js" and not item.startswith("web-"):
-                    shutil.copy2(s, os.path.join(public_dir, "resources", "js", item))
-                elif ext == ".css" and not item.startswith("web-"):
-                    shutil.copy2(s, os.path.join(public_dir, "resources", "css", item))
+# Each site module is self-contained: <module>/<module>.html plus its own css/, js/ and lang/ folders.
+# Entry files are bundled and minified into opaque hashed names under public/resources.
+MODULES = {
+    "web": {"css": ["css/web-chat.css"], "js": ["js/web-chat.mjs", "js/vendor/qrcode-generator.js"]},
+    "docs": {"css": ["css/docs.css"], "js": ["js/docs.js"]},
+    "core": {"css": ["css/core.css"], "js": []},
+    "bots": {"css": ["css/bots.css"], "js": []},
+}
 
 
 def _short_name(path):
@@ -58,55 +44,46 @@ def _short_name(path):
     return out.rjust(10, "x")
 
 
-def build_web():
-    """Bundle and minify the web app into files with opaque names, then point web.html at them."""
+def build_modules():
+    """Build every module into public/: hashed css/js bundles and a rewritten <module>.html."""
     public_dir = os.path.join(ROOT, "public")
     esbuild = os.path.join(ROOT, "node_modules", ".bin", "esbuild.cmd" if os.name == "nt" else "esbuild")
     if not os.path.exists(esbuild):
         raise SystemExit("esbuild missing. Run: npm install")
 
-    js_dir = os.path.join(public_dir, "resources", "js")
-    css_dir = os.path.join(public_dir, "resources", "css")
-    for folder in (js_dir, css_dir):
+    out_dirs = {
+        "css": os.path.join(public_dir, "resources", "css"),
+        "js": os.path.join(public_dir, "resources", "js"),
+    }
+    for folder in out_dirs.values():
         for old in os.listdir(folder):
             if re.fullmatch(r"[a-z0-9]{10}\.(js|css)", old):
                 os.remove(os.path.join(folder, old))
 
-    work = os.path.join(ROOT, ".build-web")
+    work = os.path.join(ROOT, ".build-work")
     shutil.rmtree(work, ignore_errors=True)
     os.makedirs(work)
-    shutil.copy2(os.path.join(ROOT, "web", "web-chat.mjs"), work)
-    shutil.copy2(os.path.join(ROOT, "web", "web-i18n.mjs"), work)
-    shutil.copy2(os.path.join(js_dir, "firebase-config.mjs"), work)
-    jobs = {
-        "app": [os.path.join(work, "web-chat.mjs"), "--bundle", "--format=esm", "--external:https://*"],
-        "qr": [os.path.join(js_dir, "vendor", "qrcode-generator.js")],
-        "css": [os.path.join(ROOT, "web", "web-chat.css")],
-    }
-    names = {}
-    for key, args in jobs.items():
-        ext = "css" if key == "css" else "js"
-        tmp = os.path.join(work, f"{key}.out.{ext}")
-        subprocess.run([esbuild, *args, "--minify", "--legal-comments=none", f"--outfile={tmp}"],
-                       check=True, capture_output=True, cwd=ROOT)
-        names[key] = f"{_short_name(tmp)}.{ext}"
-        shutil.copy2(tmp, os.path.join(css_dir if ext == "css" else js_dir, names[key]))
+    for mod, spec in MODULES.items():
+        mod_dir = os.path.join(ROOT, mod)
+        html = open(os.path.join(mod_dir, f"{mod}.html"), encoding="utf-8").read()
+        names = {}
+        for kind in ("css", "js"):
+            for rel in spec[kind]:
+                args = [os.path.join(mod_dir, *rel.split("/"))]
+                if kind == "js":
+                    args += ["--bundle", "--format=esm", "--external:https://*"]
+                ext = kind
+                tmp = os.path.join(work, f"{mod}-{kind}-{len(names)}.{ext}")
+                subprocess.run([esbuild, *args, "--minify", "--legal-comments=none", f"--outfile={tmp}"],
+                               check=True, capture_output=True, cwd=ROOT)
+                hashed = f"{_short_name(tmp)}.{ext}"
+                shutil.copy2(tmp, os.path.join(out_dirs[kind], hashed))
+                html = re.sub(re.escape(f"/resources/{rel}") + r"(\?v=\d+)?", f"/resources/{kind}/{hashed}", html)
+                names[rel] = hashed
+        with open(os.path.join(public_dir, f"{mod}.html"), "w", encoding="utf-8", newline="") as fh:
+            fh.write(html)
+        print(f"Build {mod}: {names}", flush=True)
     shutil.rmtree(work, ignore_errors=True)
-
-    html_path = os.path.join(ROOT, "web", "web.html")
-    html = open(html_path, encoding="utf-8").read()
-    html = re.sub(r"/resources/css/web-chat\.css\?v=\d+", "/resources/css/" + names["css"], html)
-    html = html.replace("/resources/js/vendor/qrcode-generator.js", "/resources/js/" + names["qr"])
-    html = re.sub(r"/resources/js/web-chat\.mjs\?v=\d+", "/resources/js/" + names["app"], html)
-    with open(os.path.join(public_dir, "web.html"), "w", encoding="utf-8", newline="") as fh:
-        fh.write(html)
-
-    for leftover in ("resources/js/web-chat.mjs", "resources/css/web-chat.css"):
-        try:
-            os.remove(os.path.join(public_dir, *leftover.split("/")))
-        except FileNotFoundError:
-            pass
-    print(f"Web build: {names}", flush=True)
 
 
 def main():
@@ -115,9 +92,8 @@ def main():
     print("=" * 50)
 
     # 0. Sync modular folders into public
-    print("\n[0/2] Syncing modular folders (web, core, bots, docs)...", flush=True)
-    sync_modules()
-    build_web()
+    print("\n[0/2] Building site modules (web, core, bots, docs)...", flush=True)
+    build_modules()
 
     # 1. Deploy to Firebase Hosting
     firebase_cmd = shutil.which("firebase.cmd") or shutil.which("firebase") or "firebase"
