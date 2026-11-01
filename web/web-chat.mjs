@@ -3,6 +3,9 @@ import { getAuth, onAuthStateChanged, GoogleAuthProvider, signInWithPopup, signI
 import { getFirestore, doc, getDoc, getDocs, setDoc, addDoc, collection, query, where, orderBy, limitToLast, onSnapshot, updateDoc, deleteDoc, serverTimestamp, Timestamp } from 'https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js';
 import { getFunctions, httpsCallable } from 'https://www.gstatic.com/firebasejs/10.12.2/firebase-functions.js';
 import { firebaseConfig } from './firebase-config.mjs';
+import { t, initI18n } from './web-i18n.mjs';
+
+initI18n();
 
 const app = getApps()[0] || initializeApp(firebaseConfig);
 const auth = getAuth(app), db = getFirestore(app);
@@ -35,14 +38,14 @@ function initTheme() {
   } else {
     document.body.classList.remove('dark-theme');
   }
-  themeBtn?.setAttribute('aria-label', isDark ? 'Açık temaya geç' : 'Koyu temaya geç');
+  themeBtn?.setAttribute('aria-label', isDark ? 'Switch to light theme' : 'Switch to dark theme');
 }
 if (themeBtn) {
   themeBtn.addEventListener('click', () => {
     document.body.classList.toggle('dark-theme');
     const isDark = document.body.classList.contains('dark-theme');
     localStorage.setItem('zpass-theme', isDark ? 'dark' : 'light');
-    themeBtn.setAttribute('aria-label', isDark ? 'Açık temaya geç' : 'Koyu temaya geç');
+    themeBtn.setAttribute('aria-label', isDark ? 'Switch to light theme' : 'Switch to dark theme');
   });
 }
 initTheme();
@@ -89,7 +92,7 @@ function setAuthMethod(method) {
   if ($('login-identifier')) {
     $('login-identifier').type = isPhone ? 'tel' : 'email';
     $('login-identifier').inputMode = isPhone ? 'tel' : 'email';
-    $('login-identifier').placeholder = isPhone ? '555 123 4567' : 'ornek@email.com';
+    $('login-identifier').placeholder = isPhone ? '555 123 4567' : 'name@example.com';
     $('login-identifier').autocomplete = isPhone ? 'tel' : 'username';
     if (isPhone) $('login-identifier').setAttribute('aria-describedby', 'phone-input-hint');
     else $('login-identifier').removeAttribute('aria-describedby');
@@ -97,8 +100,8 @@ function setAuthMethod(method) {
   }
   if ($('phone-input-hint')) $('phone-input-hint').hidden = !isPhone;
   if ($('email-submit')) $('email-submit').disabled = false;
-  if ($('login-identifier-label')) $('login-identifier-label').textContent = isPhone ? 'Telefon numarası' : 'E-posta';
-  if ($('email-submit')) $('email-submit').textContent = 'PassGram uygulamasına istek gönder';
+  if ($('login-identifier-label')) $('login-identifier-label').textContent = isPhone ? 'Phone number' : 'Email';
+  if ($('email-submit')) $('email-submit').textContent = 'Send request to the PassGram app';
   if ($('auth-status')) $('auth-status').textContent = '';
   if (recaptchaVerifier) {
     recaptchaVerifier.clear();
@@ -196,16 +199,16 @@ async function beginAppLogin(identifier) {
   const normalized = authMethod === 'phone'
     ? normalizePhoneNumber(identifier)
     : identifier.trim().toLowerCase();
-  if (authMethod === 'email' && !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(normalized)) throw new Error('Geçerli bir e-posta adresi gir.');
+  if (authMethod === 'email' && !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(normalized)) throw new Error('Enter a valid email address.');
   panel.hidden = false;
-  status.textContent = 'Uygulama kodu hazırlanıyor…';
+  status.textContent = 'Preparing app code…';
   clearAppLoginOtp();
   if (sendButton) sendButton.disabled = true;
   if (resendButton) resendButton.disabled = true;
   const pollSecret = randomHex();
   const coordinates = await getBrowserCoordinates();
   if (generation !== appLoginGeneration) return;
-  const deviceLabel = `Web tarayıcısı · ${navigator.userAgentData?.platform || navigator.platform || 'Web'}`;
+  const deviceLabel = `Web browser · ${navigator.userAgentData?.platform || navigator.platform || 'Web'}`;
   const response = await requestAppLoginOtp({
     identifier: normalized,
     pollSecret,
@@ -220,8 +223,8 @@ async function beginAppLogin(identifier) {
   $('app-login-device').textContent = deviceLabel;
   $('app-login-location').textContent = coordinates
     ? `${coordinates.latitude.toFixed(3)}, ${coordinates.longitude.toFixed(3)}`
-    : 'Konum kullanılamıyor';
-  status.textContent = 'Kayıtlı PassGram uygulamanı aç, biyometrik doğrulamadan sonra kodu gir.';
+    : 'Location unavailable';
+  status.textContent = 'Open your registered PassGram app and enter the code after biometric verification.';
   const deadline = Math.min(Number(expiresAt) || Date.now() + 60000, Date.now() + 60000);
   const tick = () => {
     const remaining = Math.max(0, Math.ceil((deadline - Date.now()) / 1000));
@@ -232,7 +235,7 @@ async function beginAppLogin(identifier) {
     if (resendButton) resendButton.disabled = resendRemaining > 0 || remaining === 0;
     if (!remaining) {
       stopAppLogin();
-      status.textContent = 'İstek sona erdi. Yeniden deneyebilirsin.';
+      status.textContent = 'The request expired. You can try again.';
       if (sendButton) sendButton.disabled = false;
       if (resendButton) resendButton.disabled = false;
     }
@@ -246,7 +249,7 @@ async function beginAppLogin(identifier) {
       const result = (await pollAppLogin({ requestId, pollSecret })).data;
       if (generation !== appLoginGeneration) return;
       if (result.status === 'approved' && result.customToken) {
-        stopAppLogin(); status.textContent = 'Kod doğrulandı. Oturum açılıyor…';
+        stopAppLogin(); status.textContent = 'Code verified. Signing in…';
         try {
           await signInWithCustomToken(auth, result.customToken);
           await registerWebLoginSession({
@@ -258,23 +261,23 @@ async function beginAppLogin(identifier) {
         } catch (error) {
           console.error('Could not register the web login session:', error);
           if ($('auth-status')) {
-            $('auth-status').textContent = error.message || 'Oturum güvenli biçimde kaydedilemedi.';
+            $('auth-status').textContent = error.message || 'The session could not be registered securely.';
             $('auth-status').style.color = '#bb4a54';
           }
           await signOut(auth);
         }
       } else if (['denied', 'expired', 'cancelled', 'locked'].includes(result.status)) {
         stopAppLogin();
-        status.textContent = result.status === 'denied' ? 'Giriş isteği uygulamadan reddedildi.'
-          : result.status === 'locked' ? 'Çok fazla hatalı kod girildi. Yeni kod iste.'
-            : 'İstek sona erdi. Yeni kod isteyebilirsin.';
+        status.textContent = result.status === 'denied' ? 'The sign-in request was denied in the app.'
+          : result.status === 'locked' ? 'Too many incorrect codes. Request a new code.'
+            : 'The request expired. You can request a new code.';
         if (sendButton) sendButton.disabled = false;
         if (resendButton) resendButton.disabled = false;
       }
     } catch (error) {
       if (generation === appLoginGeneration) {
         stopAppLogin();
-        status.textContent = error.message || 'İstek kontrol edilemedi. Yeniden dene.';
+        status.textContent = error.message || 'Could not check the request. Try again.';
         if (sendButton) sendButton.disabled = false;
         if (resendButton) resendButton.disabled = false;
       }
@@ -317,24 +320,24 @@ $('app-login-otp-form')?.addEventListener('submit', async event => {
   if (!active || !/^\d{6}$/.test(code)) return;
   const verifyButton = $('app-login-verify');
   if (verifyButton) verifyButton.disabled = true;
-  if (status) status.textContent = 'Kod doğrulanıyor…';
+  if (status) status.textContent = 'Verifying code…';
   try {
     const result = (await verifyAppLoginOtp({ ...active, verificationCode: code })).data;
     if (result.status === 'verified') {
-      if (status) status.textContent = 'Kod doğru. Güvenli oturum açılıyor…';
+      if (status) status.textContent = 'Code correct. Signing in securely…';
       clearAppLoginOtp();
     } else if (result.status === 'invalid') {
-      if (status) status.textContent = `Kod hatalı. Kalan deneme: ${result.attemptsRemaining}.`;
+      if (status) status.textContent = t('Incorrect code. Attempts left: {n}.').replace('{n}', result.attemptsRemaining);
       clearAppLoginOtp();
     } else if (result.status === 'locked') {
-      if (status) status.textContent = 'Çok fazla hatalı kod girildi. Yeni kod iste.';
+      if (status) status.textContent = 'Too many incorrect codes. Request a new code.';
       clearAppLoginOtp();
     } else {
-      if (status) status.textContent = 'Kodun süresi doldu. Yeni kod iste.';
+      if (status) status.textContent = 'The code expired. Request a new code.';
       clearAppLoginOtp();
     }
   } catch (error) {
-    if (status) status.textContent = error.message || 'Kod doğrulanamadı. Yeniden dene.';
+    if (status) status.textContent = error.message || 'Could not verify the code. Try again.';
     if (verifyButton) verifyButton.disabled = false;
   }
 });
@@ -353,7 +356,7 @@ $('app-login-resend')?.addEventListener('click', async () => {
     }
     await beginAppLogin(identifier);
   } catch (error) {
-    if (status) status.textContent = error.message || 'Yeni kod gönderilemedi. Yeniden dene.';
+    if (status) status.textContent = error.message || 'Could not send a new code. Try again.';
     if (resendButton) resendButton.disabled = false;
     if ($('email-submit')) $('email-submit').disabled = false;
   }
@@ -397,10 +400,10 @@ function syncCountryTrigger() {
   const input = $('login-identifier');
   if (input) {
     const nationalFormat = (option.dataset.format || '').replace(/^[\d\s()+-]+/, '').trim();
-    input.placeholder = option.dataset.iso === 'TR' ? '5XX XXX XX XX' : nationalFormat || 'Telefon numarası';
+    input.placeholder = option.dataset.iso === 'TR' ? '5XX XXX XX XX' : nationalFormat || 'Phone number';
   }
   const hint = $('phone-input-hint');
-  if (hint) hint.textContent = `Ülke kodu +${callingCode} seçili. Kodu tekrar yazmadan yalnızca numaranı yaz.`;
+  if (hint) hint.textContent = t('Country code +{code} is selected. Enter only your number without repeating the code.').replace('{code}', callingCode);
 }
 
 function closeCountryMenu() {
@@ -573,7 +576,7 @@ async function startWebQrLogin() {
   if (canvas) canvas.getContext('2d').clearRect(0, 0, 240, 240);
   const countdown = $('qr-login-countdown');
 
-  qrLoginStatus('Güvenli QR kod oluşturuluyor…');
+  qrLoginStatus('Creating secure QR code…');
 
   const pollSecret = randomSecret();
 
@@ -596,7 +599,7 @@ async function startWebQrLogin() {
     // The local PassGram bot answers with the one-time QR payload.
     const issued = await new Promise((resolve, reject) => {
       let stop = () => {};
-      const timer = setTimeout(() => reject(new Error('Giriş servisi şu an çevrimdışı. Biraz sonra tekrar dene.')), 15000);
+      const timer = setTimeout(() => reject(new Error('The sign-in service is offline right now. Try again shortly.')), 15000);
       qrUnsubscribers.push(() => { clearTimeout(timer); stop(); });
       stop = onSnapshot(requestRef, snap => {
         const data = snap.data();
@@ -609,7 +612,7 @@ async function startWebQrLogin() {
     qrLoginRequest = { requestId, pollSecret, expiresAt };
 
     drawLoginQr(issued.qrPayload);
-    qrLoginStatus('PassGram uygulamasından tara; telefonda web girişini onayla.');
+    qrLoginStatus('Scan from the PassGram app and approve the web sign-in on your phone.');
 
     const updateCountdown = () => {
       const remain = Math.max(0, expiresAt - Date.now());
@@ -617,7 +620,7 @@ async function startWebQrLogin() {
         stopQrLogin();
         if (loading) loading.hidden = true;
         if (retryBtn) retryBtn.hidden = false;
-        qrLoginStatus('QR kodu yenilenmeli. Yeni bir kod oluştur.', true);
+        qrLoginStatus('The QR code needs refreshing. Generate a new one.', true);
       }
     };
 
@@ -630,13 +633,13 @@ async function startWebQrLogin() {
       const state = snap.data();
       if (state.status === 'approved' && state.customToken) {
         stopQrLogin();
-        qrLoginStatus('Telefon onayladı! Güvenli oturum açılıyor…');
+        qrLoginStatus('Phone approved! Signing in securely…');
         try {
           await signInWithCustomToken(auth, state.customToken);
         } catch (error) {
           console.error('Custom token sign-in failed:', error);
           if (retryBtn) retryBtn.hidden = false;
-          qrLoginStatus('Oturum açılamadı. Yeni bir QR kod oluştur.', true);
+          qrLoginStatus('Could not sign in. Generate a new QR code.', true);
         }
         deleteDoc(resultRef).catch(() => {});
       } else if (state.status === 'denied') {
@@ -645,8 +648,8 @@ async function startWebQrLogin() {
         if (retryBtn) retryBtn.hidden = false;
         deleteDoc(resultRef).catch(() => {});
         qrLoginStatus(state.reason === 'revoked'
-          ? 'Bu tarayıcı oturumu sonlandırılmıştı. Yeni bir QR kod oluştur.'
-          : 'Giriş onaylanamadı. Yeni bir QR kod oluştur.', true);
+          ? 'This browser session was ended. Generate a new QR code.'
+          : 'The sign-in could not be approved. Generate a new QR code.', true);
       }
     }, error => {
       if (qrLoginRequest?.requestId !== requestId) return;
@@ -654,13 +657,13 @@ async function startWebQrLogin() {
       stopQrLogin();
       if (loading) loading.hidden = true;
       if (retryBtn) retryBtn.hidden = false;
-      qrLoginStatus('QR kod şu an kullanılamıyor. Yeni bir kod oluştur.', true);
+      qrLoginStatus('The QR code is unavailable right now. Generate a new one.', true);
     }));
   } catch (err) {
     console.error('Web QR login creation failed:', err);
     if (loading) loading.hidden = true;
     if (retryBtn) retryBtn.hidden = false;
-    qrLoginStatus(/çevrimdışı/.test(err?.message || '') ? err.message : 'QR kod şu an oluşturulamadı. Tekrar dene.', true);
+    qrLoginStatus(/offline/.test(err?.message || '') ? err.message : 'Could not create a QR code right now. Try again.', true);
   }
 }
 
@@ -669,10 +672,10 @@ $('qr-login-retry')?.addEventListener('click', startWebQrLogin);
 function normalizePhoneNumber(identifier) {
   const input = identifier.trim();
   if (!input || !/^[\d\s()+.-]+$/.test(input)) {
-    throw new Error('Telefon numaranda yalnızca rakam ve telefon biçimlendirme işaretleri kullan.');
+    throw new Error('Use only digits and phone formatting characters in your phone number.');
   }
   if (input.startsWith('+')) {
-    throw new Error('Ülke kodu zaten seçili. Telefon numaranı ülke kodu olmadan yaz.');
+    throw new Error('The country code is already selected. Enter your number without the country code.');
   }
 
   const digits = input.replace(/\D/g, '');
@@ -684,16 +687,16 @@ function normalizePhoneNumber(identifier) {
   const nationalLength = expectedLength ? expectedLength - code.length : 0;
 
   if (expectedLength && digits.startsWith(code) && digits.length === expectedLength) {
-    throw new Error('Ülke kodu zaten seçili. Yalnızca telefon numaranı yaz.');
+    throw new Error('The country code is already selected. Enter only your phone number.');
   }
 
   if (nationalLength && digits.length !== nationalLength) {
-    throw new Error('Telefon numarasının uzunluğu seçilen ülkeye uygun değil.');
+    throw new Error('The phone number length does not match the selected country.');
   }
 
   const internationalDigits = `${code}${digits}`;
   if (!/^[1-9]\d{7,14}$/.test(internationalDigits)) {
-    throw new Error('Telefon numaranı ülke kodu ve numarayla kontrol et.');
+    throw new Error('Check your phone number and country code.');
   }
   return `+${internationalDigits}`;
 }
@@ -706,7 +709,7 @@ $('email-form')?.addEventListener('submit', async (e) => {
   if (!identifier) return;
 
   if (statusNode) {
-    statusNode.textContent = 'Giriş yapılıyor…';
+    statusNode.textContent = 'Signing in…';
     statusNode.style.color = '#3390ec';
   }
 
@@ -715,10 +718,10 @@ $('email-form')?.addEventListener('submit', async (e) => {
   } catch (err) {
     if ($('email-submit')) $('email-submit').disabled = false;
     if (statusNode) {
-      statusNode.textContent = err.message || 'Giriş başarısız. Bilgileri kontrol et.';
+      statusNode.textContent = err.message || 'Sign-in failed. Check your details.';
       statusNode.style.color = '#bb4a54';
     }
-    if ($('app-login-status')) $('app-login-status').textContent = err.message || 'Uygulama kodu gönderilemedi.';
+    if ($('app-login-status')) $('app-login-status').textContent = err.message || 'Could not send the app code.';
   }
 });
 
@@ -727,7 +730,7 @@ $('app-login-cancel')?.addEventListener('click', async () => {
   const cancelButton = $('app-login-cancel');
   const status = $('app-login-status');
   if (cancelButton) cancelButton.disabled = true;
-  if (status) status.textContent = 'Giriş isteği iptal ediliyor…';
+  if (status) status.textContent = 'Cancelling sign-in request…';
   try {
     if (active) await cancelAppLoginOtp(active);
     stopAppLogin();
@@ -736,7 +739,7 @@ $('app-login-cancel')?.addEventListener('click', async () => {
     if (status) status.textContent = '';
     if ($('email-submit')) $('email-submit').disabled = false;
   } catch (error) {
-    if (status) status.textContent = error.message || 'İstek iptal edilemedi. Yeniden dene.';
+    if (status) status.textContent = error.message || 'Could not cancel the request. Try again.';
   } finally {
     if (cancelButton) cancelButton.disabled = false;
   }
@@ -746,12 +749,12 @@ $('app-login-cancel')?.addEventListener('click', async () => {
 $('passkey-login-btn')?.addEventListener('click', async () => {
   const statusNode = $('passkey-status');
   if (statusNode) {
-    statusNode.textContent = 'Passkey doğrulaması başlatılıyor…';
+    statusNode.textContent = 'Starting passkey verification…';
     statusNode.style.color = '#3390ec';
   }
   setTimeout(() => {
     if (statusNode) {
-      statusNode.textContent = 'Bu cihazda kayıtlı bir Passkey bulunamadı.';
+      statusNode.textContent = 'No passkey is registered on this device.';
       statusNode.style.color = '#bb4a54';
     }
   }, 1200);

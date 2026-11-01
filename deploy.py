@@ -66,6 +66,7 @@ def build_web():
     shutil.rmtree(work, ignore_errors=True)
     os.makedirs(work)
     shutil.copy2(os.path.join(ROOT, "web", "web-chat.mjs"), work)
+    shutil.copy2(os.path.join(ROOT, "web", "web-i18n.mjs"), work)
     shutil.copy2(os.path.join(public_dir, "js", "firebase-config.mjs"), work)
     jobs = {
         "app": [os.path.join(work, "web-chat.mjs"), "--bundle", "--format=esm", "--external:https://*"],
