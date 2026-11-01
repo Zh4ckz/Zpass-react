@@ -432,3 +432,13 @@ h1 em, h2 em { font-style: normal; color: var(--blue); }
   .main-nav > a { display: flex; align-items: center; gap: 14px; }
   .main-nav .nav-ico { width: 22px; height: 22px; flex: none; color: var(--blue); padding: 0; }
 }
+@media (min-width: 861px) {
+  .nav-brand { position: absolute; top: 20px; left: 20px; right: 76px; display: flex; align-items: center; gap: 12px; height: 44px; }
+  .nb-icon { width: 44px; height: 44px; border-radius: 14px; background: var(--blue); color: #fff; display: grid; place-items: center; flex: none; box-shadow: 0 8px 20px rgba(0,102,255,.28); }
+  .nb-icon svg { width: 24px; height: 24px; }
+  .nb-text { display: grid; line-height: 1.15; }
+  .nb-text b { font-size: 1.25rem; font-weight: 800; letter-spacing: -.03em; color: #000; }
+  .nb-text small { font-size: .78rem; color: rgba(0,0,0,.55); font-weight: 500; }
+  .main-nav { padding-top: 104px; }
+  .main-nav::after { content: none; }
+}

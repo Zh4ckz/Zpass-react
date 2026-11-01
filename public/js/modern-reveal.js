@@ -31,6 +31,10 @@
     closeBtn.innerHTML = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" aria-hidden="true"><path d="M6 6l12 12M18 6L6 18"/></svg>';
     closeBtn.addEventListener('click', function () { if (toggle.getAttribute('aria-expanded') === 'true') toggle.click(); });
     sideNav.insertBefore(closeBtn, sideNav.firstChild);
+    var head = document.createElement('div');
+    head.className = 'nav-brand';
+    head.innerHTML = '<span class="nb-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 3l8 3v6c0 4.5-3.2 7.8-8 9-4.8-1.2-8-4.5-8-9V6z"/><path d="M9 12l2 2 4-4"/></svg></span><span class="nb-text"><b>PassGram</b><small>Protect in the Trust</small></span>';
+    sideNav.insertBefore(head, closeBtn.nextSibling);
     var navIcons = {
       features: '<path d="M12 3l2.5 5.5L20 9.3l-4 4 1 5.7-5-2.8-5 2.8 1-5.7-4-4 5.5-.8z"/>',
       apps: '<rect x="3" y="3" width="7" height="7" rx="2"/><rect x="14" y="3" width="7" height="7" rx="2"/><rect x="3" y="14" width="7" height="7" rx="2"/><rect x="14" y="14" width="7" height="7" rx="2"/>',
