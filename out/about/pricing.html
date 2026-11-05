@@ -1,0 +1,139 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <script src="/resources/js/pay-host.js?v=2"></script>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="theme-color" content="#ffffff">
+  <meta name="description" content="Choose the PassGram plan that fits you. Start with Free, or unlock more with Plus and Pro.">
+  <meta property="og:title" content="PassGram Pricing">
+  <meta property="og:description" content="A clear plan for every stage. Start free and upgrade when you need more.">
+  <title>Pricing — PassGram</title>
+  <link rel="icon" type="image/png" href="/resources/assets/app-logo/zpass.png">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="/resources/css/marketing-2026.css?v=7">
+  <link rel="stylesheet" href="/resources/css/modern-2026.css?v=20">
+  <link rel="stylesheet" href="/resources/css/pricing-2026.css?v=4">
+  <link rel="stylesheet" href="/resources/css/glass-header.css?v=2">
+  <script src="/resources/js/glass-header.js?v=4" defer></script>
+</head>
+<body class="pg-pricing">
+  <header class="site-header">
+    <a class="brand" href="https://zpas.org/" aria-label="PassGram home"><span class="brand-mark">P</span><span>PassGram</span></a>
+    <button class="pg-menu-button" type="button" aria-expanded="false" aria-controls="pg-nav" aria-label="Open navigation">Menu</button>
+    <nav class="pg-nav" id="pg-nav" aria-label="Main navigation">
+      <a href="https://zpas.org/">Home</a>
+      <a href="https://zpas.org/apps">Apps</a>
+      <a href="https://api.zpas.org/" target="_blank" rel="noopener noreferrer">API</a>
+      <a href="https://zpas.org/faq">FAQ</a>
+      <a href="https://zpas.org/about/pricing" aria-current="page">Pricing</a>
+    </nav>
+    <div class="pg-header-actions"><a class="pg-x-link" href="https://x.com/4rezan" target="_blank" rel="noopener noreferrer" aria-label="PassGram on X">𝕏 <span>Follow on X</span></a></div>
+  </header>
+
+  <main>
+    <section class="pg-hero">
+      <div class="eyebrow">PassGram</div>
+      <h1>Pricing</h1>
+      <p>Choose the plan that fits your personal vault. Start free and add more space or tools whenever you need them.</p>
+    </section>
+
+    <div class="pg-billing-bar">
+      <span class="pg-billing-label">Billing period</span>
+      <div class="pg-billing" role="group" aria-label="Billing period">
+        <button type="button" data-period="MONTHLY" aria-pressed="true">Monthly</button>
+        <button type="button" data-period="YEARLY" aria-pressed="false">12 months <span id="pg-savings">Save up to 17%</span></button>
+      </div>
+    </div>
+
+    <section class="pg-plans section-wrap" aria-label="Available plans">
+      <article class="pg-plan">
+        <div class="pg-plan-top"><span class="pg-plan-name">Free</span><span class="pg-plan-tag">For getting started</span></div>
+        <p class="pg-plan-copy">The essentials for keeping your everyday accounts organized.</p>
+        <div class="pg-price"><strong>$0</strong><span>forever</span></div>
+        <p class="pg-billing-note">No payment required</p>
+        <a class="button button-light pg-plan-cta" href="https://web.zpas.org/">Continue with Free <span aria-hidden="true">↗</span></a>
+        <div class="pg-includes-label">Included</div>
+        <ul class="pg-features">
+          <li>15 vault items</li><li>Up to 3 saved logins</li><li>10 authenticator codes</li><li>Sync across your devices</li>
+        </ul>
+      </article>
+
+      <article class="pg-plan pg-plan-featured">
+        <div class="pg-popular">Most popular</div>
+        <div class="pg-plan-top"><span class="pg-plan-name">Plus</span><span class="pg-plan-tag">For everyday use</span></div>
+        <p class="pg-plan-copy">More space for the accounts, notes and codes you use every day.</p>
+        <div class="pg-price"><strong data-price="PLUS">$4.99</strong><span data-period-label="PLUS">/ month</span></div>
+        <p class="pg-billing-note" data-billed="PLUS">Billed monthly</p>
+        <a class="button button-dark pg-plan-cta" data-checkout="PLUS" href="https://pay.zpas.org/?plan=PLUS&amp;billing=MONTHLY">Choose Plus <span aria-hidden="true">↗</span></a>
+        <div class="pg-includes-label">Everything in Free, plus</div>
+        <ul class="pg-features">
+          <li>Up to 50 vault items</li><li>Up to 5 saved logins</li><li>Cloud backup and recovery</li><li>Priority support</li>
+        </ul>
+      </article>
+
+      <article class="pg-plan">
+        <div class="pg-plan-top"><span class="pg-plan-name">Pro</span><span class="pg-plan-tag">For power users</span></div>
+        <p class="pg-plan-copy">The full toolkit for a larger, more active personal vault.</p>
+        <div class="pg-price"><strong data-price="PRO">$9.00</strong><span data-period-label="PRO">/ month</span></div>
+        <p class="pg-billing-note" data-billed="PRO">Billed monthly</p>
+        <a class="button button-light pg-plan-cta" data-checkout="PRO" href="https://pay.zpas.org/?plan=PRO&amp;billing=MONTHLY">Choose Pro <span aria-hidden="true">↗</span></a>
+        <div class="pg-includes-label">Everything in Plus, plus</div>
+        <ul class="pg-features">
+          <li>Unlimited vault items</li><li>Up to 10 saved logins</li><li>Voice transcription tools</li><li>Custom app icons</li>
+        </ul>
+      </article>
+    </section>
+
+    <section class="pg-comparison section-wrap" aria-labelledby="pg-compare-title">
+      <div class="pg-compare-heading">
+        <div class="eyebrow">At a glance</div>
+        <h2 id="pg-compare-title">Compare plans</h2>
+        <p>See what is included at each level.</p>
+      </div>
+      <div class="pg-table-scroll" role="region" aria-label="Plan feature comparison" tabindex="0">
+        <table class="pg-compare-table">
+          <thead>
+            <tr><th scope="col">Features</th><th scope="col">Free</th><th scope="col">Plus</th><th scope="col">Pro</th></tr>
+          </thead>
+          <tbody>
+            <tr class="pg-table-group"><th colspan="4" scope="colgroup">Vault essentials</th></tr>
+            <tr><th scope="row">Vault items</th><td>15</td><td>Up to 50</td><td>Unlimited</td></tr>
+            <tr><th scope="row">Saved logins</th><td>Up to 3</td><td>Up to 5</td><td>Up to 10</td></tr>
+            <tr><th scope="row">Authenticator codes</th><td>10</td><td>10</td><td>10</td></tr>
+            <tr><th scope="row">Sync across devices</th><td><span class="pg-yes">Included</span></td><td><span class="pg-yes">Included</span></td><td><span class="pg-yes">Included</span></td></tr>
+            <tr class="pg-table-group"><th colspan="4" scope="colgroup">More tools</th></tr>
+            <tr><th scope="row">Cloud backup and recovery</th><td>—</td><td><span class="pg-yes">Included</span></td><td><span class="pg-yes">Included</span></td></tr>
+            <tr><th scope="row">Priority support</th><td>—</td><td><span class="pg-yes">Included</span></td><td><span class="pg-yes">Included</span></td></tr>
+            <tr><th scope="row">Voice transcription tools</th><td>—</td><td>—</td><td><span class="pg-yes">Included</span></td></tr>
+            <tr><th scope="row">Custom app icons</th><td>—</td><td>—</td><td><span class="pg-yes">Included</span></td></tr>
+          </tbody>
+        </table>
+      </div>
+    </section>
+
+    <section class="pg-reassurance section-wrap">
+      <div><span class="pg-check" aria-hidden="true">✓</span><span><b>Your choice, your pace</b><small>Stay on Free for as long as you like.</small></span></div>
+      <div><span class="pg-check" aria-hidden="true">✓</span><span><b>Private by design</b><small>Your plan does not change how your vault is protected.</small></span></div>
+      <div><span class="pg-check" aria-hidden="true">✓</span><span><b>Manage online</b><small>Review your plan and billing from your account.</small></span></div>
+    </section>
+
+    <section class="pg-faq section-wrap">
+      <div class="pg-faq-heading"><div class="eyebrow">Good to know</div><h2>Questions, <em>answered.</em></h2></div>
+      <div class="pg-faq-list">
+        <details><summary>Can I keep using PassGram for free?</summary><p>Yes. The Free plan remains available without a subscription. You can upgrade whenever you need the additional limits or features.</p></details>
+        <details><summary>How does yearly billing work?</summary><p>The 12-month option charges your card automatically each month at the discounted monthly price. Plus is $4.25 per month for 12 months ($51 total). You do not pay the full year upfront; automatic payments end after the twelfth month.</p></details>
+        <details><summary>Where can I manage or cancel a subscription?</summary><p>Sign in, open Subscription, and use the billing controls available for your account.</p></details>
+        <details><summary>Can I change plans later?</summary><p>You can review the available plan options from your account and choose a different plan when needed.</p></details>
+      </div>
+    </section>
+  </main>
+
+  <footer class="pg-footer">
+    <div class="pg-footer-inner"><a class="brand" href="https://zpas.org/"><span class="brand-mark">P</span><span>PassGram</span></a><p>Your digital life, in one private space.</p><nav aria-label="Footer"><a href="https://zpas.org/apps">Apps</a><a href="https://zpas.org/about/pricing">Pricing</a><a href="https://zpas.org/legal/privacy">Privacy</a><a href="https://zpas.org/legal/terms">Terms</a><a href="https://zpas.org/support">Support</a></nav><small>© 2026 PassGram</small></div>
+  </footer>
+  <script type="module" src="/resources/js/pricing-page.mjs?v=6"></script>
+</body>
+</html>

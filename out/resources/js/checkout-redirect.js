@@ -1,0 +1,1 @@
+(() => {const params=new URLSearchParams(location.search);const plan=params.get('plan')?.toUpperCase(),billing=params.get('billing')?.toUpperCase();location.replace('https://web.zpas.org/web?'+new URLSearchParams({checkout:'1',v:'3',plan:['PLUS','PRO'].includes(plan)?plan:'PLUS',billing:['MONTHLY','YEARLY'].includes(billing)?billing:'MONTHLY'}));})();

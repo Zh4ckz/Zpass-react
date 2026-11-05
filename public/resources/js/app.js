@@ -602,7 +602,7 @@ function renderSubscriptionPricing(){
   if(price)price.textContent=`$${paymentPlans[plan][subscriptionBilling.toLowerCase()].price} / ${subscriptionBilling==='YEARLY'?'year':'month'}`;
   const link=document.querySelector(`[data-checkout-plan="${plan}"]`);
   if(link){link.hidden=paymentPlans[plan][subscriptionBilling.toLowerCase()].enabled===false;}
-  if(link)link.href='/checkout?'+new URLSearchParams({product:'zpass',plan,billing:subscriptionBilling});
+  if(link)link.href='https://zpas.org/checkout.html?'+new URLSearchParams({product:'zpass',plan,billing:subscriptionBilling});
  }
 }
 document.querySelectorAll('[data-subscription-billing]').forEach(button=>button.addEventListener('click',()=>{subscriptionBilling=button.dataset.subscriptionBilling;renderSubscriptionPricing();}));

@@ -1,0 +1,9 @@
+export const SHARED_TABS=[['media','Medya'],['saved','Kaydedilen'],['files','Dosyalar'],['links','Bağlantılar'],['music','Müzik'],['voice','Sesler'],['polls','Anketler'],['gifs','GIF’ler']];
+export function safeMediaUrl(raw){if(typeof raw!=='string'||!raw.trim())return null;try{const u=new URL(raw,typeof location==='undefined'?'http://localhost':location.origin);return ['http:','https:','blob:'].includes(u.protocol)?u.href:null}catch{return null}}
+export function messageKind(m){const mime=String(m.mediaType||m.mime_type||m.document?.mime_type||m.file?.mime||'').toLowerCase(),name=String(m.document?.file_name||m.file?.name||'').toLowerCase();if(m.poll)return'polls';if(m.voice||m.type==='voice'||m.audioUrl)return'voice';if(mime==='image/gif'||name.endsWith('.gif'))return'gifs';if(music(mime,m))return'music';if(m.photo||m.video||mime.startsWith('image/')||mime.startsWith('video/'))return'media';if(m.document||m.file)return'files';return'text'}
+function music(mime,m){return mime.startsWith('audio/')||Boolean(m.audio)}
+export function extractLinks(m){const text=String(m.t??m.text??'');const urls=text.match(/(?:https?:\/\/|www\.)[^\s<>"']+/gi)||[];return [...new Set(urls.map(v=>v.replace(/[.,!?;:)\]}]+$/g,'')).map(v=>safeMediaUrl(v.startsWith('www.')?'https://'+v:v)).filter(Boolean))].filter(v=>!(m.document?.file_id&&v.endsWith('/file/'+m.document.file_id)))}
+export function sharedItems(chat,tab,saved=new Set()){
+ const messages=Array.isArray(chat?.msgs)?chat.msgs:[];
+ return messages.flatMap((m,index)=>{const id=String(m.id||m._sharedId||'legacy-'+index),kind=messageKind(m);if(tab==='saved')return saved.has(id)?[{id,message:m,kind}]:[];if(tab==='links')return extractLinks(m).map((url,i)=>({id,message:m,kind:'links',url,key:id+'-link-'+i}));return kind===tab?[{id,message:m,kind}]:[]}).reverse();
+}

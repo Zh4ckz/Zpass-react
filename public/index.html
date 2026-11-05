@@ -1,6 +1,7 @@
 <!doctype html>
 <html lang="en">
 <head>
+  <script src="/resources/js/pay-host.js?v=2"></script>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width,initial-scale=1">
   <meta name="theme-color" content="#ffffff">
@@ -14,330 +15,76 @@
   <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500&family=Inter:ital,opsz,wght@0,14..32,400;0,14..32,500;0,14..32,600;0,14..32,700;1,14..32,400;1,14..32,500&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="/resources/css/marketing-2026.css?v=7">
     <link rel="stylesheet" href="/resources/css/modern-2026.css?v=20">
-    <script src="/resources/js/modern-reveal.js?v=8" defer></script>  <script>
+    <script src="/resources/js/modern-reveal.js?v=11" defer></script>  <script>
     (function() {
       var h = location.hostname.toLowerCase();
+      if (h === 'pay.zpas.org' && ['/', '/index.html'].includes(location.pathname)) { location.replace('/subdomain/pay/' + location.search); return; }
       if (h.indexOf('web.') !== -1 || h.indexOf('login.') !== -1) {
         if (location.pathname === '/' || location.pathname === '' || location.pathname === '/index.html') {
-          location.replace('/web.html');
+          location.replace('/subdomain/web/index.html');
         }
       }
     })();
   </script>
+  <link rel="stylesheet" href="/resources/css/glass-header.css?v=2">
+  <script src="/resources/js/glass-header.js?v=4" defer></script>
+  <link rel="stylesheet" href="/resources/css/home-refresh.css?v=2">
 </head>
-<body>
+<body class="home-refresh">
 <header class="site-header">
-  <a class="brand" href="/" aria-label="PassGram home"><span class="brand-mark">P</span><span>PassGram</span></a>
+  <a class="brand" href="https://zpas.org/" aria-label="PassGram home"><span class="brand-mark">P</span><span>PassGram</span></a>
   <button class="menu-toggle" type="button" aria-expanded="false" aria-controls="main-nav" aria-label="Open menu"><span></span><span></span></button>
   <nav id="main-nav" class="main-nav">
-    <a href="#features">Features</a>
-    
-    <a href="/apps">Apps</a>
-    <a href="/api">API</a>
-    <a href="/faq">FAQ</a>
-    <a href="/security">Safety</a>
-    <a href="/privacy">Privacy</a>
+    <a href="https://api.zpas.org/" target="_blank" rel="noopener noreferrer">API</a>
+    <a href="https://zpas.org/apps">Apps</a>
+    <a href="https://zpas.org/faq">FAQ</a>
+    <a href="https://docs.zpas.org/" target="_blank" rel="noopener noreferrer">Docs</a>
+    <a href="https://zpas.org/about/pricing">Pricing</a>
+    <a href="https://zpas.org/legal/security">Safety</a>
+    <a href="https://zpas.org/legal/terms">Terms</a>
+    <a href="https://zpas.org/legal/privacy">Privacy</a>
+    <a href="https://zpas.org/support">Support</a>
+    <a href="https://core.zpas.org/" target="_blank" rel="noopener noreferrer">Core</a>
+    <a href="https://bots.zpas.org/" target="_blank" rel="noopener noreferrer">Bots</a>
   </nav>
   <div class="header-actions">
     <a class="x-link" href="https://x.com/4rezan" target="_blank" rel="noopener noreferrer" aria-label="Follow on X"><svg class="x-icon" viewBox="0 0 24 24" aria-hidden="true"><path fill="currentColor" d="M18.244 2.25h3.308l-7.227 8.26 8.502 11.24H16.17l-5.214-6.817L4.99 21.75H1.68l7.73-8.835L1.254 2.25H8.08l4.713 6.231zm-1.161 17.52h1.833L7.084 4.126H5.117z"/></svg><span>Follow</span></a>
   </div>
 </header>
 
-<main>
-  <section class="hero section-wrap">
-    <div class="hero-copy">
-      <div class="eyebrow"><span class="live-dot"></span> One account · your devices</div>
-      <h1>Your digital life,<br><em>quietly kept.</em></h1>
-      <p class="hero-lede">Passwords, notes and authenticator codes in a single vault. Sign in with the same PassGram account on Android, Windows and the web.</p>
-      <div class="hero-actions">
-<a class="button button-light" href="/apps">Explore the apps</a>
+<main class="pg-home-main">
+  <section class="pg-intro section-wrap" aria-labelledby="home-title">
+    <div class="pg-kicker"><span></span> ONE ACCOUNT. A LITTLE MORE PEACE OF MIND.</div>
+    <h1 id="home-title">Your digital life.<br><em>A little more private.</em></h1>
+    <p>Passwords, notes and authenticator codes.<br class="pg-desktop-break"> One familiar place, wherever your day takes you.</p>
+    <div class="pg-intro-actions"><a class="button button-dark" href="https://zpas.org/apps">Get PassGram <span aria-hidden="true">↗</span></a><a class="pg-text-link" href="https://web.zpas.org/" target="_blank" rel="noopener noreferrer">Open the web app <span aria-hidden="true">↗</span></a></div>
+    <div class="pg-product-stage">
+      <div class="pg-stage-orbit" aria-hidden="true"></div>
+      <div class="pg-desktop-preview">
+        <div class="pg-browser-bar"><span class="pg-browser-dots" aria-hidden="true"><i></i><i></i><i></i></span><span class="pg-address"><span aria-hidden="true">⌑</span> web.zpas.org</span><span class="pg-browser-label">PASSGRAM WEB</span></div>
+        <div class="pg-desktop-viewport"><img src="/resources/previews/web-desktop.webp" alt="PassGram Web: the desktop sign-in screen with email and phone options" width="980" height="580" fetchpriority="high"></div>
       </div>
-      <div class="hero-footnote"><span class="icon-mask icon-shield-check" aria-hidden="true"></span> Encrypted before it leaves your device</div>
+      <div class="pg-phone-preview" aria-hidden="true"><div class="pg-phone-camera"></div><div class="pg-phone-viewport"><img src="/resources/previews/web-mobile.webp" alt="" width="340" height="690" loading="lazy" decoding="async"></div><div class="pg-phone-home"></div></div>
+      <span class="pg-stage-note"><span></span> Your account. Your devices. Your space.</span>
     </div>
-
-    <div class="hero-art" aria-label="Preview of the PassGram vault">
-      <div class="art-glow"></div>
-      <div class="vault-window">
-        <div class="window-bar">
-          <div class="window-brand"><span class="brand-mark mini">P</span> PassGram</div>
-          <div class="window-pill">Personal vault <span class="icon-mask icon-chevron" aria-hidden="true"></span></div>
-          <span class="window-avatar">R</span>
-        </div>
-        <div class="window-content">
-          <aside class="window-side">
-            <span class="side-active">All items</span>
-            <span>Recently used</span>
-            <span>Favorites</span>
-            <i></i>
-            <span>New item</span>
-            <small>Private vault</small>
-          </aside>
-          <div class="vault-list">
-            <div class="list-heading"><div><small>Your vault</small><h3>All items</h3></div><span class="item-count">12 items</span></div>
-            <div class="vault-item"><span class="app-icon app-google" aria-hidden="true"></span><span><b>Google</b><small>Personal account</small></span></div>
-            <div class="vault-item"><span class="app-icon app-github" aria-hidden="true"></span><span><b>GitHub</b><small>work@passgram</small></span></div>
-            <div class="vault-item"><span class="app-icon app-mail" aria-hidden="true"></span><span><b>Mail</b><small>Personal</small></span></div>
-            <div class="secure-note"><span class="icon-mask icon-shield-check" aria-hidden="true"></span><span><b>Private by design</b><small>Your encrypted vault stays yours.</small></span></div>
-          </div>
-        </div>
-      </div>
-      <div class="floating-card floating-lock"><span class="icon-mask icon-lock" aria-hidden="true"></span> Encrypted vault</div>
-      <div class="floating-card floating-sync"><span class="icon-mask icon-refresh" aria-hidden="true"></span> Across your devices</div>
-    </div>
+    <p class="pg-preview-caption">The real web sign-in interface, shown on desktop and mobile.</p>
   </section>
 
-  <div class="platform-row">
-    <span>Made for everyday</span>
-    <div><b>Android</b><i></i><b>Windows</b><i></i><b>Web</b></div>
-  </div>
-
-  <section id="features" class="section-wrap section-block">
-    <div class="section-title">
-      <div class="eyebrow">Less to remember</div>
-      <h2>Everything important,<br><em>easy to reach.</em></h2>
-      <p>A clear home for the details you use every day, with security built into the experience — not bolted on later.</p>
-    </div>
-    <div class="feature-grid">
-      <article class="feature-card feature-blue">
-        <div class="feature-icon"><span class="icon-mask icon-key" aria-hidden="true"></span></div>
-        <h3>Password vault</h3>
-        <p>Keep logins, notes and account details together. Find what you need without searching through old messages.</p>
-</article>
-      <article class="feature-card feature-violet">
-        <div class="feature-icon"><span class="icon-mask icon-fingerprint" aria-hidden="true"></span></div>
-        <h3>Authenticator</h3>
-        <p>Generate sign-in codes in the same place you already manage your accounts.</p>
-        <a href="/apps">See the apps</a>
-      </article>
-      <article class="feature-card feature-mint">
-        <div class="feature-icon"><span class="icon-mask icon-cloud" aria-hidden="true"></span></div>
-        <h3>One account</h3>
-        <p>Use PassGram on Android, Windows and the web. Sign in once at the official web app.</p>
-</article>
-    </div>
+  <section class="pg-platforms section-wrap" aria-label="Available platforms">
+    <p>AT YOUR DESK. IN YOUR POCKET. IN YOUR BROWSER.</p>
+    <div><a href="https://zpas.org/apps/android"><img src="/resources/assets/apps/android.svg" alt="" width="23" height="23">Android<span>For life on the move</span></a><a href="https://zpas.org/apps/windows"><img src="/resources/assets/apps/windows.svg" alt="" width="23" height="23">Windows<span>For your everyday desktop</span></a><a href="https://web.zpas.org/" target="_blank" rel="noopener noreferrer"><img src="/resources/assets/apps/globe.svg" alt="" width="23" height="23">Web<span>Open a tab. Feel at home.</span></a></div>
   </section>
 
-  <section class="m-section m-only" id="mobile-guide">
-    <div class="m-head">
-      <div class="eyebrow">Mobile quick guide</div>
-      <h2>Everything in <em>your pocket.</em></h2>
-      <p>Swipe through the essentials. Each card is a short, practical walkthrough you can finish in under a minute.</p>
-    </div>
-    <div class="m-grid">
-      <article class="m-card"><div class="m-num">1</div><h3>Install the app</h3><p>Download PassGram for Android from the Apps tab, open it and sign in with your account. Allow notifications so login codes can reach you instantly.</p></article>
-      <article class="m-card"><div class="m-num">2</div><h3>Turn on biometrics</h3><p>Enable fingerprint or face unlock in Settings. Codes and sensitive entries stay hidden until you confirm it is really you.</p></article>
-      <article class="m-card"><div class="m-num">3</div><h3>Scan to sign in</h3><p>On any computer, open web.zpas.org and scan the QR code with the in-app scanner. Check the device and city shown, then approve.</p></article>
-      <article class="m-card"><div class="m-num">4</div><h3>Review and end sessions</h3><p>Open Settings, then Devices to see every signed-in browser. End anything you do not recognise with one tap.</p></article>
-    </div>
-    <div class="faq-list" style="margin-top:12px">
-      <details><summary>What if I lose my phone?</summary><p>Sign in from another device you trust, open Devices and end the lost phone's session. Then change your password. Because new logins need approval on a device you already own, a stolen password alone is not enough.</p></details>
-      <details><summary>Does it work offline?</summary><p>Your vault entries on the phone can be opened without a connection. Signing in to the web, receiving codes and syncing need an internet connection.</p></details>
-      <details><summary>Will notifications show my code?</summary><p>No. Lock-screen notifications stay generic. The six-digit code appears only inside the app after you confirm with biometrics or your PIN.</p></details>
-      <details><summary>How much battery or data does it use?</summary><p>Very little. PassGram only wakes up when a login request arrives or when you open it, and messages are tiny.</p></details>
-    </div>
+  <section class="pg-editorial section-wrap" id="features" aria-labelledby="features-title">
+    <div class="pg-detail-art" aria-hidden="true"><div class="pg-detail-grid"></div><div class="pg-vault-sheet"><div class="pg-sheet-top"><img src="/resources/assets/app-logo/zpass.png" alt="" width="34" height="34"><span>Your personal space<small>THE EVERYDAY ESSENTIALS</small></span><span class="pg-sheet-lock">⌑</span></div><div class="pg-sheet-item"><span class="pg-item-symbol">Aa</span><div>Passwords<small>A place for every account</small></div><span>••••••••</span></div><div class="pg-sheet-item"><span class="pg-item-symbol">#</span><div>Authenticator<small>Your sign-in essentials</small></div><span class="pg-demo-code">••• •••</span></div><div class="pg-sheet-item"><span class="pg-item-symbol">≡</span><div>Private notes<small>The things you want to keep</small></div><span>↗</span></div><div class="pg-sheet-footer"><span></span> A calmer way to keep it together.</div></div><span class="pg-art-caption">A look inside your everyday essentials · illustrative preview</span></div>
+    <div class="pg-editorial-copy"><div class="pg-kicker">LESS SEARCHING. MORE LIVING.</div><h2 id="features-title">Everything important.<br><em>Nothing in the way.</em></h2><p>A login for work. A code for your next sign-in. A note you need to keep. Give the small, important things a home of their own.</p><dl class="pg-feature-list"><div><dt>01 <b>Your passwords, together</b></dt><dd>Keep logins and account details in one personal vault.</dd></div><div><dt>02 <b>Your codes, close by</b></dt><dd>Keep authenticator codes alongside your everyday essentials.</dd></div><div><dt>03 <b>Your account, across devices</b></dt><dd>Choose Android, Windows or the web to fit your day.</dd></div></dl><a class="pg-text-link" href="https://zpas.org/apps">Find your app <span aria-hidden="true">↗</span></a></div>
   </section>
 
-  <section class="m-section" id="why">
-    <div class="m-head reveal">
-      <div class="eyebrow">Why PassGram</div>
-      <h2>One calm place for everything you<br><em>sign in to.</em></h2>
-      <p>Most of us juggle dozens of accounts, hundreds of passwords and a pile of verification codes spread across browsers, notes apps and screenshots. PassGram brings those pieces together so that signing in becomes quick, predictable and safe, whether you are on your phone, at your desk or on a borrowed computer.</p>
-    </div>
-    <div class="m-split">
-      <div class="m-prose reveal">
-        <p>PassGram starts from a simple idea: security tools should be pleasant enough that you actually use them. Instead of reusing the same password because remembering a new one is tedious, you let the vault create a long, random password for every service and fill it in for you. Instead of hunting for an authenticator app, your one-time codes sit next to the account they belong to.</p>
-        <p>Your account works across Android, Windows and the web. Sign in once on the official web app at web.zpas.org and you get the same familiar, chat-style interface you see on your phone. Everything is designed around clear screens, large touch targets and as few steps as possible between you and the thing you need.</p>
-        <p>We are also deliberate about what we do not do. Sensitive actions, such as approving a new browser or revealing a one-time code, are confirmed on the device you already own and trust, so a stolen password alone is not enough to take over an account.</p>
-      </div>
-      <div class="m-stats reveal">
-        <div class="m-stat"><b>3</b><span>platforms: Android, Windows and the web, all on one account.</span></div>
-        <div class="m-stat"><b>6-digit</b><span>one-time codes delivered to your app, not by SMS.</span></div>
-        <div class="m-stat"><b>10 min</b><span>lifetime of a QR sign-in code, usable exactly once.</span></div>
-        <div class="m-stat"><b>0</b><span>passwords you have to remember besides your own.</span></div>
-      </div>
-    </div>
-  </section>
+  <section class="pg-web-section section-wrap" id="how" aria-labelledby="web-title"><div class="pg-web-copy"><div class="pg-kicker">A FAMILIAR PLACE. ONE NEW TAB.</div><h2 id="web-title">Your space.<br><em>Anywhere you browse.</em></h2><p>No need to carry your computer everywhere. Open PassGram Web and choose the sign-in method that works for you.</p><ol class="pg-signin-steps"><li><span>01</span><div><b>Open the official web app</b><p>Start at web.zpas.org.</p></div></li><li><span>02</span><div><b>Choose how to sign in</b><p>Use the options shown in the app.</p></div></li><li><span>03</span><div><b>Continue in your own space</b><p>Review your signed-in devices in Settings.</p></div></li></ol><a class="pg-text-link" href="https://web.zpas.org/" target="_blank" rel="noopener noreferrer">Open PassGram Web <span aria-hidden="true">↗</span></a></div><div class="pg-web-visual"><div class="pg-web-visual-head"><span class="pg-live-dot"></span> PASSGRAM WEB <span>Interface preview</span></div><div class="pg-web-crop"><img src="/resources/previews/web-mobile.webp" alt="PassGram web email and phone sign-in screen" width="340" height="690" loading="lazy" decoding="async"></div><p>Your real web interface. No account data is loaded in this preview.</p></div></section>
 
-  <section class="m-section" id="how">
-    <div class="m-head reveal">
-      <div class="eyebrow">How it works</div>
-      <h2>Sign in to the web in<br><em>seconds, not minutes.</em></h2>
-      <p>PassGram Web gives you two ways to sign in. Both are confirmed by your phone, so you never have to type a long password on a shared or unfamiliar computer.</p>
-    </div>
-    <div class="m-steps">
-      <div class="m-step reveal"><div><h3>Open web.zpas.org</h3><p>Visit the official web app. You will see a QR code, and below it the option to continue with your phone number or email address. Always check that the address in your browser reads web.zpas.org before you continue.</p></div></div>
-      <div class="m-step reveal"><div><h3>Scan the QR code with the app</h3><p>Open PassGram on your phone, choose the scanner and point it at the code on your screen. The app shows which browser and approximate location is asking to sign in, so you can decide whether it is really you.</p></div></div>
-      <div class="m-step reveal"><div><h3>Or receive a code inside the app</h3><p>If you prefer to type your number or email, PassGram sends a six-digit code straight to the app on your phone instead of an SMS. The code is only revealed after you confirm with your fingerprint, face or device PIN, and it expires after one minute.</p></div></div>
-      <div class="m-step reveal"><div><h3>Review new logins in your security inbox</h3><p>Every time a new device signs in, a notice is added to the security activity area of the app with the device name, location and time. If anything looks wrong you can end that session straight from Settings, then Devices.</p></div></div>
-    </div>
-  </section>
+  <section class="pg-trust section-wrap" id="security-deep" aria-labelledby="trust-title"><div><div class="pg-kicker">THOUGHTFUL BY DESIGN</div><h2 id="trust-title">A little more clarity.<br><em>A lot less noise.</em></h2><a class="pg-text-link" href="https://zpas.org/legal/security">Read about safety <span aria-hidden="true">↗</span></a></div><div class="pg-trust-list"><article><span>01 /</span><div><h3>Know where you sign in</h3><p>Review the devices connected to your account and end sessions you no longer need.</p></div></article><article><span>02 /</span><div><h3>Keep the details private</h3><p>Understand what the app stores, how sign-in works and the choices available to you.</p></div></article><article><span>03 /</span><div><h3>Simple enough for every day</h3><p>Clear screens, familiar patterns and fewer distractions between you and your next step.</p></div></article></div></section>
 
-  <section class="m-section" id="security-deep">
-    <div class="m-head reveal">
-      <div class="eyebrow">Security you can read</div>
-      <h2>Careful by default,<br><em>clear about the details.</em></h2>
-      <p>We would rather explain how sign-in protection works than hide behind buzzwords. These are the principles the web app and the mobile app are built around.</p>
-    </div>
-    <div class="m-grid">
-      <article class="m-card reveal"><div class="m-num">1</div><h3>Codes that live briefly</h3><p>QR sign-in codes expire after ten minutes and work only once. As soon as a code is used, it is consumed on the server and cannot be replayed, even if someone photographed your screen afterwards.</p><p>App sign-in codes are stored only as a one-way hash and are limited to a handful of attempts before they are locked.</p></article>
-      <article class="m-card reveal"><div class="m-num">2</div><h3>Approval on your own device</h3><p>A new browser is never trusted on its own. The request is shown on your phone, and the code itself is revealed only after biometric or PIN confirmation, so someone holding your unlocked phone for a moment still has to prove who they are.</p></article>
-      <article class="m-card reveal"><div class="m-num">3</div><h3>Sessions you can end</h3><p>Each signed-in browser appears in your device list. Ending a session signs that browser out quickly, and a device that has been ended cannot quietly sign itself back in.</p></article>
-      <article class="m-card reveal"><div class="m-num">4</div><h3>Location without tracking</h3><p>When you allow it, your browser shares an approximate position so the login notice can show a city and country. We round it before sending and do not hand it to third-party map services. If you decline, we simply show that the location is unavailable.</p></article>
-      <article class="m-card reveal"><div class="m-num">5</div><h3>Private by design</h3><p>Secrets are protected before they are stored, and sign-in challenges are kept in server-only data that browsers cannot read or modify directly. Access rules are written to deny everything that is not explicitly needed.</p></article>
-      <article class="m-card reveal"><div class="m-num">6</div><h3>Honest notifications</h3><p>Notifications on your lock screen stay generic. The sensitive six-digit code is never printed in the notification text, so it cannot be read over your shoulder or captured by a screenshot of your notification shade.</p></article>
-    </div>
-  </section>
-
-  <section class="m-section" id="everyday">
-    <div class="m-head reveal">
-      <div class="eyebrow">Everyday life</div>
-      <h2>Built for the moments<br><em>you actually have.</em></h2>
-    </div>
-    <div class="m-prose reveal">
-      <h3>At home and at work</h3>
-      <p>Keep personal and work logins separate while still reaching both from one account. Search finds an entry in a couple of keystrokes, and a favorites list keeps the accounts you open daily within a single tap.</p>
-      <h3>On a computer that is not yours</h3>
-      <p>Need to check something from a friend's laptop or an internet cafe? Open the web app, approve the sign-in from your phone, and end the session when you are finished. Nothing needs to be installed, and nothing needs to be remembered.</p>
-      <h3>When you change phones</h3>
-      <p>Because your account is not tied to a single screen, moving to a new device is a matter of signing in again and approving it. Your old session can be ended from the device list so that nothing is left behind.</p>
-      <h3>For developers</h3>
-      <p>If you build tools of your own, the developer pages explain the planned bot interface, how tokens should be handled and what is already available today. They are written to be read from top to bottom, with examples you can adapt.</p>
-    </div>
-  </section>
-
-  <section class="apps-band">
-    <div class="section-wrap apps-layout">
-      <div>
-        <div class="eyebrow">Your devices</div>
-        <h2>Take PassGram<br><em>where you are.</em></h2>
-        <p>Use the app that fits your day. Your web account lives everywhere you do.</p>
-        <a class="button button-dark" href="/apps" style="margin-top:22px">View apps</a>
-      </div>
-      <div class="device-cards">
-        <a class="device-card" href="/apps/android">
-          <span class="device-icon"><img src="/resources/assets/icons/modern/android.svg" alt=""></span>
-          <span><b>Android</b><small>Get the Android app</small></span>
-        </a>
-        <a class="device-card" href="/apps/windows">
-          <span class="device-icon"><img src="/resources/assets/icons/modern/windows.svg" alt=""></span>
-          <span><b>Windows</b><small>Get the desktop app</small></span>
-        </a>
-        <div class="device-card">
-          <span class="device-icon"><img src="/resources/assets/icons/modern/globe.svg" alt=""></span>
-          <span><b>Web app</b><small>Type web.zpas.org in your browser</small></span>
-        </div>
-      </div>
-    </div>
-  </section>
-
-  <section id="api" class="section-wrap api-panel">
-    <div class="api-copy">
-      <div class="eyebrow">For builders</div>
-      <h2>Build with<br><em>PassGram.</em></h2>
-      <p>Explore the developer API and bot tools from one place. Bot creation and token management require the PassGram bot service to be enabled for your account.</p>
-      <a class="button button-white" href="/api" style="margin-top:22px">Explore the API</a>
-    </div>
-    <div class="api-code">
-      <div class="code-top"><span></span><span></span><span></span><small>Bot API · preview</small></div>
-      <pre><code><i>POST</i> /bot&lt;token&gt;/sendMessage
-
-{
-  <em>"chat_id"</em>: "…",
-  <em>"text"</em>: "Hello from PassGram"
-}</code></pre>
-      <div class="api-status"><span></span> Developer documentation preview</div>
-    </div>
-  </section>
-
-  
-
-  <section id="news" class="news-section">
-    <div class="section-wrap">
-      <div class="news-heading">
-        <div><div class="eyebrow">What’s new</div><h2>Recent <em>updates</em></h2></div>
-        <a href="/apps">All apps and releases</a>
-      </div>
-      <div class="news-grid">
-        <article class="news-card">
-          <div class="news-meta"><span>Android</span><span>4.15</span></div>
-          <h3>A more connected PassGram</h3>
-          <p>Update the Android app for the latest account features.</p>
-          <a href="/apps/android">Explore Android</a>
-        </article>
-        <article class="news-card">
-          <div class="news-meta"><span>Windows</span><span>4.11</span></div>
-          <h3>Your desktop vault</h3>
-          <p>Keep the password vault close on your Windows PC.</p>
-          <a href="/apps/windows">Explore Windows</a>
-        </article>
-        <article class="news-card news-card-dark">
-          <div class="news-meta"><span>Web</span><span>Live</span></div>
-          <h3>Your account, in the browser</h3>
-          <p>Sign in to the web app with the same account as the mobile app.</p>
-</article>
-      </div>
-    </div>
-  </section>
-
-  <section class="section-wrap faq-teaser">
-    <div>
-      <div class="eyebrow">Need a hand?</div>
-      <h2>Good questions.<br><em>Clear answers.</em></h2>
-      <p>Learn how PassGram works, where your account lives, and how to get started.</p>
-    </div>
-    <a class="button button-light" href="/faq">Visit the FAQ</a>
-  </section>
-
-  <section class="m-section" id="principles">
-    <div class="m-head reveal">
-      <div class="eyebrow">What we stand for</div>
-      <h2>Principles we build<br><em>every feature around.</em></h2>
-      <p>These are the promises behind the product, in our own words. Each one links to the page where you can see the detail.</p>
-    </div>
-    <div class="story-row reveal">
-      <article class="story-card">
-        <div class="story-badge"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="5" y="11" width="14" height="10" rx="2"/><path d="M8 11V7a4 4 0 018 0v4"/></svg></div>
-        <q>Your secrets should be locked before they ever leave your device.</q>
-        <div class="story-who"><b>Private by design</b>Vault data is protected before it is stored, and sign-in challenges live in server-only data.</div>
-        <a class="story-link" href="/security">Read about safety <svg viewBox="0 0 5 8" fill="currentColor"><path d="M4.85 3.63l.61.62-.61.61L1.24 8.5 0 7.27l3-3.02L0 1.23 1.24 0z"/></svg></a>
-      </article>
-      <article class="story-card">
-        <div class="story-badge"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="7" y="2" width="10" height="20" rx="2"/><path d="M11 18h2"/></svg></div>
-        <q>A new browser should always have to ask the phone you already trust.</q>
-        <div class="story-who"><b>Approval on your device</b>QR codes last ten minutes and work once. App codes need your fingerprint, face or PIN.</div>
-        <a class="story-link" href="/faq">See how sign-in works <svg viewBox="0 0 5 8" fill="currentColor"><path d="M4.85 3.63l.61.62-.61.61L1.24 8.5 0 7.27l3-3.02L0 1.23 1.24 0z"/></svg></a>
-      </article>
-      <article class="story-card">
-        <div class="story-badge"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M3 12s3.5-7 9-7 9 7 9 7-3.5 7-9 7-9-7-9-7z"/><circle cx="12" cy="12" r="3"/></svg></div>
-        <q>You should be able to see every login and end any session in one tap.</q>
-        <div class="story-who"><b>Full visibility</b>Every new device appears in your security activity with its name, location and time.</div>
-        <a class="story-link" href="/apps">Get the apps <svg viewBox="0 0 5 8" fill="currentColor"><path d="M4.85 3.63l.61.62-.61.61L1.24 8.5 0 7.27l3-3.02L0 1.23 1.24 0z"/></svg></a>
-      </article>
-    </div>
-  </section>
-  <section class="m-cta reveal">
-    <h2>Ready to try the calmer way to sign in?</h2>
-    <p>Open the web app, scan the code with PassGram on your phone and you are in. It takes less time than typing a long password, and it is safer too.</p>
-</section>
-</main>
-
-  <section class="rez reveal" id="rez-encryption">
-    <div class="rez-head">
-      <div class="eyebrow">REZ Encryption</div>
-      <h2>If it is yours, it stays <em>unreadable to everyone else.</em></h2>
-      <p>REZ Encryption is the name of the protection that surrounds everything you keep and send in PassGram. It combines AES-256 encryption, device-held keys and direct device-to-device exchange, so your private content is locked before it ever leaves your phone. No outsider, no server, and no member of our own team can open it.</p>
-    </div>
-    <div class="rez-grid">
-      <article class="rez-card"><span class="rez-ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="4" y="10" width="16" height="11" rx="3"/><path d="M8 10V7a4 4 0 0 1 8 0v3"/><circle cx="12" cy="15.5" r="1.4"/></svg></span><h3>AES-256-GCM, end to end</h3><p>Messages, notes and vault items are sealed with AES-256 in GCM mode. This is the same class of encryption that banks and governments trust, and it also detects any attempt to tamper with your data.</p></article>
-      <article class="rez-card"><span class="rez-ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="7" y="2.5" width="10" height="19" rx="2.5"/><path d="M11 18h2"/></svg></span><h3>Device-to-device (P2P) keys</h3><p>Chat keys are agreed directly between the devices of the people in the conversation. Only the public part is shared. The private part stays inside your phone&rsquo;s secure hardware and never travels to us.</p></article>
-      <article class="rez-card"><span class="rez-ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="8" cy="15" r="4"/><path d="M11 12l9-9M16 7l3 3M14 9l2 2"/></svg></span><h3>Layered key protection</h3><p>Your master password is hardened by several stages, including Argon2id and PBKDF2 with 600,000 rounds, before it becomes a key. Guessing it by brute force becomes extremely slow and expensive.</p></article>
-      <article class="rez-card"><span class="rez-ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3 3l18 18"/><path d="M10.6 6.2A9.8 9.8 0 0 1 12 6c5 0 8.5 4.2 9.5 6a12 12 0 0 1-2.6 3.2M6.5 7.6A12.5 12.5 0 0 0 2.5 12c1 1.8 4.5 6 9.5 6 1.5 0 2.8-.4 4-1"/></svg></span><h3>Nobody can read it</h3><p>Because we never hold your keys, we have nothing to hand over. A leaked database, a curious employee or a stolen server copy would show only scrambled data with no way to open it.</p></article>
-      <article class="rez-card"><span class="rez-ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M21 12a8 8 0 0 1-11.6 7.1L4 20l1-4.6A8 8 0 1 1 21 12z"/><path d="M9 11h6M9 14h3"/></svg></span><h3>Private by default</h3><p>You do not have to switch anything on. Protection is part of how PassGram stores and sends your content, on your phone, on the web and on desktop.</p></article>
-      <article class="rez-card"><span class="rez-ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 3l8 3v6c0 4.5-3.2 7.8-8 9-4.8-1.2-8-4.5-8-9V6z"/><path d="M8.5 12l2.4 2.4L15.5 10"/></svg></span><h3>Approval on your device</h3><p>New sign-ins are approved on a phone you already trust, with one-time codes delivered into your app instead of SMS, so a stolen password alone is not enough.</p></article>
-    </div>
-    <p class="rez-note">The trade-off of real privacy: because only you hold the keys, we cannot recover your vault if you lose both your master password and your recovery key. Keep your recovery key somewhere safe. <a href="/security#encryption">Read the full security guide</a></p>
-  </section>
-  <section class="founder reveal" id="founder" aria-labelledby="founder-title">
+  <section class="founder" id="founder" aria-labelledby="founder-title">
     <div class="founder-card">
       <div class="eyebrow">A note from the founder</div>
       <h2 id="founder-title">Your privacy is not a feature. <em>It is the foundation.</em></h2>
@@ -354,22 +101,24 @@
       </div>
     </div>
   </section>
+<section class="pg-final section-wrap"><div class="pg-kicker">MAKE A LITTLE ROOM FOR PEACE OF MIND</div><h2>A calmer digital day<br><em>starts here.</em></h2><p>Find PassGram for the device you already use.</p><a class="button button-dark" href="https://zpas.org/apps">Explore the apps <span aria-hidden="true">↗</span></a></section>
+</main>
 <footer class="site-footer">
   <div class="footer-main">
     <div>
-      <a class="brand" href="/"><span class="brand-mark">P</span><span>PassGram</span></a>
+      <a class="brand" href="https://zpas.org/"><span class="brand-mark">P</span><span>PassGram</span></a>
       <p>Your digital life, in <em>one private space.</em></p>
     </div>
     <nav>
-      <a href="/apps">Apps</a>
-      <a href="/api">API</a>
-      <a href="/faq">FAQ</a>
-      <a href="/privacy">Privacy</a>
-      <a href="/security">Security</a>
+      <a href="https://zpas.org/apps">Apps</a>
+      <a href="https://api.zpas.org/" target="_blank" rel="noopener noreferrer">API</a>
+      <a href="https://zpas.org/faq">FAQ</a>
+      <a href="https://zpas.org/legal/privacy">Privacy</a>
+      <a href="https://zpas.org/legal/security">Security</a>
     </nav>
     <a class="footer-x" href="https://x.com/4rezan" target="_blank" rel="noopener noreferrer"><svg class="x-icon" viewBox="0 0 24 24" aria-hidden="true"><path fill="currentColor" d="M18.244 2.25h3.308l-7.227 8.26 8.502 11.24H16.17l-5.214-6.817L4.99 21.75H1.68l7.73-8.835L1.254 2.25H8.08l4.713 6.231zm-1.161 17.52h1.833L7.084 4.126H5.117z"/></svg> Follow on X</a>
   </div>
-  <div class="footer-bottom"><div class="fb-links"><a href="/legal/terms">Terms</a><a href="/privacy">Privacy</a><a href="/security">Security</a><a class="fb-choices" href="/privacy#choices"><svg viewBox="0 0 30 14" aria-hidden="true" focusable="false"><path fill="#fff" d="M7.4 12.8h6.8l3.1-11.6H7.4C4.2 1.2 1.6 3.8 1.6 7s2.6 5.8 5.8 5.8z"/><path fill="#1769ff" d="M22.6 0H7.4c-3.9 0-7 3.1-7 7s3.1 7 7 7h15.2c3.9 0 7-3.1 7-7s-3.2-7-7-7zm-21 7c0-3.2 2.6-5.8 5.8-5.8h9.9l-3.1 11.6H7.4c-3.2 0-5.8-2.6-5.8-5.8z"/><path fill="#fff" d="M24.6 4c.2.2.2.6 0 .8L22.5 7l2.2 2.2c.2.2.2.6 0 .8-.2.2-.6.2-.8 0l-2.2-2.2-2.2 2.2c-.2.2-.6.2-.8 0-.2-.2-.2-.6 0-.8L20.8 7l-2.2-2.2c-.2-.2-.2-.6 0-.8.2-.2.6-.2.8 0l2.2 2.2L23.8 4c.2-.2.6-.2.8 0z"/><path fill="#1769ff" d="M12.7 4.1c.2.2.3.6.1.8L8.6 9.8c-.1.1-.2.2-.3.2-.2.1-.5.1-.7-.1L5.4 7.7c-.2-.2-.2-.6 0-.8.2-.2.6-.2.8 0L8 8.6l3.8-4.5c.2-.2.6-.2.9 0z"/></svg>Your Privacy Choices</a></div><span>© 2026 PassGram</span></div>
+  <div class="footer-bottom"><div class="fb-links"><a href="https://zpas.org/legal/terms">Terms</a><a href="https://zpas.org/legal/privacy">Privacy</a><a href="https://zpas.org/legal/security">Security</a><a class="fb-choices" href="https://zpas.org/legal/privacy#choices"><svg viewBox="0 0 30 14" aria-hidden="true" focusable="false"><path fill="#fff" d="M7.4 12.8h6.8l3.1-11.6H7.4C4.2 1.2 1.6 3.8 1.6 7s2.6 5.8 5.8 5.8z"/><path fill="#1769ff" d="M22.6 0H7.4c-3.9 0-7 3.1-7 7s3.1 7 7 7h15.2c3.9 0 7-3.1 7-7s-3.2-7-7-7zm-21 7c0-3.2 2.6-5.8 5.8-5.8h9.9l-3.1 11.6H7.4c-3.2 0-5.8-2.6-5.8-5.8z"/><path fill="#fff" d="M24.6 4c.2.2.2.6 0 .8L22.5 7l2.2 2.2c.2.2.2.6 0 .8-.2.2-.6.2-.8 0l-2.2-2.2-2.2 2.2c-.2.2-.6.2-.8 0-.2-.2-.2-.6 0-.8L20.8 7l-2.2-2.2c-.2-.2-.2-.6 0-.8.2-.2.6-.2.8 0l2.2 2.2L23.8 4c.2-.2.6-.2.8 0z"/><path fill="#1769ff" d="M12.7 4.1c.2.2.3.6.1.8L8.6 9.8c-.1.1-.2.2-.3.2-.2.1-.5.1-.7-.1L5.4 7.7c-.2-.2-.2-.6 0-.8.2-.2.6-.2.8 0L8 8.6l3.8-4.5c.2-.2.6-.2.9 0z"/></svg>Your Privacy Choices</a></div><span>© 2026 PassGram</span></div>
 </footer>
 
 <script>
@@ -390,7 +139,7 @@
     const a = e.target.closest('a');
     if (!a || !a.href || a.getAttribute('href').startsWith('#')) return;
     const url = new URL(a.href, location.origin);
-    if (url.origin !== location.origin || url.pathname.endsWith('.html') || (url.pathname !== '/' && url.pathname !== location.pathname)) {
+    if (url.origin !== location.origin) {
       a.target = '_blank';
       a.rel = 'noopener noreferrer';
     }

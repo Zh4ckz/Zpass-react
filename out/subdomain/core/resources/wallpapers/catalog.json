@@ -1,0 +1,537 @@
+{
+  "version": 1,
+  "accent": "#2878DB",
+  "items": [
+    {
+      "id": "wall-01",
+      "title": "Wallpaper 01",
+      "file": "BG_18-scaled.jpg",
+      "original": "BG_18-scaled.jpg",
+      "thumbnail": "thumbs/wall-01.webp",
+      "kind": "image",
+      "format": "JPG"
+    },
+    {
+      "id": "wall-02",
+      "title": "Wallpaper 02",
+      "file": "BG_20-498x1024.jpg",
+      "original": "BG_20-498x1024.jpg",
+      "thumbnail": "thumbs/wall-02.webp",
+      "kind": "image",
+      "format": "JPG"
+    },
+    {
+      "id": "wall-03",
+      "title": "Wallpaper 03",
+      "file": "BG_21-498x1024.jpg",
+      "original": "BG_21-498x1024.jpg",
+      "thumbnail": "thumbs/wall-03.webp",
+      "kind": "image",
+      "format": "JPG"
+    },
+    {
+      "id": "wall-04",
+      "title": "Wallpaper 04",
+      "file": "BG_22-498x1024.jpg",
+      "original": "BG_22-498x1024.jpg",
+      "thumbnail": "thumbs/wall-04.webp",
+      "kind": "image",
+      "format": "JPG"
+    },
+    {
+      "id": "wall-05",
+      "title": "Wallpaper 05",
+      "file": "BG_23-498x1024.jpg",
+      "original": "BG_23-498x1024.jpg",
+      "thumbnail": "thumbs/wall-05.webp",
+      "kind": "image",
+      "format": "JPG"
+    },
+    {
+      "id": "wall-06",
+      "title": "Wallpaper 06",
+      "file": "BG_24-498x1024.jpg",
+      "original": "BG_24-498x1024.jpg",
+      "thumbnail": "thumbs/wall-06.webp",
+      "kind": "image",
+      "format": "JPG"
+    },
+    {
+      "id": "wall-07",
+      "title": "Wallpaper 07",
+      "file": "BG_25-498x1024.jpg",
+      "original": "BG_25-498x1024.jpg",
+      "thumbnail": "thumbs/wall-07.webp",
+      "kind": "image",
+      "format": "JPG"
+    },
+    {
+      "id": "wall-08",
+      "title": "Wallpaper 08",
+      "file": "BG_26-498x1024.jpg",
+      "original": "BG_26-498x1024.jpg",
+      "thumbnail": "thumbs/wall-08.webp",
+      "kind": "image",
+      "format": "JPG"
+    },
+    {
+      "id": "wall-09",
+      "title": "Wallpaper 09",
+      "file": "BG_27-498x1024.jpg",
+      "original": "BG_27-498x1024.jpg",
+      "thumbnail": "thumbs/wall-09.webp",
+      "kind": "image",
+      "format": "JPG"
+    },
+    {
+      "id": "wall-10",
+      "title": "Wallpaper 10",
+      "file": "BG_28-498x1024.jpg",
+      "original": "BG_28-498x1024.jpg",
+      "thumbnail": "thumbs/wall-10.webp",
+      "kind": "image",
+      "format": "JPG"
+    },
+    {
+      "id": "wall-11",
+      "title": "Wallpaper 11",
+      "file": "BG_29-498x1024.jpg",
+      "original": "BG_29-498x1024.jpg",
+      "thumbnail": "thumbs/wall-11.webp",
+      "kind": "image",
+      "format": "JPG"
+    },
+    {
+      "id": "wall-12",
+      "title": "Wallpaper 12",
+      "file": "BG_30-498x1024.jpg",
+      "original": "BG_30-498x1024.jpg",
+      "thumbnail": "thumbs/wall-12.webp",
+      "kind": "image",
+      "format": "JPG"
+    },
+    {
+      "id": "wall-13",
+      "title": "Wallpaper 13",
+      "file": "BG_33-498x1024.jpg",
+      "original": "BG_33-498x1024.jpg",
+      "thumbnail": "thumbs/wall-13.webp",
+      "kind": "image",
+      "format": "JPG"
+    },
+    {
+      "id": "wall-14",
+      "title": "Wallpaper 14",
+      "file": "BG_N9-498x1024.jpg",
+      "original": "BG_N9-498x1024.jpg",
+      "thumbnail": "thumbs/wall-14.webp",
+      "kind": "image",
+      "format": "JPG"
+    },
+    {
+      "id": "wall-15",
+      "title": "Wallpaper 15",
+      "file": "download.jpg",
+      "original": "download.jpg",
+      "thumbnail": "thumbs/wall-15.webp",
+      "kind": "image",
+      "format": "JPG"
+    },
+    {
+      "id": "wall-16",
+      "title": "Wallpaper 16",
+      "file": "download.png",
+      "original": "download.png",
+      "thumbnail": "thumbs/wall-16.webp",
+      "kind": "image",
+      "format": "PNG"
+    },
+    {
+      "id": "wall-17",
+      "title": "Wallpaper 17",
+      "file": "ny-600x600.png",
+      "original": "ny-600x600.png",
+      "thumbnail": "thumbs/wall-17.webp",
+      "kind": "image",
+      "format": "PNG"
+    },
+    {
+      "id": "wall-18",
+      "title": "Wallpaper 18",
+      "file": "ny.png",
+      "original": "ny.png",
+      "thumbnail": "thumbs/wall-18.webp",
+      "kind": "image",
+      "format": "PNG"
+    },
+    {
+      "id": "wall-19",
+      "title": "Wallpaper 19",
+      "file": "pattern_03-600x600.png",
+      "original": "pattern_03-600x600.png",
+      "thumbnail": "thumbs/wall-19.webp",
+      "kind": "image",
+      "format": "PNG"
+    },
+    {
+      "id": "wall-20",
+      "title": "Wallpaper 20",
+      "file": "pattern_03-747x1536.png",
+      "original": "pattern_03-747x1536.png",
+      "thumbnail": "thumbs/wall-20.webp",
+      "kind": "image",
+      "format": "PNG"
+    },
+    {
+      "id": "wall-21",
+      "title": "Wallpaper 21",
+      "file": "pattern_04-600x600.png",
+      "original": "pattern_04-600x600.png",
+      "thumbnail": "thumbs/wall-21.webp",
+      "kind": "image",
+      "format": "PNG"
+    },
+    {
+      "id": "wall-22",
+      "title": "Wallpaper 22",
+      "file": "pattern_05-600x600.png",
+      "original": "pattern_05-600x600.png",
+      "thumbnail": "thumbs/wall-22.webp",
+      "kind": "image",
+      "format": "PNG"
+    },
+    {
+      "id": "wall-23",
+      "title": "Wallpaper 23",
+      "file": "pattern_06-600x600.png",
+      "original": "pattern_06-600x600.png",
+      "thumbnail": "thumbs/wall-23.webp",
+      "kind": "image",
+      "format": "PNG"
+    },
+    {
+      "id": "wall-24",
+      "title": "Pattern 24",
+      "file": "pattern-1.svg",
+      "original": "pattern-1.svg",
+      "thumbnail": "thumbs/wall-24.webp",
+      "kind": "pattern",
+      "format": "SVG"
+    },
+    {
+      "id": "wall-25",
+      "title": "Pattern 25",
+      "file": "pattern-2.svg",
+      "original": "pattern-2.svg",
+      "thumbnail": "thumbs/wall-25.webp",
+      "kind": "pattern",
+      "format": "SVG"
+    },
+    {
+      "id": "wall-26",
+      "title": "Pattern 26",
+      "file": "pattern-3.svg",
+      "original": "pattern-3.svg",
+      "thumbnail": "thumbs/wall-26.webp",
+      "kind": "pattern",
+      "format": "SVG"
+    },
+    {
+      "id": "wall-27",
+      "title": "Pattern 27",
+      "file": "pattern-4.svg",
+      "original": "pattern-4.svg",
+      "thumbnail": "thumbs/wall-27.webp",
+      "kind": "pattern",
+      "format": "SVG"
+    },
+    {
+      "id": "wall-28",
+      "title": "Pattern 28",
+      "file": "pattern-5.svg",
+      "original": "pattern-5.svg",
+      "thumbnail": "thumbs/wall-28.webp",
+      "kind": "pattern",
+      "format": "SVG"
+    },
+    {
+      "id": "wall-29",
+      "title": "Pattern 29",
+      "file": "pattern-6.svg",
+      "original": "pattern-6.svg",
+      "thumbnail": "thumbs/wall-29.webp",
+      "kind": "pattern",
+      "format": "SVG"
+    },
+    {
+      "id": "wall-30",
+      "title": "Pattern 30",
+      "file": "pattern-7.svg",
+      "original": "pattern-7.svg",
+      "thumbnail": "thumbs/wall-30.webp",
+      "kind": "pattern",
+      "format": "SVG"
+    },
+    {
+      "id": "wall-31",
+      "title": "Pattern 31",
+      "file": "pattern-8.svg",
+      "original": "pattern-8.svg",
+      "thumbnail": "thumbs/wall-31.webp",
+      "kind": "pattern",
+      "format": "SVG"
+    },
+    {
+      "id": "wall-32",
+      "title": "Pattern 32",
+      "file": "pattern-9.svg",
+      "original": "pattern-9.svg",
+      "thumbnail": "thumbs/wall-32.webp",
+      "kind": "pattern",
+      "format": "SVG"
+    },
+    {
+      "id": "wall-33",
+      "title": "Pattern 33",
+      "file": "pattern-10.svg",
+      "original": "pattern-10.svg",
+      "thumbnail": "thumbs/wall-33.webp",
+      "kind": "pattern",
+      "format": "SVG"
+    },
+    {
+      "id": "wall-34",
+      "title": "Pattern 34",
+      "file": "pattern-11.svg",
+      "original": "pattern-11.svg",
+      "thumbnail": "thumbs/wall-34.webp",
+      "kind": "pattern",
+      "format": "SVG"
+    },
+    {
+      "id": "wall-35",
+      "title": "Pattern 35",
+      "file": "pattern-12.svg",
+      "original": "pattern-12.svg",
+      "thumbnail": "thumbs/wall-35.webp",
+      "kind": "pattern",
+      "format": "SVG"
+    },
+    {
+      "id": "wall-36",
+      "title": "Pattern 36",
+      "file": "pattern-13.svg",
+      "original": "pattern-13.svg",
+      "thumbnail": "thumbs/wall-36.webp",
+      "kind": "pattern",
+      "format": "SVG"
+    },
+    {
+      "id": "wall-37",
+      "title": "Pattern 37",
+      "file": "pattern-14.svg",
+      "original": "pattern-14.svg",
+      "thumbnail": "thumbs/wall-37.webp",
+      "kind": "pattern",
+      "format": "SVG"
+    },
+    {
+      "id": "wall-38",
+      "title": "Pattern 38",
+      "file": "pattern-15.svg",
+      "original": "pattern-15.svg",
+      "thumbnail": "thumbs/wall-38.webp",
+      "kind": "pattern",
+      "format": "SVG"
+    },
+    {
+      "id": "wall-39",
+      "title": "Pattern 39",
+      "file": "pattern-16.svg",
+      "original": "pattern-16.svg",
+      "thumbnail": "thumbs/wall-39.webp",
+      "kind": "pattern",
+      "format": "SVG"
+    },
+    {
+      "id": "wall-40",
+      "title": "Pattern 40",
+      "file": "pattern-17.svg",
+      "original": "pattern-17.svg",
+      "thumbnail": "thumbs/wall-40.webp",
+      "kind": "pattern",
+      "format": "SVG"
+    },
+    {
+      "id": "wall-41",
+      "title": "Pattern 41",
+      "file": "pattern-18.svg",
+      "original": "pattern-18.svg",
+      "thumbnail": "thumbs/wall-41.webp",
+      "kind": "pattern",
+      "format": "SVG"
+    },
+    {
+      "id": "wall-42",
+      "title": "Pattern 42",
+      "file": "pattern-19.svg",
+      "original": "pattern-19.svg",
+      "thumbnail": "thumbs/wall-42.webp",
+      "kind": "pattern",
+      "format": "SVG"
+    },
+    {
+      "id": "wall-43",
+      "title": "Pattern 43",
+      "file": "pattern-20.svg",
+      "original": "pattern-20.svg",
+      "thumbnail": "thumbs/wall-43.webp",
+      "kind": "pattern",
+      "format": "SVG"
+    },
+    {
+      "id": "wall-44",
+      "title": "Pattern 44",
+      "file": "pattern-21.svg",
+      "original": "pattern-21.svg",
+      "thumbnail": "thumbs/wall-44.webp",
+      "kind": "pattern",
+      "format": "SVG"
+    },
+    {
+      "id": "wall-45",
+      "title": "Pattern 45",
+      "file": "pattern-22.svg",
+      "original": "pattern-22.svg",
+      "thumbnail": "thumbs/wall-45.webp",
+      "kind": "pattern",
+      "format": "SVG"
+    },
+    {
+      "id": "wall-46",
+      "title": "Pattern 46",
+      "file": "pattern-23.svg",
+      "original": "pattern-23.svg",
+      "thumbnail": "thumbs/wall-46.webp",
+      "kind": "pattern",
+      "format": "SVG"
+    },
+    {
+      "id": "wall-47",
+      "title": "Pattern 47",
+      "file": "pattern-24.svg",
+      "original": "pattern-24.svg",
+      "thumbnail": "thumbs/wall-47.webp",
+      "kind": "pattern",
+      "format": "SVG"
+    },
+    {
+      "id": "wall-48",
+      "title": "Pattern 48",
+      "file": "pattern-25.svg",
+      "original": "pattern-25.svg",
+      "thumbnail": "thumbs/wall-48.webp",
+      "kind": "pattern",
+      "format": "SVG"
+    },
+    {
+      "id": "wall-49",
+      "title": "Pattern 49",
+      "file": "pattern-26.svg",
+      "original": "pattern-26.svg",
+      "thumbnail": "thumbs/wall-49.webp",
+      "kind": "pattern",
+      "format": "SVG"
+    },
+    {
+      "id": "wall-50",
+      "title": "Pattern 50",
+      "file": "pattern-27.svg",
+      "original": "pattern-27.svg",
+      "thumbnail": "thumbs/wall-50.webp",
+      "kind": "pattern",
+      "format": "SVG"
+    },
+    {
+      "id": "wall-51",
+      "title": "Pattern 51",
+      "file": "pattern-28.svg",
+      "original": "pattern-28.svg",
+      "thumbnail": "thumbs/wall-51.webp",
+      "kind": "pattern",
+      "format": "SVG"
+    },
+    {
+      "id": "wall-52",
+      "title": "Pattern 52",
+      "file": "pattern-29.svg",
+      "original": "pattern-29.svg",
+      "thumbnail": "thumbs/wall-52.webp",
+      "kind": "pattern",
+      "format": "SVG"
+    },
+    {
+      "id": "wall-53",
+      "title": "Pattern 53",
+      "file": "pattern-30.svg",
+      "original": "pattern-30.svg",
+      "thumbnail": "thumbs/wall-53.webp",
+      "kind": "pattern",
+      "format": "SVG"
+    },
+    {
+      "id": "wall-54",
+      "title": "Pattern 54",
+      "file": "pattern-31.svg",
+      "original": "pattern-31.svg",
+      "thumbnail": "thumbs/wall-54.webp",
+      "kind": "pattern",
+      "format": "SVG"
+    },
+    {
+      "id": "wall-55",
+      "title": "Pattern 55",
+      "file": "pattern-32.svg",
+      "original": "pattern-32.svg",
+      "thumbnail": "thumbs/wall-55.webp",
+      "kind": "pattern",
+      "format": "SVG"
+    },
+    {
+      "id": "wall-56",
+      "title": "Pattern 56",
+      "file": "pattern-33.svg",
+      "original": "pattern-33.svg",
+      "thumbnail": "thumbs/wall-56.webp",
+      "kind": "pattern",
+      "format": "SVG"
+    },
+    {
+      "id": "wall-57",
+      "title": "Wallpaper 57",
+      "file": "pattern-3000_981739-1242-removebg-preview.png",
+      "original": "pattern-3000_981739-1242-removebg-preview.png",
+      "thumbnail": "thumbs/wall-57.webp",
+      "kind": "image",
+      "format": "PNG"
+    },
+    {
+      "id": "wall-58",
+      "title": "Wallpaper 58",
+      "file": "wall-58.webp",
+      "original": "pattern-3000_981739-1242.avif",
+      "thumbnail": "thumbs/wall-58.webp",
+      "kind": "image",
+      "format": "AVIF"
+    },
+    {
+      "id": "wall-59",
+      "title": "Wallpaper 59",
+      "file": "pattern-3000_981739-1242.png",
+      "original": "pattern-3000_981739-1242.png",
+      "thumbnail": "thumbs/wall-59.webp",
+      "kind": "image",
+      "format": "PNG"
+    }
+  ]
+}

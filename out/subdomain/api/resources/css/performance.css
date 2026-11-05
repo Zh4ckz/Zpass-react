@@ -1,0 +1,17 @@
+/* Low-cost rendering profile for mobile and embedded browsers. */
+.ambient{display:none!important}
+.topbar,.recovery-dialog::backdrop{backdrop-filter:none!important;-webkit-backdrop-filter:none!important}
+.auth-card,.browser-demo,.price-card.recommended,.demo-card,.item-drawer{box-shadow:0 12px 30px rgba(1, 1, 1, 0.13)!important}
+.security-orbit{box-shadow:none!important}
+
+@media(max-width:900px){
+  *,*::before,*::after{scroll-behavior:auto!important}
+  .marketing-view,.security-marketing,.final-cta,.showcase-main,.cloud-card,.demo-card{background-image:none!important
+  }
+  .marketing-section,.pricing-section,.comparison,.security-marketing,.final-cta{padding-top:58px!important;padding-bottom:58px!important
+  }
+}
+
+@media(prefers-reduced-motion:reduce){
+  *,*::before,*::after{animation:none!important;transition:none!important;scroll-behavior:auto!important}
+}

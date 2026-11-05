@@ -1,0 +1,4 @@
+Country phone dialing data in countries.txt is sourced from:
+https://github.com/evgeny-nadymov/telegram-react/blob/master/public/data/countries.txt
+
+The upstream repository is licensed under GNU GPL version 3. See LICENSE.countries.txt.

@@ -1,0 +1,96 @@
+<!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><meta name="robots" content="noindex"><title>PassGram web sign-in preview</title><link rel="stylesheet" href="/resources/css/p4xqke08ig.css"><style>
+html,body{margin:0!important;width:100%;height:100%;overflow:hidden!important;background:transparent!important;font-family:Inter,"Segoe UI",sans-serif}.auth-view{min-height:100%!important;padding:0!important}.auth-shell{width:100%!important;min-height:100%!important;border:0!important;border-radius:0!important;box-shadow:none!important;background:transparent!important;--card-bg:rgba(255,255,255,.8);--text-primary:#15223a;--text-muted:#6b7890;--input-border:#dce4f0;--line:#e6ebf2}.auth-brand-panel{min-height:100%!important;background:radial-gradient(ellipse at 50% 70%,#b9d5ff44,transparent 60%),linear-gradient(145deg,#edf4ffbb,#e6eefb88)!important;color:#17223b!important}.auth-brand-panel h2,.auth-brand-panel>p,.auth-privacy{color:inherit!important}.auth-brand-panel h2 span,.auth-eyebrow{color:#1769ff!important}.auth-brand{color:#17223b!important}._cardsContainer_140gf_90{background:#ffffff80!important;padding:24px!important}._card_140gf_90{box-shadow:none!important;background:transparent!important}.brand-avatar-badge{background:#1769ff!important}.auth-shell .tab-wrap{background:#edf2f9!important}.auth-shell .tab-pill{background:#fff!important}.auth-shell .tab-btn{color:#6b7890!important}.auth-shell .tab-btn.on{color:#17223b!important}.auth-shell .tg-input{color:#17223b!important;background:#ffffff88!important;border-color:#dce4f0!important}.auth-shell .tg-link-btn{color:#1769ff!important}.auth-art-core{box-shadow:0 14px 60px #1769ff20!important}.auth-shell ._subtitle_16kfa_12{color:#6b7890!important}button,input{pointer-events:none}*{animation:none!important;transition:none!important}
+@media(max-width:860px){.auth-brand-panel{display:none!important}.auth-shell{display:grid!important;grid-template-columns:1fr!important}._cardsContainer_140gf_90{padding:24px 18px!important}.auth-view{display:block!important}._card_140gf_90{padding:26px 8px!important}.auth-shell ._title_16kfa_11{font-size:25px!important}}
+.brand-avatar-badge{background:transparent url(/resources/assets/app-logo/zpass.png) center/contain no-repeat!important;border-radius:15px!important}.brand-avatar-badge span{visibility:hidden}</style></head><body><main class="auth-view" inert><div class="auth-shell"><aside class="auth-brand-panel">
+        <a class="auth-brand" href="https://zpas.org/" aria-label="PassGram home">
+          <img src="/resources/assets/app-logo/zpass.png" alt="">
+          <span>PassGram</span>
+        </a>
+        <span class="auth-eyebrow">PRIVATE MESSAGING</span>
+        <h2>Stay connected.<br><span>Stay safe.</span></h2>
+        <p>Bring your conversations together in one simple space. Your account and chats stay in your control.</p>
+        <div class="auth-art" aria-hidden="true">
+          <span class="auth-art-orbit"></span>
+          <span class="auth-art-orbit"></span>
+          <span class="auth-art-core"><img src="/resources/assets/app-logo/zpass.png" alt=""></span>
+          <span class="auth-art-node auth-art-node-one"></span>
+          <span class="auth-art-node auth-art-node-two"></span>
+          <span class="auth-art-node auth-art-node-three"></span>
+        </div>
+        <div class="auth-privacy"><span class="icon-mask icon-shield"></span> Private. Secure. Yours.</div>
+      </aside><div class="_cardsContainer_140gf_90"><div id="view-phone" class="_card_140gf_90 _pageSignQR_140gf_259">
+        <div class="brand-avatar-badge">
+          <span>Z</span>
+        </div>
+
+        <h1 class="_title_16kfa_11 text-center">Sign in to PassGram</h1>
+        <div class="_subtitle_16kfa_12 secondary">Continue with your email or phone number.</div>
+
+        <div class="tab-wrap" id="tab-wrap" role="tablist" aria-label="Sign-in method">
+          <div class="tab-pill" aria-hidden="true"></div>
+          <button class="tab-btn on" id="tab-qr" type="button" role="tab" aria-selected="true" aria-controls="email-form" data-auth-tab="email">Email sign-in</button>
+          <button class="tab-btn" id="tab-code" type="button" role="tab" aria-selected="false" aria-controls="email-form" data-auth-tab="phone">Phone sign-in</button>
+        </div>
+
+        <form id="email-form" class="tg-auth-form">
+          <div class="form-group" id="country-group" hidden>
+            <label class="tg-label" for="country-select">Country</label>
+            <div class="country-picker" id="country-picker">
+              <button class="country-trigger" id="country-picker-button" type="button" aria-haspopup="listbox" aria-expanded="false">
+                <span id="country-current"><img class="country-flag" src="/resources/assets/ui/flags/tr.svg" alt="" width="24" height="18">Turkey (+90)</span><span class="country-chevron" aria-hidden="true"></span>
+              </button>
+              <div class="country-menu" id="country-menu" hidden>
+                <label class="country-search"><span aria-hidden="true"></span><input id="country-search" type="search" placeholder="Search country or code" autocomplete="off"></label>
+                <div class="country-options" id="country-options" role="listbox" aria-label="Country and phone code"></div>
+                <p class="country-empty" id="country-empty" hidden>No country found.</p>
+              </div>
+              <select id="country-select" class="country-value" aria-hidden="true" tabindex="-1"><option value="+90" data-calling-code="90" data-length="12" data-iso="TR">Turkey (+90)</option></select>
+            </div>
+          </div>
+
+          <div class="form-group">
+            <label class="tg-label" id="login-identifier-label" for="login-identifier">Email</label>
+            <input id="login-identifier" class="tg-input" type="email" autocomplete="username" placeholder="name@example.com" required>
+            <small id="phone-input-hint" class="field-hint" hidden>Your country's code is already selected. Enter only your phone number.</small>
+          </div>
+
+          <button id="email-submit" class="button button-primary tg-btn-submit" type="submit">Send code to the PassGram app</button>
+        </form>
+
+        <div id="recaptcha-container"></div>
+        <p id="auth-status" class="status-msg" role="status"></p>
+        <section id="app-login-panel" class="app-login-panel" hidden aria-live="polite">
+          <div class="otp-panel-heading">
+            <span class="icon-mask icon-shield" aria-hidden="true"></span>
+            <div>
+              <strong id="app-login-account">Your PassGram account</strong>
+              <p>You can find the 6-digit sign-in code in your registered PassGram app.</p>
+            </div>
+          </div>
+          <div class="otp-request-details">
+            <div><span>Device</span><strong id="app-login-device">Web browser</strong></div>
+            <div><span>Location</span><strong id="app-login-location">Location unavailable</strong></div>
+          </div>
+          <form id="app-login-otp-form" class="app-login-otp-form" novalidate>
+            <div id="app-login-otp-inputs" class="app-login-otp-inputs" role="group" aria-label="6-digit verification code">
+              <input class="otp-input" type="text" inputmode="numeric" pattern="[0-9]*" maxlength="1" autocomplete="one-time-code" aria-label="Digit 1" required>
+              <input class="otp-input" type="text" inputmode="numeric" pattern="[0-9]*" maxlength="1" aria-label="Digit 2" required>
+              <input class="otp-input" type="text" inputmode="numeric" pattern="[0-9]*" maxlength="1" aria-label="Digit 3" required>
+              <input class="otp-input" type="text" inputmode="numeric" pattern="[0-9]*" maxlength="1" aria-label="Digit 4" required>
+              <input class="otp-input" type="text" inputmode="numeric" pattern="[0-9]*" maxlength="1" aria-label="Digit 5" required>
+              <input class="otp-input" type="text" inputmode="numeric" pattern="[0-9]*" maxlength="1" aria-label="Digit 6" required>
+            </div>
+            <button id="app-login-verify" class="button button-primary tg-btn-submit" type="submit" disabled>Verify code</button>
+          </form>
+          <p id="app-login-status" class="status-msg" role="status">Check the app notification.</p>
+          <button id="app-login-resend" class="tg-link-btn" type="button" disabled>Request new code <span id="app-login-resend-countdown">30</span></button>
+          <button id="app-login-cancel" class="tg-link-btn" type="button">Cancel sign-in request</button>
+        </section>
+
+        <button id="switch-to-qr" class="rp btn-primary btn-secondary btn-primary-transparent primary tg-link-btn" type="button">
+          <span class="i18n">Sign in using QR code <span class="inline-icon" aria-hidden="true"></span></span>
+        </button>
+        <button id="switch-to-passkey-from-phone" class="rp btn-primary btn-secondary btn-primary-transparent primary tg-link-btn" type="button">
+          <span class="i18n">Sign in with passkey <span class="inline-icon" aria-hidden="true"></span></span>
+        </button>
+      </div></div></div></main></body></html>

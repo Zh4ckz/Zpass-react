@@ -1,0 +1,6 @@
+{
+  "workerOrigin": "https://passgram-pay-api.rezanhassoun.workers.dev",
+  "script": "passgram-pay-api",
+  "stripeWebhookId": "we_1UXuWRRG6hGpB73Q8jaIBWC9",
+  "deployedAt": "2026-11-04T03:11:56.698Z"
+}

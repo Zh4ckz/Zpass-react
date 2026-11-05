@@ -1,0 +1,22 @@
+{
+  "PLUS_MONTHLY": {
+    "price": 4.99,
+    "enabled": true,
+    "commitmentMonths": 0
+  },
+  "PLUS_YEARLY": {
+    "price": 4.25,
+    "enabled": true,
+    "commitmentMonths": 12
+  },
+  "PRO_MONTHLY": {
+    "price": 9,
+    "enabled": true,
+    "commitmentMonths": 0
+  },
+  "PRO_YEARLY": {
+    "price": 7.5,
+    "enabled": true,
+    "commitmentMonths": 12
+  }
+}

@@ -1,0 +1,13 @@
+[
+  {
+    "relation": ["delegate_permission/common.handle_all_urls"],
+    "target": {
+      "namespace": "android_app",
+      "package_name": "com.zpass",
+      "sha256_cert_fingerprints": [
+        "01:16:4C:4B:5E:77:70:C8:92:43:1D:F5:0A:21:B9:1C:D7:5D:0C:6A:61:0B:60:75:8D:7E:A9:C6:DE:15:97:F4",
+        "3F:76:73:EB:7B:D2:22:E7:7D:AB:AB:5E:B0:70:8B:49:0D:AC:C7:EA:DA:5F:8E:25:40:32:DD:84:73:35:9F:47"
+      ]
+    }
+  }
+]

@@ -22,7 +22,7 @@
   if (sideNav && toggle) {
     var foot = document.createElement('div');
     foot.className = 'nav-side-foot';
-    foot.innerHTML = '<a class="button button-dark" href="/apps">Download the apps</a><a class="button button-light" href="https://x.com/4rezan" target="_blank" rel="noopener" style="color:#000!important">Follow on X</a>';
+    foot.innerHTML = '<a class="button button-dark" href="https://zpas.org/apps">Download the apps</a><a class="button button-light" href="https://x.com/4rezan" target="_blank" rel="noopener" style="color:#000!important">Follow on X</a>';
     sideNav.appendChild(foot);
     var closeBtn = document.createElement('button');
     closeBtn.type = 'button';
@@ -62,15 +62,15 @@
     document.body.appendChild(back);
     document.addEventListener('keydown', function (e) { if (e.key === 'Escape' && toggle.getAttribute('aria-expanded') === 'true') toggle.click(); });
   }
-  if (document.querySelector('.site-header')) {
+  if (document.querySelector('.site-header') && !document.querySelector('.pg-home-main')) {
     var p = location.pathname;
     var icon = function (d) { return '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">' + d + '</svg>'; };
     var tabs = [
-      ['/', 'Home', icon('<path d="M3 11l9-8 9 8"/><path d="M5 10v10h14V10"/>'), p === '/' || p === '/index.html'],
-      ['/apps.html', 'Apps', icon('<rect x="3" y="3" width="7" height="7" rx="2"/><rect x="14" y="3" width="7" height="7" rx="2"/><rect x="3" y="14" width="7" height="7" rx="2"/><rect x="14" y="14" width="7" height="7" rx="2"/>'), p === '/apps.html'],
-      ['https://web.zpas.org/login', 'Open', icon('<path d="M5 12h14"/><path d="M13 6l6 6-6 6"/>'), false, 'go'],
-      ['/api.html', 'API', icon('<path d="M8 8l-4 4 4 4"/><path d="M16 8l4 4-4 4"/>'), p === '/api.html'],
-      ['/faq.html', 'FAQ', icon('<circle cx="12" cy="12" r="9"/><path d="M9.5 9.5a2.5 2.5 0 115 .5c0 1.5-2.5 2-2.5 3.5"/><path d="M12 17h.01"/>'), p === '/faq.html']
+      ['https://zpas.org/', 'Home', icon('<path d="M3 11l9-8 9 8"/><path d="M5 10v10h14V10"/>'), p === '/' || p === '/'],
+      ['https://zpas.org/apps', 'Apps', icon('<rect x="3" y="3" width="7" height="7" rx="2"/><rect x="14" y="3" width="7" height="7" rx="2"/><rect x="3" y="14" width="7" height="7" rx="2"/><rect x="14" y="14" width="7" height="7" rx="2"/>'), p === '/apps'],
+      ['https://zpas.org/login', 'Open', icon('<path d="M5 12h14"/><path d="M13 6l6 6-6 6"/>'), false, 'go'],
+      ['https://api.zpas.org/', 'API', icon('<path d="M8 8l-4 4 4 4"/><path d="M16 8l4 4-4 4"/>'), p === '/api'],
+      ['https://zpas.org/faq', 'FAQ', icon('<circle cx="12" cy="12" r="9"/><path d="M9.5 9.5a2.5 2.5 0 115 .5c0 1.5-2.5 2-2.5 3.5"/><path d="M12 17h.01"/>'), p === '/faq']
     ];
     var nav = document.createElement('nav');
     nav.className = 'm-tabbar';
@@ -84,7 +84,7 @@
   // On phones the account lives in the app, so "Open" launches it instead of the web login.
   var ua = navigator.userAgent || '';
   if (/Android.+Mobile|iPhone|iPod/i.test(ua)) {
-    var fallback = location.origin + '/apps/android.html';
+    var fallback = location.origin + '/apps/android';
     document.addEventListener('click', function (e) {
       var a = e.target.closest && e.target.closest('a[href]');
       if (!a || !/^https:\/\/web\.zpas\.org\/login/.test(a.href)) return;
@@ -93,7 +93,7 @@
       if (/Android/i.test(ua)) {
         location.href = 'intent://web.zpas.org/login#Intent;scheme=https;package=com.zpass;S.browser_fallback_url=' + encodeURIComponent(fallback) + ';end';
       } else {
-        location.href = '/apps.html';
+        location.href = 'https://zpas.org/apps';
       }
     }, true);
   }

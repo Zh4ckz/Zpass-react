@@ -2,16 +2,20 @@
   "firestore": {
     "rules": "firestore.rules"
   },
+  "functions": {
+    "source": "functions"
+  },
   "hosting": {
     "site": "passgram",
-    "public": "public",
+    "public": "out",
     "cleanUrls": true,
     "trailingSlash": false,
     "ignore": [
       "firebase.json",
       "**/.*",
+      "!.well-known",
+      "!.well-known/**",
       "**/node_modules/**",
-      "apps/**",
       "resources/js/vendor/qrcode-generator.js",
       "**/*.tmp*",
       "**/*.old",
@@ -27,19 +31,140 @@
       },
       {
         "source": "/login",
-        "destination": "/web.html"
+        "destination": "/subdomain/web/index.html"
       },
       {
         "source": "/login/**",
-        "destination": "/web.html"
+        "destination": "/subdomain/web/index.html"
       },
       {
         "source": "/web",
-        "destination": "/web.html"
+        "destination": "/subdomain/web/index.html"
       },
       {
         "source": "/web/**",
-        "destination": "/web.html"
+        "destination": "/subdomain/web/index.html"
+      },
+      {
+        "source": "/api",
+        "destination": "/subdomain/api/index.html"
+      },
+      {
+        "source": "/*",
+        "destination": "/profile.html"
+      }
+    ],
+    "headers": [
+      {
+        "source": "/web",
+        "headers": [
+          {
+            "key": "Cache-Control",
+            "value": "no-store"
+          }
+        ]
+      },
+      {
+        "source": "/web/**",
+        "headers": [
+          {
+            "key": "Cache-Control",
+            "value": "no-store"
+          }
+        ]
+      },
+      {
+        "source": "/checkout",
+        "headers": [
+          {
+            "key": "Cache-Control",
+            "value": "no-store"
+          }
+        ]
+      },
+      {
+        "source": "/checkout.html",
+        "headers": [
+          {
+            "key": "Cache-Control",
+            "value": "no-store"
+          }
+        ]
+      },
+      {
+        "source": "/subdomain/web/index.html",
+        "headers": [
+          {
+            "key": "Cache-Control",
+            "value": "no-store"
+          }
+        ]
+      },
+      {
+        "source": "/subdomain/pay/index.html",
+        "headers": [
+          {
+            "key": "Cache-Control",
+            "value": "no-store"
+          }
+        ]
+      },
+      {
+        "source": "/resources/js/checkout-session.mjs",
+        "headers": [
+          {
+            "key": "Cache-Control",
+            "value": "no-store"
+          }
+        ]
+      },
+      {
+        "source": "/resources/js/pay-checkout.mjs",
+        "headers": [
+          {
+            "key": "Cache-Control",
+            "value": "no-store"
+          }
+        ]
+      },
+      {
+        "source": "/profile.html",
+        "headers": [
+          {
+            "key": "Cache-Control",
+            "value": "no-store"
+          }
+        ]
+      },
+      {
+        "source": "/resources/js/profile-routing.js",
+        "headers": [
+          {
+            "key": "Cache-Control",
+            "value": "no-store"
+          }
+        ]
+      },
+      {
+        "source": "/premium",
+        "headers": [
+          {
+            "key": "Cache-Control",
+            "value": "no-store"
+          }
+        ]
+      }
+    ],
+    "redirects": [
+      {
+        "source": "/premium_sign_up",
+        "destination": "/premium",
+        "type": 301
+      },
+      {
+        "source": "/premium_sign_up.html",
+        "destination": "/premium",
+        "type": 301
       }
     ]
   }

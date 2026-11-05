@@ -1,0 +1,46 @@
+[2026-11-04T16:56:39.644Z] ----------------------------------------------------------------------
+[2026-11-04T16:56:39.647Z] Command:       C:\Program Files\nodejs\node.exe C:\Users\rezan\AppData\Roaming\npm\node_modules\firebase-tools\lib\bin\firebase.js deploy --only firestore:rules --dry-run --project passgram-org --config firebase.json
+[2026-11-04T16:56:39.648Z] CLI Version:   15.34.1
+[2026-11-04T16:56:39.648Z] Platform:      win32
+[2026-11-04T16:56:39.648Z] Node Version:  v24.22.1
+[2026-11-04T16:56:39.648Z] Detected Agent: codex_cli
+[2026-11-04T16:56:39.648Z] Time:          Wed Nov 04 2026 11:56:39 GMT-0500 (Eastern Standard Time)
+[2026-11-04T16:56:39.649Z] ----------------------------------------------------------------------
+
+[2026-11-04T16:56:41.328Z] > command requires scopes: ["email","openid","https://www.googleapis.com/auth/cloudplatformprojects.readonly","https://www.googleapis.com/auth/firebase","https://www.googleapis.com/auth/cloud-platform"]
+[2026-11-04T16:56:41.328Z] > authorizing via signed-in user (rezanhassoun@gmail.com)
+[2026-11-04T16:56:41.328Z] [iam] checking project passgram-org for permissions ["datastore.indexes.create","datastore.indexes.delete","datastore.indexes.list","datastore.indexes.update","firebase.projects.get"]
+[2026-11-04T16:56:41.341Z] Checked if tokens are valid: true, expires at: 1793813359691
+[2026-11-04T16:56:41.341Z] Checked if tokens are valid: true, expires at: 1793813359691
+[2026-11-04T16:56:41.342Z] >>> [apiv2][query] POST https://cloudresourcemanager.googleapis.com/v1/projects/passgram-org:testIamPermissions [none]
+[2026-11-04T16:56:41.342Z] >>> [apiv2][(partial)header] POST https://cloudresourcemanager.googleapis.com/v1/projects/passgram-org:testIamPermissions  x-goog-user-project=passgram-org
+[2026-11-04T16:56:41.342Z] >>> [apiv2][body] POST https://cloudresourcemanager.googleapis.com/v1/projects/passgram-org:testIamPermissions {"permissions":["datastore.indexes.create","datastore.indexes.delete","datastore.indexes.list","datastore.indexes.update","firebase.projects.get"]}
+[2026-11-04T16:56:41.666Z] <<< [apiv2][status] POST https://cloudresourcemanager.googleapis.com/v1/projects/passgram-org:testIamPermissions 200
+[2026-11-04T16:56:41.666Z] <<< [apiv2][body] POST https://cloudresourcemanager.googleapis.com/v1/projects/passgram-org:testIamPermissions {"permissions":["datastore.indexes.create","datastore.indexes.delete","datastore.indexes.list","datastore.indexes.update","firebase.projects.get"]}
+
+=== Deploying to 'passgram-org'...
+
+i  deploying firestore 
+i  firestore: ensuring required API firestore.googleapis.com is enabled... 
+i  firestore: ensuring required API firestore.googleapis.com is enabled... 
+[2026-11-04T16:56:41.669Z] Checked if tokens are valid: true, expires at: 1793813359691
+[2026-11-04T16:56:41.670Z] Checked if tokens are valid: true, expires at: 1793813359691
+[2026-11-04T16:56:41.670Z] >>> [apiv2][query] GET https://firestore.googleapis.com/v1/projects/passgram-org/databases/(default) [none]
+[2026-11-04T16:56:42.018Z] <<< [apiv2][status] GET https://firestore.googleapis.com/v1/projects/passgram-org/databases/(default) 200
+[2026-11-04T16:56:42.018Z] <<< [apiv2][body] GET https://firestore.googleapis.com/v1/projects/passgram-org/databases/(default) {"name":"projects/passgram-org/databases/(default)","uid":"2e23e83c-468e-45db-993f-d06809ae599f","createTime":"2026-11-01T04:37:05.376283Z","updateTime":"2026-11-01T04:37:05.376283Z","locationId":"nam5","type":"FIRESTORE_NATIVE","concurrencyMode":"PESSIMISTIC","versionRetentionPeriod":"3600s","earliestVersionTime":"2026-11-04T15:56:41.188255Z","appEngineIntegrationMode":"DISABLED","keyPrefix":"s","pointInTimeRecoveryEnablement":"POINT_IN_TIME_RECOVERY_DISABLED","deleteProtectionState":"DELETE_PROTECTION_DISABLED","databaseEdition":"STANDARD","freeTier":true,"realtimeUpdatesMode":"REALTIME_UPDATES_MODE_ENABLED","etag":"IO/E8prk7pcDMOXozfqA5pcD"}
+i  cloud.firestore: checking firestore.rules for compilation errors... 
+[2026-11-04T16:56:42.019Z] Checked if tokens are valid: true, expires at: 1793813359691
+[2026-11-04T16:56:42.019Z] Checked if tokens are valid: true, expires at: 1793813359691
+[2026-11-04T16:56:42.020Z] >>> [apiv2][query] POST https://firebaserules.googleapis.com/v1/projects/passgram-org:test [none]
+[2026-11-04T16:56:42.020Z] >>> [apiv2][body] POST https://firebaserules.googleapis.com/v1/projects/passgram-org:test [omitted]
+[2026-11-04T16:56:42.676Z] <<< [apiv2][status] POST https://firebaserules.googleapis.com/v1/projects/passgram-org:test 200
+[2026-11-04T16:56:42.676Z] <<< [apiv2][body] POST https://firebaserules.googleapis.com/v1/projects/passgram-org:test {"issues":[{"sourcePosition":{"fileName":"firestore.rules","line":5,"column":14,"currentOffset":131,"endOffset":137},"description":"Invalid variable name: request.","severity":"WARNING"},{"sourcePosition":{"fileName":"firestore.rules","line":5,"column":39,"currentOffset":156,"endOffset":162},"description":"Invalid variable name: request.","severity":"WARNING"},{"sourcePosition":{"fileName":"firestore.rules","line":5,"column":90,"currentOffset":207,"endOffset":213},"description":"Invalid variable name: request.","severity":"WARNING"},{"sourcePosition":{"fileName":"firestore.rules","line":5,"column":149,"currentOffset":266,"endOffset":272},"description":"Invalid variable name: request.","severity":"WARNING"}]}
+!  [W] 5:14 - Invalid variable name: request. 
+!  [W] 5:39 - Invalid variable name: request. 
+!  [W] 5:90 - Invalid variable name: request. 
+!  [W] 5:149 - Invalid variable name: request. 
++  cloud.firestore: rules file firestore.rules compiled successfully 
+
++  Dry run complete! 
+
+Project Console: https://console.firebase.google.com/project/passgram-org/overview

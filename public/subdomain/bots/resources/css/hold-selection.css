@@ -1,0 +1,5 @@
+.password-item.hold-selected{outline:2px solid #635bff;outline-offset:-2px;background:color-mix(in srgb,#635bff 14%,var(--panel,#f5f7fc))}
+.hold-dragging,.hold-dragging *{user-select:none!important;cursor:default!important}
+.hold-selection-bar{display:flex;align-items:center;justify-content:space-between;gap:12px;padding:8px 12px;margin-bottom:10px;border-radius:12px;background:#eef0ff;color:#172033}
+.hold-selection-bar[hidden]{display:none}
+.hold-selection-bar button{border:1px solid #dce3ee;border-radius:10px;padding:7px 12px;background:white;color:#172033;cursor:pointer}

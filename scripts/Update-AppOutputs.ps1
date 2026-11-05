@@ -106,7 +106,11 @@ try {
         Write-JsonAtomic (Join-Path $apiDirectory 'zpass-version.json') $versionMetadata
 
         $releasePath = Join-Path $apiDirectory 'app-releases.json'
-        $releaseMetadata = Get-Content -LiteralPath $releasePath -Raw | ConvertFrom-Json
+        $releaseMetadata = if (Test-Path -LiteralPath $releasePath) {
+            Get-Content -LiteralPath $releasePath -Raw | ConvertFrom-Json
+        } else {
+            [PSCustomObject]@{ platforms = [PSCustomObject]@{} }
+        }
         if (!$releaseMetadata.platforms) { Set-JsonProperty $releaseMetadata 'platforms' ([PSCustomObject]@{}) }
         if (!$releaseMetadata.platforms.android) { Set-JsonProperty $releaseMetadata.platforms 'android' ([PSCustomObject]@{}) }
         Set-JsonProperty $releaseMetadata.platforms.android 'version' $VersionName
@@ -117,12 +121,18 @@ try {
     }
 
     $releasePath = Join-Path $WebsiteRoot 'public\api\app-releases.json'
-    $releaseMetadata = Get-Content -LiteralPath $releasePath -Raw | ConvertFrom-Json
+    $releaseMetadata = if (Test-Path -LiteralPath $releasePath) {
+        Get-Content -LiteralPath $releasePath -Raw | ConvertFrom-Json
+    } else {
+        [PSCustomObject]@{ platforms = [PSCustomObject]@{} }
+    }
     $platformKey = $Platform.ToLowerInvariant()
     if ($Platform -eq 'Windows' -and [string]::IsNullOrWhiteSpace($VersionName)) {
         [xml]$projectXml = Get-Content -LiteralPath 'C:\Users\rezan\source\repos\ZPassManager\ZPassManager\ZPassManager.csproj' -Raw
         $VersionName = ($projectXml.Project.PropertyGroup | Where-Object { $_.Version } | Select-Object -First 1).Version
     }
+    if (!$releaseMetadata.platforms) { Set-JsonProperty $releaseMetadata 'platforms' ([PSCustomObject]@{}) }
+    if (!$releaseMetadata.platforms.$platformKey) { Set-JsonProperty $releaseMetadata.platforms $platformKey ([PSCustomObject]@{}) }
     $entry = $releaseMetadata.platforms.$platformKey
     Set-JsonProperty $entry 'version' $VersionName
     Set-JsonProperty $entry 'releasedAt' ([DateTime]::UtcNow.ToString("yyyy-MM-dd'T'HH:mm:ss'Z'"))

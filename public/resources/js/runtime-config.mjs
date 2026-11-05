@@ -11,7 +11,7 @@ export function validateConfig(value){
   const pages=(Array.isArray(value.pages)?value.pages:[]).slice(0,8).filter(page=>{
     try{const url=new URL(page.url);return page.enabled!==false && typeof page.title==='string' && page.title.length<=80 && url.protocol==='https:' && ['zpas.org','www.zpas.org','web.zpas.org','zpass.web.app'].includes(url.hostname) && !url.username && !url.password && !url.port;}catch{return false;}
   }).map(({title,url})=>({title,url}));
-  return {schemaVersion:1,currency:'USD',plans,providers,pages};
+  return {schemaVersion:1,billingModel:value.billingModel,currency:'USD',plans,providers,pages};
 }
 export function cachedConfig(){try{return validateConfig(JSON.parse(localStorage.getItem(key)).value);}catch{return null;}}
 let pending;

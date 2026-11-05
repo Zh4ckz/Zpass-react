@@ -29,3 +29,11 @@ artifacts/releases/
 
 # Quarantined third-party page snapshots
 artifacts/quarantined-third-party-page-copy-20261028/
+
+# Separate payment-only Hosting output
+out-pay/
+
+# Cloudflare payment Worker local state and secrets
+.wrangler/
+cloudflare/payment-worker/.wrangler/
+cloudflare/payment-worker/.dev.vars*

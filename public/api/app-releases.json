@@ -1,25 +1,11 @@
 {
     "platforms":  {
                       "android":  {
-                                      "published":  true,
-                                      "publisher":  "PassGram",
                                       "version":  "4.16",
-                                      "versionCode":  42,
-                                      "releasedAt":  "2026-11-01T04:33:58Z",
+                                      "releasedAt":  "2026-11-05T17:24:09Z",
                                       "downloadUrl":  "",
-                                      "sha256":  "4db8f27c4ef7c0bdbf891aa017f1cb70862c88bb9895b843209abe350f387b84",
-                                      "sizeBytes":  95305016,
-                                      "signingCertificate":  "CN=Zh4ckz, OU=Zh4ckz, O=Zh4ckz, L=Pennsylvania, ST=Pennsylvania, C=US",
-                                      "signingCertificateSha256":  "3f7673eb7bd222e77dabab5eb0708b490dacc7eada5f8e254032dd8473359f47",
-                                      "availabilityNote":  "This signed release is verified, but direct APK downloads are temporarily unavailable on this Firebase Hosting plan.",
-                                      "downloadAvailable":  false
-                                  },
-                      "windows":  {
-                                      "version":  "4.11.0",
-                                      "releasedAt":  "2026-11-01T16:34:49Z",
-                                      "downloadUrl":  "",
-                                      "sha256":  "2b7343a1b86947f2c2355bd14cbbd652dc0f90b133ae25448861704d76c831ec",
-                                      "sizeBytes":  144442599
+                                      "sha256":  "bf9cfefffefbddde32d5399408c88ece4378d632c58aad9f049f0d4f3f282451",
+                                      "sizeBytes":  95571807
                                   }
                   }
 }

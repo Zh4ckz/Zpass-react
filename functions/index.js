@@ -11,6 +11,7 @@ if (!admin.apps.length) admin.initializeApp();
 const db = admin.firestore();
 
 Object.assign(exports, require('./web-qr-login'));
+Object.assign(exports, require('./public-profile'));
 
 // 2. Şimdi değişkenleri güvenle okuyabiliriz:
 const STRIPE_SECRET_KEY = process.env.STRIPE_SECRET_KEY || "";

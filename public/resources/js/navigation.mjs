@@ -1,11 +1,14 @@
 export function checkoutPath(plan='PLUS',billing='YEARLY') {
   if(!['PLUS','PRO'].includes(plan) || !['MONTHLY','YEARLY'].includes(billing))throw Error('Invalid plan');
-  return `/checkout.html?product=zpass&plan=${plan}&billing=${billing}`;
+  return `https://zpas.org/checkout.html?plan=${plan}&billing=${billing}`;
 }
 export function safeCheckout(value,origin) {
   try {
     const url=new URL(value,origin);
-    if(url.origin!==origin || !['/checkout','/checkout.html'].includes(url.pathname))return null;
+    const localCheckout = url.origin === origin && ['/checkout','/checkout.html'].includes(url.pathname);
+    const accountCheckout = url.origin === 'https://zpas.org' && url.pathname === '/checkout.html';
+    const paymentCheckout = url.origin === 'https://pay.zpas.org' && url.pathname === '/';
+    if(!localCheckout && !paymentCheckout && !accountCheckout)return null;
     return checkoutPath(url.searchParams.get('plan')?.toUpperCase() || 'PLUS',url.searchParams.get('billing')?.toUpperCase() || 'MONTHLY');
   }catch{return null;}
 }

@@ -1,6 +1,7 @@
 <!doctype html>
 <html lang="en">
 <head>
+  <script src="/resources/js/pay-host.js?v=2"></script>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width,initial-scale=1">
   <meta name="theme-color" content="#010101">
@@ -43,13 +44,15 @@
   <link rel="stylesheet" href="/resources/css/site-responsive.css?v=102"><link rel="stylesheet" href="/resources/css/mobile-nav.css?v=102">
 <link rel="stylesheet" href="/resources/css/footer-modern.css?v=106"><link rel="stylesheet" href="/resources/css/pages-modern.css?v=101"><script src="/resources/js/zpass-theme.js?v=3"></script><link rel="stylesheet" href="/resources/css/zpass-app-theme.css?v=109"><link rel="stylesheet" href="/resources/css/performance.css">
 <link rel="stylesheet" href="/resources/css/zpass-design-system.css">
-<link rel="stylesheet" href="/resources/css/unified-2026.css?v=414"></head>
+<link rel="stylesheet" href="/resources/css/unified-2026.css?v=414">  <link rel="stylesheet" href="/resources/css/glass-header.css?v=2">
+  <script src="/resources/js/glass-header.js?v=4" defer></script>
+</head>
 <body class="pm">
-  <header class="top"><a href="/"><img src="resources/images/zpass.png" alt="">PassGram</a></header>
+  <header class="top"><a href="https://zpas.org/"><img src="resources/images/zpass.png" alt="">PassGram</a></header>
   <main>
     <div id="signedOut" class="empty" style="display:none">
       <p>Sign in to manage your subscription.</p>
-      <a href="/web">Go to sign in →</a>
+      <a href="https://web.zpas.org/">Go to sign in →</a>
     </div>
     <div id="content" class="skeleton" style="display:none">
       <h1>Subscription</h1>
@@ -92,10 +95,10 @@
     function actionButtons(plan, isActive, data) {
       const actions = [];
       if (!isActive || plan === "FREE") {
-        actions.push(`<a class="btn btn-primary" href="/checkout?plan=PLUS">Upgrade to Plus</a>`);
-        actions.push(`<a class="btn btn-ghost" href="/checkout?plan=PRO">Upgrade to Pro</a>`);
+        actions.push(`<a class="btn btn-primary" href="https://pay.zpas.org/?plan=PLUS">Upgrade to Plus</a>`);
+        actions.push(`<a class="btn btn-ghost" href="https://pay.zpas.org/?plan=PRO">Upgrade to Pro</a>`);
       } else if (plan === "PRO") {
-        actions.push(`<a class="btn btn-ghost" href="/checkout?plan=PRO">Switch to Pro</a>`);
+        actions.push(`<a class="btn btn-ghost" href="https://pay.zpas.org/?plan=PRO">Switch to Pro</a>`);
       }
       if (data.stripeCustomerId) {
         actions.push(`<button class="btn btn-ghost" type="button" id="manageBilling">Manage billing &amp; invoices</button>`);
@@ -168,5 +171,5 @@
       $("content").classList.remove("skeleton");
     });
   </script>
-<script type="module" src="/resources/js/mobile-nav.mjs?v=4"></script><script src="/resources/js/site-footer.js"></script><script src="/resources/js/hide-links.js?v=1"></script><script type="module" src="/resources/js/wallpapers.mjs?v=414"></script></body>
+<script type="module" src="/resources/js/mobile-nav.mjs?v=6"></script><script src="/resources/js/site-footer.js"></script><script src="/resources/js/hide-links.js?v=1"></script><script type="module" src="/resources/js/wallpapers.mjs?v=414"></script></body>
 </html>

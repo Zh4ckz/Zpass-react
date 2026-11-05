@@ -288,7 +288,7 @@ class SeriesPage {
             card.dataset.seriesId = series.series_id;
             card.dataset.sourceId = series.sourceId;
 
-            const poster = series.cover || '/resources/img/placeholder.png';
+            const poster = series.cover || '/resources/assets/app-logo/zpass.png';
             const year = series.year || series.releaseDate?.substring(0, 4) || '';
             const rating = series.rating ? `${Icons.star} ${series.rating}` : '';
 
@@ -297,7 +297,7 @@ class SeriesPage {
             card.innerHTML = `
                 <div class="series-poster">
                     <img src="${poster}" alt="${series.name}" 
-                         onerror="this.onerror=null;this.src='/resources/img/placeholder.png'" loading="lazy">
+                         onerror="this.onerror=null;this.src='/resources/assets/app-logo/zpass.png'" loading="lazy">
                     <div class="series-play-overlay">
                         <span class="play-icon">${Icons.play}</span>
                     </div>
@@ -350,7 +350,7 @@ class SeriesPage {
         this.detailsPanel.classList.remove('hidden');
 
         // Set header info
-        document.getElementById('series-poster').src = series.cover || '/resources/img/placeholder.png';
+        document.getElementById('series-poster').src = series.cover || '/resources/assets/app-logo/zpass.png';
         document.getElementById('series-title').textContent = series.name;
         document.getElementById('series-plot').textContent = series.plot || '';
 

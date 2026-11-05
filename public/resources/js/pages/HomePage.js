@@ -251,14 +251,14 @@ class HomePage {
     }
 
     createChannelTile(channel) {
-        const logo = channel.tvgLogo || '/resources/img/placeholder.png';
+        const logo = channel.tvgLogo || '/resources/assets/app-logo/zpass.png';
         const logoUrl = logo.startsWith('http') ? `/api/proxy/image?url=${encodeURIComponent(logo)}` : logo;
         const name = channel.name || 'Unknown';
 
         return `
             <div class="channel-tile" data-channel-id="${channel.id}" data-source-id="${channel.sourceId}">
                 <div class="tile-logo">
-                    <img src="${logoUrl}" alt="${name}" loading="lazy" onerror="this.onerror=null;this.src='/resources/img/placeholder.png'">
+                    <img src="${logoUrl}" alt="${name}" loading="lazy" onerror="this.onerror=null;this.src='/resources/assets/app-logo/zpass.png'">
                 </div>
                 <div class="tile-name" title="${name}">${name}</div>
             </div>
@@ -411,13 +411,13 @@ class HomePage {
         const percent = Math.min(100, Math.round((progress / duration) * 100));
 
         // Proxy the poster if it's an external URL
-        const poster = data.poster || '/resources/img/poster-placeholder.jpg';
+        const poster = data.poster || '/resources/images/vault-illustration.svg';
         const posterUrl = poster.startsWith('http') ? `/api/proxy/image?url=${encodeURIComponent(poster)}` : poster;
 
         return `
             <div class="dashboard-card" data-id="${item_id}" data-type="${type}">
                 <div class="card-image">
-                    <img src="${posterUrl}" alt="${data.title || item.name}" loading="lazy" onerror="this.onerror=null;this.src='/resources/img/poster-placeholder.jpg'">
+                    <img src="${posterUrl}" alt="${data.title || item.name}" loading="lazy" onerror="this.onerror=null;this.src='/resources/images/vault-illustration.svg'">
                     <div class="progress-bar-container">
                         <div class="progress-bar" style="width: ${percent}%"></div>
                     </div>
@@ -436,13 +436,13 @@ class HomePage {
     createRecentCard(item) {
         const { data, item_id } = item;
         const type = item.type || item.item_type;
-        const poster = item.stream_icon || data.poster || '/resources/img/poster-placeholder.jpg';
+        const poster = item.stream_icon || data.poster || '/resources/images/vault-illustration.svg';
         const posterUrl = poster.startsWith('http') ? `/api/proxy/image?url=${encodeURIComponent(poster)}` : poster;
 
         return `
             <div class="dashboard-card" data-id="${item_id}" data-type="${type}">
                 <div class="card-image">
-                    <img src="${posterUrl}" alt="${item.name}" loading="lazy" onerror="this.onerror=null;this.src='/resources/img/poster-placeholder.jpg'">
+                    <img src="${posterUrl}" alt="${item.name}" loading="lazy" onerror="this.onerror=null;this.src='/resources/images/vault-illustration.svg'">
                     <div class="play-icon-overlay">
                         <svg viewBox="0 0 24 24" fill="currentColor"><path d="M8 5v14l11-7z"/></svg>
                     </div>

@@ -1,0 +1,5 @@
+body.pm{background:radial-gradient(900px 500px at 15% -5%,rgba(157,171,190,.22),transparent 60%),radial-gradient(800px 500px at 100% 10%,rgba(131,149,173,.14),transparent 60%),#080A0C!important;min-height:100vh;display:flex;flex-direction:column}
+body.pm>main,body.pm>.wrap:not(footer):not(header){flex:1 0 auto}
+body.pm>header{background:rgba(15,18,23,.55)!important;backdrop-filter:blur(22px) saturate(160%);-webkit-backdrop-filter:blur(22px) saturate(160%);border-bottom:1px solid rgba(255,255,255,.08)!important}
+body.pm .card,body.pm section.card,body.pm .panel,body.pm .plan,body.pm .box{background:linear-gradient(160deg,rgba(255,255,255,.07),rgba(255,255,255,.025))!important;border:1px solid rgba(255,255,255,.1)!important;border-radius:22px!important;backdrop-filter:blur(18px);-webkit-backdrop-filter:blur(18px);box-shadow:0 18px 50px rgba(0,0,0,.35)}
+body.pm footer.landing-footer{margin-top:60px!important;flex-shrink:0}

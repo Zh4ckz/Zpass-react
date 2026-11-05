@@ -1,0 +1,12 @@
+.side-footer{margin:12px 4px 0;padding:12px;border:1px solid #66757F;border-radius:18px;background:linear-gradient(145deg,#292F33,#292F33);box-shadow:0 12px 32px rgba(1, 1, 1, 0.33)}
+.side-footer .profile-app-logo{width:52px;height:52px;border-radius:50%;border:2px solid #66757F;background:#292F33;object-fit:cover;flex:0 0 52px}
+.side-footer>button{width:38px;height:38px;border-radius:50%;display:grid;place-items:center;background:#66757F;color:#FEFEFE;font-size:18px;flex:0 0 38px}
+.vault-sort{height:40px;min-width:110px;border:1px solid #66757F;border-radius:11px;background:#292F33;color:#66757F;padding:0 11px;font:inherit;outline:none}
+.category-row{display:grid;grid-template-columns:minmax(0,1fr) 34px;align-items:center}.category-button{display:flex!important;align-items:center;gap:8px}
+.category-button .category-name{flex:1;text-align:left;overflow:hidden;text-overflow:ellipsis}
+.category-delete{border:0;background:transparent;color:#FEFEFE;font-size:16px;padding:3px 7px;cursor:pointer;border-radius:7px}
+.category-delete:hover{background:#292F3322}
+.support-socials{display:grid;grid-template-columns:repeat(auto-fit,minmax(190px,1fr));gap:10px;margin:14px 0 4px}
+.support-socials a{display:flex;justify-content:space-between;gap:12px;padding:14px 15px;border:1px solid #66757F;border-radius:13px;background:#292F33;color:#66757F;text-decoration:none;transition:.18s ease}
+.support-socials a:hover{transform:translateY(-2px);border-color:#66757F;background:#292F33}.support-socials b{color:#66757F}
+@media(max-width:850px){.vault-sort{min-width:88px;width:88px}.side-footer{display:none}}

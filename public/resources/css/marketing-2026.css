@@ -232,32 +232,32 @@ h1, h2, h3 { letter-spacing: -.035em; }
 .icon-chevron {
   width: 14px;
   height: 14px;
-  -webkit-mask-image: url("/resources/assets/icons/ui/svg/chevron-down-outline-18.svg");
-  mask-image: url("/resources/assets/icons/ui/svg/chevron-down-outline-18.svg");
+  -webkit-mask-image: url("/resources/assets/ui/svg/chevron-down-outline-18.svg");
+  mask-image: url("/resources/assets/ui/svg/chevron-down-outline-18.svg");
 }
 .icon-shield-check {
-  -webkit-mask-image: url("/resources/assets/icons/ui/svg/shield-check-outline-18.svg");
-  mask-image: url("/resources/assets/icons/ui/svg/shield-check-outline-18.svg");
+  -webkit-mask-image: url("/resources/assets/ui/svg/shield-check-outline-18.svg");
+  mask-image: url("/resources/assets/ui/svg/shield-check-outline-18.svg");
 }
 .icon-lock {
-  -webkit-mask-image: url("/resources/assets/icons/ui/svg/lock-outline-18.svg");
-  mask-image: url("/resources/assets/icons/ui/svg/lock-outline-18.svg");
+  -webkit-mask-image: url("/resources/assets/ui/svg/lock-outline-18.svg");
+  mask-image: url("/resources/assets/ui/svg/lock-outline-18.svg");
 }
 .icon-refresh {
-  -webkit-mask-image: url("/resources/assets/icons/ui/svg/refresh-2-outline-18.svg");
-  mask-image: url("/resources/assets/icons/ui/svg/refresh-2-outline-18.svg");
+  -webkit-mask-image: url("/resources/assets/ui/svg/refresh-2-outline-18.svg");
+  mask-image: url("/resources/assets/ui/svg/refresh-2-outline-18.svg");
 }
 .icon-key {
-  -webkit-mask-image: url("/resources/assets/icons/ui/svg/key.svg");
-  mask-image: url("/resources/assets/icons/ui/svg/key.svg");
+  -webkit-mask-image: url("/resources/assets/ui/svg/key.svg");
+  mask-image: url("/resources/assets/ui/svg/key.svg");
 }
 .icon-fingerprint {
-  -webkit-mask-image: url("/resources/assets/icons/ui/svg/fingerprint-outline-18.svg");
-  mask-image: url("/resources/assets/icons/ui/svg/fingerprint-outline-18.svg");
+  -webkit-mask-image: url("/resources/assets/ui/svg/fingerprint-outline-18.svg");
+  mask-image: url("/resources/assets/ui/svg/fingerprint-outline-18.svg");
 }
 .icon-cloud {
-  -webkit-mask-image: url("/resources/assets/icons/ui/svg/cloud-fill-18.svg");
-  mask-image: url("/resources/assets/icons/ui/svg/cloud-fill-18.svg");
+  -webkit-mask-image: url("/resources/assets/ui/svg/cloud-fill-18.svg");
+  mask-image: url("/resources/assets/ui/svg/cloud-fill-18.svg");
 }
 .window-avatar {
   width: 24px; height: 24px; border-radius: 50%;
@@ -294,16 +294,16 @@ h1, h2, h3 { letter-spacing: -.035em; }
   background-color: var(--brass);
 }
 .app-google {
-  -webkit-mask: center / 24px no-repeat url("/resources/assets/icons/brands/google.png");
-  mask: center / 24px no-repeat url("/resources/assets/icons/brands/google.png");
+  -webkit-mask: center / 24px no-repeat url("/resources/images/ui/social-media/google.png");
+  mask: center / 24px no-repeat url("/resources/images/ui/social-media/google.png");
 }
 .app-github {
-  -webkit-mask: center / 24px no-repeat url("/resources/assets/icons/brands/github.png");
-  mask: center / 24px no-repeat url("/resources/assets/icons/brands/github.png");
+  -webkit-mask: center / 24px no-repeat url("/resources/images/ui/social-media/github.png");
+  mask: center / 24px no-repeat url("/resources/images/ui/social-media/github.png");
 }
 .app-mail {
-  -webkit-mask: center / 24px no-repeat url("/resources/assets/icons/ui/svg/mail-outline.svg");
-  mask: center / 24px no-repeat url("/resources/assets/icons/ui/svg/mail-outline.svg");
+  -webkit-mask: center / 24px no-repeat url("/resources/assets/ui/svg/mail-outline.svg");
+  mask: center / 24px no-repeat url("/resources/assets/ui/svg/mail-outline.svg");
 }
 .secure-note { border-bottom: 0; margin-top: 4px; background: var(--brass-dim); border-radius: 10px; padding: 12px; }
 .secure-note > .icon-mask { color: var(--brass); }
@@ -489,8 +489,8 @@ h1, h2, h3 { letter-spacing: -.035em; }
   width: 16px;
   height: 16px;
   background-color: var(--brass);
-  -webkit-mask: center / contain no-repeat url("/resources/assets/icons/ui/svg/shield-check-outline-18.svg");
-  mask: center / contain no-repeat url("/resources/assets/icons/ui/svg/shield-check-outline-18.svg");
+  -webkit-mask: center / contain no-repeat url("/resources/assets/ui/svg/shield-check-outline-18.svg");
+  mask: center / contain no-repeat url("/resources/assets/ui/svg/shield-check-outline-18.svg");
 }
 .glass-price-card .button { width: 100%; }
 .stripe-note { color: var(--mute); font-size: 12.5px; }

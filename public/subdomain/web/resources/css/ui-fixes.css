@@ -1,0 +1,35 @@
+.brand-logo,
+.auth-app-logo,
+.side-app-logo,
+.profile-app-logo {object-fit: contain !important;border-radius: 0 !important;box-shadow: none !important;background: transparent !important;
+}
+
+.empty-shield {background: linear-gradient(145deg, #66757F, #292F33) !important;font-size: 25px !important;
+}
+
+.quick-create {letter-spacing: 0 !important;
+}
+
+.create-button:disabled {cursor: not-allowed;opacity: .42;filter: saturate(.55);
+}
+
+.tools-toggle {width: 100%;border: 0;background: transparent;cursor: pointer;
+}
+
+.tools-chevron {font-size: 16px;transition: transform 220ms ease;
+}
+
+.tools-toggle[aria-expanded="true"] .tools-chevron {transform: rotate(180deg);
+}
+
+.tools-nav {max-height: 0;opacity: 0;overflow: hidden;transform: translateY(-8px);pointer-events: none;transition: max-height 300ms ease, opacity 190ms ease, transform 260ms ease;
+}
+
+.tools-toggle[aria-expanded="true"] + .tools-nav {max-height: 260px;opacity: 1;transform: translateY(0);pointer-events: auto;
+}
+
+.nav-svg {width: 18px;height: 18px;display: inline-grid;place-items: center;flex: 0 0 18px;
+}
+
+.nav-svg svg {width: 18px;height: 18px;fill: none;stroke: currentColor;stroke-width: 1.8;stroke-linecap: round;stroke-linejoin: round;
+}

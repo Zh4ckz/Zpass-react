@@ -23,17 +23,17 @@ const I = {
 // always does a normal browser navigation, so it works identically from any page on the
 // site - not just a scroll trick confined to index.html.
 const outTabs = [
-  { id: "home", label: "Home", icon: I.home, href: "/" },
-  { id: "pricing", label: "Pricing", icon: I.tag, href: "/#pricing" },
-  { id: "apps", label: "Apps", icon: I.grid, href: "/apps.html" },
-  { id: "info", label: "Info", icon: I.info, href: "/info.html" }
+  { id: "home", label: "Home", icon: I.home, href: "https://zpas.org/" },
+  { id: "pricing", label: "Pricing", icon: I.tag, href: "https://zpas.org/#pricing" },
+  { id: "apps", label: "Apps", icon: I.grid, href: "https://zpas.org/apps" },
+  { id: "info", label: "Info", icon: I.info, href: "https://zpas.org/info" }
 ];
 const inSite = [
-  { id: "home", label: "Home", icon: I.home, href: "/" },
-  { id: "vault", label: "Vault", icon: I.vault, href: "/web" },
-  { id: "plans", label: "Plans", icon: I.bag, href: "/subscription.html" },
-  { id: "apps", label: "Apps", icon: I.grid, href: "/apps.html" },
-  { id: "profile", label: "Profile", icon: I.user, href: "/web" }
+  { id: "home", label: "Home", icon: I.home, href: "https://zpas.org/" },
+  { id: "vault", label: "Vault", icon: I.vault, href: "https://web.zpas.org/" },
+  { id: "plans", label: "Plans", icon: I.bag, href: "https://zpas.org/subscription" },
+  { id: "apps", label: "Apps", icon: I.grid, href: "https://zpas.org/apps" },
+  { id: "profile", label: "Profile", icon: I.user, href: "https://web.zpas.org/" }
 ];
 const inDash = [
   { id: "overview", label: "Vault", icon: I.vault, panel: "overview" },

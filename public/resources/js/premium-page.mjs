@@ -1,4 +1,4 @@
-import { paymentPlans } from "/resources/js/payment-plans.mjs";
+import { paymentPlans } from "/resources/js/payment-plans.mjs?v=2";
 import { getApps, initializeApp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
 import { getAuth, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js";
 import { firebaseConfig } from "/resources/js/firebase-config.mjs";
@@ -56,18 +56,18 @@ function renderPrices() {
   const savings = ["PLUS", "PRO"].map(tier => {
     const monthly = paymentPlans[tier].monthly.price;
     const yearly = paymentPlans[tier].yearly.price;
-    return monthly > 0 ? Math.max(0, Math.round((1 - yearly / (monthly * 12)) * 100)) : 0;
+    return monthly > 0 ? Math.max(0, Math.round((1 - yearly / monthly) * 100)) : 0;
   });
   const bestSavings = Math.max(...savings);
   document.getElementById("savePill").textContent = bestSavings ? `SAVE UP TO ${bestSavings}%` : "YEARLY";
   for (const [card, tier] of Object.entries(cardTier)) {
     const price = paymentPlans[tier][key].price;
     rollText(document.querySelector(`[data-price="${card}"]`), formatter.format(price), direction);
-    document.querySelector(`[data-price-period="${card}"]`).textContent = period === "YEARLY" ? "/ year" : "/ month";
+    document.querySelector(`[data-price-period="${card}"]`).textContent = "/ month";
     document.querySelector(`[data-billed="${card}"]`).textContent = period === "YEARLY"
-      ? `Billed yearly · ${formatter.format(price)} total`
+      ? `Charged monthly for 12 months · ${formatter.format(price * 12)} total`
       : "Billed monthly";
-    document.querySelector(`[data-checkout="${card}"]`).href = `/checkout?plan=${tier}&billing=${period}`;
+    document.querySelector(`[data-checkout="${card}"]`).href = `https://zpas.org/checkout.html?plan=${tier}&billing=${period}`;
   }
 }
 
