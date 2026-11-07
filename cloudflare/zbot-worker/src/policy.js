@@ -1,0 +1,81 @@
+// Validation rules shared by every route.
+export class HttpError extends Error {
+  constructor(status, message) { super(message); this.status = status; }
+}
+export const fail = (status, message) => { throw new HttpError(status, message); };
+
+// Same rule as firestore.rules isAdmin(): an `admin` custom claim, or the verified owner address.
+const OWNER_EMAILS = new Set(['zh4ckz@proton.me']);
+export function isAdminIdentity(identity) {
+  if (!identity) return false;
+  if (identity.admin === true) return true;
+  return identity.email_verified === true && OWNER_EMAILS.has(String(identity.email || '').toLowerCase());
+}
+
+export function username(value) {
+  const name = String(value || '').toLowerCase().replace(/^@/, '');
+  if (!/^[a-z][a-z0-9_]{3,31}$/.test(name) || name === 'zbot') fail(400, 'Invalid bot username');
+  return name;
+}
+
+const hex = (bytes) => [...bytes].map((b) => b.toString(16).padStart(2, '0')).join('');
+const b64url = (bytes) => btoa(String.fromCharCode(...bytes)).replace(/=/g, '').replace(/\+/g, '-').replace(/\//g, '_');
+const sha256 = async (text) => hex(new Uint8Array(await crypto.subtle.digest('SHA-256', new TextEncoder().encode(text))));
+export const randomId = () => hex(crypto.getRandomValues(new Uint8Array(12)));
+
+// A bot token is "<24 hex id>:<43 random chars>". Only its SHA-256 is stored.
+export async function tokenPair(id = randomId()) {
+  if (!/^[a-f0-9]{24}$/.test(id)) throw Error('Invalid bot ID');
+  const token = `${id}:${b64url(crypto.getRandomValues(new Uint8Array(32)))}`;
+  return { id, token, hash: await sha256(token) };
+}
+export async function tokenMatches(token, hash) {
+  if (!/^[a-f0-9]{24}:[A-Za-z0-9_-]{43}$/.test(token) || !/^[a-f0-9]{64}$/.test(hash || '')) return false;
+  const actual = await sha256(token);
+  let diff = 0;
+  for (let i = 0; i < 64; i++) diff |= actual.charCodeAt(i) ^ hash.charCodeAt(i);
+  return diff === 0;
+}
+
+// Commands: [{ command, description }], at most 100. Also accepts "cmd - description" lines.
+const COMMAND = /^[a-z][a-z0-9_]{0,31}$/;
+export function commands(value) {
+  let list = value;
+  if (typeof value === 'string' && value.trim().startsWith('[')) { try { list = JSON.parse(value); } catch { fail(400, 'commands must be a JSON array'); } }
+  else if (typeof value === 'string') {
+    list = value.split('\n').map((line) => line.trim()).filter(Boolean).map((line) => {
+      const match = /^\/?(\S+)\s+-\s+(.+)$/.exec(line);
+      if (!match) fail(400, 'Use command - description, one per line');
+      return { command: match[1], description: match[2] };
+    });
+  }
+  if (!Array.isArray(list) || list.length > 100) fail(400, 'Up to 100 commands are allowed');
+  const seen = new Set();
+  return list.map((item) => {
+    const command = String(item?.command || '').trim().replace(/^\//, '').toLowerCase();
+    const description = String(item?.description || '').trim();
+    if (!COMMAND.test(command)) fail(400, `Invalid command: ${command || '(empty)'}`);
+    if (!description || description.length > 100) fail(400, `Description for /${command} must be 1–100 characters`);
+    if (seen.has(command)) fail(400, `Duplicate command: /${command}`);
+    seen.add(command);
+    return { command, description };
+  });
+}
+
+export function webAppUrl(value) {
+  const text = String(value || '').trim();
+  let url;
+  try { url = new URL(text); } catch { fail(400, 'Mini app URL must be a valid https address'); }
+  if (url.protocol !== 'https:' || url.username || url.password || text.length > 512) fail(400, 'Mini app URL must be a valid https address');
+  return url.toString();
+}
+
+export function menuButton(value) {
+  if (typeof value === 'string') { try { value = JSON.parse(value); } catch { fail(400, 'menu_button must be JSON'); } }
+  const type = String(value?.type || 'commands');
+  if (type === 'default' || type === 'commands') return { type };
+  if (type !== 'web_app') fail(400, 'Menu type must be commands, web_app or default');
+  const text = String(value?.text || '').trim();
+  if (!text || text.length > 32) fail(400, 'Menu button text must be 1–32 characters');
+  return { type, text, url: webAppUrl(value?.url ?? value?.web_app?.url) };
+}

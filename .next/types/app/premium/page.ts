@@ -1,4 +1,4 @@
-// File: c:\Users\rezan\Desktop\Web-Sites\Zpass\app\premium\page.js
+// File: C:\Users\rezan\Desktop\Web-Sites\Zpass\app\premium\page.js
 import * as entry from '../../../../app/premium/page.js'
 import type { ResolvingMetadata, ResolvingViewport } from 'next/dist/lib/metadata/types/metadata-interface.js'
 

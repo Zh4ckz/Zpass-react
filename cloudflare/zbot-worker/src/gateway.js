@@ -1,0 +1,265 @@
+// Z Pass bot gateway.
+//   /manage/<method>   app users (Firebase ID token) manage their own bots
+//   /admin/<method>    administrators manage every bot (bots / core / api.zpas.org)
+//   /<method>, /api/<method>, /bot<token>/<method>   Bot API for bot programs ("Authorization: Bearer <token>")
+// Bot conversations are server-readable by design; private end-to-end encrypted chats are not touched.
+import * as policy from './policy.js';
+
+const { fail, HttpError } = policy;
+const ADMIN_ORIGINS = new Set(['https://bots.zpas.org', 'https://core.zpas.org', 'https://api.zpas.org']);
+const BOT_ID = /^[a-f0-9]{24}$/;
+const TEXT_LIMITS = { name: 64, description: 512, about: 120 };
+const MAX_BODY = 16384;
+
+const botId = (value) => { const id = String(value || ''); if (!BOT_ID.test(id)) fail(400, 'Invalid bot'); return id; };
+const millis = (value) => (value instanceof Date ? value.getTime() : typeof value === 'number' ? value : null);
+const commandList = (bot) => (Array.isArray(bot.commands) ? bot.commands : bot.commands ? policy.commands(bot.commands) : []);
+const publicView = (id, bot) => ({
+  id, username: bot.username, name: bot.name, description: bot.description || '', about: bot.about || '',
+  commands: commandList(bot), menuButton: bot.menuButton || { type: 'commands' }, disabled: !!bot.disabled,
+});
+const ownerView = (id, bot) => ({ ...publicView(id, bot), owner: bot.owner, createdAt: millis(bot.createdAt) });
+
+// Best-effort limit per Worker instance: 120 requests per minute per key.
+const hits = new Map();
+function rateLimit(key, limit = 120) {
+  const minute = Math.floor(Date.now() / 60000), row = hits.get(key);
+  const count = row?.minute === minute ? row.count + 1 : 1;
+  hits.set(key, { minute, count });
+  if (hits.size > 5000) for (const [k, v] of hits) if (v.minute !== minute) hits.delete(k);
+  if (count > limit) fail(429, 'Too many requests; retry in one minute');
+}
+
+export function createGateway({ db, verifyUser, verifyAppCheck, requireAppCheck = false }) {
+  async function editable(tx, id, caller) {
+    const path = `zp_bots/${id}`, bot = await tx.get(path);
+    if (!bot) fail(404, 'Bot not found');
+    if (!caller.admin && bot.owner !== caller.uid) fail(403, 'Not your bot');
+    if (!caller.admin && bot.disabled) fail(403, 'This bot was disabled by an administrator');
+    return { path, bot };
+  }
+
+  async function setCommands(caller, body) {
+    const id = botId(body.id), list = policy.commands(body.commands ?? []);
+    await db.transaction(async (tx) => { const { path } = await editable(tx, id, caller); tx.update(path, { commands: list }); });
+    return { commands: list };
+  }
+
+  async function setMenu(caller, body) {
+    const id = botId(body.id), menu = policy.menuButton(body.menuButton || body);
+    await db.transaction(async (tx) => { const { path } = await editable(tx, id, caller); tx.update(path, { menuButton: menu }); });
+    return { menuButton: menu };
+  }
+
+  async function editBot(caller, body) {
+    const id = botId(body.id), field = String(body.field || '');
+    if (field === 'commands') return setCommands(caller, { id, commands: body.value });
+    const value = String(body.value || '').trim();
+    if (!Object.hasOwn(TEXT_LIMITS, field) || !value || value.length > TEXT_LIMITS[field]) fail(400, 'Invalid bot setting');
+    await db.transaction(async (tx) => {
+      const { path, bot } = await editable(tx, id, caller);
+      tx.update(path, { [field]: value });
+      if (field === 'name') tx.set(`chat_profiles/bot_${id}`, { username: bot.username, displayName: value, isBot: true, botId: id, verified: false });
+    });
+    return { updated: true };
+  }
+
+  async function deleteBot(caller, body) {
+    const id = botId(body.id);
+    let bot;
+    await db.transaction(async (tx) => {
+      const found = await editable(tx, id, caller);
+      bot = found.bot;
+      const quota = await tx.get(`zp_bot_owners/${bot.owner}`);
+      const name = await tx.get(`chat_usernames/${bot.username}`);
+      tx.delete(`chat_profiles/bot_${id}`);
+      if (name?.botId === id) tx.delete(`chat_usernames/${bot.username}`);
+      tx.set(`zp_bot_owners/${bot.owner}`, { count: Math.max(0, (quota?.count || 1) - 1) });
+    });
+    await db.deleteTree(`zp_bots/${id}`);
+    for (const thread of await db.query('zp_bot_threads', { where: [['botId', '==', id]], limit: 100 })) await db.deleteTree(thread.path);
+    return { deleted: true, username: bot.username };
+  }
+
+  async function identity(request) {
+    return verifyUser((request.headers.get('authorization') || '').replace(/^Bearer /, ''));
+  }
+
+  async function handleAdmin(request, method, body) {
+    const user = await identity(request);
+    if (!policy.isAdminIdentity(user)) fail(403, 'You are not authorized');
+    rateLimit(`admin_${user.uid}`, 300);
+    const caller = { uid: user.uid, admin: true };
+    switch (method) {
+      case 'whoami': return { uid: user.uid, email: user.email, admin: true };
+      case 'stats': {
+        const [bots, disabled, chats, profiles] = await Promise.all([
+          db.count('zp_bots'), db.count('zp_bots', [['disabled', '==', true]]), db.count('zp_bot_threads'), db.count('chat_profiles'),
+        ]);
+        return { bots, disabledBots: disabled, botChats: chats, profiles };
+      }
+      case 'bots': {
+        const query = String(body.query || '').trim().toLowerCase().replace(/^@/, '');
+        if (!query) return (await db.query('zp_bots', { orderBy: ['createdAt', 'desc'], limit: 200 })).map((d) => ownerView(d.id, d.data));
+        let id = BOT_ID.test(query) ? query : null;
+        if (!id && /^[a-z0-9_]{1,32}$/.test(query)) id = (await db.get(`chat_usernames/${query}`))?.botId;
+        const bot = id && await db.get(`zp_bots/${id}`);
+        return bot ? [ownerView(id, bot)] : [];
+      }
+      case 'get': { const id = botId(body.id), bot = await db.get(`zp_bots/${id}`); if (!bot) fail(404, 'Bot not found'); return ownerView(id, bot); }
+      case 'disable': {
+        const id = botId(body.id), disabled = body.disabled === true;
+        await db.transaction(async (tx) => { const { path } = await editable(tx, id, caller); tx.update(path, { disabled }); });
+        return { disabled };
+      }
+      case 'edit': return editBot(caller, body);
+      case 'setCommands': return setCommands(caller, body);
+      case 'setMenu': return setMenu(caller, body);
+      case 'delete': return deleteBot(caller, body);
+      default: fail(404, 'Unknown admin method');
+    }
+  }
+
+  async function handleManage(request, method, body) {
+    if (request.method !== 'POST') fail(405, 'Management requires POST');
+    const user = await identity(request);
+    if (!user.email_verified && !user.phone_number) fail(403, 'Verified account required');
+    const appCheck = request.headers.get('x-firebase-appcheck');
+    if (appCheck ? !(await verifyAppCheck(appCheck)) : requireAppCheck) fail(403, 'App Check required');
+    rateLimit(`owner_${user.uid}`);
+    const owner = user.uid, caller = { uid: owner, admin: false };
+    switch (method) {
+      case 'whoami': return { admin: policy.isAdminIdentity(user) };
+      case 'list': return (await db.query('zp_bots', { where: [['owner', '==', owner]], limit: 20 })).map((d) => ownerView(d.id, d.data));
+      case 'info': {
+        const id = (await db.get(`chat_usernames/${policy.username(body.username)}`))?.botId;
+        const bot = id && await db.get(`zp_bots/${id}`);
+        if (!bot) fail(404, 'Bot not found');
+        return publicView(id, bot);
+      }
+      case 'create': {
+        const username = policy.username(body.username), name = String(body.name || '').trim();
+        if (!name || name.length > 64) fail(400, 'Name must be 1–64 characters');
+        const { id, token, hash } = await policy.tokenPair();
+        await db.transaction(async (tx) => {
+          const quota = await tx.get(`zp_bot_owners/${owner}`);
+          if (await tx.get(`chat_usernames/${username}`)) fail(409, 'Username already taken');
+          if ((quota?.count || 0) >= 20) fail(429, 'Bot limit reached');
+          tx.create(`chat_usernames/${username}`, { uid: `bot_${id}`, botId: id });
+          tx.create(`zp_bots/${id}`, { owner, username, name, tokenHash: hash, sequence: 0, commands: [], menuButton: { type: 'commands' }, createdAt: new Date() });
+          tx.create(`chat_profiles/bot_${id}`, { username, displayName: name, isBot: true, botId: id, verified: false });
+          tx.set(`zp_bot_owners/${owner}`, { count: (quota?.count || 0) + 1 });
+        });
+        return { id, username, name, token };
+      }
+      case 'rotate': {
+        const id = botId(body.id), { token, hash } = await policy.tokenPair(id);
+        await db.transaction(async (tx) => { const { path } = await editable(tx, id, caller); tx.update(path, { tokenHash: hash }); });
+        return { token };
+      }
+      case 'edit': return editBot(caller, body);
+      case 'setCommands': return setCommands(caller, body);
+      case 'setMenu': return setMenu(caller, body);
+      case 'delete': return deleteBot(caller, body);
+      case 'send': {
+        const username = policy.username(body.username);
+        const id = (await db.get(`chat_usernames/${username}`))?.botId;
+        if (!id) fail(404, 'Bot not found');
+        const text = String(body.text || '').trim();
+        if (!text || text.length > 4096) fail(400, 'Text must be 1–4096 characters');
+        const nonce = String(body.requestId || '');
+        if (!/^[a-f0-9-]{36}$/.test(nonce)) fail(400, 'Request ID required');
+        const thread = `zp_bot_threads/${id}_${owner}`;
+        return db.transaction(async (tx) => {
+          const bot = await tx.get(`zp_bots/${id}`), old = await tx.get(`${thread}/messages/${nonce}`);
+          if (!bot) fail(404, 'Bot not found');
+          if (bot.disabled) fail(403, 'Bot disabled');
+          if (old) return old;
+          const sequence = (bot.sequence || 0) + 1;
+          const message = { message_id: sequence, text, sender: owner, createdAt: Date.now(), chat: { id: owner, type: 'private' } };
+          tx.update(`zp_bots/${id}`, { sequence });
+          tx.set(thread, { owner, botId: id, username, name: bot.name, lastMessage: text.slice(0, 120), lastAt: message.createdAt });
+          tx.create(`${thread}/messages/${nonce}`, message);
+          tx.create(`zp_bots/${id}/updates/${String(sequence).padStart(16, '0')}`, { update_id: sequence, message, expiresAt: new Date(Date.now() + 86400000) });
+          return message;
+        });
+      }
+      default: fail(404, 'Unknown management method');
+    }
+  }
+
+  async function handleBot(request, path, method, body) {
+    const token = (request.headers.get('authorization') || '').replace(/^Bearer /, '') || (path[0]?.startsWith('bot') ? decodeURIComponent(path[0].slice(3)) : '');
+    if (!/^[a-f0-9]{24}:[A-Za-z0-9_-]{43}$/.test(token)) fail(401, 'Invalid token');
+    const id = token.split(':')[0], botPath = `zp_bots/${id}`;
+    const bot = await db.get(botPath);
+    if (!bot || !(await policy.tokenMatches(token, bot.tokenHash))) fail(401, 'Invalid token');
+    if (bot.disabled) fail(403, 'Bot disabled');
+    rateLimit(`bot_${id}`);
+    switch (method) {
+      case 'getMe': return { id, is_bot: true, first_name: bot.name, username: bot.username };
+      case 'getMyCommands': return commandList(bot);
+      case 'setMyCommands': await db.update(botPath, { commands: policy.commands(body.commands ?? []) }); return true;
+      case 'deleteMyCommands': await db.update(botPath, { commands: [] }); return true;
+      case 'getChatMenuButton': {
+        const menu = bot.menuButton || { type: 'commands' };
+        return menu.type === 'web_app' ? { type: 'web_app', text: menu.text, web_app: { url: menu.url } } : menu;
+      }
+      case 'setChatMenuButton': await db.update(botPath, { menuButton: policy.menuButton(body.menu_button ?? { type: 'default' }) }); return true;
+      case 'getUpdates': {
+        const offset = Number(body.offset || 0), limit = Number(body.limit || 100);
+        if (!Number.isSafeInteger(offset) || offset < 0 || !Number.isSafeInteger(limit) || limit < 1 || limit > 100) fail(400, 'Invalid offset or limit');
+        const rows = await db.query(`${botPath}/updates`, { where: [['update_id', '>=', offset]], orderBy: ['update_id', 'asc'], limit });
+        return rows.map((r) => r.data).filter((u) => millis(u.expiresAt) > Date.now()).map(({ expiresAt, ...update }) => update);
+      }
+      case 'sendMessage': {
+        const uid = String(body.chat_id || ''), text = String(body.text || '').trim();
+        if (!/^[A-Za-z0-9_-]{1,128}$/.test(uid) || !text || text.length > 4096) fail(400, 'Invalid chat or text');
+        if (body.parse_mode || body.reply_markup) fail(400, 'Formatting and buttons not yet supported');
+        const thread = `zp_bot_threads/${id}_${uid}`, messageId = policy.randomId();
+        const message = { text, sender: `bot_${id}`, createdAt: Date.now(), chat: { id: uid, type: 'private' } };
+        await db.transaction(async (tx) => {
+          if (!(await tx.get(thread))) fail(403, 'User must start this bot first');
+          tx.create(`${thread}/messages/${messageId}`, message);
+          tx.update(thread, { lastMessage: text.slice(0, 120), lastAt: message.createdAt });
+        });
+        return { ...message, message_id: messageId };
+      }
+      default: fail(501, 'Method not implemented');
+    }
+  }
+
+  async function readBody(request, url) {
+    if (request.method === 'GET') return Object.fromEntries(url.searchParams);
+    const text = await request.text();
+    if (text.length > MAX_BODY) fail(413, 'Request too large');
+    if (!text) return {};
+    if ((request.headers.get('content-type') || '').includes('application/x-www-form-urlencoded')) return Object.fromEntries(new URLSearchParams(text));
+    try { const value = JSON.parse(text); return value && typeof value === 'object' ? value : {}; } catch { fail(400, 'Body must be JSON'); }
+  }
+
+  return async function handle(request) {
+    const url = new URL(request.url);
+    const path = url.pathname.split('/').filter(Boolean);
+    const origin = request.headers.get('origin') || '';
+    const cors = path[0] === 'admin' && ADMIN_ORIGINS.has(origin)
+      ? { 'Access-Control-Allow-Origin': origin, Vary: 'Origin', 'Access-Control-Allow-Headers': 'Authorization, Content-Type', 'Access-Control-Allow-Methods': 'POST, OPTIONS', 'Access-Control-Max-Age': '3600' }
+      : {};
+    const reply = (status, data) => new Response(JSON.stringify(data), { status, headers: { 'Content-Type': 'application/json; charset=utf-8', 'Cache-Control': 'no-store', ...cors } });
+    if (request.method === 'OPTIONS' && cors['Access-Control-Allow-Origin']) return new Response(null, { status: 204, headers: cors });
+    try {
+      if (!path.length) return reply(200, { ok: true, result: { service: 'Z Pass Bot API', docs: 'https://docs.zpas.org/' } });
+      if (!['GET', 'POST'].includes(request.method)) fail(405, 'GET or POST required');
+      const body = await readBody(request, url), method = path.at(-1);
+      let result;
+      if (path[0] === 'admin') { if (request.method !== 'POST') fail(405, 'Admin requires POST'); result = await handleAdmin(request, method, body); }
+      else if (path[0] === 'manage') result = await handleManage(request, method, body);
+      else result = await handleBot(request, path, method, body);
+      return reply(200, { ok: true, result });
+    } catch (e) {
+      const status = e instanceof HttpError ? e.status : 500;
+      if (status === 500) console.error('zbot', e?.message);
+      return reply(status, { ok: false, error_code: status, description: status === 500 ? 'Server error' : e.message });
+    }
+  };
+}

@@ -1,4 +1,4 @@
-// File: c:\Users\rezan\Desktop\Web-Sites\Zpass\app\layout.js
+// File: C:\Users\rezan\Desktop\Web-Sites\Zpass\app\layout.js
 import * as entry from '../../../app/layout.js'
 import type { ResolvingMetadata, ResolvingViewport } from 'next/dist/lib/metadata/types/metadata-interface.js'
 

@@ -1,29 +1,31 @@
 <!doctype html>
 <html lang="en">
 <head>
-  <script src="/resources/js/pay-host.js?v=2"></script>
+  <script src="/subdomain/docs/resources/js/pay-host.js?v=2"></script>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
 <title>PassGram Bot API Documentation</title>
 <meta name="description" content="Build bots for PassGram. Authentication, GET and POST requests, getMe, getUpdates, sendMessage, error codes, rate limits and best practices, with examples in cURL, JavaScript and Python.">
-<link rel="icon" type="image/png" href="/resources/assets/app-logo/zpass.png">
+<link rel="icon" type="image/png" href="/subdomain/docs/resources/assets/app-logo/zpass.png">
 <link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
-<link rel="stylesheet" href="/resources/css/8xk9e0et8w.css">
+<link rel="stylesheet" href="/subdomain/docs/resources/css/8xk9e0et8w.css">
 </head>
 <body>
 <header class="top">
   <button class="burger" aria-label="Menu" onclick="document.body.classList.toggle('open')">☰</button>
   <a class="brand" href="https://zpas.org/"><span class="mark">P</span>PassGram <span class="pill">Docs</span></a>
-  <nav><a href="https://api.zpas.org/" target="_blank" rel="noopener noreferrer">API overview</a><a href="https://zpas.org/faq">FAQ</a><a class="btn" href="https://zpas.org/login">Open PassGram</a></nav>
+  <nav><a href="#status">API status</a><a href="https://zpas.org/faq">FAQ</a><a class="btn" href="https://zpas.org/login">Open PassGram</a></nav>
 </header>
 <div class="layout">
 <aside class="side" id="side">
   <h4>Start</h4><a href="#intro">Introduction</a><a href="#status">What is live</a><a href="#quickstart">Quick start</a>
   <h4>Basics</h4><a href="#auth">Authentication</a><a href="#requests">GET and POST</a><a href="#responses">Responses</a><a href="#errors">Errors</a><a href="#limits">Rate limits</a>
-  <h4>Methods</h4><a href="#getMe">getMe</a><a href="#getUpdates">getUpdates</a><a href="#sendMessage">sendMessage</a>
+  <h4>Methods</h4><a href="#getMe">getMe</a><a href="#getUpdates">getUpdates</a><a href="#sendMessage">sendMessage</a><a href="#commands">Commands</a><a href="#menu-button">Menu button &amp; mini apps</a>
   <h4>Coming soon</h4><a href="#keyboards">Inline keyboards</a><a href="#documents">Send documents</a><a href="#users">Get user</a><a href="#webhooks">Webhooks</a>
-  <h4>Guides</h4><a href="#example-bot">Example: echo bot</a><a href="#security">Security</a><a href="#help">Help</a>
+  <h4>Guides</h4><a href="#example-bot">Example: echo bot</a><a href="#security">Security</a>
+  <h4>Protocol</h4><a href="#mtproto">MTProto 2.0</a><a href="#tl-schema">TL schema</a><a href="#e2ee">End-to-end encryption</a>
+  <h4>More</h4><a href="#help">Help</a>
 </aside>
 <main>
 <div class="hero" id="intro">
@@ -44,6 +46,8 @@
   <tr><td><code>getMe</code></td><td><span class="tag live">LIVE</span></td><td>Check that your token works.</td></tr>
   <tr><td><code>getUpdates</code></td><td><span class="tag live">LIVE</span></td><td>Poll for new messages, with <code>offset</code> and <code>limit</code>.</td></tr>
   <tr><td><code>sendMessage</code></td><td><span class="tag live">LIVE</span></td><td>Plain text only, up to 4096 characters.</td></tr>
+  <tr><td><code>getMyCommands</code>, <code>setMyCommands</code>, <code>deleteMyCommands</code></td><td><span class="tag live">LIVE</span></td><td>The <code>/</code> command list users see in the chat.</td></tr>
+  <tr><td><code>getChatMenuButton</code>, <code>setChatMenuButton</code></td><td><span class="tag live">LIVE</span></td><td>Button next to the message box: command list or a mini app.</td></tr>
   <tr><td>Inline keyboards (<code>reply_markup</code>)</td><td><span class="tag soon">PLANNED</span></td><td>Currently returns <code>400</code>.</td></tr>
   <tr><td><code>parse_mode</code> formatting</td><td><span class="tag soon">PLANNED</span></td><td>Currently returns <code>400</code>.</td></tr>
   <tr><td>Documents, user lookup, callbacks, webhooks</td><td><span class="tag soon">PLANNED</span></td><td>Described below so you can prepare. Calling them today returns <code>501</code>.</td></tr></table>
@@ -58,16 +62,16 @@
   </ol>
   <div class="tabs"><div class="tabbar"><button class="on">cURL</button><button>JavaScript</button><button>Python</button><button class="copy">Copy</button></div>
 <pre class="on"><span class="c"># 1. Check the token</span>
-curl https://api.zpas.org/getMe \
+curl https://botapi.zpas.org/getMe \
   -H <span class="s">"Authorization: Bearer $TOKEN"</span>
 
 <span class="c"># 2. Send a message</span>
-curl -X POST https://api.zpas.org/sendMessage \
+curl -X POST https://botapi.zpas.org/sendMessage \
   -H <span class="s">"Authorization: Bearer $TOKEN"</span> \
   -H <span class="s">"Content-Type: application/json"</span> \
   -d <span class="s">'{"chat_id":"USER_ID","text":"Hello from my bot!"}'</span></pre>
 <pre><span class="k">const</span> TOKEN = process.env.PASSGRAM_TOKEN;
-<span class="k">const</span> api = (method, body) =&gt; fetch(<span class="s">`https://api.zpas.org/${method}`</span>, {
+<span class="k">const</span> api = (method, body) =&gt; fetch(<span class="s">`https://botapi.zpas.org/${method}`</span>, {
   method: <span class="s">'POST'</span>,
   headers: { Authorization: <span class="s">`Bearer ${TOKEN}`</span>, <span class="s">'Content-Type'</span>: <span class="s">'application/json'</span> },
   body: JSON.stringify(body || {})
@@ -78,13 +82,13 @@ curl -X POST https://api.zpas.org/sendMessage \
 <pre><span class="k">import</span> os, requests
 
 TOKEN = os.environ[<span class="s">"PASSGRAM_TOKEN"</span>]
-BASE = <span class="s">"https://api.zpas.org"</span>
+BASE = <span class="s">"https://botapi.zpas.org"</span>
 HEAD = {<span class="s">"Authorization"</span>: f<span class="s">"Bearer {TOKEN}"</span>}
 
 print(requests.get(f<span class="s">"{BASE}/getMe"</span>, headers=HEAD).json())
 requests.post(f<span class="s">"{BASE}/sendMessage"</span>, headers=HEAD,
               json={<span class="s">"chat_id"</span>: <span class="s">"USER_ID"</span>, <span class="s">"text"</span>: <span class="s">"Hello from my bot!"</span>})</pre></div>
-  <div class="note info"><b>ℹ Note</b><span>Base address: <code>https://api.zpas.org</code>. The API is in preview, so confirm the address in the app or with <a href="https://x.com/4rezan" target="_blank" rel="noopener">@4rezan</a> before going to production.</span></div>
+  <div class="note info"><b>ℹ Note</b><span>Base address: <code>https://botapi.zpas.org</code>. It runs on Cloudflare, close to your users. The same API is also reachable at <code>https://zpass-zbot.rezanhassoun.workers.dev</code>.</span></div>
 </section>
 
 <section id="auth">
@@ -99,8 +103,8 @@ requests.post(f<span class="s">"{BASE}/sendMessage"</span>, headers=HEAD,
 <section id="requests">
   <h2>GET and POST</h2>
   <p>Methods accept <b>GET</b> (parameters in the query string) or <b>POST</b> (JSON body). Use POST for anything that changes data, such as <code>sendMessage</code>, and GET for simple reads like <code>getMe</code>.</p>
-  <div class="method"><span class="tag get">GET</span><span class="url">https://api.zpas.org/getUpdates?offset=0&amp;limit=20</span></div>
-  <div class="method"><span class="tag post">POST</span><span class="url">https://api.zpas.org/sendMessage</span></div>
+  <div class="method"><span class="tag get">GET</span><span class="url">https://botapi.zpas.org/getUpdates?offset=0&amp;limit=20</span></div>
+  <div class="method"><span class="tag post">POST</span><span class="url">https://botapi.zpas.org/sendMessage</span></div>
   <p>Other HTTP methods return <code>405</code>. Send <code>Content-Type: application/json</code> with POST bodies.</p>
 </section>
 
@@ -124,7 +128,7 @@ requests.post(f<span class="s">"{BASE}/sendMessage"</span>, headers=HEAD,
   <table><tr><th>Code</th><th>Meaning</th><th>What to do</th></tr>
   <tr><td><code>400</code></td><td>Bad request: invalid chat, empty text, text over 4096 characters, bad <code>offset</code>/<code>limit</code>, or an unsupported field such as <code>reply_markup</code>.</td><td>Fix the parameters.</td></tr>
   <tr><td><code>401</code></td><td>Invalid token.</td><td>Check or rotate the token.</td></tr>
-  <tr><td><code>403</code></td><td>The user has not started your bot.</td><td>Ask them to open the bot and press Start.</td></tr>
+  <tr><td><code>403</code></td><td>The user has not started your bot, or the bot was disabled by Z Pass.</td><td>Ask the user to press Start. If the bot is disabled, contact support.</td></tr>
   <tr><td><code>405</code></td><td>Only GET and POST are allowed.</td><td>Change the HTTP method.</td></tr>
   <tr><td><code>429</code></td><td>Too many requests.</td><td>Wait one minute and retry.</td></tr>
   <tr><td><code>501</code></td><td>Method not implemented yet.</td><td>See the planned features below.</td></tr>
@@ -141,7 +145,7 @@ requests.post(f<span class="s">"{BASE}/sendMessage"</span>, headers=HEAD,
   <div class="method"><span class="tag get">GET</span><span class="tag post">POST</span><span class="url">/getMe</span><span class="tag live">LIVE</span></div>
   <p>Returns basic information about your bot. Use it to confirm the token is valid.</p>
   <div class="tabs"><div class="tabbar"><button class="on">Request</button><button>Response</button><button class="copy">Copy</button></div>
-<pre class="on">curl https://api.zpas.org/getMe -H <span class="s">"Authorization: Bearer $TOKEN"</span></pre>
+<pre class="on">curl https://botapi.zpas.org/getMe -H <span class="s">"Authorization: Bearer $TOKEN"</span></pre>
 <pre>{ <span class="s">"ok"</span>: <span class="k">true</span>,
   <span class="s">"result"</span>: { <span class="s">"id"</span>: <span class="s">"a1b2c3..."</span>, <span class="s">"is_bot"</span>: <span class="k">true</span>,
               <span class="s">"first_name"</span>: <span class="s">"My Bot"</span>, <span class="s">"username"</span>: <span class="s">"my_bot"</span> } }</pre></div>
@@ -155,9 +159,9 @@ requests.post(f<span class="s">"{BASE}/sendMessage"</span>, headers=HEAD,
   <tr><td><code>offset</code></td><td>integer</td><td>Return updates with <code>update_id</code> greater than or equal to this value. Use the last <code>update_id + 1</code> to move past what you processed. Default 0.</td></tr>
   <tr><td><code>limit</code></td><td>integer</td><td>1 to 100. Default 100.</td></tr></table>
   <div class="tabs"><div class="tabbar"><button class="on">cURL</button><button>JavaScript</button><button>Python</button><button class="copy">Copy</button></div>
-<pre class="on">curl <span class="s">"https://api.zpas.org/getUpdates?offset=0&amp;limit=20"</span> \
+<pre class="on">curl <span class="s">"https://botapi.zpas.org/getUpdates?offset=0&amp;limit=20"</span> \
   -H <span class="s">"Authorization: Bearer $TOKEN"</span></pre>
-<pre><span class="k">const</span> r = <span class="k">await</span> fetch(<span class="s">'https://api.zpas.org/getUpdates?offset=0&amp;limit=20'</span>,
+<pre><span class="k">const</span> r = <span class="k">await</span> fetch(<span class="s">'https://botapi.zpas.org/getUpdates?offset=0&amp;limit=20'</span>,
   { headers: { Authorization: <span class="s">`Bearer ${TOKEN}`</span> } }).then(r =&gt; r.json());
 <span class="k">for</span> (<span class="k">const</span> u <span class="k">of</span> r.result) console.log(u.update_id, u.message?.text);</pre>
 <pre>r = requests.get(f<span class="s">"{BASE}/getUpdates"</span>, params={<span class="s">"offset"</span>: <span class="n">0</span>, <span class="s">"limit"</span>: <span class="n">20</span>}, headers=HEAD).json()
@@ -179,13 +183,54 @@ requests.post(f<span class="s">"{BASE}/sendMessage"</span>, headers=HEAD,
   <tr><td><code>parse_mode</code></td><td>string</td><td>No</td><td>Not available yet. Sending it returns <code>400</code>.</td></tr>
   <tr><td><code>reply_markup</code></td><td>object</td><td>No</td><td>Not available yet. See <a href="#keyboards">inline keyboards</a>.</td></tr></table>
   <div class="tabs"><div class="tabbar"><button class="on">cURL</button><button>JavaScript</button><button>Python</button><button class="copy">Copy</button></div>
-<pre class="on">curl -X POST https://api.zpas.org/sendMessage \
+<pre class="on">curl -X POST https://botapi.zpas.org/sendMessage \
   -H <span class="s">"Authorization: Bearer $TOKEN"</span> -H <span class="s">"Content-Type: application/json"</span> \
   -d <span class="s">'{"chat_id":"USER_ID","text":"Your order is ready."}'</span></pre>
 <pre><span class="k">await</span> api(<span class="s">'sendMessage'</span>, { chat_id: <span class="s">'USER_ID'</span>, text: <span class="s">'Your order is ready.'</span> });</pre>
 <pre>requests.post(f<span class="s">"{BASE}/sendMessage"</span>, headers=HEAD,
               json={<span class="s">"chat_id"</span>: <span class="s">"USER_ID"</span>, <span class="s">"text"</span>: <span class="s">"Your order is ready."</span>})</pre></div>
   <div class="note warn"><b>⚠ 403?</b><span>The user must open your bot and press Start first. Bots cannot message people who never contacted them.</span></div>
+</section>
+
+<section id="commands">
+  <h2>Commands</h2>
+  <div class="method"><span class="tag post">POST</span><span class="url">/setMyCommands</span><span class="tag live">LIVE</span></div>
+  <div class="method"><span class="tag get">GET</span><span class="tag post">POST</span><span class="url">/getMyCommands</span><span class="tag live">LIVE</span></div>
+  <div class="method"><span class="tag post">POST</span><span class="url">/deleteMyCommands</span><span class="tag live">LIVE</span></div>
+  <p>Commands appear when a user types <code>/</code> in the chat with your bot. You can also manage them without code in the app: open <b>Zbot</b> and choose your bot.</p>
+  <table><tr><th>Field</th><th>Rules</th></tr>
+  <tr><td><code>command</code></td><td>1 to 32 characters: lowercase letters, digits and <code>_</code>, starting with a letter. A leading <code>/</code> is removed.</td></tr>
+  <tr><td><code>description</code></td><td>1 to 100 characters.</td></tr>
+  <tr><td>List</td><td>Up to 100 commands, no duplicates. <code>setMyCommands</code> replaces the whole list.</td></tr></table>
+  <div class="tabs"><div class="tabbar"><button class="on">cURL</button><button>JavaScript</button><button>Response</button><button class="copy">Copy</button></div>
+<pre class="on">curl -X POST https://botapi.zpas.org/setMyCommands \
+  -H <span class="s">"Authorization: Bearer $TOKEN"</span> -H <span class="s">"Content-Type: application/json"</span> \
+  -d <span class="s">'{"commands":[{"command":"start","description":"Start the bot"},{"command":"help","description":"How it works"}]}'</span></pre>
+<pre><span class="k">await</span> api(<span class="s">'setMyCommands'</span>, { commands: [
+  { command: <span class="s">'start'</span>, description: <span class="s">'Start the bot'</span> },
+  { command: <span class="s">'help'</span>, description: <span class="s">'How it works'</span> },
+] });
+<span class="k">const</span> { result } = <span class="k">await</span> api(<span class="s">'getMyCommands'</span>);</pre>
+<pre>{ <span class="s">"ok"</span>: <span class="k">true</span>, <span class="s">"result"</span>: [ { <span class="s">"command"</span>: <span class="s">"start"</span>, <span class="s">"description"</span>: <span class="s">"Start the bot"</span> } ] }</pre></div>
+</section>
+
+<section id="menu-button">
+  <h2>Menu button &amp; mini apps</h2>
+  <div class="method"><span class="tag post">POST</span><span class="url">/setChatMenuButton</span><span class="tag live">LIVE</span></div>
+  <div class="method"><span class="tag get">GET</span><span class="tag post">POST</span><span class="url">/getChatMenuButton</span><span class="tag live">LIVE</span></div>
+  <p>The menu button sits next to the message box. It can open the command list, open a <b>mini app</b> (a web page shown inside the chat), or be hidden.</p>
+  <table><tr><th><code>menu_button.type</code></th><th>Extra fields</th><th>Result</th></tr>
+  <tr><td><code>commands</code></td><td>none</td><td>Opens the <code>/</code> command list. Default.</td></tr>
+  <tr><td><code>web_app</code></td><td><code>text</code> (1 to 32 characters), <code>web_app.url</code> (https only)</td><td>Opens your mini app.</td></tr>
+  <tr><td><code>default</code></td><td>none</td><td>No menu button.</td></tr></table>
+  <div class="tabs"><div class="tabbar"><button class="on">Mini app</button><button>Command list</button><button class="copy">Copy</button></div>
+<pre class="on">curl -X POST https://botapi.zpas.org/setChatMenuButton \
+  -H <span class="s">"Authorization: Bearer $TOKEN"</span> -H <span class="s">"Content-Type: application/json"</span> \
+  -d <span class="s">'{"menu_button":{"type":"web_app","text":"Open store","web_app":{"url":"https://shop.example.com/app"}}}'</span></pre>
+<pre>curl -X POST https://botapi.zpas.org/setChatMenuButton \
+  -H <span class="s">"Authorization: Bearer $TOKEN"</span> -H <span class="s">"Content-Type: application/json"</span> \
+  -d <span class="s">'{"menu_button":{"type":"commands"}}'</span></pre></div>
+  <div class="note info"><b>ℹ Mini apps</b><span>The page opens in a secure in-app browser. Use HTTPS, design for phone screens, and never ask users for their PassGram password or codes inside a mini app.</span></div>
 </section>
 
 <section id="keyboards">
@@ -216,7 +261,7 @@ requests.post(f<span class="s">"{BASE}/sendMessage"</span>, headers=HEAD,
   <h2>Send documents <span class="tag soon">PLANNED</span></h2>
   <p>A <code>sendDocument</code> method will let your bot send files such as PDFs and reports, up to a size limit, with an optional caption.</p>
 <div class="tabs"><div class="tabbar"><button class="on">Planned request</button><button class="copy">Copy</button></div>
-<pre class="on">curl -X POST https://api.zpas.org/sendDocument \
+<pre class="on">curl -X POST https://botapi.zpas.org/sendDocument \
   -H <span class="s">"Authorization: Bearer $TOKEN"</span> \
   -F chat_id=USER_ID -F document=@report.pdf -F caption=<span class="s">"Monthly report"</span></pre></div>
   <p>Until it ships, calling it returns <code>501 Method not implemented</code>.</p>
@@ -236,7 +281,7 @@ requests.post(f<span class="s">"{BASE}/sendMessage"</span>, headers=HEAD,
   <h2>Example: echo bot</h2>
   <p>A complete bot that repeats every message back. It reads updates, remembers the last id, and replies.</p>
   <div class="tabs"><div class="tabbar"><button class="on">Node.js</button><button>Python</button><button class="copy">Copy</button></div>
-<pre class="on"><span class="k">const</span> TOKEN = process.env.PASSGRAM_TOKEN, BASE = <span class="s">'https://api.zpas.org'</span>;
+<pre class="on"><span class="k">const</span> TOKEN = process.env.PASSGRAM_TOKEN, BASE = <span class="s">'https://botapi.zpas.org'</span>;
 <span class="k">const</span> call = (m, body) =&gt; fetch(<span class="s">`${BASE}/${m}`</span>, { method: <span class="s">'POST'</span>,
   headers: { Authorization: <span class="s">`Bearer ${TOKEN}`</span>, <span class="s">'Content-Type'</span>: <span class="s">'application/json'</span> },
   body: JSON.stringify(body || {}) }).then(r =&gt; r.json());
@@ -252,7 +297,7 @@ requests.post(f<span class="s">"{BASE}/sendMessage"</span>, headers=HEAD,
   <span class="k">await</span> <span class="k">new</span> Promise(r =&gt; setTimeout(r, <span class="n">2000</span>)); <span class="c">// stay under 120 requests/min</span>
 }</pre>
 <pre><span class="k">import</span> os, time, requests
-TOKEN, BASE = os.environ[<span class="s">"PASSGRAM_TOKEN"</span>], <span class="s">"https://api.zpas.org"</span>
+TOKEN, BASE = os.environ[<span class="s">"PASSGRAM_TOKEN"</span>], <span class="s">"https://botapi.zpas.org"</span>
 H = {<span class="s">"Authorization"</span>: f<span class="s">"Bearer {TOKEN}"</span>}
 offset = <span class="n">0</span>
 <span class="k">while</span> True:
@@ -275,6 +320,27 @@ offset = <span class="n">0</span>
   <li>Handle <code>429</code> and <code>5xx</code> with a delay, not a tight retry loop.</li></ul>
 </section>
 
+<section id="mtproto">
+  <h2>MTProto 2.0 protocol</h2>
+  <p>MTProto 2.0 provides high-speed binary serialization over TCP and HTTPS with Diffie-Hellman key exchange and AES-256-IGE payload encryption.</p>
+  <div class="tabs"><div class="tabbar"><button class="on">Frame</button><button class="copy">Copy</button></div>
+<pre class="on"><span class="c">// DH key exchange &amp; encrypted frame structure</span>
+auth_key_id:int64 msg_key:int128 encrypted_data:bytes</pre></div>
+</section>
+
+<section id="tl-schema">
+  <h2>Type Language (TL) schema</h2>
+  <p>Z Pass schemas are defined in Type Language syntax:</p>
+  <div class="tabs"><div class="tabbar"><button class="on">Schema</button><button class="copy">Copy</button></div>
+<pre class="on">user#2e2e12a id:long first_name:string username:string = User;
+message#8d8d21c id:long sender_id:long text:string date:int = Message;</pre></div>
+</section>
+
+<section id="e2ee">
+  <h2>End-to-end encryption</h2>
+  <p>Private chats are end-to-end encrypted and stay that way. <b>Bot conversations are different:</b> they are readable by the bot operator and by the Z Pass server, because the bot program has to read them to answer. Never send passwords, recovery keys or payment secrets to a bot.</p>
+</section>
+
 <section id="help">
   <h2>Help</h2>
   <p>Questions or ideas for the API? Message <a href="https://x.com/4rezan" target="_blank" rel="noopener">@4rezan on X</a> or use <b>Settings → Support</b> in the app. Read also the <a href="https://zpas.org/legal/privacy">Privacy Policy</a>, <a href="https://zpas.org/legal/terms">Terms</a> and <a href="https://zpas.org/legal/security">Security</a> pages.</p>
@@ -282,6 +348,6 @@ offset = <span class="n">0</span>
 <div class="foot"><span>© 2026 PassGram</span><span><a href="https://zpas.org/legal/terms">Terms</a> · <a href="https://zpas.org/legal/privacy">Privacy</a> · <a href="https://zpas.org/legal/security">Security</a></span></div>
 </main>
 </div>
-<script src="/resources/js/nsnmi7dano.js" defer></script>
+<script src="/subdomain/docs/resources/js/nsnmi7dano.js" defer></script>
 </body>
 </html>

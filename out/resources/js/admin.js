@@ -5,8 +5,7 @@ import {
 } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js";
 import {
   getFirestore, collection, doc, getDoc, getDocs, setDoc, updateDoc,
-  query, where, orderBy, limit, serverTimestamp, Timestamp,
-  arrayUnion, arrayRemove
+  query, where, orderBy, limit, serverTimestamp, Timestamp
 } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
 
 const ADMIN_EMAIL = "zh4ckz@proton.me";
@@ -331,11 +330,6 @@ async function approveChange(requestId, data) {
     await setDoc(subRef, {
       status: "CANCELLED",
       expiresAt: Timestamp.now(),
-      updatedAt: serverTimestamp()
-    }, { merge: true });
-  } else if (data.type === "ADD_FAMILY_MEMBER" || data.type === "REMOVE_FAMILY_MEMBER") {
-    await setDoc(subRef, {
-      familyMembers: data.type === "ADD_FAMILY_MEMBER" ? arrayUnion(data.target) : arrayRemove(data.target),
       updatedAt: serverTimestamp()
     }, { merge: true });
   }

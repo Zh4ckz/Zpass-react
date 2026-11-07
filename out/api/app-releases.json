@@ -2,10 +2,10 @@
     "platforms":  {
                       "android":  {
                                       "version":  "4.16",
-                                      "releasedAt":  "2026-11-05T17:24:09Z",
+                                      "releasedAt":  "2026-11-07T04:55:19Z",
                                       "downloadUrl":  "",
-                                      "sha256":  "bf9cfefffefbddde32d5399408c88ece4378d632c58aad9f049f0d4f3f282451",
-                                      "sizeBytes":  95571807
+                                      "sha256":  "9c0da9be01772b4e3cdd95a6e12b35f8fcb615d65f3fbc0c082b9f261d4b7530",
+                                      "sizeBytes":  95717742
                                   }
                   }
 }

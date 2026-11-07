@@ -81,7 +81,6 @@ def main():
     print("🌐 Firebase URL: https://passgram.web.app")
     print("🌐 Bots Interface: https://bots.zpas.org")
     print("🌐 Docs Interface: https://docs.zpas.org")
-    print("🌐 Modular Web: https://modular.zpas.org")
 
     print("=" * 50)
     return 0

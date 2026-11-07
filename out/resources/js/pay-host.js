@@ -8,7 +8,7 @@
   location.replace('https://zpas.org'+target+location.search+location.hash);return;
  }
  const legacy=path.match(/^\/subdomain\/(api|docs|core|bots|web|pay|developers)(?:\/(.*))?$/);
- if(legacy&&window.top===window.self&&host!==legacy[1]+'.zpas.org'){
+ if(legacy&&window.top===window.self&&host!==legacy[1]+'.zpas.org'&&!/^(localhost|127.0.0.1)$/.test(host)){
   const tail=(legacy[2]||'').replace(/(?:^|\/)index\.html$/,'').replace(/\.html$/,'');
   location.replace('https://'+legacy[1]+'.zpas.org/'+tail+location.search+location.hash);return;
  }

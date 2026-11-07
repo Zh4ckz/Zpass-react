@@ -1,0 +1,11 @@
+{
+  "name": "zpass-zbot-worker",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "check": "node --test test/*.test.mjs",
+    "deploy": "node ../payment-worker/node_modules/wrangler/bin/wrangler.js deploy",
+    "provision": "node scripts/provision.mjs"
+  },
+  "engines": { "node": ">=22" }
+}

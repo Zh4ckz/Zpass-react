@@ -241,7 +241,7 @@
 
       <section class="card" id="sec-changes">
         <h2>Subscription change requests</h2>
-        <p class="hint">From the website's plan/family management flow. Approving a plan change updates the subscription directly; approving a family add/remove updates the family member list.</p>
+        <p class="hint">From the website's plan management flow. Approving a plan change updates the subscription directly.</p>
         <div class="form-row">
           <label style="color:var(--muted); font-size:12.5px;">Status:</label>
           <select id="changeStatusFilter">
@@ -268,7 +268,6 @@
         <div class="form-row">
           <select id="manageTier">
             <option value="PRO">PRO</option>
-            <option value="FAMILY">FAMILY</option>
           </select>
           <input id="manageMonths" type="number" min="1" value="1" style="width:80px;" placeholder="Months">
           <button id="manageGrant" class="primary">Grant / extend</button>
