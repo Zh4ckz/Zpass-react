@@ -83,9 +83,19 @@ if (!fs.existsSync(SRC)) {
     unresolved.add(match);
     return match;
   };
+  // Only files copied from public/ (and the moved files) are rewritten. Next's own output (HTML, RSC
+  // .txt, chunks) is never touched: its RSC payload stores string byte lengths, so editing it breaks
+  // hydration and leaves a white page. Next code gets the URLs from app/service-pages.js instead.
+  const PUBLIC = path.join(ROOT, 'public');
+  const fromPublic = (full) => {
+    const rel = path.relative(OUT, full);
+    if (rel.startsWith('_next' + path.sep)) return [...fileMap.values()].includes('/' + toPosix(rel).replace(/\.html$/, '')) || [...fileMap.values()].includes('/' + toPosix(rel));
+    const nextPage = full.endsWith('.html') && fs.existsSync(full.slice(0, -5) + '.txt'); // Next overwrote it
+    return fs.existsSync(path.join(PUBLIC, rel)) && !nextPage;
+  };
   const touched = [];
   for (const full of walk(OUT)) {
-    if (full.startsWith(SRC + path.sep) || !TEXT.has(path.extname(full).toLowerCase())) continue;
+    if (full.startsWith(SRC + path.sep) || !TEXT.has(path.extname(full).toLowerCase()) || !fromPublic(full)) continue;
     const text = fs.readFileSync(full, 'utf8');
     if (!text.includes('/subdomain/')) continue;
     const next = text.replace(RE, resolve);
@@ -101,6 +111,11 @@ if (!fs.existsSync(SRC)) {
     const m = /\\?\/subdomain\\?\//.exec(text); // also catches regex/JSON-escaped forms like \/subdomain\/
     const i = m ? m.index : -1;
     if (i !== -1) leftovers.push(`${toPosix(path.relative(OUT, full))}: …${text.slice(Math.max(0, i - 40), i + 60)}…`);
+  }
+  // app/service-pages.js must point at the pages created here.
+  const servicePages = fs.readFileSync(path.join(ROOT, 'app', 'service-pages.js'), 'utf8');
+  for (const s of ['api', 'bots', 'core', 'docs', 'pay']) {
+    if (!servicePages.includes(`${s}: '${pageUrl(s)}'`)) leftovers.push(`app/service-pages.js: ${s} must be '${pageUrl(s)}'`);
   }
   if (unresolved.size || leftovers.length) {
     console.error('hide-internal-paths: internal paths would be visible:');
