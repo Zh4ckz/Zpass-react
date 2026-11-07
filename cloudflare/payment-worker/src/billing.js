@@ -4,7 +4,8 @@ export function terms(id){if(!PLAN_IDS.has(id))return null;const annual=id.endsW
 export function publicConfig(available){return{billingModel:BILLING_MODEL,provider:'STRIPE',available:Boolean(available),plans:Object.fromEntries([...PLAN_IDS].map(id=>{const value=terms(id);return[id,{price:value.amountCents/100,commitmentMonths:value.commitmentMonths,enabled:true}]}))}}
 export function validRequest(p){return p&&PLAN_IDS.has(p.productId)&&/^ZP-[A-Z0-9]{10}$/.test(p.zPassId||'')&&/^[a-f0-9-]{32,36}$/i.test(p.requestId||'')&&Object.keys(p).every(k=>['productId','zPassId','requestId'].includes(k))}
 export const objectId=v=>typeof v==='string'?v:v?.id;
-export const stripeId=(v,prefix)=>typeof v==='string'&&new RegExp('^'+prefix+'_[A-Za-z0-9]+$').test(v);
+// Real Stripe IDs can carry a mode segment after the prefix (cs_live_..., cs_test_...), so underscores are allowed.
+export const stripeId=(v,prefix)=>typeof v==='string'&&v.length<=255&&new RegExp('^'+prefix+'_[A-Za-z0-9_]+$').test(v);
 export const invoiceSubscription=v=>objectId(v.parent?.subscription_details?.subscription)||objectId(v.subscription);
 export function commitmentEnd(anchor,months){const d=new Date(anchor*1000),day=d.getUTCDate();d.setUTCDate(1);d.setUTCMonth(d.getUTCMonth()+months);const last=new Date(Date.UTC(d.getUTCFullYear(),d.getUTCMonth()+1,0)).getUTCDate();d.setUTCDate(Math.min(day,last));return Math.floor(d.getTime()/1000)}
 export function verifiedSession(session,order){return Boolean(order?.billingModel===BILLING_MODEL&&session.mode==='subscription'&&session.payment_status==='paid'&&session.currency==='usd'&&session.id===order.sessionId&&session.amount_total===order.amountCents&&session.client_reference_id===order.uid&&session.metadata?.pay_checkout==='passgram-org'&&session.metadata?.pay_order_id===order.orderId&&stripeId(objectId(session.subscription),'sub'))}

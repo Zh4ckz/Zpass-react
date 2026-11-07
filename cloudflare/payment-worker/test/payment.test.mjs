@@ -76,3 +76,5 @@ test('checkout keys expire at 15 minutes and cannot select another account',asyn
 });
 
 test('authenticated accounts can checkout without a legacy ZP identifier, with UID binding',async()=>{const f=fixture();await f.service.create({...payload,zPassId:''},'fixture');assert.equal(f.calls.length,1);const order=[...f.rows.values()].find(value=>value.orderId);assert.equal(order.uid,'fixture');const denied=fixture();await assert.rejects(denied.service.create({...payload,zPassId:'',amount:1},'fixture'),/Choose a plan/);assert.equal(denied.calls.length,0)});
+
+test('accepts real-format Stripe IDs with a mode segment',async()=>{const {stripeId}=await import('../src/billing.js');assert.equal(stripeId('cs_live_b1Xy9KqZ','cs'),true);assert.equal(stripeId('cs_test_a1B2','cs'),true);assert.equal(stripeId('sub_1Abc','sub'),true);assert.equal(stripeId('cs_bad-id','cs'),false);assert.equal(stripeId('pi_live_1','cs'),false)});
