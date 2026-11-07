@@ -18,11 +18,13 @@ const firebaseConfig = {
   appId: '1:157086803240:web:152ae9d14c582db8c91c1d',
 };
 export const GATEWAY = 'https://zpass-zbot.rezanhassoun.workers.dev';
-const OWNER_EMAILS = ['zh4ckz@proton.me'];
 const NOT_FOUND = { ok: false, error_code: 404, description: 'Not Found' };
 const FORBIDDEN = { ok: false, error_code: 403, description: 'Forbidden: you are not authorized' };
-const SUB = location.pathname.match(/^\/subdomain\/([a-z]+)\//)?.[1] || location.hostname.split('.')[0];
-const RES = `/subdomain/${SUB}/resources`;
+// Each service page names itself on <html data-sub>, so no folder path is needed to tell them apart.
+const SUB = document.documentElement.dataset.sub || location.hostname.split('.')[0];
+const LOGO = '/resources/assets/app-logo/zpass.png';
+// Local preview only. Literal paths so the build can swap them for the published (opaque) URLs.
+const LOCAL_PAGES = { core: '/subdomain/core/index.html', bots: '/subdomain/bots/index.html', api: '/subdomain/api/index.html' };
 
 // ---------- tiny DOM helpers ----------
 export const esc = (value) => String(value ?? '').replace(/[&<>"']/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' })[c]);
@@ -100,7 +102,7 @@ function signInView(auth, notice = '') {
   document.title = 'Sign in';
   document.body.className = 'ad';
   document.body.innerHTML = `<main class="signin"><form class="signin-card" autocomplete="on">
-    <img src="${RES}/assets/app-logo/zpass.png" alt="" width="48" height="48" style="border-radius:14px">
+    <img src="${LOGO}" alt="" width="48" height="48" style="border-radius:14px">
     <div><h1>Administrator sign in</h1><p>Only Z Pass administrators can open this console.</p></div>
     <label class="field"><span>Email</span><input class="input" type="email" name="email" autocomplete="username" required></label>
     <label class="field"><span>Password</span><input class="input" type="password" name="password" autocomplete="current-password" required></label>
@@ -128,8 +130,8 @@ function friendly(error) {
   return error?.message || 'Sign in failed.';
 }
 
-const isAdminToken = (claims) => claims.admin === true
-  || (claims.email_verified === true && OWNER_EMAILS.includes(String(claims.email || '').toLowerCase()));
+// Admin access comes only from the private admin custom claim (no addresses in public code).
+const isAdminToken = (claims) => claims.admin === true;
 
 // ---------- console shell ----------
 const SITES = [
@@ -147,11 +149,11 @@ function shell(session) {
   const light = (() => { try { return localStorage.getItem('zp-admin-theme') === 'light'; } catch { return false; } })();
   document.body.className = `ad${light ? ' light' : ''}`;
   const local = /^(localhost|127\.0\.0\.1)$/.test(location.hostname);
-  const href = (site) => (local ? `/subdomain/${site.key}/index.html${location.search}` : site.url);
+  const href = (site) => (local ? `${LOCAL_PAGES[site.key]}${location.search}` : site.url);
   const name = session.email || session.uid;
   document.body.innerHTML = `<div class="shell">
     <aside class="side" id="side">
-      <a class="brand" href="${href(SITES[0])}"><img src="${RES}/assets/app-logo/zpass.png" alt=""><span><b>Z Pass</b><small>Admin console</small></span></a>
+      <a class="brand" href="${href(SITES[0])}"><img src="${LOGO}" alt=""><span><b>Z Pass</b><small>Admin console</small></span></a>
       <div class="group">Manage</div>
       ${SITES.map((s) => `<a class="nav-link${s.key === SUB ? ' on' : ''}" href="${href(s)}">${icons[s.icon]}${esc(s.label)}</a>`).join('')}
       <div class="group">Public</div>

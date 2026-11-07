@@ -7,11 +7,6 @@
   let target=path.replace(/\.html$/,'');if(/^\/(privacy|security|terms)$/.test(target))target='/legal'+target;
   location.replace('https://zpas.org'+target+location.search+location.hash);return;
  }
- const legacy=path.match(/^\/subdomain\/(api|docs|core|bots|web|pay|developers)(?:\/(.*))?$/);
- if(legacy&&window.top===window.self&&host!==legacy[1]+'.zpas.org'&&!/^(localhost|127.0.0.1)$/.test(host)){
-  const tail=(legacy[2]||'').replace(/(?:^|\/)index\.html$/,'').replace(/\.html$/,'');
-  location.replace('https://'+legacy[1]+'.zpas.org/'+tail+location.search+location.hash);return;
- }
  if(host!=='pay.zpas.org')return;
  document.title='Checkout — PassGram';
  if(['/','/index.html','/subdomain/pay/','/subdomain/pay/index.html'].includes(path))return;

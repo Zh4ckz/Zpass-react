@@ -4,12 +4,10 @@ export class HttpError extends Error {
 }
 export const fail = (status, message) => { throw new HttpError(status, message); };
 
-// Same rule as firestore.rules isAdmin(): an `admin` custom claim, or the verified owner address.
-const OWNER_EMAILS = new Set(['zh4ckz@proton.me']);
+// Same rule as firestore.rules isAdmin(): only the `admin` custom claim grants admin access.
+// Email addresses never grant admin rights (the support address is not an admin).
 export function isAdminIdentity(identity) {
-  if (!identity) return false;
-  if (identity.admin === true) return true;
-  return identity.email_verified === true && OWNER_EMAILS.has(String(identity.email || '').toLowerCase());
+  return !!identity && identity.admin === true;
 }
 
 export function username(value) {

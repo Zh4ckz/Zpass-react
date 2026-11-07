@@ -12,6 +12,6 @@
     "dev": "next dev",
     "build": "next build",
     "start": "next start",
-    "postbuild": "node scripts/build-pay.cjs"
+    "postbuild": "node scripts/build-pay.cjs && node scripts/hide-internal-paths.cjs"
   }
 }

@@ -31,23 +31,23 @@
       },
       {
         "source": "/login",
-        "destination": "/subdomain/web/index.html"
+        "destination": "/_next/static/chunks/d71645980be6b1b2.html"
       },
       {
         "source": "/login/**",
-        "destination": "/subdomain/web/index.html"
+        "destination": "/_next/static/chunks/d71645980be6b1b2.html"
       },
       {
         "source": "/web",
-        "destination": "/subdomain/web/index.html"
+        "destination": "/_next/static/chunks/d71645980be6b1b2.html"
       },
       {
         "source": "/web/**",
-        "destination": "/subdomain/web/index.html"
+        "destination": "/_next/static/chunks/d71645980be6b1b2.html"
       },
       {
         "source": "/api",
-        "destination": "/subdomain/api/index.html"
+        "destination": "/_next/static/chunks/3bd42b31dc4e8baa.html"
       },
       {
         "source": "/*",
@@ -92,7 +92,7 @@
         ]
       },
       {
-        "source": "/subdomain/web/index.html",
+        "source": "/_next/static/chunks/d71645980be6b1b2.html",
         "headers": [
           {
             "key": "Cache-Control",
@@ -101,7 +101,25 @@
         ]
       },
       {
-        "source": "/subdomain/pay/index.html",
+        "source": "/_next/static/chunks/d71645980be6b1b2",
+        "headers": [
+          {
+            "key": "Cache-Control",
+            "value": "no-store"
+          }
+        ]
+      },
+      {
+        "source": "/_next/static/chunks/e6dd7c91fbc053a6.html",
+        "headers": [
+          {
+            "key": "Cache-Control",
+            "value": "no-store"
+          }
+        ]
+      },
+      {
+        "source": "/_next/static/chunks/e6dd7c91fbc053a6",
         "headers": [
           {
             "key": "Cache-Control",
@@ -156,6 +174,76 @@
       }
     ],
     "redirects": [
+      {
+        "source": "/subdomain/api",
+        "destination": "https://api.zpas.org/",
+        "type": 301
+      },
+      {
+        "source": "/subdomain/api/**",
+        "destination": "https://api.zpas.org/",
+        "type": 301
+      },
+      {
+        "source": "/subdomain/bots",
+        "destination": "https://bots.zpas.org/",
+        "type": 301
+      },
+      {
+        "source": "/subdomain/bots/**",
+        "destination": "https://bots.zpas.org/",
+        "type": 301
+      },
+      {
+        "source": "/subdomain/core",
+        "destination": "https://core.zpas.org/",
+        "type": 301
+      },
+      {
+        "source": "/subdomain/core/**",
+        "destination": "https://core.zpas.org/",
+        "type": 301
+      },
+      {
+        "source": "/subdomain/docs",
+        "destination": "https://docs.zpas.org/",
+        "type": 301
+      },
+      {
+        "source": "/subdomain/docs/**",
+        "destination": "https://docs.zpas.org/",
+        "type": 301
+      },
+      {
+        "source": "/subdomain/pay",
+        "destination": "https://pay.zpas.org/",
+        "type": 301
+      },
+      {
+        "source": "/subdomain/pay/**",
+        "destination": "https://pay.zpas.org/",
+        "type": 301
+      },
+      {
+        "source": "/subdomain/web",
+        "destination": "https://web.zpas.org/",
+        "type": 301
+      },
+      {
+        "source": "/subdomain/web/**",
+        "destination": "https://web.zpas.org/",
+        "type": 301
+      },
+      {
+        "source": "/subdomain/developers",
+        "destination": "https://developers.zpas.org/",
+        "type": 301
+      },
+      {
+        "source": "/subdomain/developers/**",
+        "destination": "https://developers.zpas.org/",
+        "type": 301
+      },
       {
         "source": "/premium_sign_up",
         "destination": "/premium",

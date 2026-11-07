@@ -40,9 +40,9 @@ const USERS = {
   owner: { uid: 'owner', email_verified: true },
   attacker: { uid: 'attacker', email_verified: true },
   stranger: { uid: 'stranger', email_verified: true },
-  boss: { uid: 'boss', email: 'zh4ckz@proton.me', email_verified: true },
+  boss: { uid: 'boss', admin: true },
   claimed: { uid: 'claimed', admin: true },
-  fake: { uid: 'fake', email: 'zh4ckz@proton.me', email_verified: false },
+  fake: { uid: 'fake', email: 'support@zpas.org', email_verified: true },
 };
 
 function fixture({ requireAppCheck = true } = {}) {

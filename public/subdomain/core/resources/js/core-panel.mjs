@@ -2,7 +2,8 @@
 import { startAdmin, topBar, icons, esc, $, toast } from './admin-gate.mjs';
 
 const local = /^(localhost|127\.0\.0\.1)$/.test(location.hostname);
-const link = (key) => (local ? `/subdomain/${key}/index.html${location.search}` : `https://${key}.zpas.org/`);
+const LOCAL_PAGES = { bots: '/subdomain/bots/index.html', api: '/subdomain/api/index.html' };
+const link = (key) => (local ? `${LOCAL_PAGES[key]}${location.search}` : `https://${key}.zpas.org/`);
 const json = async (url) => { const r = await fetch(url, { cache: 'no-store' }); if (!r.ok) throw new Error(`${url} ${r.status}`); return r.json(); };
 const fmt = (n) => (typeof n === 'number' ? n.toLocaleString() : '—');
 const ago = (iso) => {

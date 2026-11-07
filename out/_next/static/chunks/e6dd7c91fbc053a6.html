@@ -1,0 +1,42 @@
+<!doctype html>
+<html lang="en" data-sub="pay">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <meta name="robots" content="noindex,nofollow">
+  <meta name="referrer" content="no-referrer">
+  <meta name="theme-color" content="#f7f9fd">
+  <title>Checkout — PassGram</title>
+  <link rel="icon" href="/_next/static/chunks/2c214b7a7de331a5/zpass.png">
+  <link rel="stylesheet" href="/_next/static/chunks/2b5a13eed55076d4/pay-checkout.css?v=2">
+  <script type="module" src="/_next/static/chunks/69fc7248e403df27/pay-checkout.mjs?v=5"></script>
+</head>
+<body>
+  <header class="pay-header"><a class="pay-brand" href="https://zpas.org/"><img src="/_next/static/chunks/2c214b7a7de331a5/zpass.png" alt="" width="30" height="30">PassGram<span>Checkout</span></a><a class="pay-back" href="https://zpas.org/about/pricing">Back to plans <span aria-hidden="true">↗</span></a></header>
+  <main class="pay-shell" aria-labelledby="pay-title">
+    <section class="pay-configuration">
+      <div class="pay-eyebrow"><span></span> A LITTLE MORE ROOM FOR YOUR DAY</div>
+      <h1 id="pay-title">Make it yours.</h1>
+      <p class="pay-intro">Choose your plan. Review the details.<br>Continue to Stripe to complete your payment.</p>
+      <fieldset class="pay-plan-picker"><legend>Your plan</legend><label><input type="radio" name="plan" value="PLUS" checked><span><b>Plus</b><small>More room for your everyday essentials</small></span><i aria-hidden="true"></i></label><label><input type="radio" name="plan" value="PRO"><span><b>Pro</b><small>More space for a bigger personal vault</small></span><i aria-hidden="true"></i></label></fieldset>
+      <fieldset class="pay-period-picker"><legend>Billing period</legend><div><label><input type="radio" name="billing" value="MONTHLY" checked><span>Monthly</span></label><label><input type="radio" name="billing" value="YEARLY"><span>12 months <small id="pay-savings" hidden></small></span></label></div></fieldset>
+      <div class="pay-account-field"><span class="pay-account-label">Account receiving the plan</span><strong id="pay-account" aria-live="polite">Checking your session...</strong><p>This plan will be added to your signed-in account.</p><a id="pay-signin" href="https://web.zpas.org/web?checkout=1">Sign in to continue</a></div>
+      <div class="pay-info"><span class="pay-lock" aria-hidden="true">⌑</span><div><b>Your card details stay with Stripe</b><p>You enter payment details on Stripe’s hosted checkout. PassGram does not collect card numbers on this page.</p></div></div>
+      <p class="pay-help">A question before you continue? <a href="https://zpas.org/support" target="_blank" rel="noopener noreferrer">We can help ↗</a></p>
+    </section>
+    <aside class="pay-summary" aria-labelledby="summary-title">
+      <div class="pay-summary-top"><img src="/_next/static/chunks/2c214b7a7de331a5/zpass.png" width="36" height="36" alt=""><span>YOUR ORDER</span><span class="pay-order-mark" aria-hidden="true">↗</span></div>
+      <h2 id="summary-title">PassGram Plus</h2><p id="pay-plan-description">For your everyday essentials.</p>
+      <div class="pay-price"><strong id="pay-amount">$4.99</strong><span id="pay-interval">/ month</span></div>
+      <ul id="pay-includes"><li>Up to 50 vault items</li><li>Up to 5 saved logins</li><li>Cloud backup and recovery</li></ul>
+      <dl class="pay-totals"><div><dt>Billing</dt><dd id="pay-billing-label">Monthly</dd></div><div><dt>Plan subtotal</dt><dd id="pay-subtotal">$4.99</dd></div><div><dt>Taxes</dt><dd>Calculated at checkout</dd></div></dl>
+      <p class="pay-renewal" id="pay-renewal">Charged monthly automatically until cancelled.</p>
+      <button class="pay-submit" id="pay-submit" type="button" disabled>Checking availability…</button>
+      <p id="pay-status" class="pay-status" role="status" aria-live="polite">Loading checkout details.</p>
+      <p class="pay-legal">Review our <a href="https://zpas.org/legal/terms" target="_blank" rel="noopener noreferrer">Terms</a> and <a href="https://zpas.org/legal/privacy" target="_blank" rel="noopener noreferrer">Privacy Policy</a>. The plan is added to your signed-in account.</p>
+    </aside>
+  </main>
+  <footer class="pay-footer"><span>© PassGram</span><span>Plan review → Stripe checkout → Confirmation</span><a href="https://zpas.org/support">Contact support</a></footer>
+  <noscript><p class="pay-noscript">Enable JavaScript to choose your plan. No payment has been taken.</p></noscript>
+</body>
+</html>
