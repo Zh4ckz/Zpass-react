@@ -69,4 +69,6 @@ async function start() {
   }
 }
 
-start();
+// Load the 170 KB player only after the page is fully loaded and idle, so it never competes with CSS on slow networks.
+const later = () => (window.requestIdleCallback ? requestIdleCallback(() => start(), { timeout: 4000 }) : setTimeout(start, 500));
+if (document.readyState === 'complete') later(); else window.addEventListener('load', later, { once: true });
