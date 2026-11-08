@@ -31,7 +31,7 @@ export const darkAppearance = {
   labels: 'above',
   variables: {
     colorPrimary: '#ffffff', colorBackground: '#1c1c1f', colorText: '#f4f4f5', colorTextSecondary: '#a1a1aa',
-    colorDanger: '#ff6b6b', borderRadius: '12px', fontFamily: 'Inter, system-ui, sans-serif', fontSizeBase: '15px', spacingUnit: '4px',
+    colorDanger: '#ff6b6b', borderRadius: '10px', fontFamily: 'Inter, system-ui, sans-serif', fontSizeBase: '14px', spacingUnit: '3px',
   },
   rules: {
     '.Input': { border: '1px solid #3a3a3f', boxShadow: 'none', backgroundColor: '#141416' },
@@ -76,7 +76,7 @@ export async function mountElements({ publishableKey, clientSecret, appearance, 
   // Apple Pay / Google Pay / Link appear only on HTTPS, on registered domains and supported devices; report so the page can hide an empty row.
   express.on('ready', (event) => onExpressReady?.(Object.values(event?.availablePaymentMethods || {}).some(Boolean)));
   express.mount(expressContainer);
-  const payment = checkout.createPaymentElement({ layout: { type: 'accordion', defaultCollapsed: false } });
+  const payment = checkout.createPaymentElement({ layout: { type: 'accordion', defaultCollapsed: true } });
   payment.mount(paymentContainer);
 
   const loaded = await checkout.loadActions();

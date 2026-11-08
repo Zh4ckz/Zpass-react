@@ -74,7 +74,7 @@ async function startElements(current,uid){
    onChange:({canConfirm,total})=>{if(pay!==mine)return;mine.canConfirm=canConfirm;mine.total=total;render()},
    onExpress:result=>{if(pay!==mine)return;if(result.ok)paid();else{$('pp-status').textContent=result.error}}});
   if(pay!==mine){api.destroy();return}
-  mine.api=api;$('pp-status').textContent='Your card details go directly to Stripe.';render();
+  mine.api=api;$('pp-status').textContent='';render();
  }catch(error){if(pay===mine){stopElements();$('pp-status').textContent=error.name==='TimeoutError'?'Payment service took too long. Try again.':error.message;render()}}
 }
 function stopElements(){if(pay?.api)pay.api.destroy();pay=null;document.getElementById('pp-elements')?.remove();dialog.querySelector('.pp-provider')?.classList.remove('pp-hidden');dialog.classList.remove('pp-paying')}
