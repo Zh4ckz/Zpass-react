@@ -15,6 +15,38 @@ const MAX_BODY = 16384;
 export const MAX_FILE = 5 * 1024 * 1024;   // 5 MB per file
 const FILE_TTL = 86400;                    // seconds a file waits for its recipient
 const FILE_ID = /^[a-f0-9]{48}$/;
+const CALLBACK_ID = /^[a-f0-9]{24}$/;
+
+// Telegram-compatible inline keyboard: { inline_keyboard: [[{ text, callback_data } | { text, url }], ...] }
+// Limits: 10 rows, 4 buttons per row, 30 buttons; text 1–64 chars; callback_data 1–64 bytes; url https:// up to 512.
+export function inlineKeyboard(markup) {
+  if (markup == null || markup === '') return null;
+  let value = markup;
+  if (typeof value === 'string') { try { value = JSON.parse(value); } catch { fail(400, 'reply_markup must be JSON'); } }
+  const rows = value?.inline_keyboard;
+  if (!Array.isArray(rows) || !rows.length || rows.length > 10) fail(400, 'inline_keyboard must have 1–10 rows');
+  let total = 0;
+  const out = rows.map((row) => {
+    if (!Array.isArray(row) || !row.length || row.length > 4) fail(400, 'Each keyboard row needs 1–4 buttons');
+    return row.map((b) => {
+      total++;
+      const text = String(b?.text ?? '').trim();
+      if (!text || text.length > 64) fail(400, 'Button text must be 1–64 characters');
+      const hasData = b.callback_data != null, hasUrl = b.url != null;
+      if (hasData === hasUrl) fail(400, 'Each button needs exactly one of callback_data or url');
+      if (hasData) {
+        const data = String(b.callback_data);
+        if (!data || new TextEncoder().encode(data).length > 64) fail(400, 'callback_data must be 1–64 bytes');
+        return { text, callback_data: data };
+      }
+      const url = String(b.url);
+      if (!/^https:\/\/[^\s]{1,500}$/.test(url)) fail(400, 'Button url must start with https://');
+      return { text, url };
+    });
+  });
+  if (total > 30) fail(400, 'At most 30 buttons per keyboard');
+  return { inline_keyboard: out };
+}
 
 const botId = (value) => { const id = String(value || ''); if (!BOT_ID.test(id)) fail(400, 'Invalid bot'); return id; };
 const millis = (value) => (value instanceof Date ? value.getTime() : typeof value === 'number' ? value : null);
@@ -202,6 +234,35 @@ export function createGateway({ db, files = null, verifyUser, verifyAppCheck, re
           return message;
         });
       }
+      case 'press': {
+        const username = policy.username(body.username);
+        const id = (await db.get(`chat_usernames/${username}`))?.botId;
+        if (!id) fail(404, 'Bot not found');
+        const mid = String(body.message_id || ''), data = String(body.data || '');
+        if (!/^[a-f0-9]{24}$/.test(mid) || !data || data.length > 64) fail(400, 'Invalid button');
+        const thread = `zp_bot_threads/${id}_${owner}`;
+        const cbid = policy.randomId();
+        return db.transaction(async (tx) => {
+          const bot = await tx.get(`zp_bots/${id}`), msg = await tx.get(`${thread}/messages/${mid}`);
+          if (!bot) fail(404, 'Bot not found');
+          if (bot.disabled) fail(403, 'Bot disabled');
+          const buttons = (msg?.reply_markup?.inline_keyboard || []).flat();
+          if (!msg || msg.sender !== `bot_${id}` || !buttons.some((b) => b.callback_data === data)) fail(404, 'This button is no longer available');
+          const sequence = (bot.sequence || 0) + 1;
+          const callback_query = { id: cbid, from: { id: owner }, message: { message_id: mid, text: msg.text || '', chat: { id: owner, type: 'private' } }, data };
+          tx.update(`zp_bots/${id}`, { sequence });
+          tx.create(`zp_bot_callbacks/${cbid}`, { botId: id, owner, messageId: mid, answered: false, createdAt: Date.now(), expiresAt: new Date(Date.now() + 3600000) });
+          tx.create(`zp_bots/${id}/updates/${String(sequence).padStart(16, '0')}`, { update_id: sequence, callback_query, expiresAt: new Date(Date.now() + 86400000) });
+          return { callback_query_id: cbid };
+        });
+      }
+      case 'callback': {
+        const cb = String(body.callback_query_id || '');
+        if (!CALLBACK_ID.test(cb)) fail(400, 'Invalid callback_query_id');
+        const row = await db.get(`zp_bot_callbacks/${cb}`);
+        if (!row || row.owner !== owner) fail(404, 'Not found');
+        return { answered: !!row.answered, text: row.text || '', show_alert: !!row.show_alert };
+      }
       default: fail(404, 'Unknown management method');
     }
   }
@@ -233,15 +294,46 @@ export function createGateway({ db, files = null, verifyUser, verifyAppCheck, re
       case 'sendMessage': {
         const uid = await recipient(body.chat_id), text = String(body.text || '').trim();
         if (!text || text.length > 4096) fail(400, 'Invalid chat or text');
-        if (body.parse_mode || body.reply_markup) fail(400, 'Formatting and buttons not yet supported');
+        if (body.parse_mode) fail(400, 'Formatting not yet supported');
+        const markup = inlineKeyboard(body.reply_markup);
         const thread = `zp_bot_threads/${id}_${uid}`, messageId = policy.randomId();
-        const message = { text, sender: `bot_${id}`, createdAt: Date.now(), chat: { id: uid, type: 'private' } };
+        const message = { text, sender: `bot_${id}`, createdAt: Date.now(), chat: { id: uid, type: 'private' }, ...(markup ? { reply_markup: markup } : {}) };
         await db.transaction(async (tx) => {
           if (!(await tx.get(thread))) fail(403, 'User must start this bot first');
           tx.create(`${thread}/messages/${messageId}`, message);
           tx.update(thread, { lastMessage: text.slice(0, 120), lastAt: message.createdAt });
         });
         return { ...message, message_id: messageId };
+      }
+      case 'editMessageText':
+      case 'editMessageReplyMarkup': {
+        const uid = await recipient(body.chat_id);
+        const mid = String(body.message_id || '');
+        if (!/^[a-f0-9]{24}$/.test(mid)) fail(400, 'Invalid message_id');
+        const path = `zp_bot_threads/${id}_${uid}/messages/${mid}`;
+        const update = {};
+        if (method === 'editMessageText') {
+          const text = String(body.text || '').trim();
+          if (!text || text.length > 4096) fail(400, 'Text must be 1–4096 characters');
+          update.text = text; update.editedAt = Date.now();
+        }
+        const markup = body.reply_markup === undefined && method === 'editMessageText' ? undefined : inlineKeyboard(body.reply_markup);
+        if (markup !== undefined) update.reply_markup = markup || { inline_keyboard: [] };
+        await db.transaction(async (tx) => {
+          const old = await tx.get(path);
+          if (!old || old.sender !== `bot_${id}`) fail(404, 'Message not found');
+          tx.update(path, update);
+        });
+        return true;
+      }
+      case 'answerCallbackQuery': {
+        const cb = String(body.callback_query_id || '');
+        if (!CALLBACK_ID.test(cb)) fail(400, 'Invalid callback_query_id');
+        const text = String(body.text || '').slice(0, 200);
+        const row = await db.get(`zp_bot_callbacks/${cb}`);
+        if (!row || row.botId !== id) fail(404, 'Callback query not found or expired');
+        await db.update(`zp_bot_callbacks/${cb}`, { answered: true, text, show_alert: body.show_alert === true || body.show_alert === 'true', answeredAt: Date.now() });
+        return true;
       }
       case 'sendDocument': {
         if (!files) fail(503, 'File relay unavailable');

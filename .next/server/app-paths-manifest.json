@@ -1,9 +1,9 @@
 {
   "/_not-found/page": "app/_not-found/page.js",
   "/page": "app/page.js",
+  "/admin/page": "app/admin/page.js",
   "/auth/action/page": "app/auth/action/page.js",
-  "/premium/page": "app/premium/page.js",
   "/account/subscription/page": "app/account/subscription/page.js",
-  "/support/page": "app/support/page.js",
-  "/admin/page": "app/admin/page.js"
+  "/premium/page": "app/premium/page.js",
+  "/support/page": "app/support/page.js"
 }

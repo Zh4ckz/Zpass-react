@@ -8,6 +8,7 @@
     "FIREBASE_PROJECT_ID": "passgram-org",
     "REQUIRE_APP_CHECK": "false"
   },
+  "kv_namespaces": [{ "binding": "ZBOT_FILES", "id": "950cdde17b924a10862a1073419d3fa1" }],
   "observability": { "enabled": true },
   "account_id": "ceaaa7d98e5d8eddc066654306107a7b"
 }

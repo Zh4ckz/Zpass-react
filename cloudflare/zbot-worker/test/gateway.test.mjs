@@ -253,3 +253,48 @@ test('sendDocument relays a file to @username once and deletes it after download
   assert.equal((await get()).status, 404, 'deleted after the first download');
   assert.equal(files.map.size, 0);
 });
+
+// ---------- inline keyboards (Telegram format) ----------
+test('inline keyboard: send, press, getUpdates, answerCallbackQuery, edit', async () => {
+  const db = memoryDb();
+  const handle = createGateway({ db, verifyUser: async (t) => { if (!USERS[t]) throw new HttpError(401, 'Sign in required'); return USERS[t]; }, verifyAppCheck: async (t) => t === 'check' });
+  const api = async (path, body, token) => {
+    const headers = { 'content-type': 'application/json', authorization: `Bearer ${token}`, 'x-firebase-appcheck': 'check' };
+    const res = await handle(new Request('https://botapi.zpas.org' + path, { method: 'POST', headers, body: JSON.stringify(body) }));
+    return { status: res.status, ...(await res.json()) };
+  };
+  const bot = (await api('/manage/create', { name: 'Keys', username: 'keys_bot' }, 'owner')).result;
+  db.data.set('chat_usernames/rezan', { uid: 'owner' });
+  await api('/manage/send', { username: 'keys_bot', text: '/start', requestId: REQ }, 'owner');
+  const kb = { inline_keyboard: [[{ text: 'Yeni bot', callback_data: 'new' }, { text: 'Botlarım', callback_data: 'mine' }], [{ text: 'Docs', url: 'https://docs.zpas.org/' }]] };
+  // validation
+  assert.equal((await api('/sendMessage', { chat_id: '@rezan', text: 'x', reply_markup: { inline_keyboard: [[{ text: 'a' }]] } }, bot.token)).status, 400);
+  assert.equal((await api('/sendMessage', { chat_id: '@rezan', text: 'x', reply_markup: { inline_keyboard: [[{ text: 'a', url: 'http://x' }]] } }, bot.token)).status, 400);
+  assert.equal((await api('/sendMessage', { chat_id: '@rezan', text: 'x', reply_markup: { inline_keyboard: [[1, 2, 3, 4, 5].map((n) => ({ text: 'b' + n, callback_data: 'd' + n }))] } }, bot.token)).status, 400);
+  const sent = await api('/sendMessage', { chat_id: '@rezan', text: 'Merhaba!', reply_markup: kb }, bot.token);
+  assert.equal(sent.ok, true);
+  assert.deepEqual(sent.result.reply_markup, kb);
+  // reply_markup may also arrive as a JSON string (form posts)
+  assert.equal((await api('/sendMessage', { chat_id: '@rezan', text: 'str', reply_markup: JSON.stringify(kb) }, bot.token)).ok, true);
+  const mid = sent.result.message_id;
+  // pressing an unknown button is refused, a real one creates a callback_query update
+  assert.equal((await api('/manage/press', { username: 'keys_bot', message_id: mid, data: 'nope' }, 'owner')).status, 404);
+  const press = await api('/manage/press', { username: 'keys_bot', message_id: mid, data: 'mine' }, 'owner');
+  assert.equal(press.ok, true);
+  const updates = (await api('/getUpdates', {}, bot.token)).result;
+  const cbq = updates.find((u) => u.callback_query)?.callback_query;
+  assert.equal(cbq.data, 'mine');
+  assert.equal(cbq.message.message_id, mid);
+  assert.equal(cbq.from.id, 'owner');
+  // answer shows a toast in the app
+  assert.equal((await api('/answerCallbackQuery', { callback_query_id: cbq.id, text: 'Done' }, bot.token)).ok, true);
+  assert.deepEqual((await api('/manage/callback', { callback_query_id: cbq.id }, 'owner')).result, { answered: true, text: 'Done', show_alert: false });
+  assert.equal((await api('/manage/callback', { callback_query_id: cbq.id }, 'attacker')).status, 404);
+  // edit text and remove the keyboard
+  assert.equal((await api('/editMessageText', { chat_id: '@rezan', message_id: mid, text: 'Your bots: none' }, bot.token)).ok, true);
+  assert.equal((await api('/editMessageReplyMarkup', { chat_id: '@rezan', message_id: mid }, bot.token)).ok, true);
+  const stored = db.data.get(`zp_bot_threads/${bot.id}_owner/messages/${mid}`);
+  assert.equal(stored.text, 'Your bots: none');
+  assert.deepEqual(stored.reply_markup, { inline_keyboard: [] });
+  assert.equal((await api('/manage/press', { username: 'keys_bot', message_id: mid, data: 'mine' }, 'owner')).status, 404, 'removed buttons cannot be pressed');
+});
