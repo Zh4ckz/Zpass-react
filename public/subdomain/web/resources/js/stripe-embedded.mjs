@@ -31,7 +31,8 @@ export async function mountEmbedded({ publishableKey, fetchClientSecret, contain
   const checkout = await stripe.createEmbeddedCheckoutPage({
     fetchClientSecret: async () => {
       const secret = await fetchClientSecret();
-      if (typeof secret !== 'string' || !/^cs_(live|test)_[A-Za-z0-9_]+$/.test(secret)) throw Error('The payment provider could not be verified. No payment has been taken.');
+      // Real client secrets look like cs_live_<id>_secret_<token> and the token contains %-encoded bytes.
+      if (typeof secret !== 'string' || secret.length > 2048 || !/^cs_(live|test)_[A-Za-z0-9]+_secret_[A-Za-z0-9_%]+$/.test(secret)) throw Error('The payment provider could not be verified. No payment has been taken.');
       return secret;
     },
     onComplete: () => onComplete?.(),
