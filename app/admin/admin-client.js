@@ -182,8 +182,10 @@ const NAV = [
   { id: 'requests', label: 'Payment requests', icon: 'inbox' },
   { id: 'subscriptions', label: 'Subscriptions', icon: 'crown' },
   { id: 'users', label: 'Users', icon: 'users' },
+  { id: 'moderation', label: 'Moderation', icon: 'shield' },
   { id: 'payments', label: 'Payment history', icon: 'card' },
   { id: 'releases', label: 'Updates & releases', icon: 'rocket' },
+  { id: 'paywall', label: 'Subscription pop-up', icon: 'crown' },
   { id: 'errors', label: 'Error reports', icon: 'bug' },
 ]
 const EXTERNAL = [
@@ -516,6 +518,170 @@ function Releases({ fb, ask, toast }) {
   )
 }
 
+const EMPTY_PW = { paywallEnabled: false, paywallEveryHours: 72, paywallMaxShows: 3, paywallDelaySeconds: 20, paywallDefaultTier: 'pro', paywallTitle: '', paywallOffer: '', paywallOfferBilling: 'monthly', paywallCta: '' }
+function Paywall({ fb, ask, toast }) {
+  const { fs, db } = fb
+  const ref = fs.doc(db, 'app_config', 'public')
+  const [form, setForm] = useState(EMPTY_PW)
+  const [saving, setSaving] = useState(false)
+  const cfg = useLoader(async () => (await fs.getDoc(ref)).data() || {}, [])
+  useEffect(() => { if (cfg.data) setForm({ ...EMPTY_PW, ...Object.fromEntries(Object.keys(EMPTY_PW).map((k) => [k, cfg.data[k] ?? EMPTY_PW[k]])) }) }, [cfg.data])
+  const set = (k) => (e) => setForm({ ...form, [k]: e.target.type === 'checkbox' ? e.target.checked : e.target.value })
+  const save = async (newCampaign) => {
+    const every = Number(form.paywallEveryHours), max = Number(form.paywallMaxShows), delay = Number(form.paywallDelaySeconds)
+    if (!(every >= 0 && every <= 2160) || !(max >= 0 && max <= 1000) || !(delay >= 0 && delay <= 600)) return toast('Check the numbers: hours 0–2160, max 0–1000, delay 0–600 s.', 'bad')
+    if (newCampaign && !(await ask({ title: 'Show the pop-up again to everyone?', message: 'Starts a new campaign: every signed-in free user sees the subscription pop-up again on their next app open.', confirm: 'Start campaign' }))) return
+    setSaving(true)
+    try {
+      const enabled = newCampaign ? true : !!form.paywallEnabled
+      await fs.setDoc(ref, {
+        paywallEnabled: enabled, paywallEveryHours: every, paywallMaxShows: max, paywallDelaySeconds: delay,
+        paywallDefaultTier: form.paywallDefaultTier === 'plus' ? 'plus' : 'pro',
+        paywallTitle: form.paywallTitle.trim().slice(0, 80), paywallOffer: form.paywallOffer.trim().slice(0, 80),
+        paywallOfferBilling: form.paywallOfferBilling === 'yearly' ? 'yearly' : 'monthly', paywallCta: form.paywallCta.trim().slice(0, 40),
+        paywallCampaignId: newCampaign || (enabled && !cfg.data?.paywallCampaignId) ? 'c' + Date.now() : cfg.data?.paywallCampaignId || '',
+        updatedAt: fs.serverTimestamp(),
+      }, { merge: true })
+      toast(newCampaign ? 'New campaign started. Apps pick it up live.' : 'Saved. Apps pick this up live.'); cfg.reload()
+    } catch (error) { toast(errorText(error), 'bad') } finally { setSaving(false) }
+  }
+  if (cfg.error) return <Card title="Subscription pop-up"><div className="zpa-state bad">{cfg.error}</div></Card>
+  return (
+    <Card title="Subscription pop-up" hint="X-style upgrade sheet in the Android app. Only signed-in free users see it; closing it returns them where they were. Also controllable from the admin Telegram bot with /paywall."
+      actions={<button className="zpa-btn ghost sm" onClick={cfg.reload}><Icon name="refresh" size={15} />Reload</button>}>
+      <div className="zpa-grid3">
+        <div className="zpa-tile">
+          <h4>When</h4>
+          <label className="zpa-switch"><input type="checkbox" checked={!!form.paywallEnabled} onChange={set('paywallEnabled')} /><span />Pop-up enabled</label>
+          <label className="zpa-field"><span>Minimum hours between pop-ups</span><input type="number" min="0" value={form.paywallEveryHours} onChange={set('paywallEveryHours')} /></label>
+          <label className="zpa-field"><span>Max per user per campaign (0 = no limit)</span><input type="number" min="0" value={form.paywallMaxShows} onChange={set('paywallMaxShows')} /></label>
+          <label className="zpa-field"><span>Delay after the app opens (seconds)</span><input type="number" min="0" value={form.paywallDelaySeconds} onChange={set('paywallDelaySeconds')} /></label>
+        </div>
+        <div className="zpa-tile">
+          <h4>Content</h4>
+          <label className="zpa-field"><span>Headline (empty = default)</span><input value={form.paywallTitle} onChange={set('paywallTitle')} placeholder="One subscription. Everything protected." /></label>
+          <label className="zpa-field"><span>Button text (empty = “Upgrade to …”)</span><input value={form.paywallCta} onChange={set('paywallCta')} placeholder="Claim limited-time offer" /></label>
+          <label className="zpa-field"><span>Plan tab selected first</span><select value={form.paywallDefaultTier} onChange={set('paywallDefaultTier')}><option value="pro">Pro</option><option value="plus">Plus</option></select></label>
+        </div>
+        <div className="zpa-tile">
+          <h4>Offer</h4>
+          <label className="zpa-field"><span>Blue offer line (empty = none)</span><input value={form.paywallOffer} onChange={set('paywallOffer')} placeholder="50% off your first month" /></label>
+          <label className="zpa-field"><span>Show the offer on</span><select value={form.paywallOfferBilling} onChange={set('paywallOfferBilling')}><option value="monthly">Monthly</option><option value="yearly">Yearly</option></select></label>
+          <p style={{ fontSize: 12, opacity: 0.7, margin: "6px 0 0" }}>The offer line is display text only. Make sure the real discount exists in Stripe.</p>
+        </div>
+      </div>
+      <div className="zpa-form-row end">
+        <button className="zpa-btn ghost" disabled={saving || cfg.loading} onClick={() => save(true)}><Icon name="rocket" size={15} />Show again to everyone</button>
+        <button className="zpa-btn primary" disabled={saving || cfg.loading} onClick={() => save(false)}>{saving ? 'Saving…' : 'Save'}</button>
+      </div>
+    </Card>
+  )
+}
+
+// ---------------- Moderation (Telegram style bans) ----------------
+// chat_bans/{uid} bans an account; chat_bans/group_{gid} closes a group or channel for everyone.
+// Firestore rules make the collection admin-only and refuse messages from banned accounts / in closed groups.
+function Moderation({ fb, ask, toast }) {
+  const { fs, db } = fb
+  const [kind, setKind] = useState('user')
+  const [target, setTarget] = useState('')
+  const [reason, setReason] = useState('')
+  const [busy, setBusy] = useState(false)
+  const bans = useLoader(async () => {
+    const snap = await fs.getDocs(fs.query(fs.collection(db, 'chat_bans'), fs.orderBy('bannedAt', 'desc'), fs.limit(200)))
+    return snap.docs.map((d) => ({ id: d.id, ...d.data() }))
+  }, [])
+
+  // "@name", "zpas.org/name" or a raw id → { id, name } for a person or a group/channel
+  const resolve = async (raw, wantGroup) => {
+    const text = String(raw || '').trim().replace(/^https?:\/\/(www\.)?zpas\.org\//i, '').replace(/^zpas\.org\//i, '').replace(/^@/, '')
+    if (!text) throw Error('Enter a @username or an id.')
+    const handle = text.toLowerCase()
+    if (/^[a-z0-9_]{4,32}$/.test(handle)) {
+      const row = await fs.getDoc(fs.doc(db, 'chat_usernames', handle))
+      if (row.exists()) {
+        const d = row.data()
+        if (wantGroup) { if (!d.gid) throw Error(`@${handle} is not a group or channel.`); return { id: d.gid, name: '@' + handle } }
+        if (d.gid || d.botId) throw Error(`@${handle} is not a person. Use the Group / channel tab.`)
+        return { id: d.uid, name: '@' + handle }
+      }
+    }
+    if (/^[A-Za-z0-9_-]{6,128}$/.test(text)) return { id: text, name: text }
+    throw Error('Not found: ' + raw)
+  }
+
+  const ban = async () => {
+    setBusy(true)
+    try {
+      const wantGroup = kind === 'group'
+      const { id, name } = await resolve(target, wantGroup)
+      const ok = await ask({
+        title: wantGroup ? `Close ${name}?` : `Ban ${name}?`,
+        message: wantGroup ? 'Every member sees "This channel can\'t be displayed … violates the Z Pass Terms of Service" and nobody can post.'
+          : 'The person sees "Your account was banned by Z Pass for violating the Z Pass Terms of Service" and can no longer send messages.',
+        confirm: wantGroup ? 'Close' : 'Ban', danger: true,
+      })
+      if (!ok) return
+      const docId = wantGroup ? 'group_' + id : id
+      await fs.setDoc(fs.doc(db, 'chat_bans', docId), {
+        banned: true, type: wantGroup ? 'group' : 'user', [wantGroup ? 'gid' : 'uid']: id, username: name,
+        reason: reason.trim().slice(0, 200), bannedAt: fs.serverTimestamp(), by: fb.auth?.currentUser?.uid || '',
+      })
+      toast(wantGroup ? `${name} closed.` : `${name} banned.`); setTarget(''); setReason(''); bans.reload()
+    } catch (error) { toast(errorText(error), 'bad') } finally { setBusy(false) }
+  }
+
+  const unban = async (row) => {
+    if (!(await ask({ title: `Lift the ban on ${row.username || row.id}?`, message: 'They can use chats again right away.', confirm: 'Lift ban' }))) return
+    try { await fs.deleteDoc(fs.doc(db, 'chat_bans', row.id)); toast('Ban lifted.'); bans.reload() } catch (error) { toast(errorText(error), 'bad') }
+  }
+
+  const deleteGroup = async (row) => {
+    const gid = row.gid || row.id.replace(/^group_/, '')
+    if (!(await ask({ title: `Delete ${row.username || gid} permanently?`, message: 'The group / channel is removed for every member. This cannot be undone.', confirm: 'Delete', danger: true }))) return
+    try {
+      await fs.deleteDoc(fs.doc(db, 'chat_groups', gid))
+      const handle = String(row.username || '').replace(/^@/, '')
+      if (handle) await fs.deleteDoc(fs.doc(db, 'chat_usernames', handle)).catch(() => {})
+      toast('Deleted.'); bans.reload()
+    } catch (error) { toast(errorText(error), 'bad') }
+  }
+
+  return (
+    <>
+      <Card title="Ban or close" hint="Bans apply instantly in the app. Banned people keep their account but cannot use chats; closed groups and channels disappear for every member.">
+        <div className="zpa-form-row">
+          <label className="zpa-field"><span>Type</span>
+            <select value={kind} onChange={(e) => setKind(e.target.value)}><option value="user">Person</option><option value="group">Group / channel</option></select></label>
+          <label className="zpa-field" style={{ flex: 2 }}><span>{kind === 'user' ? '@username or user id' : '@username, zpas.org/link or group id'}</span>
+            <input value={target} onChange={(e) => setTarget(e.target.value)} placeholder={kind === 'user' ? '@username' : '@channel'} /></label>
+          <label className="zpa-field" style={{ flex: 2 }}><span>Reason (shown to them, optional)</span>
+            <input value={reason} onChange={(e) => setReason(e.target.value)} placeholder="Spam, scam, abuse…" maxLength={200} /></label>
+        </div>
+        <div className="zpa-form-row end">
+          <button className="zpa-btn primary" disabled={busy || !target.trim()} onClick={ban}><Icon name="shield" size={15} />{busy ? 'Working…' : kind === 'user' ? 'Ban person' : 'Close group / channel'}</button>
+        </div>
+      </Card>
+      <Card title="Active bans" hint="Lift a ban, or delete a closed group / channel for good." actions={<button className="zpa-btn ghost sm" onClick={bans.reload}><Icon name="refresh" size={15} />Refresh</button>}>
+        <Table rows={bans.data} loading={bans.loading} error={bans.error} empty="Nobody is banned."
+          columns={[
+            { label: 'Type', render: (r) => (r.type === 'group' ? 'Group / channel' : 'Person') },
+            { label: 'Who', render: (r) => r.username || r.uid || r.gid || r.id },
+            { label: 'Id', mono: true, render: (r) => r.uid || r.gid || r.id },
+            { label: 'Reason', render: (r) => r.reason || '—' },
+            { label: 'When', render: (r) => fmtDate(r.bannedAt) },
+            { label: '', render: (r) => (
+              <span style={{ display: 'inline-flex', gap: 6 }}>
+                <button className="zpa-btn ghost sm" onClick={() => unban(r)}>Lift</button>
+                {r.type === 'group' && <button className="zpa-btn ghost sm" onClick={() => deleteGroup(r)}>Delete</button>}
+              </span>
+            ) },
+          ]} />
+      </Card>
+    </>
+  )
+}
+
 function Errors({ fb }) {
   const { fs, db } = fb
   const list = useLoader(async () => {
@@ -645,8 +811,10 @@ export default function AdminClient() {
               {view === 'requests' && <Requests {...props} />}
               {view === 'subscriptions' && <Subscriptions {...props} />}
               {view === 'users' && <Users {...props} />}
+              {view === 'moderation' && <Moderation {...props} />}
               {view === 'payments' && <Payments {...props} />}
               {view === 'releases' && <Releases {...props} />}
+              {view === 'paywall' && <Paywall {...props} />}
               {view === 'errors' && <Errors {...props} />}
             </div>
           </div>

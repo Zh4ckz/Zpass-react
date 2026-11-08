@@ -2,6 +2,8 @@
 //   /manage/<method>   app users (Firebase ID token) manage their own bots
 //   /admin/<method>    administrators manage every bot (bots / core / api.zpas.org)
 //   /<method>, /api/<method>, /bot<token>/<method>   Bot API for bot programs ("Authorization: Bearer <token>")
+// Files (sendDocument) are relayed only: the bytes wait in KV (ZBOT_FILES) until the recipient downloads them once,
+// or at most 24 hours, then they are gone. Nothing is kept on the server after that.
 // Bot conversations are server-readable by design; private end-to-end encrypted chats are not touched.
 import * as policy from './policy.js';
 
@@ -10,6 +12,9 @@ const ADMIN_ORIGINS = new Set(['https://bots.zpas.org', 'https://core.zpas.org',
 const BOT_ID = /^[a-f0-9]{24}$/;
 const TEXT_LIMITS = { name: 64, description: 512, about: 120 };
 const MAX_BODY = 16384;
+export const MAX_FILE = 5 * 1024 * 1024;   // 5 MB per file
+const FILE_TTL = 86400;                    // seconds a file waits for its recipient
+const FILE_ID = /^[a-f0-9]{48}$/;
 
 const botId = (value) => { const id = String(value || ''); if (!BOT_ID.test(id)) fail(400, 'Invalid bot'); return id; };
 const millis = (value) => (value instanceof Date ? value.getTime() : typeof value === 'number' ? value : null);
@@ -30,7 +35,20 @@ function rateLimit(key, limit = 120) {
   if (count > limit) fail(429, 'Too many requests; retry in one minute');
 }
 
-export function createGateway({ db, verifyUser, verifyAppCheck, requireAppCheck = false }) {
+export function createGateway({ db, files = null, verifyUser, verifyAppCheck, requireAppCheck = false }) {
+  // chat_id may be a user id or "@username" (people only, never bots or groups).
+  async function recipient(chatId) {
+    const raw = String(chatId ?? '').trim();
+    if (raw.startsWith('@')) {
+      const name = policy.username(raw);
+      const row = await db.get(`chat_usernames/${name}`);
+      if (!row?.uid || row.gid || row.botId) fail(400, 'Unknown user');
+      return row.uid;
+    }
+    if (!/^[A-Za-z0-9_-]{1,128}$/.test(raw)) fail(400, 'Invalid chat_id');
+    return raw;
+  }
+
   async function editable(tx, id, caller) {
     const path = `zp_bots/${id}`, bot = await tx.get(path);
     if (!bot) fail(404, 'Bot not found');
@@ -213,8 +231,8 @@ export function createGateway({ db, verifyUser, verifyAppCheck, requireAppCheck 
         return rows.map((r) => r.data).filter((u) => millis(u.expiresAt) > Date.now()).map(({ expiresAt, ...update }) => update);
       }
       case 'sendMessage': {
-        const uid = String(body.chat_id || ''), text = String(body.text || '').trim();
-        if (!/^[A-Za-z0-9_-]{1,128}$/.test(uid) || !text || text.length > 4096) fail(400, 'Invalid chat or text');
+        const uid = await recipient(body.chat_id), text = String(body.text || '').trim();
+        if (!text || text.length > 4096) fail(400, 'Invalid chat or text');
         if (body.parse_mode || body.reply_markup) fail(400, 'Formatting and buttons not yet supported');
         const thread = `zp_bot_threads/${id}_${uid}`, messageId = policy.randomId();
         const message = { text, sender: `bot_${id}`, createdAt: Date.now(), chat: { id: uid, type: 'private' } };
@@ -225,12 +243,64 @@ export function createGateway({ db, verifyUser, verifyAppCheck, requireAppCheck 
         });
         return { ...message, message_id: messageId };
       }
+      case 'sendDocument': {
+        if (!files) fail(503, 'File relay unavailable');
+        const doc = body.document;
+        if (!doc || typeof doc.arrayBuffer !== 'function') fail(400, 'Send the file as multipart/form-data field "document"');
+        const bytes = new Uint8Array(await doc.arrayBuffer());
+        if (!bytes.length) fail(400, 'Empty file');
+        if (bytes.length > MAX_FILE) fail(413, 'File too large (max 5 MB)');
+        const uid = await recipient(body.chat_id);
+        const caption = String(body.caption || '').trim();
+        if (caption.length > 1024) fail(400, 'Caption too long');
+        const fileName = (String(doc.name || 'file').replace(/[\\/\u0000-\u001f]/g, '_').trim() || 'file').slice(0, 128);
+        const mime = /^[\w.+-]+\/[\w.+-]+$/.test(doc.type || '') ? doc.type : 'application/octet-stream';
+        const thread = `zp_bot_threads/${id}_${uid}`, messageId = policy.randomId();
+        if (!(await db.get(thread))) fail(403, 'User must start this bot first');
+        const fileId = policy.randomId() + policy.randomId();
+        const expiresAt = Date.now() + FILE_TTL * 1000;
+        await files.put(fileId, bytes, { expirationTtl: FILE_TTL, metadata: { uid, botId: id, name: fileName, mime } });
+        const document = { file_id: fileId, file_name: fileName, mime_type: mime, file_size: bytes.length, expiresAt };
+        const message = { text: caption, document, sender: `bot_${id}`, createdAt: Date.now(), chat: { id: uid, type: 'private' } };
+        try {
+          await db.transaction(async (tx) => {
+            if (!(await tx.get(thread))) fail(403, 'User must start this bot first');
+            tx.create(`${thread}/messages/${messageId}`, message);
+            tx.update(thread, { lastMessage: `\ud83d\udcc4 ${fileName}`.slice(0, 120), lastAt: message.createdAt });
+          });
+        } catch (e) { await files.delete(fileId); throw e; }
+        return { ...message, message_id: messageId };
+      }
       default: fail(501, 'Method not implemented');
     }
   }
 
+  // Recipient downloads a relayed file once; the bytes are deleted right after.
+  async function downloadFile(request, body) {
+    if (!files) fail(503, 'File relay unavailable');
+    const user = await identity(request);
+    const fileId = String(body.file_id || '');
+    if (!FILE_ID.test(fileId)) fail(400, 'Invalid file');
+    rateLimit(`file_${user.uid}`, 60);
+    const found = await files.getWithMetadata(fileId, { type: 'arrayBuffer' });
+    if (!found?.value || found.metadata?.uid !== user.uid) fail(404, 'File expired or already downloaded');
+    await files.delete(fileId);
+    const name = encodeURIComponent(found.metadata.name || 'file');
+    return new Response(found.value, { status: 200, headers: {
+      'Content-Type': found.metadata.mime || 'application/octet-stream',
+      'Content-Disposition': `attachment; filename*=UTF-8''${name}`,
+      'Cache-Control': 'no-store', 'X-Content-Type-Options': 'nosniff',
+    } });
+  }
+
   async function readBody(request, url) {
     if (request.method === 'GET') return Object.fromEntries(url.searchParams);
+    if ((request.headers.get('content-type') || '').includes('multipart/form-data')) {
+      if (Number(request.headers.get('content-length') || 0) > MAX_FILE + 65536) fail(413, 'File too large (max 5 MB)');
+      const form = await request.formData(), out = {};
+      for (const [k, v] of form) out[k] = v;
+      return out;
+    }
     const text = await request.text();
     if (text.length > MAX_BODY) fail(413, 'Request too large');
     if (!text) return {};
@@ -253,6 +323,7 @@ export function createGateway({ db, verifyUser, verifyAppCheck, requireAppCheck 
       const body = await readBody(request, url), method = path.at(-1);
       let result;
       if (path[0] === 'admin') { if (request.method !== 'POST') fail(405, 'Admin requires POST'); result = await handleAdmin(request, method, body); }
+      else if (path[0] === 'manage' && method === 'file') { if (request.method !== 'POST') fail(405, 'POST required'); return await downloadFile(request, body); }
       else if (path[0] === 'manage') result = await handleManage(request, method, body);
       else result = await handleBot(request, path, method, body);
       return reply(200, { ok: true, result });

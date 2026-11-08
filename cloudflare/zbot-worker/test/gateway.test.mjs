@@ -200,3 +200,56 @@ test('form-encoded Bot API requests work', async () => {
   assert.equal(res.status, 200);
   assert.equal((await call('/getMyCommands', {}, bot.token)).result[0].command, 'start');
 });
+
+// ---------- sendDocument: relay only, one download, then gone ----------
+function memoryKv() {
+  const map = new Map();
+  return {
+    map,
+    async put(k, v, opts) { map.set(k, { value: new Uint8Array(v).buffer.slice(0), metadata: opts?.metadata, ttl: opts?.expirationTtl }); },
+    async getWithMetadata(k) { const r = map.get(k); return r ? { value: r.value, metadata: r.metadata } : { value: null, metadata: null }; },
+    async delete(k) { map.delete(k); },
+  };
+}
+
+test('sendDocument relays a file to @username once and deletes it after download', async () => {
+  const db = memoryDb(), files = memoryKv();
+  const handle = createGateway({ db, files, verifyUser: async (t) => { if (!USERS[t]) throw new HttpError(401, 'Sign in required'); return USERS[t]; }, verifyAppCheck: async (t) => t === 'check' });
+  const json = async (path, body, token, check = 'check') => {
+    const headers = { 'content-type': 'application/json', authorization: `Bearer ${token}`, 'x-firebase-appcheck': check };
+    const res = await handle(new Request('https://botapi.zpas.org' + path, { method: 'POST', headers, body: JSON.stringify(body) }));
+    return { status: res.status, ...(await res.json()) };
+  };
+  const bot = (await json('/manage/create', { name: 'Files', username: 'files_bot' }, 'owner')).result;
+  db.data.set('chat_usernames/rezan', { uid: 'owner' });
+  db.data.set('chat_usernames/somegroup', { uid: 'owner', gid: 'g1' });
+  const sendDoc = async (chat, content = 'bot çalışıyor', name = 'metin.txt') => {
+    const form = new FormData();
+    form.set('chat_id', chat);
+    form.set('caption', 'Test');
+    form.set('document', new Blob([content], { type: 'text/plain' }), name);
+    const res = await handle(new Request(`https://botapi.zpas.org/bot${bot.token}/sendDocument`, { method: 'POST', body: form }));
+    return { status: res.status, ...(await res.json()) };
+  };
+  assert.equal((await sendDoc('@rezan')).status, 403, 'user must start the bot first');
+  await json('/manage/send', { username: 'files_bot', text: '/start', requestId: REQ }, 'owner');
+  assert.equal((await sendDoc('@somegroup')).status, 400, 'groups are not people');
+  assert.equal((await sendDoc('@files_bot')).status, 400, 'bots are not people');
+  const sent = await sendDoc('@rezan');
+  assert.equal(sent.ok, true);
+  const doc = sent.result.document;
+  assert.equal(doc.file_name, 'metin.txt');
+  assert.equal(doc.file_size, Buffer.byteLength('bot çalışıyor'));
+  assert.equal(files.map.get(doc.file_id).ttl, 86400);
+  assert.equal((await sendDoc('@rezan', new Uint8Array(5 * 1024 * 1024 + 1))).status, 413);
+  // a stranger cannot take the file
+  const steal = await handle(new Request('https://botapi.zpas.org/manage/file', { method: 'POST', headers: { 'content-type': 'application/json', authorization: 'Bearer attacker' }, body: JSON.stringify({ file_id: doc.file_id }) }));
+  assert.equal(steal.status, 404);
+  const get = () => handle(new Request('https://botapi.zpas.org/manage/file', { method: 'POST', headers: { 'content-type': 'application/json', authorization: 'Bearer owner' }, body: JSON.stringify({ file_id: doc.file_id }) }));
+  const first = await get();
+  assert.equal(first.status, 200);
+  assert.equal(await first.text(), 'bot çalışıyor');
+  assert.match(first.headers.get('content-disposition'), /metin\.txt/);
+  assert.equal((await get()).status, 404, 'deleted after the first download');
+  assert.equal(files.map.size, 0);
+});
