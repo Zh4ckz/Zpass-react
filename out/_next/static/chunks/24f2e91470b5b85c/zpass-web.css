@@ -575,3 +575,33 @@ body.dark-theme .ap-shortcuts{background:#1b2232;color:#e5e7eb}
 .ap-nav #pg-premium-open .ap-anim{color:#f5a524}
 .ap-nav svg[hidden],.ap-side-foot svg[hidden],.ap-signout svg[hidden]{display:none!important}
 .ap-row > span.ap-anim,.ap-nav span.ap-anim,.ap-signout span.ap-anim{flex:0 0 20px}
+
+/* ===== Telegram-style Chats view =====
+   Chat list = full-height flat column next to the sidebar (no card), search on top, results above the list.
+   Thread area = full height, flat, subtle dot pattern. Narrow screens keep the existing single-panel behaviour. */
+.ap-search-results[hidden]{display:none}
+.ap-chat-list{display:flex;flex-direction:column}
+.ap-chat-list .ap-search{order:0;margin:10px 12px 8px;height:40px;border-radius:999px;flex:none}
+.ap-chat-list .ap-search-results{order:1;margin:0 6px 6px;padding-bottom:6px;border-bottom:1px solid var(--line)}
+.ap-chat-list .ap-chat-items{order:2;padding:0 6px 8px}
+.ap-chat-item{padding:9px 10px;border-radius:12px;gap:12px}
+.ap-chat-item .ap-avatar,.ap-search-item .ap-avatar{position:static;flex:none;width:50px;height:50px;border-radius:50%;display:inline-flex;align-items:center;justify-content:center;font-size:19px;font-weight:700;color:#fff;box-shadow:none}
+.ap-search-item .ap-avatar{background:linear-gradient(135deg,#4c6ef5,#339af0)}
+.ap-chat-item .ap-li-main b{font-size:15px}
+.ap-chat-item .ap-li-main small{font-size:13.5px}
+.ap-chat-item:hover{background:var(--soft)}
+.ap-chat-item.on{background:#2f7bf6!important}
+.ap-chat-item.on b,.ap-chat-item.on small,.ap-chat-item.on time,.ap-chat-item.on .ap-bot-tag{color:#fff!important}
+.ap-chat-item.on .ap-verified{color:#fff}
+.ap-search-item.on{outline:none}
+.ap-search-head{padding:6px 12px 6px}
+.ap-thread{background-color:var(--soft);background-image:radial-gradient(rgba(47,123,246,.10) 1px,transparent 1.2px);background-size:20px 20px}
+body.dark-theme .ap-thread{background-image:radial-gradient(rgba(148,163,184,.10) 1px,transparent 1.2px)}
+@media (min-width:861px){
+  .ap-main:has(#ap-v-chats:not([hidden])) .ap-top{display:none}
+  .ap-views:has(#ap-v-chats:not([hidden])){padding:0;overflow:hidden}
+  #ap-v-chats:not([hidden]){height:100dvh;max-width:none;margin:0;gap:0;grid-template-columns:minmax(300px,380px) 1fr;grid-template-rows:minmax(0,1fr);align-content:stretch;animation:none}
+  #ap-v-chats .ap-chat-list,#ap-v-chats .ap-thread{min-height:0;height:100%;border-radius:0;border:0;box-shadow:none}
+  #ap-v-chats .ap-chat-list{background:var(--card);border-right:1px solid var(--line);backdrop-filter:blur(18px)}
+  #ap-v-chats .ap-chat-items{flex:1;min-height:0;overflow-y:auto}
+}
