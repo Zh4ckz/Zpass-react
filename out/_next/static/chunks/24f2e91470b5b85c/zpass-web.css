@@ -566,3 +566,12 @@ body.dark-theme .ap-top { background: var(--glass); }
 .ap-shortcuts dd{margin:0;opacity:.8;font-size:14px;text-align:right}
 .ap-shortcuts kbd{display:inline-block;min-width:22px;padding:2px 7px;border-radius:6px;border:1px solid rgba(100,116,139,.35);font:600 12px/1.4 Inter,system-ui,sans-serif;text-align:center;background:rgba(100,116,139,.1)}
 body.dark-theme .ap-shortcuts{background:#1b2232;color:#e5e7eb}
+
+/* Animated sidebar icons (nav-icons.mjs, useAnimations MIT). Hidden until loaded; inherit the menu colour. */
+.ap-anim{display:none;width:20px;height:20px;flex:none;align-items:center;justify-content:center}
+.ap-anim.ready{display:inline-flex}
+.ap-anim svg{width:20px!important;height:20px!important}
+.ap-anim svg path{stroke:currentColor}
+.ap-nav #pg-premium-open .ap-anim{color:#f5a524}
+.ap-nav svg[hidden],.ap-side-foot svg[hidden],.ap-signout svg[hidden]{display:none!important}
+.ap-row > span.ap-anim,.ap-nav span.ap-anim,.ap-signout span.ap-anim{flex:0 0 20px}
