@@ -1,5 +1,5 @@
 // Review only: card details and payment confirmation stay with the bot + Stripe.
-import {elementsAvailable,loadStripe,mountElements,lightAppearance,validEmail} from './stripe-elements.mjs';
+import {elementsAvailable,loadStripe,mountElements,lightAppearance,validEmail} from './stripe-elements.mjs?v=2';
 const params=new URLSearchParams(location.search);
 let plan=['PLUS','PRO'].includes(params.get('plan')?.toUpperCase())?params.get('plan').toUpperCase():'PLUS';
 let billing=['MONTHLY','YEARLY'].includes(params.get('billing')?.toUpperCase())?params.get('billing').toUpperCase():'MONTHLY';

@@ -4,7 +4,7 @@ import {firebaseConfig} from './firebase-config.mjs';
 import {paymentPlans} from './payment-plans.mjs';
 import {billingRequest} from './billing-api.mjs?v=1';
 import {rollPrice} from './price-roller.mjs?v=1';
-import {elementsAvailable,loadStripe,mountElements,darkAppearance,validEmail} from './stripe-elements.mjs';
+import {elementsAvailable,loadStripe,mountElements,darkAppearance,validEmail} from './stripe-elements.mjs?v=2';
 const auth=getAuth(getApps()[0]||initializeApp(firebaseConfig));
 const features={FREE:['Unlimited vault entries and notes','Up to 15 authenticator accounts','Up to 10 aliases','Vault sharing up to 3','Uploads up to 500 MB'],PLUS:['Unlimited vault entries and notes','Unlimited authenticator accounts and aliases','Vault sharing up to 10','Uploads up to 2,000 MB'],PRO:['Unlimited vault entries and notes','Unlimited authenticator accounts and aliases','Unlimited vault sharing','Uploads up to 4,000 MB']};
 const money=value=>new Intl.NumberFormat('en-US',{style:'currency',currency:'USD'}).format(value);

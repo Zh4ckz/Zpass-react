@@ -28,8 +28,24 @@ function loadPlayer() {
   });
 }
 
+// The module ships its own size/colour rules so a stale cached stylesheet can never show huge black icons.
+function injectStyle() {
+  if (document.getElementById('ap-anim-style')) return;
+  const style = document.createElement('style');
+  style.id = 'ap-anim-style';
+  style.textContent = `
+.ap-anim{display:none;width:20px;height:20px;flex:0 0 20px;align-items:center;justify-content:center;line-height:0}
+.ap-anim.ready{display:inline-flex}
+.ap-anim svg{width:20px!important;height:20px!important}
+.ap-anim svg path{stroke:currentColor}
+.ap-anim svg path[fill]:not([fill="none"]){fill:currentColor}
+#pg-premium-open .ap-anim{color:#f5a524}`;
+  document.head.appendChild(style);
+}
+
 async function start() {
   if (window.matchMedia?.('(prefers-reduced-motion: reduce)').matches) return;
+  injectStyle();
   let lottie;
   try { lottie = await loadPlayer(); } catch { return; }
   for (const [selector, path] of ICONS) {
@@ -38,6 +54,7 @@ async function start() {
     if (!host || !still) continue;
     const box = document.createElement('span');
     box.className = 'ap-anim';
+    box.style.cssText = 'width:20px;height:20px;flex:0 0 20px';
     box.setAttribute('aria-hidden', 'true');
     still.insertAdjacentElement('beforebegin', box);
     const anim = lottie.loadAnimation({ container: box, renderer: 'svg', loop: false, autoplay: false, path, rendererSettings: { preserveAspectRatio: 'xMidYMid meet' } });

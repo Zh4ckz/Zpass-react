@@ -3,7 +3,7 @@
   "/page": "app/page.js",
   "/admin/page": "app/admin/page.js",
   "/account/subscription/page": "app/account/subscription/page.js",
-  "/auth/action/page": "app/auth/action/page.js",
+  "/support/page": "app/support/page.js",
   "/premium/page": "app/premium/page.js",
-  "/support/page": "app/support/page.js"
+  "/auth/action/page": "app/auth/action/page.js"
 }
