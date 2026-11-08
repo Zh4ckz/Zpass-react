@@ -39,7 +39,8 @@ export function createWorker({serviceFactory=env=>new PaymentService({db:new Fir
     return reply(await account[action](user.uid));
    }catch(error){return reply({error:error instanceof HttpError?error.message:'Billing service is temporarily unavailable.'},error instanceof HttpError?error.status:503)}
   }
-  if(url.pathname==='/checkout/pay-config'&&request.method==='GET')return reply(publicConfig(configured(env)));
+  // publishableKey is public by design (Stripe.js needs it in the page); it enables Embedded Checkout on our own pages.
+  if(url.pathname==='/checkout/pay-config'&&request.method==='GET')return reply({...publicConfig(configured(env)),publishableKey:/^pk_(live|test)_[A-Za-z0-9]+$/.test(env.STRIPE_PUBLISHABLE_KEY||'')?env.STRIPE_PUBLISHABLE_KEY:null});
   if(['/checkout/pay-key','/checkout/pay-account'].includes(url.pathname)&&request.method==='POST'){
    if(!origins.has(origin))return reply({error:'Origin not allowed.'},403);
    try{const payload=JSON.parse(await limitedText(request,8192)),db=new Firestore(env);
@@ -58,7 +59,7 @@ export function createWorker({serviceFactory=env=>new PaymentService({db:new Fir
   }
   if(url.pathname==='/checkout/pay-session'&&request.method==='POST'){
    if(!['https://pay.zpas.org','https://web.zpas.org'].includes(origin))return reply({error:'Open checkout at pay.zpas.org.'},403);if(!configured(env))return reply({error:'Checkout is not configured yet.'},503);
-   try{let payload;try{payload=JSON.parse(await limitedText(request,4096))}catch(e){if(e instanceof HttpError)throw e;throw new HttpError(400,'Invalid checkout request.')}const session=await paymentSession(new Firestore(env),payload.key);if(Object.keys(payload).some(k=>!['key','productId','requestId'].includes(k)))throw new HttpError(400,'Invalid checkout request.');return reply(await serviceFactory(env).create({productId:payload.productId,requestId:payload.requestId,zPassId:session.zPassId},session.uid))}catch(e){if(!(e instanceof HttpError))console.error('pay-session failed:',e?.stack||String(e));return reply({error:e instanceof HttpError?e.message:'Checkout could not be created. Try again shortly.'},e instanceof HttpError?e.status:503)}
+   try{let payload;try{payload=JSON.parse(await limitedText(request,4096))}catch(e){if(e instanceof HttpError)throw e;throw new HttpError(400,'Invalid checkout request.')}const session=await paymentSession(new Firestore(env),payload.key);if(Object.keys(payload).some(k=>!['key','productId','requestId','embedded'].includes(k)))throw new HttpError(400,'Invalid checkout request.');return reply(await serviceFactory(env).create({productId:payload.productId,requestId:payload.requestId,zPassId:session.zPassId},session.uid,payload.embedded===true))}catch(e){if(!(e instanceof HttpError))console.error('pay-session failed:',e?.stack||String(e));return reply({error:e instanceof HttpError?e.message:'Checkout could not be created. Try again shortly.'},e instanceof HttpError?e.status:503)}
   }
   if(url.pathname==='/stripe-webhook'&&request.method==='POST'){
    if(!configured(env))return reply({error:'Webhook is not configured.'},503);

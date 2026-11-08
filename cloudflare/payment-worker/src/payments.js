@@ -3,7 +3,7 @@ export class HttpError extends Error{constructor(status,message){super(message);
 export const digest=async value=>Array.from(new Uint8Array(await crypto.subtle.digest('SHA-256',new TextEncoder().encode(value))),v=>v.toString(16).padStart(2,'0')).join('');
 export class PaymentService {
  constructor({db,stripe,now=()=>Date.now()}){this.db=db;this.stripe=stripe;this.now=now}
- async create(payload,expectedUid){
+ async create(payload,expectedUid,embedded=false){
   if(!validRequest(payload)&&!(expectedUid&&terms(payload?.productId)&&/^[a-f0-9-]{32,36}$/i.test(payload?.requestId||'')&&typeof payload.zPassId==='string'&&payload.zPassId.length<=128&&Object.keys(payload).every(k=>['productId','zPassId','requestId'].includes(k))))throw new HttpError(400,'Choose a plan and enter a valid Z Pass ID.');
   const account=expectedUid&&!/^ZP-[A-Z0-9]{10}$/.test(payload.zPassId)?{uid:expectedUid}:await this.db.findRecipient(payload.zPassId);if(!account)throw new HttpError(400,'Check your Z Pass ID in the app and try again.');
   if(expectedUid&&account.uid!==expectedUid)throw new HttpError(403,'Checkout account mismatch.');
@@ -17,6 +17,12 @@ export class PaymentService {
    if(rate?.createdAt instanceof Date&&this.now()-rate.createdAt.getTime()<60000)throw new HttpError(429,'Please wait a minute before trying again.');
    tx.set(path,{...order,createdAt:new Date(this.now())},{create:true});tx.set(ratePath,{createdAt:new Date(this.now())});return null;
   });
+  if(embedded){
+   if(existing?.clientSecret)return{clientSecret:existing.clientSecret};
+   const session=await this.stripe('POST','checkout/sessions',checkoutForm(order,true),'passgram-pay-embedded-'+orderId);
+   if(!stripeId(session.id,'cs')||typeof session.client_secret!=='string'||!session.client_secret.startsWith(session.id))throw Error('Invalid provider session');
+   await this.db.patch(path,{sessionId:session.id,clientSecret:session.client_secret});return{clientSecret:session.client_secret};
+  }
   if(existing?.paymentUrl)return{checkoutUrl:this.providerUrl(existing.paymentUrl)};
   const session=await this.stripe('POST','checkout/sessions',checkoutForm(order),'passgram-pay-'+orderId),url=this.providerUrl(session.url);
   if(!stripeId(session.id,'cs'))throw Error('Invalid provider session');

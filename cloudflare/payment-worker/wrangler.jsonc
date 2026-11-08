@@ -4,7 +4,9 @@
   "compatibility_date": "2026-11-03",
   "workers_dev": true,
   "vars": {
-    "FIREBASE_PROJECT_ID": "passgram-org"
+    "FIREBASE_PROJECT_ID": "passgram-org",
+    // Public by design (Stripe.js needs it in the page). Enables Embedded Checkout. Never put the sk_ key here.
+    "STRIPE_PUBLISHABLE_KEY": "pk_live_51TftT4RG6hGpB73Qfy1uiTwBcfCXLxDJoWBkxJIIVUa7aqGFxo7ydbIYfASm805cllHH3VVmjnFMuHfs44uLLGMf008NnO9G8A"
   },
   "observability": {
     "enabled": true

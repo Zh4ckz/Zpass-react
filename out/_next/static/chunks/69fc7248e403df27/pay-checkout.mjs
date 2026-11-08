@@ -1,4 +1,5 @@
 // Review only: card details and payment confirmation stay with the bot + Stripe.
+import {embeddedAvailable,loadStripe,mountEmbedded} from './stripe-embedded.mjs';
 const params=new URLSearchParams(location.search);
 let plan=['PLUS','PRO'].includes(params.get('plan')?.toUpperCase())?params.get('plan').toUpperCase():'PLUS';
 let billing=['MONTHLY','YEARLY'].includes(params.get('billing')?.toUpperCase())?params.get('billing').toUpperCase():'MONTHLY';
@@ -30,7 +31,8 @@ function render(){
  $('pay-submit').disabled=!available||!sessionValid()||busy;
  $('pay-submit').textContent=busy?'Opening Stripe…':available?'Continue to Stripe ↗':'Checkout unavailable';
  $('pay-status').textContent=!available?'Online checkout is temporarily unavailable. No payment has been taken.':!sessionValid()?(sessionKey?'Session key expired. Start checkout again.':'Sign in to continue with your account.'):'Review your account and final amount before paying on Stripe.';
- document.querySelectorAll('input').forEach(i=>i.disabled=busy);
+ const embeddedOpen=Boolean(document.getElementById('pay-embedded')&&!document.getElementById('pay-embedded').hidden);
+ document.querySelectorAll('input').forEach(i=>i.disabled=busy||embeddedOpen);
  const url=new URL(location.href);url.search=new URLSearchParams({plan,billing}).toString();if(params.has('payment'))url.searchParams.set('payment',params.get('payment'));if(sessionKey)url.searchParams.set('key',sessionKey);history.replaceState(null,'',url);
  $('pay-account').textContent=account?.username || (sessionKey?'Session key expired':'Sign in to your account');
  $('pay-signin').hidden=Boolean(sessionValid());
@@ -40,12 +42,26 @@ function render(){
 }
 document.querySelectorAll('input[name="plan"],input[name="billing"]').forEach(input=>input.addEventListener('change',()=>{if(input.name==='plan')plan=input.value;else billing=input.value;render()}));
 
+// Embedded checkout: the Stripe payment form opens inside this page (falls back to the Stripe page if Stripe.js cannot load).
+async function createSession(embedded){
+ const response=await fetch(apiOrigin+'/checkout/pay-session',{method:'POST',credentials:'omit',headers:{'Content-Type':'application/json'},signal:AbortSignal.timeout(20000),body:JSON.stringify({productId:'zpass_'+plan.toLowerCase()+'_'+billing.toLowerCase(),key:sessionKey,requestId:crypto.randomUUID(),...(embedded?{embedded:true}:{})})});
+ const result=await response.json();if(!response.ok)throw Error(typeof result.error==='string'?result.error:'Checkout could not be created. Try again shortly.');return result;
+}
+async function openEmbedded(){
+ if(!embeddedAvailable(config))return false;
+ try{await loadStripe()}catch{return false}
+ let box=$('pay-embedded');if(!box){box=document.createElement('div');box.id='pay-embedded';box.className='pay-embedded';$('pay-submit').insertAdjacentElement('afterend',box)}
+ $('pay-status').textContent='Enter your payment details below. Your card details go directly to Stripe.';
+ await mountEmbedded({publishableKey:config.publishableKey,container:box,fetchClientSecret:async()=>(await createSession(true)).clientSecret,onComplete:()=>{$('pay-submit').hidden=true;$('pay-status').textContent='Payment received. Your membership will appear in the app in a moment.'}});
+ $('pay-submit').hidden=true;document.querySelectorAll('input[name="plan"],input[name="billing"]').forEach(i=>i.disabled=true);
+ return true;
+}
 $('pay-submit').addEventListener('click',async()=>{
  if($('pay-submit').disabled||!apiOrigin||!sessionValid())return;
  busy=true;render();
  try{
-  const response=await fetch(apiOrigin+'/checkout/pay-session',{method:'POST',credentials:'omit',headers:{'Content-Type':'application/json'},signal:AbortSignal.timeout(20000),body:JSON.stringify({productId:'zpass_'+plan.toLowerCase()+'_'+billing.toLowerCase(),key:sessionKey,requestId:crypto.randomUUID()})});
-  const result=await response.json();if(!response.ok)throw Error(typeof result.error==='string'?result.error:'Checkout could not be created. Try again shortly.');
+  if(await openEmbedded()){busy=false;document.querySelectorAll('input[name="plan"],input[name="billing"]').forEach(i=>i.disabled=true);return}
+  const result=await createSession(false);
   const destination=stripeCheckout(result.checkoutUrl);if(!destination)throw Error('The payment provider could not be verified. No payment has been taken.');
   window.top.location.assign(destination);
  }catch(error){busy=false;render();$('pay-status').textContent=error.name==='TimeoutError'?'The payment service took too long. No payment has been taken. Try again shortly.':String(error.message||'Checkout is temporarily unavailable.').slice(0,180)}

@@ -3,3 +3,6 @@
 .pay-account-field{margin:0 0 24px}.pay-account-field label{display:block;font-size:11px;font-weight:650;color:#42526b;margin-bottom:10px}.pay-account-field input{width:100%;min-height:45px;padding:12px 14px;border:1px solid #dce5f1;background:#ffffffb0;border-radius:10px;font-size:13px;color:#243750;text-transform:uppercase;letter-spacing:.03em}.pay-account-field input::placeholder{color:#a0aec0}.pay-account-field p{font-size:10px;line-height:1.8;color:#8a98ac;margin:8px 0 0}
 
 .pay-account-label{display:block;font-size:11px;font-weight:650;color:#42526b;margin-bottom:10px}#pay-account{display:block;padding:14px;border:1px solid #dce5f1;border-radius:10px;background:#ffffffb0;font-size:14px;overflow-wrap:anywhere}#pay-signin{display:inline-block;margin-top:8px;color:var(--blue);font-size:11px}
+
+/* Stripe Embedded Checkout mounted in the page (stripe-embedded.mjs) */
+.pay-embedded{margin-top:16px;width:100%;border-radius:14px;overflow:hidden;background:#fff;min-height:420px}
