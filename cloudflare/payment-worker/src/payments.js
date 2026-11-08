@@ -14,12 +14,12 @@ export class PaymentService {
    if(previous){if(previous.uid!==order.uid||previous.productId!==order.productId||previous.amountCents!==order.amountCents||previous.billingModel!==BILLING_MODEL)throw new HttpError(409,'This checkout needs to be refreshed.');return previous}
    if(subscription?.status==='ACTIVE'&&subscription?.expiresAt instanceof Date&&subscription.expiresAt.getTime()>this.now())throw new HttpError(409,'Manage your existing subscription to change plans.');
    if(subscription?.stripeSubscriptionId&&['active','trialing','past_due','unpaid','incomplete'].includes(subscription.stripeStatus))throw new HttpError(409,'This account already has an automatic subscription. Manage the existing subscription or contact support.');
-   if(rate?.createdAt instanceof Date&&this.now()-rate.createdAt.getTime()<60000)throw new HttpError(429,'Please wait a minute before trying again.');
+   if(rate?.createdAt instanceof Date&&this.now()-rate.createdAt.getTime()<15000)throw new HttpError(429,'Please wait a few seconds before trying again.');
    tx.set(path,{...order,createdAt:new Date(this.now())},{create:true});tx.set(ratePath,{createdAt:new Date(this.now())});return null;
   });
   if(embedded){
    if(existing?.clientSecret)return{clientSecret:existing.clientSecret};
-   const session=await this.stripe('POST','checkout/sessions',checkoutForm(order,true),'passgram-pay-embedded-'+orderId);
+   const session=await this.stripe('POST','checkout/sessions',checkoutForm(order,true),'passgram-pay-elements-'+orderId);
    if(!stripeId(session.id,'cs')||typeof session.client_secret!=='string'||!session.client_secret.startsWith(session.id))throw Error('Invalid provider session');
    await this.db.patch(path,{sessionId:session.id,clientSecret:session.client_secret});return{clientSecret:session.client_secret};
   }

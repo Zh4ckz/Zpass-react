@@ -4,7 +4,7 @@ import {firebaseConfig} from './firebase-config.mjs';
 import {paymentPlans} from './payment-plans.mjs';
 import {billingRequest} from './billing-api.mjs?v=1';
 import {rollPrice} from './price-roller.mjs?v=1';
-import {embeddedAvailable,loadStripe,mountEmbedded,unmountEmbedded} from './stripe-embedded.mjs';
+import {elementsAvailable,loadStripe,mountElements,darkAppearance,validEmail} from './stripe-elements.mjs';
 const auth=getAuth(getApps()[0]||initializeApp(firebaseConfig));
 const features={FREE:['Unlimited vault entries and notes','Up to 15 authenticator accounts','Up to 10 aliases','Vault sharing up to 3','Uploads up to 500 MB'],PLUS:['Unlimited vault entries and notes','Unlimited authenticator accounts and aliases','Vault sharing up to 10','Uploads up to 2,000 MB'],PRO:['Unlimited vault entries and notes','Unlimited authenticator accounts and aliases','Unlimited vault sharing','Uploads up to 4,000 MB']};
 const money=value=>new Intl.NumberFormat('en-US',{style:'currency',currency:'USD'}).format(value);
@@ -29,7 +29,8 @@ function render(){
  $('pp-username').textContent=session?.username||membership?.username||user?.displayName||user?.email||'Sign in to your account';
  const entry=config?.plans?.['zpass_'+plan.toLowerCase()+'_'+billing.toLowerCase()];
  $('pp-continue').disabled=busy||(upgrading()?Boolean(membership?.scheduledPlan)||!membership?.managed||!membership?.autoRenew:!validSession())||!config?.available||config?.billingModel!=='monthly-v1'||entry?.enabled===false||!(entry?.price>0);
- $('pp-continue').textContent=busy?'Preparing checkout…':upgrading()?'Schedule Pro at next renewal':'Continue to Stripe ↗';
+ if(pay){$('pp-continue').disabled=$('pp-continue').disabled||!pay.api||!pay.canConfirm||pay.confirming||pay.done||!validEmail($('pp-email')?.value||'');if(pay.total)$('pp-due').textContent=pay.total;}
+ $('pp-continue').textContent=busy?'Preparing checkout…':upgrading()?'Schedule Pro at next renewal':pay?(pay.done?'Payment received ✓':pay.confirming?'Processing…':'Agree, Subscribe & Pay'):'Continue to payment';
  $('pp-renew').classList.toggle('pp-hidden',upgrading()||busy||Boolean(validSession()));
  $('pp-session').textContent=upgrading()?'Pro starts at your next renewal. Your existing commitment end date is preserved.':validSession()?'Session valid for '+Math.ceil((Date.parse(session.expiresAt)-Date.now())/60000)+' min.':session?'Session key expired. Create a new session to continue.':'';
  dialog.querySelector('.pp-back').disabled=busy;
@@ -38,7 +39,7 @@ async function json(url,body){const response=await fetch(url,{...(body?{method:'
 async function loadConfig(){const routing=await json('/subdomain/web/resources/data/pay-backend.json'),url=new URL(routing.url);if(url.protocol!=='https:'||url.port||url.username||url.password||!(url.hostname==='api.zpas.org'||/^[a-z0-9-]+\.[a-z0-9-]+\.workers\.dev$/.test(url.hostname)))throw Error('Payment service unavailable.');backend=url.origin;config=await json(backend+'/checkout/pay-config');if(config.billingModel!=='monthly-v1')throw Error('Payment service unavailable.');render()}
 async function prepare(){
  if(busy)return;busy=true;const current=++generation,uid=user?.uid;session=null;$('pp-status').textContent='Preparing your account…';render();
- try{if(!user)throw Error('Sign in to your account before subscribing.');await loadConfig();if(upgrading()){$('pp-status').textContent='No charge today. Confirm to schedule Pro for your next billing date.';return;}const key=await json(backend+'/checkout/pay-key',{idToken:await user.getIdToken()}),account=await json(backend+'/checkout/pay-account',{key:key.key});if(current!==generation||user?.uid!==uid)return;session={...account,key:key.key,uid};$('pp-status').textContent='Review your plan, then continue to Stripe.';}
+ try{if(!user)throw Error('Sign in to your account before subscribing.');await loadConfig();if(upgrading()){$('pp-status').textContent='No charge today. Confirm to schedule Pro for your next billing date.';return;}const key=await json(backend+'/checkout/pay-key',{idToken:await user.getIdToken()}),account=await json(backend+'/checkout/pay-account',{key:key.key});if(current!==generation||user?.uid!==uid)return;session={...account,key:key.key,uid};$('pp-status').textContent='Review your plan, then continue to payment.';void startElements(current,uid);}
  catch(error){if(current===generation)$('pp-status').textContent=error.name==='TimeoutError'?'Payment service took too long. Try again.':error.message;}
  finally{if(current===generation){busy=false;render()}}
 }
@@ -49,28 +50,39 @@ document.getElementById('pg-premium-open')?.addEventListener('click',event=>{eve
 dialog.querySelector('[data-free]').addEventListener('click',()=>{dialog.close();window.top.location.assign('https://web.zpas.org/web');});
 dialog.querySelector('.pp-close').addEventListener('click',()=>dialog.close());
 dialog.addEventListener('click',event=>{if(event.target===dialog){const box=dialog.getBoundingClientRect();if(event.clientX<box.left||event.clientX>box.right||event.clientY<box.top||event.clientY>box.bottom)dialog.close();}});
-dialog.addEventListener('close',()=>{closeEmbedded();if(!document.getElementById('pg-premium-page')&&location.pathname==='/premium')history.replaceState(null,'','/web');generation++;busy=false;session=null;$('pp-picker').classList.remove('pp-hidden');$('pp-configure').classList.add('pp-hidden');dialog.setAttribute('aria-labelledby','pp-title');});
+dialog.addEventListener('close',()=>{stopElements();if(!document.getElementById('pg-premium-page')&&location.pathname==='/premium')history.replaceState(null,'','/web');generation++;busy=false;session=null;$('pp-picker').classList.remove('pp-hidden');$('pp-configure').classList.add('pp-hidden');dialog.setAttribute('aria-labelledby','pp-title');});
 dialog.querySelectorAll('[data-period]').forEach(button=>button.addEventListener('click',()=>{billing=button.dataset.period;render()}));
 dialog.querySelectorAll('[data-plan]').forEach(button=>button.addEventListener('click',()=>{plan=button.dataset.plan;$('pp-picker').classList.add('pp-hidden');$('pp-configure').classList.remove('pp-hidden');dialog.setAttribute('aria-labelledby','pp-config-title');dialog.scrollTop=0;dialog.querySelector('.pp-back').focus();void prepare()}));
-dialog.querySelector('.pp-back').addEventListener('click',()=>{closeEmbedded();generation++;session=null;$('pp-picker').classList.remove('pp-hidden');$('pp-configure').classList.add('pp-hidden');dialog.setAttribute('aria-labelledby','pp-title');dialog.querySelector(`[data-plan="${plan}"]`).focus()});
+dialog.querySelector('.pp-back').addEventListener('click',()=>{stopElements();generation++;session=null;$('pp-picker').classList.remove('pp-hidden');$('pp-configure').classList.add('pp-hidden');dialog.setAttribute('aria-labelledby','pp-title');dialog.querySelector(`[data-plan="${plan}"]`).focus()});
 $('pp-renew').addEventListener('click',prepare);
-// Embedded checkout: Stripe's payment form inside this dialog (like X). Card data goes only to Stripe (iframes).
-// Returns false to fall back to the checkout.stripe.com redirect when no publishable key or Stripe.js cannot load.
-async function openEmbedded(current,uid){
- if(!embeddedAvailable(config))return false;
- try{await loadStripe()}catch{return false}
- if(current!==generation||user?.uid!==uid)return true;
- const left=dialog.querySelector('.pp-config-left');let box=document.getElementById('pp-embedded');if(!box){box=document.createElement('div');box.id='pp-embedded';box.className='pp-embedded';left.appendChild(box)}
- dialog.querySelector('.pp-provider').classList.add('pp-hidden');$('pp-continue').classList.add('pp-hidden');dialog.classList.add('pp-paying');
- $('pp-status').textContent='Your card details go directly to Stripe.';
- try{await mountEmbedded({publishableKey:config.publishableKey,container:box,fetchClientSecret:async()=>(await json(backend+'/checkout/pay-session',{productId:'zpass_'+plan.toLowerCase()+'_'+billing.toLowerCase(),key:session.key,requestId:crypto.randomUUID(),embedded:true})).clientSecret,onComplete:()=>{$('pp-status').textContent='Payment received. Your plan will update in a moment.';void refreshMembership()}})}
- catch(error){closeEmbedded();throw error}
- return true;
+// X-style checkout: Stripe Elements styled into the left panel, confirmed by our own "Agree, Subscribe & Pay" button.
+// Card data only ever goes to Stripe's iframes. Without a publishable key (or if Stripe.js cannot load) the button keeps
+// the hosted checkout.stripe.com redirect.
+let pay=null;
+async function startElements(current,uid){
+ if(pay||!elementsAvailable(config)||upgrading()||!validSession())return;
+ try{await loadStripe()}catch{return}
+ if(current!==generation||user?.uid!==uid||pay)return;
+ const left=dialog.querySelector('.pp-config-left'),wrap=document.createElement('div');wrap.id='pp-elements';wrap.className='pp-elements';
+ wrap.innerHTML='<p class="pp-pay-label">Pay with</p><div id="pp-express" class="pp-express"></div><div class="pp-or"><span>or</span></div><div id="pp-payment" class="pp-payment"></div><p class="pp-pay-label">Billing information</p><label class="pp-email"><span>Email for invoices</span><input id="pp-email" type="email" autocomplete="email" inputmode="email" placeholder="you@example.com" maxlength="254"></label>';
+ left.appendChild(wrap);dialog.querySelector('.pp-provider').classList.add('pp-hidden');dialog.classList.add('pp-paying');
+ $('pp-email').value=user?.email||'';$('pp-email').addEventListener('input',render);
+ const mine={api:null,canConfirm:false,total:'',confirming:false,done:false};pay=mine;$('pp-status').textContent='Loading secure payment…';render();
+ try{
+  const api=await mountElements({onExpressReady:has=>{const w=$('pp-express');if(!w)return;w.hidden=!has;w.previousElementSibling.hidden=!has;w.nextElementSibling.hidden=!has},publishableKey:config.publishableKey,appearance:darkAppearance,expressContainer:$('pp-express'),paymentContainer:$('pp-payment'),email:user?.email||'',
+   clientSecret:json(backend+'/checkout/pay-session',{productId:'zpass_'+plan.toLowerCase()+'_'+billing.toLowerCase(),key:session.key,requestId:crypto.randomUUID(),embedded:true}).then(result=>result.clientSecret),
+   onChange:({canConfirm,total})=>{if(pay!==mine)return;mine.canConfirm=canConfirm;mine.total=total;render()},
+   onExpress:result=>{if(pay!==mine)return;if(result.ok)paid();else{$('pp-status').textContent=result.error}}});
+  if(pay!==mine){api.destroy();return}
+  mine.api=api;$('pp-status').textContent='Your card details go directly to Stripe.';render();
+ }catch(error){if(pay===mine){stopElements();$('pp-status').textContent=error.name==='TimeoutError'?'Payment service took too long. Try again.':error.message;render()}}
 }
-function closeEmbedded(){unmountEmbedded();document.getElementById('pp-embedded')?.remove();dialog.querySelector('.pp-provider')?.classList.remove('pp-hidden');$('pp-continue').classList.remove('pp-hidden');dialog.classList.remove('pp-paying')}
+function stopElements(){if(pay?.api)pay.api.destroy();pay=null;document.getElementById('pp-elements')?.remove();dialog.querySelector('.pp-provider')?.classList.remove('pp-hidden');dialog.classList.remove('pp-paying')}
+function paid(){if(pay)pay.done=true;$('pp-status').textContent='Payment received. Your plan will update in a moment.';render();void refreshMembership()}
 $('pp-continue').addEventListener('click',async()=>{
- if(busy||$('pp-continue').disabled)return;if(upgrading()){busy=true;render();try{const result=await billingRequest(user,'upgrade',{confirm:true});membership={...membership,...result};$('pp-status').textContent=result.message||'Pro is scheduled for your next renewal.';}catch(error){$('pp-status').textContent=error.message}finally{busy=false;render()}return;}if(!validSession())return;busy=true;const uid=user.uid,current=++generation;render();$('pp-status').textContent='Opening secure checkout…';
- try{if(await openEmbedded(current,uid))return;const result=await json(backend+'/checkout/pay-session',{productId:'zpass_'+plan.toLowerCase()+'_'+billing.toLowerCase(),key:session.key,requestId:crypto.randomUUID()});if(current!==generation||user?.uid!==uid)return;const url=new URL(result.checkoutUrl);if(url.protocol!=='https:'||url.hostname!=='checkout.stripe.com'||url.port||url.username||url.password)throw Error('Payment provider could not be verified.');window.top.location.assign(url.href)}
+ if(busy||$('pp-continue').disabled)return;if(upgrading()){busy=true;render();try{const result=await billingRequest(user,'upgrade',{confirm:true});membership={...membership,...result};$('pp-status').textContent=result.message||'Pro is scheduled for your next renewal.';}catch(error){$('pp-status').textContent=error.message}finally{busy=false;render()}return;}if(pay){if(!pay.api||pay.confirming||pay.done)return;const mine=pay;mine.confirming=true;$('pp-status').textContent='Processing payment…';render();let result;try{result=await mine.api.confirm($('pp-email').value)}catch(error){result={ok:false,error:error.message||'Payment failed. No payment has been taken.'}}if(pay!==mine)return;mine.confirming=false;if(result.ok)paid();else{$('pp-status').textContent=result.error;render()}return;}
+ if(!validSession())return;busy=true;const uid=user.uid,current=++generation;render();$('pp-status').textContent='Opening secure checkout…';
+ try{const result=await json(backend+'/checkout/pay-session',{productId:'zpass_'+plan.toLowerCase()+'_'+billing.toLowerCase(),key:session.key,requestId:crypto.randomUUID()});if(current!==generation||user?.uid!==uid)return;const url=new URL(result.checkoutUrl);if(url.protocol!=='https:'||url.hostname!=='checkout.stripe.com'||url.port||url.username||url.password)throw Error('Payment provider could not be verified.');window.top.location.assign(url.href)}
  catch(error){if(current===generation)$('pp-status').textContent=error.message;}
  finally{if(current===generation){busy=false;render()}}
 });

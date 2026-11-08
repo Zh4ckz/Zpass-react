@@ -537,3 +537,32 @@ body.dark-theme .ap-top { background: var(--glass); }
 @media (prefers-reduced-motion: reduce) {
   *, *::before, *::after { animation: none !important; transition: none !important; }
 }
+
+/* Global search in Chats (chat-search.mjs) */
+.ap-chat-items.ap-searching > .none, #ap-chat-items.ap-searching > .none{display:none}
+.ap-search-results{display:flex;flex-direction:column;gap:2px;margin-top:6px}
+.ap-search-head{font-size:11px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;opacity:.6;padding:8px 12px 4px}
+.ap-search-results .none{padding:14px 12px;opacity:.7;font-size:13px}
+.ap-search-item.on{outline:2px solid #2f7bf6;outline-offset:-2px}
+.ap-verified{width:15px;height:15px;color:#2f7bf6;vertical-align:-2px;margin-left:4px;flex:none}
+.ap-bot-tag{display:inline-block;margin-left:6px;padding:1px 6px;border-radius:6px;font-size:10px;font-weight:700;letter-spacing:.04em;background:rgba(47,123,246,.14);color:#2f7bf6;vertical-align:1px}
+.ap-search-profile{display:flex;align-items:center;justify-content:center;height:100%;padding:32px}
+.ap-profile-card{text-align:center;max-width:360px}
+.ap-profile-card h2{margin:14px 0 4px;display:flex;align-items:center;justify-content:center;gap:2px}
+.ap-profile-card .ap-verified{width:20px;height:20px}
+.ap-profile-handle{opacity:.7;margin:0}
+.ap-profile-bio{margin:14px 0 0;line-height:1.5}
+.ap-profile-note{display:block;margin-top:12px;font-size:12px;opacity:.65}
+.ap-avatar.lg{width:88px;height:88px;font-size:34px;display:inline-flex;align-items:center;justify-content:center;border-radius:50%;background:linear-gradient(135deg,#4c6ef5,#339af0);color:#fff;font-weight:700}
+
+/* Keyboard shortcuts sheet (shortcuts.mjs) */
+.ap-shortcuts{border:0;border-radius:18px;padding:0;width:min(440px,calc(100vw - 32px));background:var(--ap-card,#fff);color:inherit;box-shadow:0 24px 60px rgba(15,23,42,.28)}
+.ap-shortcuts::backdrop{background:rgba(15,23,42,.45)}
+.ap-shortcuts-head{display:flex;align-items:center;justify-content:space-between;padding:18px 20px 8px}
+.ap-shortcuts-head h2{margin:0;font-size:18px}
+.ap-shortcuts-close{border:0;background:none;font-size:22px;cursor:pointer;color:inherit;opacity:.7}
+.ap-shortcuts dl{margin:0;padding:4px 20px 20px;display:grid;gap:8px}
+.ap-shortcuts dl div{display:flex;justify-content:space-between;gap:16px;align-items:center}
+.ap-shortcuts dd{margin:0;opacity:.8;font-size:14px;text-align:right}
+.ap-shortcuts kbd{display:inline-block;min-width:22px;padding:2px 7px;border-radius:6px;border:1px solid rgba(100,116,139,.35);font:600 12px/1.4 Inter,system-ui,sans-serif;text-align:center;background:rgba(100,116,139,.1)}
+body.dark-theme .ap-shortcuts{background:#1b2232;color:#e5e7eb}

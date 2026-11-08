@@ -16,6 +16,15 @@
 
 .pp-membership{color:#b7c7e0;font-size:12px;margin:-12px 0 8px!important}.pp-membership:empty{display:none}.pp-manage{display:inline-block;color:#9dcaff;font-size:12px;margin:0 0 20px;text-decoration:none}.pp-manage:hover{text-decoration:underline}.pp-card .pp-action:disabled{cursor:default;opacity:.55}
 
-/* Stripe Embedded Checkout mounted in the page (stripe-embedded.mjs) */
-.pp-embedded{margin-top:16px;border-radius:14px;overflow:hidden;background:#fff;min-height:420px}
-.pg-premium.pp-paying .pp-config-left{overflow:auto}
+/* X-style Stripe Elements checkout (stripe-elements.mjs) */
+.pp-elements{margin-top:16px;display:flex;flex-direction:column;gap:12px}
+.pp-pay-label{margin:6px 0 0;font-size:15px;font-weight:600;color:#f4f4f5}
+.pp-express{min-height:48px}
+.pp-or{display:flex;align-items:center;gap:12px;color:#71717a;font-size:11px;letter-spacing:.12em;text-transform:uppercase}
+.pp-or::before,.pp-or::after{content:"";flex:1;height:1px;background:#2e2e33}
+.pp-email{display:flex;flex-direction:column;gap:6px;font-size:13px;font-weight:500;color:#d4d4d8}
+.pp-email input{background:#141416;border:1px solid #3a3a3f;border-radius:12px;padding:12px 14px;color:#f4f4f5;font:inherit;font-size:15px}
+.pp-email input::placeholder{color:#71717a}
+.pp-email input:focus{outline:none;border-color:#8ab4ff;box-shadow:0 0 0 2px rgba(138,180,255,.25)}
+.pg-premium.pp-paying .pp-config-left{overflow-y:auto}
+.pp-or[hidden],.pp-express[hidden],.pp-pay-label[hidden]{display:none}
