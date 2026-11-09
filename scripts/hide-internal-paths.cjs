@@ -99,7 +99,7 @@ if (!fs.existsSync(SRC)) {
     const text = fs.readFileSync(full, 'utf8');
     if (!text.includes('/subdomain/')) continue;
     const next = text.replace(RE, resolve);
-    if (next !== text) { fs.writeFileSync(full, next); touched.push(toPosix(path.relative(OUT, full))); }
+    if (next !== text) { try { fs.unlinkSync(full); } catch {} fs.writeFileSync(full, next); touched.push(toPosix(path.relative(OUT, full))); }
   }
 
   // ---- 3. remove the readable folders and verify ----

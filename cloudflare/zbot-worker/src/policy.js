@@ -10,9 +10,11 @@ export function isAdminIdentity(identity) {
   return !!identity && identity.admin === true;
 }
 
+// Names of PassGram's own system bots and official words: never available to users or bots.
+const RESERVED = new Set(['zbot', 'verify', 'verified', 'verifybot', 'passgram', 'zpass', 'official', 'support', 'admin']);
 export function username(value) {
   const name = String(value || '').toLowerCase().replace(/^@/, '');
-  if (!/^[a-z][a-z0-9_]{3,31}$/.test(name) || name === 'zbot') fail(400, 'Invalid bot username');
+  if (!/^[a-z][a-z0-9_]{3,31}$/.test(name) || RESERVED.has(name)) fail(400, 'Invalid bot username');
   return name;
 }
 

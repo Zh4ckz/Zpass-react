@@ -518,12 +518,14 @@ export function createGateway({ db, files = null, verifyUser, verifyAppCheck, re
         const links = urlList(body.links, 2, 5, 'Send at least 2 links to official accounts (https://…)');
         const press = urlList(body.press, 0, 3, 'Press links must be https:// addresses');
         const note = String(body.note || '').trim().slice(0, 500);
+        // optional company / brand name the applicant asks for (shown next to the name, e.g. "Google"); an admin decides
+        const company = String(body.company || '').trim().replace(/\s+/g, ' ').slice(0, 32);
         const path = `zp_verify_requests/${target.key}`;
         await db.transaction(async (tx) => {
           const [profile, old] = await Promise.all([tx.get(`chat_profiles/${target.key}`), tx.get(path)]);
           if (profile?.verified) fail(409, 'This account is already verified');
           if (old?.status === 'pending') fail(409, 'A request for this account is already waiting for review');
-          tx.set(path, { uid: owner, target: target.key, kind: target.kind, username: target.username, links, press, note, status: 'pending', reason: '', createdAt: Date.now() });
+          tx.set(path, { uid: owner, target: target.key, kind: target.kind, username: target.username, links, press, note, company, status: 'pending', reason: '', createdAt: Date.now() });
         });
         return { status: 'pending', username: target.username };
       }

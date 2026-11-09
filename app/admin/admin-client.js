@@ -223,7 +223,7 @@ const NAV = [
   { id: 'paywall', label: 'Subscription pop-up', icon: 'crown', anim: 'star', group: 'Money', hint: 'X-style upgrade sheet in the app' },
   { id: 'users', label: 'Users', icon: 'users', anim: 'users', group: 'People', hint: 'Accounts and PassGram IDs' },
   { id: 'moderation', label: 'Moderation', icon: 'shield', anim: 'shield', group: 'People', hint: 'Ban people, close groups and channels' },
-  { id: 'verification', label: 'Verification', icon: 'check', anim: 'award', group: 'People', hint: 'Blue check requests from Zbot /verify' },
+  { id: 'verification', label: 'Verification', icon: 'check', anim: 'award', group: 'People', hint: 'Blue check requests from Verify Bot' },
   { id: 'releases', label: 'Updates & releases', icon: 'rocket', anim: 'upload-cloud', group: 'App', hint: 'Versions, maintenance, announcements' },
   { id: 'errors', label: 'Error reports', icon: 'bug', anim: 'alert-triangle', group: 'App', hint: 'Crash and error codes from the apps' },
 ]
@@ -1074,7 +1074,7 @@ function Moderation({ fb, ask, toast }) {
 }
 
 // ---------------- Verification (blue check requests from Zbot /verify) ----------------
-// People apply in the app (Zbot → /verify). The bot server checks they own the account or bot.
+// People apply in the app (Verify Bot, zpas.org/verifybot). The bot server checks they own the account or bot.
 // Approving sets chat_profiles/{id}.verified = true, which shows the blue check everywhere.
 const linkHost = (u) => { try { return new URL(u).hostname.replace(/^www\./, '') } catch { return u } }
 function Verification({ fb, ask, toast }) {
@@ -1091,19 +1091,27 @@ function Verification({ fb, ask, toast }) {
     if (!approve) {
       reason = (window.prompt(`Why is @${r.username} rejected? They will see this in Zbot (/myverify).`, 'No zpas.org link on the official accounts.') || '').trim()
       if (!reason) return
-    } else if (!(await ask({ title: `Verify @${r.username}?`, message: 'The blue check appears on this ' + (r.kind === 'bot' ? 'bot' : 'account') + ' everywhere in PassGram right away.', confirm: 'Verify' }))) return
+    }
+    let company = ''
+    if (approve) {
+      if (!(await ask({ title: `Verify @${r.username}?`, message: 'The blue check appears on this ' + (r.kind === 'bot' ? 'bot' : 'account') + ' everywhere in PassGram right away.', confirm: 'Verify' }))) return
+      // optional company / brand name next to the name ("Google", "X"…); prefilled with what they asked for
+      const typed = window.prompt('Company name to show next to the name (optional, max 32). Leave empty for none.', r.company || '')
+      if (typed === null) return
+      company = typed.trim().replace(/\s+/g, ' ').slice(0, 32)
+    }
     setBusy(r.id)
     try {
       const batch = fs.writeBatch(db)
       batch.update(fs.doc(db, 'zp_verify_requests', r.id), { status: approve ? 'approved' : 'rejected', reason, decidedAt: Date.now(), decidedBy: auth.currentUser?.uid || '' })
-      if (approve) batch.update(fs.doc(db, 'chat_profiles', r.id), { verified: true })
+      if (approve) batch.update(fs.doc(db, 'chat_profiles', r.id), { verified: true, ...(company ? { companyLabel: company } : {}) })
       await batch.commit()
       toast(approve ? `@${r.username} is verified.` : `@${r.username} was rejected.`)
       list.reload()
     } catch (error) { toast(errorText(error), 'bad') } finally { setBusy('') }
   }
   return (
-    <Card title="Blue check requests" hint="Applications from Zbot → /verify. Check that the official accounts are real and link back to zpas.org/username."
+    <Card title="Blue check requests" hint="Applications from Verify Bot (zpas.org/verifybot). Check that the official accounts are real and link back to zpas.org/username."
       actions={<button className="zpa-btn ghost sm" onClick={list.reload}><Icon name="refresh" size={15} />Reload</button>}>
       <div className="zpa-toolbar">
         <Segmented value={status} onChange={setStatus} options={[
@@ -1116,6 +1124,7 @@ function Verification({ fb, ask, toast }) {
           { label: 'Who', render: (r) => <span><strong>@{r.username}</strong> <span className={`zpa-pill ${r.kind === 'bot' ? 'warn' : 'muted'}`}>{r.kind === 'bot' ? 'BOT' : 'ACCOUNT'}</span></span> },
           { label: 'Official accounts', render: (r) => <span style={{ display: 'flex', flexDirection: 'column', gap: 2 }}>{(r.links || []).map((u) => <a key={u} href={u} target="_blank" rel="noopener noreferrer">{linkHost(u)} ↗</a>)}</span> },
           { label: 'Press', render: (r) => (r.press || []).length ? <span style={{ display: 'flex', flexDirection: 'column', gap: 2 }}>{r.press.map((u) => <a key={u} href={u} target="_blank" rel="noopener noreferrer">{linkHost(u)} ↗</a>)}</span> : '—' },
+          { label: 'Company', render: (r) => r.company || '—' },
           { label: 'Note', render: (r) => r.note || '—' },
           { label: 'Sent', render: (r) => (r.createdAt ? new Date(r.createdAt).toLocaleString() : '—') },
           { label: status === 'pending' ? '' : 'Result', render: (r) => status === 'pending' ? (

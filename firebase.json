@@ -50,6 +50,14 @@
         "destination": "/_next/static/chunks/3bd42b31dc4e8baa.html"
       },
       {
+        "source": "/bot",
+        "destination": "/index.html"
+      },
+      {
+        "source": "/bot/**",
+        "destination": "/index.html"
+      },
+      {
         "source": "/*",
         "destination": "/profile.html"
       }

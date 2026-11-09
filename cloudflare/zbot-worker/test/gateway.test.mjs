@@ -494,10 +494,10 @@ test('verification: apply for own account or own bot only, one pending request, 
   assert.equal((await call('/manage/verifyApply', { target: 'me', links: ['https://x.com/only-one'] })).status, 400);
   assert.equal((await call('/manage/verifyApply', { target: 'me', links: ['http://x.com/a', 'https://y.com/b'] })).status, 400);
   assert.equal((await call('/manage/verifyApply', { target: 'me', links: [links[0], links[0]] })).status, 400, 'duplicates do not count twice');
-  const ok = await call('/manage/verifyApply', { target: 'me', links, press: ['https://news.example/rezan'], note: 'Founder' });
+  const ok = await call('/manage/verifyApply', { target: 'me', links, press: ['https://news.example/rezan'], note: 'Founder', company: '  Z   Pass Inc  ' });
   assert.equal(ok.ok, true, ok.description);
   const row = data.get('zp_verify_requests/owner');
-  assert.equal(row.status, 'pending'); assert.equal(row.kind, 'account'); assert.equal(row.username, 'rezan');
+  assert.equal(row.status, 'pending'); assert.equal(row.kind, 'account'); assert.equal(row.username, 'rezan'); assert.equal(row.company, 'Z Pass Inc');
   assert.equal((await call('/manage/verifyApply', { target: 'me', links })).status, 409, 'one waiting request at a time');
   // bots: only your own
   const { result: bot } = await call('/manage/create', { name: 'Shop', username: 'shop_bot' });
