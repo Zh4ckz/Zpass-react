@@ -1,0 +1,1060 @@
+<!doctype html>
+<html lang="en" data-sub="docs">
+<head>
+<script src="/_next/static/chunks/531c39f2b396c1a7/pay-host.js?v=2"></script>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Bot examples — PassGram Docs</title>
+<meta name="description" content="Complete PassGram bots in Python and JavaScript: menus, quizzes, forms, shops, reminders, webhooks and more.">
+<link rel="icon" type="image/png" href="/_next/static/chunks/f2b7dcccd2f2c296/zpass.png">
+<link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="/_next/static/chunks/08f09644139302c4/8xk9e0et8w.css?v=2">
+</head>
+<body>
+<header class="top">
+  <button class="burger" aria-label="Menu" onclick="document.body.classList.toggle('open')">☰</button>
+  <a class="brand" href="/"><span class="mark">P</span>PassGram <span class="pill">Docs</span></a>
+  <nav><a href="/">Docs home</a><a href="/bot">Bots</a><a href="/bot/examples" class=on>Examples</a><a href="/bot/api">Bot API reference</a></nav>
+</header>
+<div class="layout">
+<aside class="side" id="side"><h4>Start</h4><a href="#how-to-use">How to use these examples</a><h4>Examples</h4><a href="#echo">Echo bot</a><a href="#language">Answer in the person&#x27;s language</a><a href="#menu">Main menu with buttons and a Back button</a><a href="#pagination">Long lists with Next / Previous pages</a><a href="#confirm">Yes / No confirmation</a><a href="#quiz">Quiz with a score</a><a href="#survey">Survey with a reply keyboard</a><a href="#form">Step-by-step form (name, email, message)</a><a href="#notes">Saving data: a notes bot with SQLite</a><a href="#broadcast">Announcements to everyone who uses your bot</a><a href="#reminders">Reminders</a><a href="#weather">Calling another web service (weather)</a><a href="#gallery">Photo gallery</a><a href="#export">Sending a generated file (CSV report)</a><a href="#formatting">Formatting safely (bold, links, code)</a><a href="#admin">Commands only you can use</a><a href="#support">Support desk: people write, you answer</a><a href="#errors">Handling errors and limits</a><a href="#webhook-python">Webhook server in Python (no framework)</a><a href="#webhook-node">Webhook server in Node.js (no framework)</a><a href="#deploy">Keeping your bot online (systemd, pm2, Docker)</a></aside>
+<main>
+<div class="hero" id="top"><span class="pill">Examples</span><h1>Bot <em>examples.</em></h1><p>21 complete bots you can copy, run and change. Each one comes in <b>Python</b> and <b>JavaScript</b>, built with the <a href="/bot#official-sdk">official PassGram SDK</a>, with an explanation of how it works. Every title has its own link (<b>#</b>).</p></div>
+<section id="sec-how-to-use"><h2 id="how-to-use">How to use these examples<a class="anchor" href="#how-to-use" aria-label="Link to this section">#</a></h2><ol><li>Create a bot with <a href="https://zpas.org/zbot">Zbot</a> and copy its token.</li><li>Download the SDK file for your language: <a href="/_next/static/chunks/b8bc8a0ae19955fa/passgram.py" download>passgram.py</a> or <a href="/_next/static/chunks/b8bc8a0ae19955fa/passgram.js" download>passgram.js</a>, into an empty folder.</li><li>Save the example next to it as <code>bot.py</code> or <code>bot.js</code>.</li><li>Give the bot its token through the environment: <code>set PASSGRAM_BOT_TOKEN=…</code> on Windows, <code>export PASSGRAM_BOT_TOKEN=…</code> on macOS and Linux.</li><li>Run <code>python bot.py</code> or <code>node bot.js</code> and open your bot in PassGram.</li></ol><div class="note info"><b>ℹ One program per token</b><span>Run only one example at a time with the same token; two programs would take each other's messages.</span></div></section>
+<section id="sec-echo"><h2 id="echo">Echo bot<a class="anchor" href="#echo" aria-label="Link to this section">#</a></h2><p>The smallest useful bot: it greets people on <code>/start</code> and repeats everything they write. Use it to check that your token, your connection and the app work before you build anything bigger.</p><p class="ex-label"><b>How it works</b></p><ul><li><code>@bot.command("start")</code> runs only for the <code>/start</code> command.</li><li><code>@bot.message()</code> runs for every other text message.</li><li><code>bot.run()</code> keeps asking the server for new messages (long polling) until you press Ctrl+C.</li></ul><div class="tabs"><div class="tabbar"><button class=on>Python</button><button>JavaScript</button><button class="copy">Copy</button></div><pre class=on>from passgram import Bot
+
+bot = Bot()  # reads PASSGRAM_BOT_TOKEN from the environment
+
+
+@bot.command(&quot;start&quot;)
+def start(msg):
+    msg.reply(f&quot;Hi {msg.user.first_name}! Send me anything and I will repeat it.&quot;)
+
+
+@bot.message()
+def echo(msg):
+    msg.reply(&quot;You said: &quot; + msg.text)
+
+
+bot.run()</pre><pre>const { Bot } = require(&#x27;./passgram&#x27;);
+
+const bot = new Bot(); // reads PASSGRAM_BOT_TOKEN from the environment
+
+bot.command(&#x27;start&#x27;, (msg) =&gt; msg.reply(`Hi ${msg.user.firstName}! Send me anything and I will repeat it.`));
+
+bot.message((msg) =&gt; msg.reply(&#x27;You said: &#x27; + msg.text));
+
+bot.run();</pre></div><p class="ex-label"><b>Try it</b></p><ul><li>Set the token: <code>set PASSGRAM_BOT_TOKEN=123:abc</code> (Windows) or <code>export PASSGRAM_BOT_TOKEN=123:abc</code> (macOS/Linux).</li><li>Run <code>python bot.py</code> or <code>node bot.js</code>.</li><li>Open the bot in PassGram, press Start, write "hello".</li></ul><p class="ex-label"><b>Ideas</b></p><ul><li>Answer in uppercase: <code>msg.reply(msg.text.upper())</code>.</li><li>Ignore very long messages: check <code>len(msg.text)</code> first.</li></ul></section>
+<section id="sec-language"><h2 id="language">Answer in the person's language<a class="anchor" href="#language" aria-label="Link to this section">#</a></h2><p>Every message carries the person's app language in <code>msg.user.language</code> (for example <code>tr</code>, <code>en</code>, <code>de</code>). Use it to greet people in their own language and fall back to English.</p><p class="ex-label"><b>How it works</b></p><ul><li>Keep all texts in one dictionary per language.</li><li>Pick the language with a fallback: unknown languages get English.</li><li>The language can change between messages if the person switches the app language.</li></ul><div class="tabs"><div class="tabbar"><button class=on>Python</button><button>JavaScript</button><button class="copy">Copy</button></div><pre class=on>from passgram import Bot
+
+bot = Bot()
+
+TEXTS = {
+    &quot;en&quot;: {&quot;hello&quot;: &quot;Hello {name}! How can I help?&quot;, &quot;help&quot;: &quot;Send /start to begin.&quot;},
+    &quot;tr&quot;: {&quot;hello&quot;: &quot;Merhaba {name}! Nasıl yardımcı olabilirim?&quot;, &quot;help&quot;: &quot;Başlamak için /start gönder.&quot;},
+    &quot;de&quot;: {&quot;hello&quot;: &quot;Hallo {name}! Wie kann ich helfen?&quot;, &quot;help&quot;: &quot;Sende /start, um zu beginnen.&quot;},
+}
+
+
+def t(msg, key, **values):
+    lang = (msg.user.language or &quot;en&quot;).split(&quot;-&quot;)[0]
+    return TEXTS.get(lang, TEXTS[&quot;en&quot;])[key].format(**values)
+
+
+@bot.command(&quot;start&quot;)
+def start(msg):
+    msg.reply(t(msg, &quot;hello&quot;, name=msg.user.first_name))
+
+
+@bot.message()
+def other(msg):
+    msg.reply(t(msg, &quot;help&quot;))
+
+
+bot.run()</pre><pre>const { Bot } = require(&#x27;./passgram&#x27;);
+
+const bot = new Bot();
+
+const TEXTS = {
+  en: { hello: &#x27;Hello {name}! How can I help?&#x27;, help: &#x27;Send /start to begin.&#x27; },
+  tr: { hello: &#x27;Merhaba {name}! Nasıl yardımcı olabilirim?&#x27;, help: &#x27;Başlamak için /start gönder.&#x27; },
+  de: { hello: &#x27;Hallo {name}! Wie kann ich helfen?&#x27;, help: &#x27;Sende /start, um zu beginnen.&#x27; },
+};
+
+function t(msg, key, values = {}) {
+  const lang = (msg.user.language || &#x27;en&#x27;).split(&#x27;-&#x27;)[0];
+  const text = (TEXTS[lang] || TEXTS.en)[key];
+  return text.replace(/\{(\w+)\}/g, (_, k) =&gt; values[k] ?? &#x27;&#x27;);
+}
+
+bot.command(&#x27;start&#x27;, (msg) =&gt; msg.reply(t(msg, &#x27;hello&#x27;, { name: msg.user.firstName })));
+bot.message((msg) =&gt; msg.reply(t(msg, &#x27;help&#x27;)));
+
+bot.run();</pre></div><p class="ex-label"><b>Try it</b></p><ul><li>Change the app language in PassGram settings, then send /start again.</li></ul><p class="ex-label"><b>Ideas</b></p><ul><li>Store the person's chosen language yourself if you offer a language menu.</li></ul></section>
+<section id="sec-menu"><h2 id="menu">Main menu with buttons and a Back button<a class="anchor" href="#menu" aria-label="Link to this section">#</a></h2><p>A menu that changes <b>in place</b>: pressing a button edits the same message instead of sending new ones, so the chat stays clean. This is how most good bots feel.</p><p class="ex-label"><b>How it works</b></p><ul><li>The menu is a <code>Buttons</code> object; each button has a label and a value.</li><li><code>press.edit()</code> replaces the text and the buttons of the message the button belongs to.</li><li>A "Back" button simply edits the message back to the main menu.</li><li>Always call <code>press.answer()</code> so the button stops spinning (the SDK does it for you if you forget).</li></ul><div class="tabs"><div class="tabbar"><button class=on>Python</button><button>JavaScript</button><button class="copy">Copy</button></div><pre class=on>from passgram import Bot, Buttons
+
+bot = Bot()
+
+MAIN = Buttons([(&quot;📦 Products&quot;, &quot;products&quot;), (&quot;ℹ️ About&quot;, &quot;about&quot;)], [(&quot;☎️ Contact&quot;, &quot;contact&quot;)])
+BACK = Buttons([(&quot;⬅️ Back&quot;, &quot;home&quot;)])
+
+PAGES = {
+    &quot;products&quot;: &quot;&lt;b&gt;Products&lt;/b&gt;\n• Coffee — $3\n• Tea — $2\n• Cake — $4&quot;,
+    &quot;about&quot;: &quot;&lt;b&gt;About us&lt;/b&gt;\nA small café since 2020.&quot;,
+    &quot;contact&quot;: &quot;&lt;b&gt;Contact&lt;/b&gt;\nhello@example.com&quot;,
+}
+
+
+@bot.command(&quot;start&quot;)
+def start(msg):
+    msg.reply(&quot;Welcome! Choose:&quot;, buttons=MAIN)
+
+
+@bot.button(&quot;products&quot;, &quot;about&quot;, &quot;contact&quot;)
+def open_page(press):
+    press.answer()
+    press.edit(PAGES[press.data], format=&quot;html&quot;, buttons=BACK)
+
+
+@bot.button(&quot;home&quot;)
+def home(press):
+    press.answer()
+    press.edit(&quot;Welcome! Choose:&quot;, buttons=MAIN)
+
+
+bot.run()</pre><pre>const { Bot, Buttons } = require(&#x27;./passgram&#x27;);
+
+const bot = new Bot();
+
+const MAIN = new Buttons([[&#x27;📦 Products&#x27;, &#x27;products&#x27;], [&#x27;ℹ️ About&#x27;, &#x27;about&#x27;]], [[&#x27;☎️ Contact&#x27;, &#x27;contact&#x27;]]);
+const BACK = new Buttons([[&#x27;⬅️ Back&#x27;, &#x27;home&#x27;]]);
+
+const PAGES = {
+  products: &#x27;&lt;b&gt;Products&lt;/b&gt;\n• Coffee — $3\n• Tea — $2\n• Cake — $4&#x27;,
+  about: &#x27;&lt;b&gt;About us&lt;/b&gt;\nA small café since 2020.&#x27;,
+  contact: &#x27;&lt;b&gt;Contact&lt;/b&gt;\nhello@example.com&#x27;,
+};
+
+bot.command(&#x27;start&#x27;, (msg) =&gt; msg.reply(&#x27;Welcome! Choose:&#x27;, { buttons: MAIN }));
+
+bot.button([&#x27;products&#x27;, &#x27;about&#x27;, &#x27;contact&#x27;], async (press) =&gt; {
+  await press.answer();
+  await press.edit(PAGES[press.data], { format: &#x27;html&#x27;, buttons: BACK });
+});
+
+bot.button(&#x27;home&#x27;, async (press) =&gt; {
+  await press.answer();
+  await press.edit(&#x27;Welcome! Choose:&#x27;, { buttons: MAIN });
+});
+
+bot.run();</pre></div><p class="ex-label"><b>Try it</b></p><ul><li>Send /start, press Products, then Back. The same message changes; no new messages appear.</li></ul><p class="ex-label"><b>Ideas</b></p><ul><li>Add a "🌐 Website" button with an <code>https://</code> value: it opens a link instead of calling your bot.</li></ul></section>
+<section id="sec-pagination"><h2 id="pagination">Long lists with Next / Previous pages<a class="anchor" href="#pagination" aria-label="Link to this section">#</a></h2><p>When you have more items than fit in one message (products, results, history), show them a page at a time with ◀ and ▶ buttons. The page number travels inside the button value.</p><p class="ex-label"><b>How it works</b></p><ul><li>Button values can carry data, like <code>page:3</code>. Up to 64 bytes.</li><li>One button handler catches every press and reads the page number from <code>press.data</code>.</li><li>Buttons are only shown when there is a page in that direction.</li></ul><div class="tabs"><div class="tabbar"><button class=on>Python</button><button>JavaScript</button><button class="copy">Copy</button></div><pre class=on>from passgram import Bot, Buttons
+
+bot = Bot()
+ITEMS = [f&quot;Item number {i}&quot; for i in range(1, 48)]
+PER_PAGE = 8
+
+
+def render(page):
+    pages = (len(ITEMS) + PER_PAGE - 1) // PER_PAGE
+    chunk = ITEMS[page * PER_PAGE:(page + 1) * PER_PAGE]
+    text = f&quot;&lt;b&gt;Page {page + 1} of {pages}&lt;/b&gt;\n&quot; + &quot;\n&quot;.join(chunk)
+    nav = []
+    if page &gt; 0:
+        nav.append((&quot;◀ Previous&quot;, f&quot;page:{page - 1}&quot;))
+    if page &lt; pages - 1:
+        nav.append((&quot;Next ▶&quot;, f&quot;page:{page + 1}&quot;))
+    return text, Buttons(nav) if nav else None
+
+
+@bot.command(&quot;start&quot;)
+def start(msg):
+    text, buttons = render(0)
+    msg.reply(text, format=&quot;html&quot;, buttons=buttons)
+
+
+@bot.button()
+def on_press(press):
+    if not press.data.startswith(&quot;page:&quot;):
+        return
+    press.answer()
+    text, buttons = render(int(press.data.split(&quot;:&quot;)[1]))
+    press.edit(text, format=&quot;html&quot;, buttons=buttons)
+
+
+bot.run()</pre><pre>const { Bot, Buttons } = require(&#x27;./passgram&#x27;);
+
+const bot = new Bot();
+const ITEMS = Array.from({ length: 47 }, (_, i) =&gt; `Item number ${i + 1}`);
+const PER_PAGE = 8;
+
+function render(page) {
+  const pages = Math.ceil(ITEMS.length / PER_PAGE);
+  const chunk = ITEMS.slice(page * PER_PAGE, (page + 1) * PER_PAGE);
+  const text = `&lt;b&gt;Page ${page + 1} of ${pages}&lt;/b&gt;\n` + chunk.join(&#x27;\n&#x27;);
+  const nav = [];
+  if (page &gt; 0) nav.push([&#x27;◀ Previous&#x27;, `page:${page - 1}`]);
+  if (page &lt; pages - 1) nav.push([&#x27;Next ▶&#x27;, `page:${page + 1}`]);
+  return [text, nav.length ? new Buttons(nav) : undefined];
+}
+
+bot.command(&#x27;start&#x27;, (msg) =&gt; {
+  const [text, buttons] = render(0);
+  return msg.reply(text, { format: &#x27;html&#x27;, buttons });
+});
+
+bot.button(async (press) =&gt; {
+  if (!press.data.startsWith(&#x27;page:&#x27;)) return;
+  await press.answer();
+  const [text, buttons] = render(Number(press.data.split(&#x27;:&#x27;)[1]));
+  await press.edit(text, { format: &#x27;html&#x27;, buttons });
+});
+
+bot.run();</pre></div><p class="ex-label"><b>Try it</b></p><ul><li>Send /start and walk through the pages. On the last page only "Previous" is shown.</li></ul></section>
+<section id="sec-confirm"><h2 id="confirm">Yes / No confirmation<a class="anchor" href="#confirm" aria-label="Link to this section">#</a></h2><p>Before doing something that cannot be undone (deleting data, placing an order), ask for confirmation with two buttons, then replace the question with the result so it cannot be pressed twice.</p><p class="ex-label"><b>How it works</b></p><ul><li>The question message carries "Yes" and "No" buttons.</li><li>After a press, the message is edited without buttons, so the choice is final.</li></ul><div class="tabs"><div class="tabbar"><button class=on>Python</button><button>JavaScript</button><button class="copy">Copy</button></div><pre class=on>from passgram import Bot, Buttons
+
+bot = Bot()
+CONFIRM = Buttons([(&quot;✅ Yes, delete&quot;, &quot;delete:yes&quot;), (&quot;✖️ No&quot;, &quot;delete:no&quot;)])
+
+
+@bot.command(&quot;deleteall&quot;)
+def ask(msg):
+    msg.reply(&quot;Delete all your saved notes? This cannot be undone.&quot;, buttons=CONFIRM)
+
+
+@bot.button(&quot;delete:yes&quot;)
+def yes(press):
+    press.answer(&quot;Deleted&quot;)
+    # ... delete the data here ...
+    press.edit(&quot;🗑 All notes were deleted.&quot;)
+
+
+@bot.button(&quot;delete:no&quot;)
+def no(press):
+    press.answer()
+    press.edit(&quot;Nothing was deleted.&quot;)
+
+
+bot.run()</pre><pre>const { Bot, Buttons } = require(&#x27;./passgram&#x27;);
+
+const bot = new Bot();
+const CONFIRM = new Buttons([[&#x27;✅ Yes, delete&#x27;, &#x27;delete:yes&#x27;], [&#x27;✖️ No&#x27;, &#x27;delete:no&#x27;]]);
+
+bot.command(&#x27;deleteall&#x27;, (msg) =&gt; msg.reply(&#x27;Delete all your saved notes? This cannot be undone.&#x27;, { buttons: CONFIRM }));
+
+bot.button(&#x27;delete:yes&#x27;, async (press) =&gt; {
+  await press.answer(&#x27;Deleted&#x27;);
+  // ... delete the data here ...
+  await press.edit(&#x27;🗑 All notes were deleted.&#x27;);
+});
+
+bot.button(&#x27;delete:no&#x27;, async (press) =&gt; {
+  await press.answer();
+  await press.edit(&#x27;Nothing was deleted.&#x27;);
+});
+
+bot.run();</pre></div></section>
+<section id="sec-quiz"><h2 id="quiz">Quiz with a score<a class="anchor" href="#quiz" aria-label="Link to this section">#</a></h2><p>A quiz asks questions with answer buttons, says right or wrong, keeps a score per person and shows the result at the end. It shows how to keep <b>state per chat</b>.</p><p class="ex-label"><b>How it works</b></p><ul><li>A dictionary keyed by chat ID stores each person's position and score.</li><li>Button values say which question and answer were pressed, so old buttons cannot cheat.</li><li><code>press.answer(text, alert=True)</code> shows a small dialog instead of a short notice.</li></ul><div class="tabs"><div class="tabbar"><button class=on>Python</button><button>JavaScript</button><button class="copy">Copy</button></div><pre class=on>from passgram import Bot, Buttons
+
+bot = Bot()
+QUESTIONS = [
+    (&quot;What is the capital of Turkey?&quot;, [&quot;Istanbul&quot;, &quot;Ankara&quot;, &quot;Izmir&quot;], 1),
+    (&quot;How many minutes are in an hour?&quot;, [&quot;60&quot;, &quot;100&quot;, &quot;30&quot;], 0),
+    (&quot;Which planet is the largest?&quot;, [&quot;Mars&quot;, &quot;Earth&quot;, &quot;Jupiter&quot;], 2),
+]
+state = {}  # chat_id -&gt; {&quot;q&quot;: index, &quot;score&quot;: n}
+
+
+def ask(chat_id):
+    s = state[chat_id]
+    question, answers, _ = QUESTIONS[s[&quot;q&quot;]]
+    rows = [[(a, f&quot;q{s[&#x27;q&#x27;]}:{i}&quot;)] for i, a in enumerate(answers)]
+    bot.send(chat_id, f&quot;Question {s[&#x27;q&#x27;] + 1}/{len(QUESTIONS)}\n\n{question}&quot;, buttons=Buttons(*rows))
+
+
+@bot.command(&quot;start&quot;, &quot;quiz&quot;)
+def start(msg):
+    state[msg.chat_id] = {&quot;q&quot;: 0, &quot;score&quot;: 0}
+    ask(msg.chat_id)
+
+
+@bot.button()
+def answer(press):
+    s = state.get(press.chat_id)
+    if not s or not press.data.startswith(f&quot;q{s[&#x27;q&#x27;]}:&quot;):
+        press.answer(&quot;This question is over. Send /quiz to play again.&quot;)
+        return
+    question, answers, right = QUESTIONS[s[&quot;q&quot;]]
+    picked = int(press.data.split(&quot;:&quot;)[1])
+    if picked == right:
+        s[&quot;score&quot;] += 1
+        press.answer(&quot;✅ Correct!&quot;)
+    else:
+        press.answer(f&quot;❌ Wrong. It was {answers[right]}.&quot;, alert=True)
+    press.edit(f&quot;{question}\nYour answer: {answers[picked]}&quot;)
+    s[&quot;q&quot;] += 1
+    if s[&quot;q&quot;] &lt; len(QUESTIONS):
+        ask(press.chat_id)
+    else:
+        bot.send(press.chat_id, f&quot;🏁 Done! Score: {s[&#x27;score&#x27;]}/{len(QUESTIONS)}. /quiz to play again.&quot;)
+
+
+bot.run()</pre><pre>const { Bot, Buttons } = require(&#x27;./passgram&#x27;);
+
+const bot = new Bot();
+const QUESTIONS = [
+  [&#x27;What is the capital of Turkey?&#x27;, [&#x27;Istanbul&#x27;, &#x27;Ankara&#x27;, &#x27;Izmir&#x27;], 1],
+  [&#x27;How many minutes are in an hour?&#x27;, [&#x27;60&#x27;, &#x27;100&#x27;, &#x27;30&#x27;], 0],
+  [&#x27;Which planet is the largest?&#x27;, [&#x27;Mars&#x27;, &#x27;Earth&#x27;, &#x27;Jupiter&#x27;], 2],
+];
+const state = new Map(); // chatId -&gt; { q, score }
+
+function ask(chatId) {
+  const s = state.get(chatId);
+  const [question, answers] = QUESTIONS[s.q];
+  const rows = answers.map((a, i) =&gt; [[a, `q${s.q}:${i}`]]);
+  return bot.send(chatId, `Question ${s.q + 1}/${QUESTIONS.length}\n\n${question}`, { buttons: new Buttons(...rows) });
+}
+
+bot.command([&#x27;start&#x27;, &#x27;quiz&#x27;], (msg) =&gt; {
+  state.set(msg.chatId, { q: 0, score: 0 });
+  return ask(msg.chatId);
+});
+
+bot.button(async (press) =&gt; {
+  const s = state.get(press.chatId);
+  if (!s || !press.data.startsWith(`q${s.q}:`)) return press.answer(&#x27;This question is over. Send /quiz to play again.&#x27;);
+  const [question, answers, right] = QUESTIONS[s.q];
+  const picked = Number(press.data.split(&#x27;:&#x27;)[1]);
+  if (picked === right) { s.score++; await press.answer(&#x27;✅ Correct!&#x27;); }
+  else await press.answer(`❌ Wrong. It was ${answers[right]}.`, { alert: true });
+  await press.edit(`${question}\nYour answer: ${answers[picked]}`);
+  s.q++;
+  if (s.q &lt; QUESTIONS.length) await ask(press.chatId);
+  else await bot.send(press.chatId, `🏁 Done! Score: ${s.score}/${QUESTIONS.length}. /quiz to play again.`);
+});
+
+bot.run();</pre></div><p class="ex-label"><b>Ideas</b></p><ul><li>Memory is lost when the bot restarts. To keep scores, save them in a file or database (see the notes recipe).</li></ul></section>
+<section id="sec-survey"><h2 id="survey">Survey with a reply keyboard<a class="anchor" href="#survey" aria-label="Link to this section">#</a></h2><p>Reply keyboards replace the phone keyboard with big answer buttons. They are perfect for ratings and quick choices; the tap arrives as a normal text message.</p><p class="ex-label"><b>How it works</b></p><ul><li><code>Keyboard([...], one_time=True)</code> hides the keyboard after one answer.</li><li><code>@bot.text(...)</code> catches exactly those answers.</li><li><code>Keyboard.remove()</code> takes the keyboard away.</li></ul><div class="tabs"><div class="tabbar"><button class=on>Python</button><button>JavaScript</button><button class="copy">Copy</button></div><pre class=on>from passgram import Bot, Keyboard
+
+bot = Bot()
+RATINGS = [&quot;😍 Great&quot;, &quot;🙂 Good&quot;, &quot;😐 OK&quot;, &quot;🙁 Bad&quot;]
+results = {r: 0 for r in RATINGS}
+
+
+@bot.command(&quot;start&quot;, &quot;rate&quot;)
+def rate(msg):
+    msg.reply(&quot;How was your order today?&quot;, keyboard=Keyboard(RATINGS[:2], RATINGS[2:], one_time=True))
+
+
+@bot.text(*RATINGS)
+def answer(msg):
+    results[msg.text] += 1
+    msg.reply(&quot;Thanks for the feedback! 🙏&quot;, keyboard=Keyboard.remove())
+
+
+@bot.command(&quot;results&quot;)
+def show(msg):
+    msg.reply(&quot;\n&quot;.join(f&quot;{r}: {n}&quot; for r, n in results.items()))
+
+
+bot.run()</pre><pre>const { Bot, Keyboard } = require(&#x27;./passgram&#x27;);
+
+const bot = new Bot();
+const RATINGS = [&#x27;😍 Great&#x27;, &#x27;🙂 Good&#x27;, &#x27;😐 OK&#x27;, &#x27;🙁 Bad&#x27;];
+const results = Object.fromEntries(RATINGS.map((r) =&gt; [r, 0]));
+
+bot.command([&#x27;start&#x27;, &#x27;rate&#x27;], (msg) =&gt; msg.reply(&#x27;How was your order today?&#x27;, {
+  keyboard: new Keyboard(RATINGS.slice(0, 2), RATINGS.slice(2), { oneTime: true }),
+}));
+
+bot.text(RATINGS, (msg) =&gt; {
+  results[msg.text]++;
+  return msg.reply(&#x27;Thanks for the feedback! 🙏&#x27;, { keyboard: Keyboard.remove() });
+});
+
+bot.command(&#x27;results&#x27;, (msg) =&gt; msg.reply(Object.entries(results).map(([r, n]) =&gt; `${r}: ${n}`).join(&#x27;\n&#x27;)));
+
+bot.run();</pre></div></section>
+<section id="sec-form"><h2 id="form">Step-by-step form (name, email, message)<a class="anchor" href="#form" aria-label="Link to this section">#</a></h2><p>Many bots collect information in steps: "What is your name?" → "Your email?" → "Your message?". The trick is to remember, per chat, which step the person is on.</p><p class="ex-label"><b>How it works</b></p><ul><li><code>steps[chat_id]</code> holds the current step and the answers so far.</li><li>The general message handler looks at the step to know what the text means.</li><li><code>/cancel</code> clears the state at any time.</li><li>Simple validation (for example the email) keeps the person on the same step until the answer is valid.</li></ul><div class="tabs"><div class="tabbar"><button class=on>Python</button><button>JavaScript</button><button class="copy">Copy</button></div><pre class=on>import re
+
+from passgram import Bot
+
+bot = Bot()
+steps = {}  # chat_id -&gt; {&quot;step&quot;: &quot;name&quot; | &quot;email&quot; | &quot;text&quot;, &quot;data&quot;: {...}}
+
+
+@bot.command(&quot;contact&quot;, &quot;start&quot;)
+def begin(msg):
+    steps[msg.chat_id] = {&quot;step&quot;: &quot;name&quot;, &quot;data&quot;: {}}
+    msg.reply(&quot;Let&#x27;s write to our team. What is your name? (/cancel to stop)&quot;)
+
+
+@bot.command(&quot;cancel&quot;)
+def cancel(msg):
+    steps.pop(msg.chat_id, None)
+    msg.reply(&quot;Cancelled.&quot;)
+
+
+@bot.message()
+def answer(msg):
+    s = steps.get(msg.chat_id)
+    if not s:
+        msg.reply(&quot;Send /contact to write to us.&quot;)
+        return
+    if s[&quot;step&quot;] == &quot;name&quot;:
+        s[&quot;data&quot;][&quot;name&quot;] = msg.text.strip()[:60]
+        s[&quot;step&quot;] = &quot;email&quot;
+        msg.reply(&quot;Thanks! Your email address?&quot;)
+    elif s[&quot;step&quot;] == &quot;email&quot;:
+        if not re.fullmatch(r&quot;[^@\s]+@[^@\s]+\.[^@\s]+&quot;, msg.text.strip()):
+            msg.reply(&quot;That doesn&#x27;t look like an email. Please try again.&quot;)
+            return
+        s[&quot;data&quot;][&quot;email&quot;] = msg.text.strip()
+        s[&quot;step&quot;] = &quot;text&quot;
+        msg.reply(&quot;And your message?&quot;)
+    elif s[&quot;step&quot;] == &quot;text&quot;:
+        s[&quot;data&quot;][&quot;text&quot;] = msg.text
+        d = steps.pop(msg.chat_id)[&quot;data&quot;]
+        print(&quot;New contact form:&quot;, d)  # save it, e-mail it, or send it to yourself
+        msg.reply(f&quot;✅ Thank you {d[&#x27;name&#x27;]}, we will answer at {d[&#x27;email&#x27;]}.&quot;)
+
+
+bot.run()</pre><pre>const { Bot } = require(&#x27;./passgram&#x27;);
+
+const bot = new Bot();
+const steps = new Map(); // chatId -&gt; { step, data }
+
+bot.command([&#x27;contact&#x27;, &#x27;start&#x27;], (msg) =&gt; {
+  steps.set(msg.chatId, { step: &#x27;name&#x27;, data: {} });
+  return msg.reply(&quot;Let&#x27;s write to our team. What is your name? (/cancel to stop)&quot;);
+});
+
+bot.command(&#x27;cancel&#x27;, (msg) =&gt; { steps.delete(msg.chatId); return msg.reply(&#x27;Cancelled.&#x27;); });
+
+bot.message(async (msg) =&gt; {
+  const s = steps.get(msg.chatId);
+  if (!s) return msg.reply(&#x27;Send /contact to write to us.&#x27;);
+  if (s.step === &#x27;name&#x27;) {
+    s.data.name = msg.text.trim().slice(0, 60); s.step = &#x27;email&#x27;;
+    return msg.reply(&#x27;Thanks! Your email address?&#x27;);
+  }
+  if (s.step === &#x27;email&#x27;) {
+    if (!/^[^@\s]+@[^@\s]+\.[^@\s]+$/.test(msg.text.trim())) return msg.reply(&quot;That doesn&#x27;t look like an email. Please try again.&quot;);
+    s.data.email = msg.text.trim(); s.step = &#x27;text&#x27;;
+    return msg.reply(&#x27;And your message?&#x27;);
+  }
+  s.data.text = msg.text;
+  steps.delete(msg.chatId);
+  console.log(&#x27;New contact form:&#x27;, s.data); // save it, e-mail it, or send it to yourself
+  return msg.reply(`✅ Thank you ${s.data.name}, we will answer at ${s.data.email}.`);
+});
+
+bot.run();</pre></div></section>
+<section id="sec-notes"><h2 id="notes">Saving data: a notes bot with SQLite<a class="anchor" href="#notes" aria-label="Link to this section">#</a></h2><p>Memory in a variable disappears when the bot restarts. To keep data, store it. This bot saves notes per person in an SQLite file, which needs no server and is built into Python.</p><p class="ex-label"><b>How it works</b></p><ul><li>One table <code>notes(chat_id, text, created)</code>.</li><li><code>/add text</code>, <code>/list</code>, <code>/clear</code>.</li><li><code>msg.args</code> holds the words after the command.</li><li>In JavaScript the same idea is shown with a JSON file, so no packages are needed.</li></ul><div class="tabs"><div class="tabbar"><button class=on>Python</button><button>JavaScript</button><button class="copy">Copy</button></div><pre class=on>import sqlite3
+import time
+
+from passgram import Bot
+
+bot = Bot()
+db = sqlite3.connect(&quot;notes.db&quot;, check_same_thread=False)
+db.execute(&quot;CREATE TABLE IF NOT EXISTS notes (chat_id INTEGER, text TEXT, created INTEGER)&quot;)
+
+
+@bot.command(&quot;add&quot;)
+def add(msg):
+    text = &quot; &quot;.join(msg.args)
+    if not text:
+        msg.reply(&quot;Write the note after the command, e.g. /add buy milk&quot;)
+        return
+    db.execute(&quot;INSERT INTO notes VALUES (?, ?, ?)&quot;, (msg.chat_id, text, int(time.time())))
+    db.commit()
+    msg.reply(&quot;📝 Saved.&quot;)
+
+
+@bot.command(&quot;list&quot;, &quot;start&quot;)
+def list_notes(msg):
+    rows = db.execute(&quot;SELECT text FROM notes WHERE chat_id = ? ORDER BY created&quot;, (msg.chat_id,)).fetchall()
+    msg.reply(&quot;\n&quot;.join(f&quot;{i}. {r[0]}&quot; for i, r in enumerate(rows, 1)) or &quot;No notes yet. Use /add.&quot;)
+
+
+@bot.command(&quot;clear&quot;)
+def clear(msg):
+    db.execute(&quot;DELETE FROM notes WHERE chat_id = ?&quot;, (msg.chat_id,))
+    db.commit()
+    msg.reply(&quot;🗑 All your notes were deleted.&quot;)
+
+
+bot.run()</pre><pre>const fs = require(&#x27;node:fs&#x27;);
+const { Bot } = require(&#x27;./passgram&#x27;);
+
+const bot = new Bot();
+const FILE = &#x27;notes.json&#x27;;
+const notes = fs.existsSync(FILE) ? JSON.parse(fs.readFileSync(FILE, &#x27;utf8&#x27;)) : {};
+const save = () =&gt; fs.writeFileSync(FILE, JSON.stringify(notes, null, 2));
+
+bot.command(&#x27;add&#x27;, (msg) =&gt; {
+  const text = msg.args.join(&#x27; &#x27;);
+  if (!text) return msg.reply(&#x27;Write the note after the command, e.g. /add buy milk&#x27;);
+  (notes[msg.chatId] ||= []).push(text);
+  save();
+  return msg.reply(&#x27;📝 Saved.&#x27;);
+});
+
+bot.command([&#x27;list&#x27;, &#x27;start&#x27;], (msg) =&gt; {
+  const list = notes[msg.chatId] || [];
+  return msg.reply(list.map((t, i) =&gt; `${i + 1}. ${t}`).join(&#x27;\n&#x27;) || &#x27;No notes yet. Use /add.&#x27;);
+});
+
+bot.command(&#x27;clear&#x27;, (msg) =&gt; { delete notes[msg.chatId]; save(); return msg.reply(&#x27;🗑 All your notes were deleted.&#x27;); });
+
+bot.run();</pre></div></section>
+<section id="sec-broadcast"><h2 id="broadcast">Announcements to everyone who uses your bot<a class="anchor" href="#broadcast" aria-label="Link to this section">#</a></h2><p>A bot can only write to people who started it, so remember who they are and send announcements to that list. Send slowly enough to stay under the rate limit (120 requests per minute).</p><p class="ex-label"><b>How it works</b></p><ul><li>Every <code>/start</code> adds the chat ID to a file.</li><li><code>/announce text</code> is only accepted from your own chat ID.</li><li>A short pause between messages keeps you under the limit; people who blocked or deleted the chat are skipped.</li></ul><div class="tabs"><div class="tabbar"><button class=on>Python</button><button>JavaScript</button><button class="copy">Copy</button></div><pre class=on>import json
+import os
+import time
+
+from passgram import Bot, PassGramError
+
+bot = Bot()
+OWNER = int(os.environ.get(&quot;OWNER_ID&quot;, &quot;0&quot;))  # your own Z Pass ID (send /id to Zbot)
+FILE = &quot;users.json&quot;
+users = set(json.load(open(FILE))) if os.path.exists(FILE) else set()
+
+
+@bot.command(&quot;start&quot;)
+def start(msg):
+    users.add(msg.chat_id)
+    json.dump(sorted(users), open(FILE, &quot;w&quot;))
+    msg.reply(&quot;Subscribed to news ✅&quot;)
+
+
+@bot.command(&quot;announce&quot;)
+def announce(msg):
+    if msg.chat_id != OWNER:
+        return
+    text = &quot; &quot;.join(msg.args)
+    sent = failed = 0
+    for chat_id in list(users):
+        try:
+            bot.send(chat_id, &quot;📢 &quot; + text)
+            sent += 1
+        except PassGramError as e:
+            if e.code == 429:
+                time.sleep(getattr(e, &quot;retry_after&quot;, None) or 60)
+            failed += 1
+        time.sleep(0.6)  # about 100 messages per minute
+    msg.reply(f&quot;Sent to {sent}, failed {failed}.&quot;)
+
+
+bot.run()</pre><pre>const fs = require(&#x27;node:fs&#x27;);
+const { Bot } = require(&#x27;./passgram&#x27;);
+
+const bot = new Bot();
+const OWNER = Number(process.env.OWNER_ID || 0); // your own Z Pass ID (send /id to Zbot)
+const FILE = &#x27;users.json&#x27;;
+const users = new Set(fs.existsSync(FILE) ? JSON.parse(fs.readFileSync(FILE, &#x27;utf8&#x27;)) : []);
+const sleep = (ms) =&gt; new Promise((r) =&gt; setTimeout(r, ms));
+
+bot.command(&#x27;start&#x27;, (msg) =&gt; {
+  users.add(msg.chatId);
+  fs.writeFileSync(FILE, JSON.stringify([...users]));
+  return msg.reply(&#x27;Subscribed to news ✅&#x27;);
+});
+
+bot.command(&#x27;announce&#x27;, async (msg) =&gt; {
+  if (msg.chatId !== OWNER) return;
+  const text = msg.args.join(&#x27; &#x27;);
+  let sent = 0, failed = 0;
+  for (const chatId of users) {
+    try { await bot.send(chatId, &#x27;📢 &#x27; + text); sent++; }
+    catch (e) { if (e.code === 429) await sleep((e.retryAfter || 60) * 1000); failed++; }
+    await sleep(600); // about 100 messages per minute
+  }
+  return msg.reply(`Sent to ${sent}, failed ${failed}.`);
+});
+
+bot.run();</pre></div><p class="ex-label"><b>Ideas</b></p><ul><li>Only send news people asked for. Bots that spam are removed (see <a href="/bot#rules-for-bots">rules</a>).</li></ul></section>
+<section id="sec-reminders"><h2 id="reminders">Reminders<a class="anchor" href="#reminders" aria-label="Link to this section">#</a></h2><p><code>/remind 10 drink water</code> answers after 10 minutes. The bot keeps running in the background, waits, then sends the reminder.</p><p class="ex-label"><b>How it works</b></p><ul><li>Python uses a background timer; JavaScript uses <code>setTimeout</code>.</li><li>Reminders live in memory: they are lost if the bot restarts. For long reminders, save them and check them every minute.</li></ul><div class="tabs"><div class="tabbar"><button class=on>Python</button><button>JavaScript</button><button class="copy">Copy</button></div><pre class=on>import threading
+
+from passgram import Bot
+
+bot = Bot()
+
+
+@bot.command(&quot;remind&quot;)
+def remind(msg):
+    if len(msg.args) &lt; 2 or not msg.args[0].isdigit():
+        msg.reply(&quot;Use: /remind &lt;minutes&gt; &lt;text&gt;, e.g. /remind 10 drink water&quot;)
+        return
+    minutes, text = int(msg.args[0]), &quot; &quot;.join(msg.args[1:])
+    if not 1 &lt;= minutes &lt;= 1440:
+        msg.reply(&quot;Choose 1 to 1440 minutes.&quot;)
+        return
+    threading.Timer(minutes * 60, lambda: bot.send(msg.chat_id, &quot;⏰ &quot; + text)).start()
+    msg.reply(f&quot;OK, I will remind you in {minutes} min.&quot;)
+
+
+bot.run()</pre><pre>const { Bot } = require(&#x27;./passgram&#x27;);
+
+const bot = new Bot();
+
+bot.command(&#x27;remind&#x27;, (msg) =&gt; {
+  const [minutesText, ...rest] = msg.args;
+  const minutes = Number(minutesText);
+  if (!Number.isInteger(minutes) || !rest.length) return msg.reply(&#x27;Use: /remind &lt;minutes&gt; &lt;text&gt;, e.g. /remind 10 drink water&#x27;);
+  if (minutes &lt; 1 || minutes &gt; 1440) return msg.reply(&#x27;Choose 1 to 1440 minutes.&#x27;);
+  setTimeout(() =&gt; bot.send(msg.chatId, &#x27;⏰ &#x27; + rest.join(&#x27; &#x27;)).catch(console.error), minutes * 60000);
+  return msg.reply(`OK, I will remind you in ${minutes} min.`);
+});
+
+bot.run();</pre></div></section>
+<section id="sec-weather"><h2 id="weather">Calling another web service (weather)<a class="anchor" href="#weather" aria-label="Link to this section">#</a></h2><p>Bots often fetch data from other services. This one asks the free Open-Meteo weather service (no key needed) and shows "typing…" while it waits.</p><p class="ex-label"><b>How it works</b></p><ul><li><code>msg.typing()</code> shows that the bot is working.</li><li>Errors from the other service are caught, so the person always gets an answer.</li></ul><div class="tabs"><div class="tabbar"><button class=on>Python</button><button>JavaScript</button><button class="copy">Copy</button></div><pre class=on>import json
+import urllib.request
+
+from passgram import Bot
+
+bot = Bot()
+CITIES = {&quot;istanbul&quot;: (41.01, 28.97), &quot;ankara&quot;: (39.93, 32.86), &quot;berlin&quot;: (52.52, 13.40), &quot;london&quot;: (51.51, -0.13)}
+
+
+@bot.command(&quot;weather&quot;)
+def weather(msg):
+    city = (msg.args[0] if msg.args else &quot;istanbul&quot;).lower()
+    if city not in CITIES:
+        msg.reply(&quot;Cities: &quot; + &quot;, &quot;.join(CITIES))
+        return
+    msg.typing()
+    lat, lon = CITIES[city]
+    url = f&quot;https://api.open-meteo.com/v1/forecast?latitude={lat}&amp;longitude={lon}&amp;current=temperature_2m,wind_speed_10m&quot;
+    try:
+        now = json.load(urllib.request.urlopen(url, timeout=10))[&quot;current&quot;]
+        msg.reply(f&quot;🌤 {city.title()}: {now[&#x27;temperature_2m&#x27;]} °C, wind {now[&#x27;wind_speed_10m&#x27;]} km/h&quot;)
+    except Exception:
+        msg.reply(&quot;The weather service is not answering. Try again in a minute.&quot;)
+
+
+bot.run()</pre><pre>const { Bot } = require(&#x27;./passgram&#x27;);
+
+const bot = new Bot();
+const CITIES = { istanbul: [41.01, 28.97], ankara: [39.93, 32.86], berlin: [52.52, 13.4], london: [51.51, -0.13] };
+
+bot.command(&#x27;weather&#x27;, async (msg) =&gt; {
+  const city = (msg.args[0] || &#x27;istanbul&#x27;).toLowerCase();
+  if (!CITIES[city]) return msg.reply(&#x27;Cities: &#x27; + Object.keys(CITIES).join(&#x27;, &#x27;));
+  await msg.typing();
+  const [lat, lon] = CITIES[city];
+  try {
+    const res = await fetch(`https://api.open-meteo.com/v1/forecast?latitude=${lat}&amp;longitude=${lon}&amp;current=temperature_2m,wind_speed_10m`, { signal: AbortSignal.timeout(10000) });
+    const { current } = await res.json();
+    return msg.reply(`🌤 ${city[0].toUpperCase() + city.slice(1)}: ${current.temperature_2m} °C, wind ${current.wind_speed_10m} km/h`);
+  } catch {
+    return msg.reply(&#x27;The weather service is not answering. Try again in a minute.&#x27;);
+  }
+});
+
+bot.run();</pre></div></section>
+<section id="sec-gallery"><h2 id="gallery">Photo gallery<a class="anchor" href="#gallery" aria-label="Link to this section">#</a></h2><p>Show photos one by one with a Next button. Photos are sent as links from your own server (any size); the old photo message is deleted so the chat stays tidy.</p><p class="ex-label"><b>How it works</b></p><ul><li><code>bot.send_photo(chat, url, caption=..., buttons=...)</code> sends a photo by link.</li><li>When "Next" is pressed, the old message is deleted and the next photo is sent.</li></ul><div class="tabs"><div class="tabbar"><button class=on>Python</button><button>JavaScript</button><button class="copy">Copy</button></div><pre class=on>from passgram import Bot, Buttons
+
+bot = Bot()
+PHOTOS = [
+    (&quot;https://picsum.photos/id/1015/800/500&quot;, &quot;River valley&quot;),
+    (&quot;https://picsum.photos/id/1016/800/500&quot;, &quot;Canyon&quot;),
+    (&quot;https://picsum.photos/id/1018/800/500&quot;, &quot;Mountains&quot;),
+]
+
+
+def show(chat_id, i):
+    url, caption = PHOTOS[i]
+    nxt = (i + 1) % len(PHOTOS)
+    bot.send_photo(chat_id, url, caption=f&quot;{i + 1}/{len(PHOTOS)} · {caption}&quot;, buttons=Buttons([(&quot;Next ▶&quot;, f&quot;photo:{nxt}&quot;)]))
+
+
+@bot.command(&quot;start&quot;, &quot;gallery&quot;)
+def start(msg):
+    show(msg.chat_id, 0)
+
+
+@bot.button()
+def next_photo(press):
+    if not press.data.startswith(&quot;photo:&quot;):
+        return
+    press.answer()
+    press.message.delete()
+    show(press.chat_id, int(press.data.split(&quot;:&quot;)[1]))
+
+
+bot.run()</pre><pre>const { Bot, Buttons } = require(&#x27;./passgram&#x27;);
+
+const bot = new Bot();
+const PHOTOS = [
+  [&#x27;https://picsum.photos/id/1015/800/500&#x27;, &#x27;River valley&#x27;],
+  [&#x27;https://picsum.photos/id/1016/800/500&#x27;, &#x27;Canyon&#x27;],
+  [&#x27;https://picsum.photos/id/1018/800/500&#x27;, &#x27;Mountains&#x27;],
+];
+
+function show(chatId, i) {
+  const [url, caption] = PHOTOS[i];
+  const next = (i + 1) % PHOTOS.length;
+  return bot.sendPhoto(chatId, url, { caption: `${i + 1}/${PHOTOS.length} · ${caption}`, buttons: new Buttons([[&#x27;Next ▶&#x27;, `photo:${next}`]]) });
+}
+
+bot.command([&#x27;start&#x27;, &#x27;gallery&#x27;], (msg) =&gt; show(msg.chatId, 0));
+
+bot.button(async (press) =&gt; {
+  if (!press.data.startsWith(&#x27;photo:&#x27;)) return;
+  await press.answer();
+  await press.message.delete();
+  await show(press.chatId, Number(press.data.split(&#x27;:&#x27;)[1]));
+});
+
+bot.run();</pre></div></section>
+<section id="sec-export"><h2 id="export">Sending a generated file (CSV report)<a class="anchor" href="#export" aria-label="Link to this section">#</a></h2><p>Bots can create files on the fly and upload them: reports, invoices, exports. Uploads up to 20 MB are relayed once to the person and then deleted from the server.</p><p class="ex-label"><b>How it works</b></p><ul><li>Build the file in memory, wrap it in <code>File(bytes, "name.csv")</code>, and send it.</li><li>For bigger files, put them on your own server and send the <code>https://</code> link instead.</li></ul><div class="tabs"><div class="tabbar"><button class=on>Python</button><button>JavaScript</button><button class="copy">Copy</button></div><pre class=on>import csv
+import io
+from datetime import date
+
+from passgram import Bot, File
+
+bot = Bot()
+SALES = [(&quot;Coffee&quot;, 42, 3.0), (&quot;Tea&quot;, 17, 2.0), (&quot;Cake&quot;, 9, 4.0)]
+
+
+@bot.command(&quot;report&quot;)
+def report(msg):
+    msg.typing(&quot;upload_document&quot;)
+    buffer = io.StringIO()
+    writer = csv.writer(buffer)
+    writer.writerow([&quot;product&quot;, &quot;sold&quot;, &quot;price&quot;, &quot;total&quot;])
+    for name, sold, price in SALES:
+        writer.writerow([name, sold, price, sold * price])
+    name = f&quot;sales-{date.today()}.csv&quot;
+    msg.reply_file(File(buffer.getvalue().encode(&quot;utf-8&quot;), name, &quot;text/csv&quot;), caption=&quot;📊 Today&#x27;s sales&quot;)
+
+
+bot.run()</pre><pre>const { Bot, File } = require(&#x27;./passgram&#x27;);
+
+const bot = new Bot();
+const SALES = [[&#x27;Coffee&#x27;, 42, 3], [&#x27;Tea&#x27;, 17, 2], [&#x27;Cake&#x27;, 9, 4]];
+
+bot.command(&#x27;report&#x27;, async (msg) =&gt; {
+  await msg.typing(&#x27;upload_document&#x27;);
+  const lines = [[&#x27;product&#x27;, &#x27;sold&#x27;, &#x27;price&#x27;, &#x27;total&#x27;], ...SALES.map(([n, s, p]) =&gt; [n, s, p, s * p])];
+  const csv = lines.map((row) =&gt; row.join(&#x27;,&#x27;)).join(&#x27;\n&#x27;) + &#x27;\n&#x27;;
+  const name = `sales-${new Date().toISOString().slice(0, 10)}.csv`;
+  return msg.replyFile(new File(Buffer.from(csv), name, &#x27;text/csv&#x27;), { caption: &#x27;📊 Daily sales&#x27; });
+});
+
+bot.run();</pre></div></section>
+<section id="sec-formatting"><h2 id="formatting">Formatting safely (bold, links, code)<a class="anchor" href="#formatting" aria-label="Link to this section">#</a></h2><p>With <code>format="html"</code> you can write <b>bold</b>, <i>italic</i>, <code>code</code> and links. When text comes from people (names, messages), <b>escape it</b> first, or a <code>&lt;</code> in someone's name breaks your message.</p><p class="ex-label"><b>How it works</b></p><ul><li>HTML: escape <code>&amp;</code>, <code>&lt;</code> and <code>&gt;</code> in user text.</li><li>MarkdownV2: put a backslash before special characters in user text.</li><li>Prefer HTML: it is easier to escape correctly.</li></ul><div class="tabs"><div class="tabbar"><button class=on>Python</button><button>JavaScript</button><button class="copy">Copy</button></div><pre class=on>import html
+import re
+
+from passgram import Bot
+
+bot = Bot()
+
+
+def md_escape(text):
+    return re.sub(r&quot;([_*\[\]()~`&gt;#+\-=|{}.!\\])&quot;, r&quot;\\\1&quot;, text)
+
+
+@bot.command(&quot;start&quot;)
+def start(msg):
+    name = html.escape(msg.user.first_name)  # never trust user text
+    msg.reply(
+        f&quot;&lt;b&gt;Hello {name}!&lt;/b&gt;\n&quot;
+        f&quot;&lt;i&gt;Italic&lt;/i&gt;, &lt;u&gt;underline&lt;/u&gt;, &lt;s&gt;strike&lt;/s&gt;, &lt;tg-spoiler&gt;spoiler&lt;/tg-spoiler&gt;\n&quot;
+        f&quot;&lt;code&gt;inline code&lt;/code&gt;\n&quot;
+        f&#x27;&lt;a href=&quot;https://docs.zpas.org/bot&quot;&gt;Read the docs&lt;/a&gt;&#x27;,
+        format=&quot;html&quot;,
+    )
+
+
+@bot.command(&quot;md&quot;)
+def markdown(msg):
+    name = md_escape(msg.user.first_name)
+    msg.reply(f&quot;*Hello {name}\\!* Price: 4\\.50 €&quot;, format=&quot;markdown&quot;)
+
+
+bot.run()</pre><pre>const { Bot } = require(&#x27;./passgram&#x27;);
+
+const bot = new Bot();
+const htmlEscape = (s) =&gt; s.replace(/&amp;/g, &#x27;&amp;amp;&#x27;).replace(/&lt;/g, &#x27;&amp;lt;&#x27;).replace(/&gt;/g, &#x27;&amp;gt;&#x27;);
+const mdEscape = (s) =&gt; s.replace(/([_*\[\]()~`&gt;#+\-=|{}.!\\])/g, &#x27;\\$1&#x27;);
+
+bot.command(&#x27;start&#x27;, (msg) =&gt; msg.reply(
+  `&lt;b&gt;Hello ${htmlEscape(msg.user.firstName)}!&lt;/b&gt;\n` +
+  &#x27;&lt;i&gt;Italic&lt;/i&gt;, &lt;u&gt;underline&lt;/u&gt;, &lt;s&gt;strike&lt;/s&gt;, &lt;tg-spoiler&gt;spoiler&lt;/tg-spoiler&gt;\n&#x27; +
+  &#x27;&lt;code&gt;inline code&lt;/code&gt;\n&#x27; +
+  &#x27;&lt;a href=&quot;https://docs.zpas.org/bot&quot;&gt;Read the docs&lt;/a&gt;&#x27;,
+  { format: &#x27;html&#x27; },
+));
+
+bot.command(&#x27;md&#x27;, (msg) =&gt; msg.reply(`*Hello ${mdEscape(msg.user.firstName)}\\!* Price: 4\\.50 €`, { format: &#x27;markdown&#x27; }));
+
+bot.run();</pre></div></section>
+<section id="sec-admin"><h2 id="admin">Commands only you can use<a class="anchor" href="#admin" aria-label="Link to this section">#</a></h2><p>Some commands should only work for you: statistics, announcements, settings. Check the sender's ID; your own ID is your Z Pass ID (send <code>/id</code> to Zbot).</p><p class="ex-label"><b>How it works</b></p><ul><li>Keep admin IDs in an environment variable, not in the code.</li><li>Ignore admin commands from others silently, or answer with a generic message.</li></ul><div class="tabs"><div class="tabbar"><button class=on>Python</button><button>JavaScript</button><button class="copy">Copy</button></div><pre class=on>import os
+
+from passgram import Bot
+
+bot = Bot()
+ADMINS = {int(x) for x in os.environ.get(&quot;ADMIN_IDS&quot;, &quot;&quot;).split(&quot;,&quot;) if x.strip()}
+started = set()
+
+
+def admin_only(handler):
+    def wrapped(msg):
+        if msg.user.id in ADMINS:
+            handler(msg)
+        else:
+            msg.reply(&quot;Unknown command.&quot;)
+    return wrapped
+
+
+@bot.command(&quot;start&quot;)
+def start(msg):
+    started.add(msg.chat_id)
+    msg.reply(&quot;Hi!&quot;)
+
+
+@bot.command(&quot;stats&quot;)
+@admin_only
+def stats(msg):
+    msg.reply(f&quot;👥 {len(started)} people started the bot since it was turned on.&quot;)
+
+
+bot.run()</pre><pre>const { Bot } = require(&#x27;./passgram&#x27;);
+
+const bot = new Bot();
+const ADMINS = new Set((process.env.ADMIN_IDS || &#x27;&#x27;).split(&#x27;,&#x27;).filter(Boolean).map(Number));
+const started = new Set();
+const adminOnly = (handler) =&gt; (msg) =&gt; (ADMINS.has(msg.user.id) ? handler(msg) : msg.reply(&#x27;Unknown command.&#x27;));
+
+bot.command(&#x27;start&#x27;, (msg) =&gt; { started.add(msg.chatId); return msg.reply(&#x27;Hi!&#x27;); });
+bot.command(&#x27;stats&#x27;, adminOnly((msg) =&gt; msg.reply(`👥 ${started.size} people started the bot since it was turned on.`)));
+
+bot.run();</pre></div></section>
+<section id="sec-support"><h2 id="support">Support desk: people write, you answer<a class="anchor" href="#support" aria-label="Link to this section">#</a></h2><p>People write to your bot; their messages are forwarded to you with their chat ID. You answer with <code>/reply ID text</code> and the bot delivers it. You never share your own account.</p><p class="ex-label"><b>How it works</b></p><ul><li><code>OWNER_ID</code> is your Z Pass ID. You must have started your own bot once.</li><li>Messages from others are sent to you with a "Reply" hint.</li></ul><div class="tabs"><div class="tabbar"><button class=on>Python</button><button>JavaScript</button><button class="copy">Copy</button></div><pre class=on>import html
+import os
+
+from passgram import Bot
+
+bot = Bot()
+OWNER = int(os.environ[&quot;OWNER_ID&quot;])
+
+
+@bot.command(&quot;start&quot;)
+def start(msg):
+    msg.reply(&quot;Hi! Write your question and our team will answer here.&quot;)
+
+
+@bot.command(&quot;reply&quot;)
+def reply(msg):
+    if msg.chat_id != OWNER or len(msg.args) &lt; 2:
+        return
+    target, text = int(msg.args[0]), &quot; &quot;.join(msg.args[1:])
+    bot.send(target, &quot;💬 Support: &quot; + text)
+    msg.reply(&quot;Sent ✅&quot;)
+
+
+@bot.message()
+def incoming(msg):
+    if msg.chat_id == OWNER:
+        msg.reply(&quot;Use /reply &lt;id&gt; &lt;text&gt; to answer someone.&quot;)
+        return
+    bot.send(OWNER, f&quot;📩 &lt;b&gt;{html.escape(msg.user.first_name)}&lt;/b&gt; (&lt;code&gt;{msg.chat_id}&lt;/code&gt;):\n{html.escape(msg.text)}\n\nAnswer: /reply {msg.chat_id} …&quot;, format=&quot;html&quot;)
+    msg.reply(&quot;Thanks, we received your message. ✅&quot;)
+
+
+bot.run()</pre><pre>const { Bot } = require(&#x27;./passgram&#x27;);
+
+const bot = new Bot();
+const OWNER = Number(process.env.OWNER_ID);
+const esc = (s) =&gt; s.replace(/&amp;/g, &#x27;&amp;amp;&#x27;).replace(/&lt;/g, &#x27;&amp;lt;&#x27;).replace(/&gt;/g, &#x27;&amp;gt;&#x27;);
+
+bot.command(&#x27;start&#x27;, (msg) =&gt; msg.reply(&#x27;Hi! Write your question and our team will answer here.&#x27;));
+
+bot.command(&#x27;reply&#x27;, async (msg) =&gt; {
+  if (msg.chatId !== OWNER || msg.args.length &lt; 2) return;
+  await bot.send(Number(msg.args[0]), &#x27;💬 Support: &#x27; + msg.args.slice(1).join(&#x27; &#x27;));
+  return msg.reply(&#x27;Sent ✅&#x27;);
+});
+
+bot.message(async (msg) =&gt; {
+  if (msg.chatId === OWNER) return msg.reply(&#x27;Use /reply &lt;id&gt; &lt;text&gt; to answer someone.&#x27;);
+  await bot.send(OWNER, `📩 &lt;b&gt;${esc(msg.user.firstName)}&lt;/b&gt; (&lt;code&gt;${msg.chatId}&lt;/code&gt;):\n${esc(msg.text)}\n\nAnswer: /reply ${msg.chatId} …`, { format: &#x27;html&#x27; });
+  return msg.reply(&#x27;Thanks, we received your message. ✅&#x27;);
+});
+
+bot.run();</pre></div></section>
+<section id="sec-errors"><h2 id="errors">Handling errors and limits<a class="anchor" href="#errors" aria-label="Link to this section">#</a></h2><p>Networks fail, people block bots, and limits exist. A good bot never crashes because of one bad message. The SDK keeps running when a handler fails; you decide what to log and what to tell the person.</p><p class="ex-label"><b>How it works</b></p><ul><li><code>bot.on_error</code> (Python) / <code>bot.onError</code> (JavaScript) receives every handler error.</li><li><code>PassGramError</code> has <code>code</code> and <code>description</code>; for 429 also <code>retry_after</code>.</li><li>Code 403 means the person has not started the bot (or it was disabled): stop writing to them.</li></ul><div class="tabs"><div class="tabbar"><button class=on>Python</button><button>JavaScript</button><button class="copy">Copy</button></div><pre class=on>import time
+
+from passgram import Bot, PassGramError
+
+bot = Bot()
+
+
+def on_error(error, update):
+    print(&quot;Handler failed:&quot;, repr(error))
+    chat = (update.get(&quot;message&quot;) or (update.get(&quot;callback_query&quot;) or {}).get(&quot;message&quot;) or {}).get(&quot;chat&quot;, {})
+    if chat.get(&quot;id&quot;):
+        try:
+            bot.send(chat[&quot;id&quot;], &quot;😕 Something went wrong. Please try again.&quot;)
+        except PassGramError:
+            pass
+
+
+bot.on_error = on_error
+
+
+def send_safely(chat_id, text, tries=3):
+    for _ in range(tries):
+        try:
+            return bot.send(chat_id, text)
+        except PassGramError as e:
+            if e.code == 429:
+                time.sleep(getattr(e, &quot;retry_after&quot;, None) or 60)
+            elif e.code &gt;= 500:
+                time.sleep(2)
+            else:
+                raise  # 400 / 403: retrying will not help
+
+
+@bot.command(&quot;start&quot;)
+def start(msg):
+    send_safely(msg.chat_id, &quot;Hello!&quot;)
+
+
+@bot.command(&quot;crash&quot;)
+def crash(msg):
+    raise RuntimeError(&quot;test&quot;)  # the person gets the friendly message above
+
+
+bot.run()</pre><pre>const { Bot } = require(&#x27;./passgram&#x27;);
+
+const bot = new Bot();
+const sleep = (ms) =&gt; new Promise((r) =&gt; setTimeout(r, ms));
+
+bot.onError = async (error, update) =&gt; {
+  console.error(&#x27;Handler failed:&#x27;, error);
+  const chat = (update.message || update.callback_query?.message || {}).chat;
+  if (chat?.id) await bot.send(chat.id, &#x27;😕 Something went wrong. Please try again.&#x27;).catch(() =&gt; {});
+};
+
+async function sendSafely(chatId, text, tries = 3) {
+  for (let i = 0; i &lt; tries; i++) {
+    try { return await bot.send(chatId, text); }
+    catch (e) {
+      if (e.code === 429) await sleep((e.retryAfter || 60) * 1000);
+      else if (e.code &gt;= 500) await sleep(2000);
+      else throw e; // 400 / 403: retrying will not help
+    }
+  }
+}
+
+bot.command(&#x27;start&#x27;, (msg) =&gt; sendSafely(msg.chatId, &#x27;Hello!&#x27;));
+bot.command(&#x27;crash&#x27;, () =&gt; { throw new Error(&#x27;test&#x27;); }); // the person gets the friendly message above
+
+bot.run();</pre></div></section>
+<section id="sec-webhook-python"><h2 id="webhook-python">Webhook server in Python (no framework)<a class="anchor" href="#webhook-python" aria-label="Link to this section">#</a></h2><p>With a webhook, PassGram sends each update to your server the moment it happens, and your bot uses no resources while idle. This server uses only the Python standard library.</p><p class="ex-label"><b>How it works</b></p><ul><li>Your server must be reachable over <code>https://</code>. Put it behind a reverse proxy (nginx, Caddy) or a tunnel that gives you an https address.</li><li>Check the secret header on every request.</li><li>Answer <code>200</code> first, then handle the update, so PassGram never waits.</li></ul><div class="tabs"><div class="tabbar"><button class=on>Python</button><button class="copy">Copy</button></div><pre class=on>import json
+import os
+import threading
+from http.server import BaseHTTPRequestHandler, ThreadingHTTPServer
+
+from passgram import Bot
+
+bot = Bot()
+SECRET = os.environ[&quot;HOOK_SECRET&quot;]          # any long random string you choose
+PUBLIC_URL = os.environ[&quot;PUBLIC_URL&quot;]       # e.g. https://bot.example.com/passgram
+
+
+@bot.command(&quot;start&quot;)
+def start(msg):
+    msg.reply(&quot;Hello from a webhook bot! ⚡&quot;)
+
+
+class Hook(BaseHTTPRequestHandler):
+    def do_POST(self):
+        if self.headers.get(&quot;X-ZPass-Bot-Api-Secret-Token&quot;) != SECRET:
+            self.send_response(401)
+            self.end_headers()
+            return
+        update = json.loads(self.rfile.read(int(self.headers.get(&quot;Content-Length&quot;, 0))))
+        self.send_response(200)
+        self.end_headers()
+        threading.Thread(target=bot.process_update, args=(update,)).start()
+
+
+bot.call(&quot;setWebhook&quot;, {&quot;url&quot;: PUBLIC_URL, &quot;secret_token&quot;: SECRET})
+print(&quot;Webhook set. Listening on :8080&quot;)
+ThreadingHTTPServer((&quot;0.0.0.0&quot;, 8080), Hook).serve_forever()</pre></div><p class="ex-label"><b>Ideas</b></p><ul><li>To go back to polling, stop the server and run a bot with <code>bot.run()</code>: it removes the webhook automatically.</li></ul></section>
+<section id="sec-webhook-node"><h2 id="webhook-node">Webhook server in Node.js (no framework)<a class="anchor" href="#webhook-node" aria-label="Link to this section">#</a></h2><p>The same webhook server in Node.js, using only the built-in <code>http</code> module.</p><p class="ex-label"><b>How it works</b></p><ul><li>Same rules: https in front, check the secret, answer 200 first.</li></ul><div class="tabs"><div class="tabbar"><button class=on>JavaScript</button><button class="copy">Copy</button></div><pre class=on>const http = require(&#x27;node:http&#x27;);
+const { Bot } = require(&#x27;./passgram&#x27;);
+
+const bot = new Bot();
+const SECRET = process.env.HOOK_SECRET;     // any long random string you choose
+const PUBLIC_URL = process.env.PUBLIC_URL;  // e.g. https://bot.example.com/passgram
+
+bot.command(&#x27;start&#x27;, (msg) =&gt; msg.reply(&#x27;Hello from a webhook bot! ⚡&#x27;));
+
+http.createServer(async (req, res) =&gt; {
+  if (req.method !== &#x27;POST&#x27; || req.headers[&#x27;x-zpass-bot-api-secret-token&#x27;] !== SECRET) {
+    res.writeHead(401).end();
+    return;
+  }
+  let body = &#x27;&#x27;;
+  for await (const chunk of req) body += chunk;
+  res.writeHead(200).end();
+  bot.processUpdate(JSON.parse(body));
+}).listen(8080, async () =&gt; {
+  await bot.call(&#x27;setWebhook&#x27;, { url: PUBLIC_URL, secret_token: SECRET });
+  console.log(&#x27;Webhook set. Listening on :8080&#x27;);
+});</pre></div></section>
+<section id="sec-deploy"><h2 id="deploy">Keeping your bot online (systemd, pm2, Docker)<a class="anchor" href="#deploy" aria-label="Link to this section">#</a></h2><p>On a server, run your bot as a service so it starts after reboots and restarts after crashes. Pick one of these three; all are free.</p><p class="ex-label"><b>How it works</b></p><ul><li><b>systemd</b> is built into most Linux servers.</li><li><b>pm2</b> is a popular process manager for Node.js.</li><li><b>Docker</b> packages the bot so it runs the same everywhere.</li><li>In every case, the token is passed as an environment variable, never written in the code.</li></ul><div class="tabs"><div class="tabbar"><button class=on>Python</button><button>JavaScript</button><button class="copy">Copy</button></div><pre class=on># ---- systemd: /etc/systemd/system/mybot.service ----
+# [Unit]
+# Description=My PassGram bot
+# After=network-online.target
+#
+# [Service]
+# WorkingDirectory=/opt/mybot
+# ExecStart=/usr/bin/python3 /opt/mybot/bot.py
+# Environment=PASSGRAM_BOT_TOKEN=123:abc
+# Restart=always
+# RestartSec=5
+#
+# [Install]
+# WantedBy=multi-user.target
+#
+# then:  sudo systemctl enable --now mybot   and   journalctl -u mybot -f
+
+# ---- Docker: Dockerfile ----
+# FROM python:3.12-slim
+# WORKDIR /app
+# COPY passgram.py bot.py ./
+# CMD [&quot;python&quot;, &quot;bot.py&quot;]
+#
+# then:  docker build -t mybot .
+#        docker run -d --restart=always -e PASSGRAM_BOT_TOKEN=123:abc mybot</pre><pre>// ---- pm2 ----
+// npm install -g pm2
+// PASSGRAM_BOT_TOKEN=123:abc pm2 start bot.js --name mybot
+// pm2 save &amp;&amp; pm2 startup      (start again after reboot)
+// pm2 logs mybot               (see what it prints)
+
+// ---- Docker: Dockerfile ----
+// FROM node:20-slim
+// WORKDIR /app
+// COPY passgram.js bot.js ./
+// CMD [&quot;node&quot;, &quot;bot.js&quot;]
+//
+// then:  docker build -t mybot .
+//        docker run -d --restart=always -e PASSGRAM_BOT_TOKEN=123:abc mybot</pre></div></section>
+<div class="foot"><span>© 2026 PassGram by Zizo Software LLC · SDK: <a href="/bot#license">MIT License</a></span><span><a href="https://zpas.org/legal/terms">Terms</a> · <a href="https://zpas.org/legal/privacy">Privacy</a> · <a href="https://zpas.org/legal/security">Security</a></span></div>
+</main>
+</div>
+<script src="/_next/static/chunks/531c39f2b396c1a7/nsnmi7dano.js" defer></script>
+<script>
+// The page is loaded into docs.zpas.org after the first paint, so jump to #anchor once it is visible.
+(function(){function go(){var id=decodeURIComponent(location.hash.slice(1));if(!id)return;var el=document.getElementById(id);if(el)el.scrollIntoView();}
+setTimeout(go,150);setTimeout(go,700);window.addEventListener('hashchange',go);})();
+</script>
+</body>
+</html>

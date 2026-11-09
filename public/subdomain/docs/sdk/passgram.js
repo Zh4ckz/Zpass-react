@@ -196,6 +196,11 @@ class Bot {
     if (fn) await fn(msg); else for (const h of this.messages) await h(msg);
   }
 
+  /** Handle one update yourself, e.g. one that arrived at your webhook. */
+  async processUpdate(update) {
+    try { await this.dispatch(update); } catch (e) { this.onError(e, update); }
+  }
+
   /** Wait for updates and call your handlers. Stops with Ctrl+C. */
   async run({ timeout = 25 } = {}) {
     let me;

@@ -11,10 +11,11 @@ const PRODUCTION = {
   // docs.zpas.org/bot and /bot/api (files public/subdomain/docs/bot.html and api.html, moved with the docs folder)
   docsBot: '/_next/static/chunks/70f407ecc5697ab4/bot',
   docsApi: '/_next/static/chunks/70f407ecc5697ab4/api',
+  docsExamples: '/_next/static/chunks/70f407ecc5697ab4/examples',
   pay: '/_next/static/chunks/e6dd7c91fbc053a6',
 }
 
-const DEV_FILES = { docsBot: ['docs', 'bot.html'], docsApi: ['docs', 'api.html'] }
+const DEV_FILES = { docsBot: ['docs', 'bot.html'], docsApi: ['docs', 'api.html'], docsExamples: ['docs', 'examples.html'] }
 const DEVELOPMENT = Object.fromEntries(Object.keys(PRODUCTION).map((s) => [s, ['', 'subdomain', ...(DEV_FILES[s] || [s, 'index.html'])].join('/')]))
 
 export const SERVICE_PAGES = process.env.NODE_ENV === 'production' ? PRODUCTION : DEVELOPMENT

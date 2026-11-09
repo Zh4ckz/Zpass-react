@@ -344,6 +344,16 @@ class Bot:
             for handler in self._messages:
                 handler(msg)
 
+    def process_update(self, update):
+        """Handle one update yourself, e.g. one that arrived at your webhook. Errors go to on_error / are printed."""
+        try:
+            self._dispatch(update)
+        except Exception as e:
+            if self.on_error:
+                self.on_error(e, update)
+            else:
+                traceback.print_exc()
+
     def run(self, timeout=25):
         """Wait for updates and call your handlers. Stops with Ctrl+C."""
         try:

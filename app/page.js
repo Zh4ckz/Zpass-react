@@ -46,7 +46,7 @@ export default function Home() {
     }
 
     const modernScript = document.createElement('script')
-    modernScript.src = '/resources/js/modern-reveal.js?v=11'
+    modernScript.src = '/resources/js/modern-reveal.js?v=12'
     modernScript.async = false
     document.body.appendChild(modernScript)
 

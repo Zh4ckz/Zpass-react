@@ -14,7 +14,33 @@ import re
 import sys
 
 sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
-from bot_docs_examples import EXAMPLES  # noqa: E402
+from bot_docs_examples import EXAMPLES, PERSON, CHAT_OBJ, BOT, KB, bot_msg, person_msg  # noqa: E402
+
+TYPE_EXAMPLES = {
+    "Update": {"update_id": 7, "message": person_msg(1, "/start")},
+    "User": PERSON,
+    "BotUser": {**BOT, "can_join_groups": False, "can_read_all_group_messages": False, "supports_inline_queries": False, "can_connect_to_business": False, "has_main_web_app": False},
+    "Chat": CHAT_OBJ,
+    "ChatFullInfo": {**CHAT_OBJ, "accent_color_id": 0, "max_reaction_count": 0},
+    "Message": bot_msg(3, text="Pick something:", reply_markup=KB),
+    "MessageEntity": {"type": "bot_command", "offset": 0, "length": 6},
+    "PhotoSize": {"file_id": "u7a1c3e5b9d2f4a6c8e0b1d3f", "file_unique_id": "u7a1c3e5b9d2f4a6", "width": 0, "height": 0},
+    "Document": {"file_id": "4f0c2a9b7e6d5c4b3a2f1e0d9c8b7a6f5e4d3c2b1a0f9e8d", "file_unique_id": "4f0c2a9b7e6d5c4b", "file_name": "menu.pdf", "mime_type": "application/pdf", "file_size": 48213},
+    "CallbackQuery": {"id": "5f1c0a9e2b7d4c3e8a6f1b2c", "from": PERSON, "message": bot_msg(2, text="Pick something:", reply_markup=KB), "chat_instance": "45957845239", "data": "shop"},
+    "InlineKeyboardMarkup": KB,
+    "InlineKeyboardButton": {"text": "🛒 Shop", "callback_data": "shop"},
+    "ReplyKeyboardMarkup": {"keyboard": [["👍 Good", "👎 Bad"], [{"text": "❌ Close"}]], "one_time_keyboard": True, "resize_keyboard": True},
+    "ReplyKeyboardRemove": {"remove_keyboard": True},
+    "ForceReply": {"force_reply": True, "input_field_placeholder": "Your answer"},
+    "ReplyParameters": {"message_id": 12},
+    "BotCommand": {"command": "start", "description": "Main menu"},
+    "MenuButton": {"type": "web_app", "text": "Open shop", "web_app": {"url": "https://shop.example.com/app"}},
+    "WebhookInfo": {"url": "https://bot.example.com/passgram", "has_custom_certificate": False, "pending_update_count": 0, "max_connections": 40},
+    "BotName": {"name": "My Shop"},
+    "BotDescription": {"description": "Order coffee in 10 seconds. Press Start!"},
+    "BotShortDescription": {"short_description": "Coffee to go ☕"},
+    "ResponseParameters": {"retry_after": 60},
+}
 
 ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 OUT = os.path.join(ROOT, "public", "subdomain", "docs")
@@ -41,8 +67,14 @@ def table(head, rows):
 def note(kind, title, text):
     return f'<div class="note {kind}"><b>{title}</b><span>{text}</span></div>'
 
+LINKS = {"<code>zpas.org/zbot</code>": '<a href="https://zpas.org/zbot"><code>zpas.org/zbot</code></a>',
+         "<code>zpas.org/verifybot</code>": '<a href="https://zpas.org/verifybot"><code>zpas.org/verifybot</code></a>'}
+
+
 def page(title, description, side, body, active):
-    nav = "".join(f'<a href="{href}"{" class=on" if href == active else ""}>{label}</a>' for href, label in [("/", "Docs home"), ("/bot", "Bots"), ("/bot/api", "Bot API reference")])
+    for plain, linked in LINKS.items():
+        body = body.replace(plain, linked)
+    nav = "".join(f'<a href="{href}"{" class=on" if href == active else ""}>{label}</a>' for href, label in [("/", "Docs home"), ("/bot", "Bots"), ("/bot/examples", "Examples"), ("/bot/api", "Bot API reference")])
     side_html = "".join(f"<h4>{group}</h4>" + "".join(f'<a href="#{a}">{E(t)}</a>' for a, t in links) for group, links in side)
     return f"""<!doctype html>
 <html lang="en" data-sub="docs">
@@ -61,7 +93,7 @@ def page(title, description, side, body, active):
 <header class="top">
   <button class="burger" aria-label="Menu" onclick="document.body.classList.toggle('open')">☰</button>
   <a class="brand" href="/"><span class="mark">P</span>PassGram <span class="pill">Docs</span></a>
-  <nav>{nav}<a class="btn" href="https://zpas.org/login">Open PassGram</a></nav>
+  <nav>{nav}</nav>
 </header>
 <div class="layout">
 <aside class="side" id="side">{side_html}</aside>
@@ -432,6 +464,8 @@ def build_api():
         inner = f"<p>{desc}</p>" if desc else ""
         if fields:
             inner += table(["Field", "Type", "Description"], [[f"<code>{f}</code>", t, d] for f, t, d in fields])
+        if name in TYPE_EXAMPLES:
+            inner += '<p class="ex-label"><b>Example</b></p>' + code_tabs([("JSON", json.dumps(TYPE_EXAMPLES[name], ensure_ascii=False, indent=2))])
         b.append(section(3, name, name, inner))
 
     log = "".join(f'{h(3, f"{date} · {title}", slug(date + "-" + title))}<ul>' + "".join(f"<li>{x}</li>" for x in items) + "</ul>" for date, title, items in CHANGELOG)
@@ -454,7 +488,7 @@ def build_bot():
         "<p>A bot is a PassGram account run by a program instead of a person. People chat with it like with anyone else; your program reads their messages and answers through the <a href=\"/bot/api\">Bot API</a>. Bots can answer questions, send files and photos, show buttons, run shops, support desks, alerts and games.</p>"
         "<p>Bots are marked with <b>bot</b> under their name, and they can only write to people who opened them and pressed <b>Start</b>.</p>"))
     b.append(section(2, "Create your bot", "create-your-bot",
-        "<ol><li>In the PassGram app, open <a href=\"#zbot\">Zbot</a> (<code>zpas.org/zbot</code>).</li><li>Send <code>/newbot</code>, then the bot's name, then a username ending as you like (4–32 letters, digits or <code>_</code>).</li><li>Zbot shows the bot's <b>token</b> once. Copy it and keep it secret.</li><li>Write your bot with the <a href=\"#official-sdk\">SDK</a> and run it.</li></ol>"))
+        "<ol><li>In the PassGram app, open <a href=\"https://zpas.org/zbot\">Zbot</a>: tap the link, it opens the chat in the app.</li><li>Send <code>/newbot</code>, then the bot's name, then a username ending as you like (4–32 letters, digits or <code>_</code>).</li><li>Zbot shows the bot's <b>token</b> once. Copy it and keep it secret.</li><li>Write your bot with the <a href=\"#official-sdk\">SDK</a> and run it.</li></ol>"))
     b.append(section(2, "Zbot", "zbot",
         "<p><b>Zbot</b> is PassGram's bot for making and managing bots. It only does that; blue checks are handled by <a href=\"#verify-bot\">Verify Bot</a>.</p>" +
         table(["Command", "What it does"], [
@@ -533,7 +567,7 @@ bot.run();''')]) +
     b.append(section(2, "Reports and bans", "reports-and-bans",
         "<p>People can report bots. PassGram sees the bot's owner and can disable or delete bots that break the rules. A disabled bot's API calls return <code>403</code>.</p>"))
     b.append(section(2, "Tutorial: your first bot in 5 minutes", "tutorial-first-bot",
-        "<ol><li>In the app, open <a href=\"#zbot\">Zbot</a>, send <code>/newbot</code>, choose a name and a username. Copy the token.</li>"
+        "<ol><li>In the app, open <a href=\"https://zpas.org/zbot\">Zbot</a>, send <code>/newbot</code>, choose a name and a username. Copy the token.</li>"
         "<li>Download <a href=\"/subdomain/docs/sdk/passgram.py\" download>passgram.py</a> into a new folder.</li>"
         "<li>Next to it create <code>bot.py</code>:</li></ol>" +
         code_tabs([("bot.py", '''from passgram import Bot
@@ -672,8 +706,67 @@ bot.run()''')])))
     b.append(section(2, "FAQ", "faq", "".join(f"<details><summary>{q}</summary><p>{a}</p></details>" for q, a in faq)))
     return page("Bots on PassGram — Docs", "Everything about PassGram bots: Zbot, the SDK, libraries, Verify Bot and the blue check, rules, privacy and limits.", side, "\n".join(b), "/bot")
 
+# ================================================================ EXAMPLES (recipes)
+def parse_recipes():
+    path = os.path.join(os.path.dirname(os.path.abspath(__file__)), "bot-recipes.txt")
+    text = open(path, encoding="utf-8").read()
+    recipes = []
+    for block in text.split("\n=== ")[0:]:
+        block = block.removeprefix("=== ").strip("\n")
+        if not block:
+            continue
+        head, *parts = block.split("\n--- ")
+        rid, title = [x.strip() for x in head.split("|", 1)]
+        r = {"id": rid, "title": title}
+        for part in parts:
+            key, _, body = part.partition("\n")
+            r[key.strip()] = body.rstrip("\n")
+        recipes.append(r)
+    return recipes
+
+
+def bullets(body):
+    items = [line[2:] for line in body.splitlines() if line.startswith("- ")]
+    return "<ul>" + "".join(f"<li>{i}</li>" for i in items) + "</ul>"
+
+
+def build_examples():
+    recipes = parse_recipes()
+    side = [("Start", [("how-to-use", "How to use these examples")]),
+            ("Examples", [(r["id"], r["title"]) for r in recipes])]
+    b = ['<div class="hero" id="top"><span class="pill">Examples</span><h1>Bot <em>examples.</em></h1>'
+         f'<p>{len(recipes)} complete bots you can copy, run and change. Each one comes in <b>Python</b> and <b>JavaScript</b>, '
+         'built with the <a href="/bot#official-sdk">official PassGram SDK</a>, with an explanation of how it works. '
+         'Every title has its own link (<b>#</b>).</p></div>']
+    b.append(section(2, "How to use these examples", "how-to-use",
+        "<ol><li>Create a bot with <a href=\"https://zpas.org/zbot\">Zbot</a> and copy its token.</li>"
+        "<li>Download the SDK file for your language: <a href=\"/subdomain/docs/sdk/passgram.py\" download>passgram.py</a> or "
+        "<a href=\"/subdomain/docs/sdk/passgram.js\" download>passgram.js</a>, into an empty folder.</li>"
+        "<li>Save the example next to it as <code>bot.py</code> or <code>bot.js</code>.</li>"
+        "<li>Give the bot its token through the environment: <code>set PASSGRAM_BOT_TOKEN=…</code> on Windows, "
+        "<code>export PASSGRAM_BOT_TOKEN=…</code> on macOS and Linux.</li>"
+        "<li>Run <code>python bot.py</code> or <code>node bot.js</code> and open your bot in PassGram.</li></ol>" +
+        note("info", "ℹ One program per token", "Run only one example at a time with the same token; two programs would take each other's messages.")))
+    for r in recipes:
+        inner = f"<p>{r.get('intro', '')}</p>"
+        if r.get("how"):
+            inner += '<p class="ex-label"><b>How it works</b></p>' + bullets(r["how"])
+        tabs = []
+        if r.get("py") and not r["py"].startswith("# See the"):
+            tabs.append(("Python", r["py"]))
+        if r.get("js") and not r["js"].startswith("// See the"):
+            tabs.append(("JavaScript", r["js"]))
+        inner += code_tabs(tabs)
+        if r.get("try"):
+            inner += '<p class="ex-label"><b>Try it</b></p>' + bullets(r["try"])
+        if r.get("more"):
+            inner += '<p class="ex-label"><b>Ideas</b></p>' + bullets(r["more"])
+        b.append(section(2, r["title"], r["id"], inner))
+    return page("Bot examples — PassGram Docs", "Complete PassGram bots in Python and JavaScript: menus, quizzes, forms, shops, reminders, webhooks and more.", side, "\n".join(b), "/bot/examples")
+
+
 if __name__ == "__main__":
-    for name, content in [("bot.html", build_bot()), ("api.html", build_api())]:
+    for name, content in [("bot.html", build_bot()), ("api.html", build_api()), ("examples.html", build_examples())]:
         with open(os.path.join(OUT, name), "w", encoding="utf-8", newline="\n") as f:
             f.write(content)
         print("wrote", name, len(content), "bytes")

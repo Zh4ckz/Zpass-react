@@ -15,7 +15,7 @@
 <header class="top">
   <button class="burger" aria-label="Menu" onclick="document.body.classList.toggle('open')">☰</button>
   <a class="brand" href="/"><span class="mark">P</span>PassGram <span class="pill">Docs</span></a>
-  <nav><a href="/">Docs home</a><a href="/bot">Bots</a><a href="/bot/api" class=on>Bot API reference</a><a class="btn" href="https://zpas.org/login">Open PassGram</a></nav>
+  <nav><a href="/">Docs home</a><a href="/bot">Bots</a><a href="/bot/examples">Examples</a><a href="/bot/api" class=on>Bot API reference</a></nav>
 </header>
 <div class="layout">
 <aside class="side" id="side"><h4>Basics</h4><a href="#introduction">Introduction</a><a href="#authorizing">Your token</a><a href="#making-requests">Making requests</a><a href="#responses">Responses</a><a href="#errors">Errors</a><a href="#limits">Limits</a><a href="#ids">IDs</a><a href="#webhooks">Webhooks</a><a href="#formatting-options">Formatting options</a><h4>Getting updates</h4><a href="#getUpdates">getUpdates</a><a href="#setWebhook">setWebhook</a><a href="#deleteWebhook">deleteWebhook</a><a href="#getWebhookInfo">getWebhookInfo</a><h4>Bot info</h4><a href="#getMe">getMe</a><a href="#logOut">logOut</a><a href="#close">close</a><a href="#getChat">getChat</a><h4>Sending messages</h4><a href="#sendMessage">sendMessage</a><a href="#sendPhoto">sendPhoto</a><a href="#sendVideo">sendVideo</a><a href="#sendAnimation">sendAnimation</a><a href="#sendAudio">sendAudio</a><a href="#sendVoice">sendVoice</a><a href="#sendVideoNote">sendVideoNote</a><a href="#sendSticker">sendSticker</a><a href="#sendDocument">sendDocument</a><a href="#sendChatAction">sendChatAction</a><h4>Buttons</h4><a href="#answerCallbackQuery">answerCallbackQuery</a><h4>Changing messages</h4><a href="#editMessageText">editMessageText</a><a href="#editMessageCaption">editMessageCaption</a><a href="#editMessageReplyMarkup">editMessageReplyMarkup</a><a href="#deleteMessage">deleteMessage</a><a href="#deleteMessages">deleteMessages</a><h4>Bot profile</h4><a href="#setMyCommands">setMyCommands</a><a href="#getMyCommands">getMyCommands</a><a href="#deleteMyCommands">deleteMyCommands</a><a href="#setMyName">setMyName</a><a href="#getMyName">getMyName</a><a href="#setMyDescription">setMyDescription</a><a href="#getMyDescription">getMyDescription</a><a href="#setMyShortDescription">setMyShortDescription</a><a href="#getMyShortDescription">getMyShortDescription</a><a href="#setChatMenuButton">setChatMenuButton</a><a href="#getChatMenuButton">getChatMenuButton</a><h4>Available types</h4><a href="#Update">Update</a><a href="#User">User</a><a href="#BotUser">BotUser</a><a href="#Chat">Chat</a><a href="#ChatFullInfo">ChatFullInfo</a><a href="#Message">Message</a><a href="#MessageEntity">MessageEntity</a><a href="#PhotoSize">PhotoSize</a><a href="#Video">Video</a><a href="#Animation">Animation</a><a href="#Audio">Audio</a><a href="#Voice">Voice</a><a href="#VideoNote">VideoNote</a><a href="#Sticker">Sticker</a><a href="#Document">Document</a><a href="#InputFile">InputFile</a><a href="#CallbackQuery">CallbackQuery</a><a href="#InlineKeyboardMarkup">InlineKeyboardMarkup</a><a href="#InlineKeyboardButton">InlineKeyboardButton</a><a href="#ReplyKeyboardMarkup">ReplyKeyboardMarkup</a><a href="#KeyboardButton">KeyboardButton</a><a href="#ReplyKeyboardRemove">ReplyKeyboardRemove</a><a href="#ForceReply">ForceReply</a><a href="#ReplyParameters">ReplyParameters</a><a href="#BotCommand">BotCommand</a><a href="#MenuButton">MenuButton</a><a href="#WebhookInfo">WebhookInfo</a><a href="#BotName">BotName</a><a href="#BotDescription">BotDescription</a><a href="#BotShortDescription">BotShortDescription</a><a href="#ResponseParameters">ResponseParameters</a><h4>More</h4><a href="#changelog">Changelog</a></aside>
@@ -825,37 +825,256 @@ def buy(press):
   }
 }</pre></div></section>
 <h2 id="available-types">Available types<a class="anchor" href="#available-types">#</a></h2><p>All objects are JSON. Optional fields are left out when empty. New fields may be added; ignore ones you do not know.</p>
-<section id="sec-Update"><h3 id="Update">Update<a class="anchor" href="#Update" aria-label="Link to this section">#</a></h3><p>One event for your bot. Exactly one of the optional fields is present.</p><table><tr><th>Field</th><th>Type</th><th>Description</th></tr><tr><td><code>update_id</code></td><td>Integer</td><td>Increasing number. Send <code>update_id + 1</code> as <code>offset</code> to confirm it.</td></tr><tr><td><code>message</code></td><td><a href="#Message">Message</a></td><td><i>Optional.</i> A new message from a person.</td></tr><tr><td><code>callback_query</code></td><td><a href="#CallbackQuery">CallbackQuery</a></td><td><i>Optional.</i> A press on one of your inline buttons.</td></tr></table></section>
-<section id="sec-User"><h3 id="User">User<a class="anchor" href="#User" aria-label="Link to this section">#</a></h3><p>A person or a bot.</p><table><tr><th>Field</th><th>Type</th><th>Description</th></tr><tr><td><code>id</code></td><td>Integer</td><td>Unique ID. For people this is their <b>Z Pass ID</b> (11 digits); for bots, 10 digits.</td></tr><tr><td><code>is_bot</code></td><td>Boolean</td><td><code>true</code> for bots.</td></tr><tr><td><code>first_name</code></td><td>String</td><td>Display name.</td></tr><tr><td><code>username</code></td><td>String</td><td><i>Optional.</i> Username without <code>@</code>.</td></tr><tr><td><code>language_code</code></td><td>String</td><td><i>Optional.</i> The person's app language, e.g. <code>tr</code>, <code>en</code>.</td></tr></table></section>
-<section id="sec-BotUser"><h3 id="BotUser">BotUser<a class="anchor" href="#BotUser" aria-label="Link to this section">#</a></h3><p>What <a href="#getMe">getMe</a> returns: a <a href="#User">User</a> plus these fields (all <code>false</code> today).</p><table><tr><th>Field</th><th>Type</th><th>Description</th></tr><tr><td><code>can_join_groups</code></td><td>Boolean</td><td>Bots cannot be added to groups yet.</td></tr><tr><td><code>can_read_all_group_messages</code></td><td>Boolean</td><td>—</td></tr><tr><td><code>supports_inline_queries</code></td><td>Boolean</td><td>Inline mode is not available yet.</td></tr><tr><td><code>can_connect_to_business</code></td><td>Boolean</td><td>—</td></tr><tr><td><code>has_main_web_app</code></td><td>Boolean</td><td>—</td></tr></table></section>
-<section id="sec-Chat"><h3 id="Chat">Chat<a class="anchor" href="#Chat" aria-label="Link to this section">#</a></h3><p>A conversation. Bots only have private chats with people.</p><table><tr><th>Field</th><th>Type</th><th>Description</th></tr><tr><td><code>id</code></td><td>Integer</td><td>Same as the person's user ID.</td></tr><tr><td><code>type</code></td><td>String</td><td>Always <code>private</code>.</td></tr><tr><td><code>first_name</code></td><td>String</td><td>The person's display name.</td></tr><tr><td><code>username</code></td><td>String</td><td><i>Optional.</i></td></tr></table></section>
-<section id="sec-ChatFullInfo"><h3 id="ChatFullInfo">ChatFullInfo<a class="anchor" href="#ChatFullInfo" aria-label="Link to this section">#</a></h3><p>What <a href="#getChat">getChat</a> returns: a <a href="#Chat">Chat</a> plus:</p><table><tr><th>Field</th><th>Type</th><th>Description</th></tr><tr><td><code>accent_color_id</code></td><td>Integer</td><td>Always <code>0</code>.</td></tr><tr><td><code>max_reaction_count</code></td><td>Integer</td><td>Always <code>0</code>.</td></tr></table></section>
-<section id="sec-Message"><h3 id="Message">Message<a class="anchor" href="#Message" aria-label="Link to this section">#</a></h3><p>A message in a chat.</p><table><tr><th>Field</th><th>Type</th><th>Description</th></tr><tr><td><code>message_id</code></td><td>Integer</td><td>Counts up within each chat.</td></tr><tr><td><code>from</code></td><td><a href="#User">User</a></td><td>Who sent it (a person or your bot).</td></tr><tr><td><code>chat</code></td><td><a href="#Chat">Chat</a></td><td>The chat it belongs to.</td></tr><tr><td><code>date</code></td><td>Integer</td><td>Unix time in seconds.</td></tr><tr><td><code>edit_date</code></td><td>Integer</td><td><i>Optional.</i> Last edit, Unix seconds.</td></tr><tr><td><code>text</code></td><td>String</td><td><i>Optional.</i> Text of a text message.</td></tr><tr><td><code>entities</code></td><td>Array of <a href="#MessageEntity">MessageEntity</a></td><td><i>Optional.</i> Marks a leading <code>/command</code>.</td></tr><tr><td><code>caption</code></td><td>String</td><td><i>Optional.</i> Caption of a photo, video or file.</td></tr><tr><td><code>photo</code></td><td>Array of <a href="#PhotoSize">PhotoSize</a></td><td><i>Optional.</i></td></tr><tr><td><code>video</code></td><td><a href="#Video">Video</a></td><td><i>Optional.</i></td></tr><tr><td><code>animation</code></td><td><a href="#Animation">Animation</a></td><td><i>Optional.</i> GIF or silent video.</td></tr><tr><td><code>audio</code></td><td><a href="#Audio">Audio</a></td><td><i>Optional.</i></td></tr><tr><td><code>voice</code></td><td><a href="#Voice">Voice</a></td><td><i>Optional.</i></td></tr><tr><td><code>video_note</code></td><td><a href="#VideoNote">VideoNote</a></td><td><i>Optional.</i></td></tr><tr><td><code>sticker</code></td><td><a href="#Sticker">Sticker</a></td><td><i>Optional.</i></td></tr><tr><td><code>document</code></td><td><a href="#Document">Document</a></td><td><i>Optional.</i> Any other file.</td></tr><tr><td><code>reply_markup</code></td><td><a href="#InlineKeyboardMarkup">InlineKeyboardMarkup</a></td><td><i>Optional.</i> Inline buttons under the message.</td></tr></table></section>
-<section id="sec-MessageEntity"><h3 id="MessageEntity">MessageEntity<a class="anchor" href="#MessageEntity" aria-label="Link to this section">#</a></h3><p>A special part of the text.</p><table><tr><th>Field</th><th>Type</th><th>Description</th></tr><tr><td><code>type</code></td><td>String</td><td><code>bot_command</code> for a leading <code>/command</code>.</td></tr><tr><td><code>offset</code></td><td>Integer</td><td>Start, in UTF-16 units.</td></tr><tr><td><code>length</code></td><td>Integer</td><td>Length, in UTF-16 units.</td></tr></table></section>
-<section id="sec-PhotoSize"><h3 id="PhotoSize">PhotoSize<a class="anchor" href="#PhotoSize" aria-label="Link to this section">#</a></h3><p>A photo. Sizes are reported as 0 because PassGram does not resize.</p><table><tr><th>Field</th><th>Type</th><th>Description</th></tr><tr><td><code>file_id</code></td><td>String</td><td>ID of this file.</td></tr><tr><td><code>file_unique_id</code></td><td>String</td><td>Stable short ID.</td></tr><tr><td><code>width</code></td><td>Integer</td><td>0</td></tr><tr><td><code>height</code></td><td>Integer</td><td>0</td></tr><tr><td><code>file_size</code></td><td>Integer</td><td><i>Optional.</i> Bytes, for uploads.</td></tr></table></section>
+<section id="sec-Update"><h3 id="Update">Update<a class="anchor" href="#Update" aria-label="Link to this section">#</a></h3><p>One event for your bot. Exactly one of the optional fields is present.</p><table><tr><th>Field</th><th>Type</th><th>Description</th></tr><tr><td><code>update_id</code></td><td>Integer</td><td>Increasing number. Send <code>update_id + 1</code> as <code>offset</code> to confirm it.</td></tr><tr><td><code>message</code></td><td><a href="#Message">Message</a></td><td><i>Optional.</i> A new message from a person.</td></tr><tr><td><code>callback_query</code></td><td><a href="#CallbackQuery">CallbackQuery</a></td><td><i>Optional.</i> A press on one of your inline buttons.</td></tr></table><p class="ex-label"><b>Example</b></p><div class="tabs"><div class="tabbar"><button class=on>JSON</button><button class="copy">Copy</button></div><pre class=on>{
+  &quot;update_id&quot;: 7,
+  &quot;message&quot;: {
+    &quot;message_id&quot;: 1,
+    &quot;from&quot;: {
+      &quot;id&quot;: 45957845239,
+      &quot;is_bot&quot;: false,
+      &quot;first_name&quot;: &quot;Rezan&quot;,
+      &quot;username&quot;: &quot;rezan&quot;,
+      &quot;language_code&quot;: &quot;tr&quot;
+    },
+    &quot;chat&quot;: {
+      &quot;id&quot;: 45957845239,
+      &quot;type&quot;: &quot;private&quot;,
+      &quot;first_name&quot;: &quot;Rezan&quot;,
+      &quot;username&quot;: &quot;rezan&quot;
+    },
+    &quot;date&quot;: 1794200943,
+    &quot;text&quot;: &quot;/start&quot;,
+    &quot;entities&quot;: [
+      {
+        &quot;type&quot;: &quot;bot_command&quot;,
+        &quot;offset&quot;: 0,
+        &quot;length&quot;: 6
+      }
+    ]
+  }
+}</pre></div></section>
+<section id="sec-User"><h3 id="User">User<a class="anchor" href="#User" aria-label="Link to this section">#</a></h3><p>A person or a bot.</p><table><tr><th>Field</th><th>Type</th><th>Description</th></tr><tr><td><code>id</code></td><td>Integer</td><td>Unique ID. For people this is their <b>Z Pass ID</b> (11 digits); for bots, 10 digits.</td></tr><tr><td><code>is_bot</code></td><td>Boolean</td><td><code>true</code> for bots.</td></tr><tr><td><code>first_name</code></td><td>String</td><td>Display name.</td></tr><tr><td><code>username</code></td><td>String</td><td><i>Optional.</i> Username without <code>@</code>.</td></tr><tr><td><code>language_code</code></td><td>String</td><td><i>Optional.</i> The person's app language, e.g. <code>tr</code>, <code>en</code>.</td></tr></table><p class="ex-label"><b>Example</b></p><div class="tabs"><div class="tabbar"><button class=on>JSON</button><button class="copy">Copy</button></div><pre class=on>{
+  &quot;id&quot;: 45957845239,
+  &quot;is_bot&quot;: false,
+  &quot;first_name&quot;: &quot;Rezan&quot;,
+  &quot;username&quot;: &quot;rezan&quot;,
+  &quot;language_code&quot;: &quot;tr&quot;
+}</pre></div></section>
+<section id="sec-BotUser"><h3 id="BotUser">BotUser<a class="anchor" href="#BotUser" aria-label="Link to this section">#</a></h3><p>What <a href="#getMe">getMe</a> returns: a <a href="#User">User</a> plus these fields (all <code>false</code> today).</p><table><tr><th>Field</th><th>Type</th><th>Description</th></tr><tr><td><code>can_join_groups</code></td><td>Boolean</td><td>Bots cannot be added to groups yet.</td></tr><tr><td><code>can_read_all_group_messages</code></td><td>Boolean</td><td>—</td></tr><tr><td><code>supports_inline_queries</code></td><td>Boolean</td><td>Inline mode is not available yet.</td></tr><tr><td><code>can_connect_to_business</code></td><td>Boolean</td><td>—</td></tr><tr><td><code>has_main_web_app</code></td><td>Boolean</td><td>—</td></tr></table><p class="ex-label"><b>Example</b></p><div class="tabs"><div class="tabbar"><button class=on>JSON</button><button class="copy">Copy</button></div><pre class=on>{
+  &quot;id&quot;: 8513445453,
+  &quot;is_bot&quot;: true,
+  &quot;first_name&quot;: &quot;My Shop&quot;,
+  &quot;username&quot;: &quot;myshop_bot&quot;,
+  &quot;can_join_groups&quot;: false,
+  &quot;can_read_all_group_messages&quot;: false,
+  &quot;supports_inline_queries&quot;: false,
+  &quot;can_connect_to_business&quot;: false,
+  &quot;has_main_web_app&quot;: false
+}</pre></div></section>
+<section id="sec-Chat"><h3 id="Chat">Chat<a class="anchor" href="#Chat" aria-label="Link to this section">#</a></h3><p>A conversation. Bots only have private chats with people.</p><table><tr><th>Field</th><th>Type</th><th>Description</th></tr><tr><td><code>id</code></td><td>Integer</td><td>Same as the person's user ID.</td></tr><tr><td><code>type</code></td><td>String</td><td>Always <code>private</code>.</td></tr><tr><td><code>first_name</code></td><td>String</td><td>The person's display name.</td></tr><tr><td><code>username</code></td><td>String</td><td><i>Optional.</i></td></tr></table><p class="ex-label"><b>Example</b></p><div class="tabs"><div class="tabbar"><button class=on>JSON</button><button class="copy">Copy</button></div><pre class=on>{
+  &quot;id&quot;: 45957845239,
+  &quot;type&quot;: &quot;private&quot;,
+  &quot;first_name&quot;: &quot;Rezan&quot;,
+  &quot;username&quot;: &quot;rezan&quot;
+}</pre></div></section>
+<section id="sec-ChatFullInfo"><h3 id="ChatFullInfo">ChatFullInfo<a class="anchor" href="#ChatFullInfo" aria-label="Link to this section">#</a></h3><p>What <a href="#getChat">getChat</a> returns: a <a href="#Chat">Chat</a> plus:</p><table><tr><th>Field</th><th>Type</th><th>Description</th></tr><tr><td><code>accent_color_id</code></td><td>Integer</td><td>Always <code>0</code>.</td></tr><tr><td><code>max_reaction_count</code></td><td>Integer</td><td>Always <code>0</code>.</td></tr></table><p class="ex-label"><b>Example</b></p><div class="tabs"><div class="tabbar"><button class=on>JSON</button><button class="copy">Copy</button></div><pre class=on>{
+  &quot;id&quot;: 45957845239,
+  &quot;type&quot;: &quot;private&quot;,
+  &quot;first_name&quot;: &quot;Rezan&quot;,
+  &quot;username&quot;: &quot;rezan&quot;,
+  &quot;accent_color_id&quot;: 0,
+  &quot;max_reaction_count&quot;: 0
+}</pre></div></section>
+<section id="sec-Message"><h3 id="Message">Message<a class="anchor" href="#Message" aria-label="Link to this section">#</a></h3><p>A message in a chat.</p><table><tr><th>Field</th><th>Type</th><th>Description</th></tr><tr><td><code>message_id</code></td><td>Integer</td><td>Counts up within each chat.</td></tr><tr><td><code>from</code></td><td><a href="#User">User</a></td><td>Who sent it (a person or your bot).</td></tr><tr><td><code>chat</code></td><td><a href="#Chat">Chat</a></td><td>The chat it belongs to.</td></tr><tr><td><code>date</code></td><td>Integer</td><td>Unix time in seconds.</td></tr><tr><td><code>edit_date</code></td><td>Integer</td><td><i>Optional.</i> Last edit, Unix seconds.</td></tr><tr><td><code>text</code></td><td>String</td><td><i>Optional.</i> Text of a text message.</td></tr><tr><td><code>entities</code></td><td>Array of <a href="#MessageEntity">MessageEntity</a></td><td><i>Optional.</i> Marks a leading <code>/command</code>.</td></tr><tr><td><code>caption</code></td><td>String</td><td><i>Optional.</i> Caption of a photo, video or file.</td></tr><tr><td><code>photo</code></td><td>Array of <a href="#PhotoSize">PhotoSize</a></td><td><i>Optional.</i></td></tr><tr><td><code>video</code></td><td><a href="#Video">Video</a></td><td><i>Optional.</i></td></tr><tr><td><code>animation</code></td><td><a href="#Animation">Animation</a></td><td><i>Optional.</i> GIF or silent video.</td></tr><tr><td><code>audio</code></td><td><a href="#Audio">Audio</a></td><td><i>Optional.</i></td></tr><tr><td><code>voice</code></td><td><a href="#Voice">Voice</a></td><td><i>Optional.</i></td></tr><tr><td><code>video_note</code></td><td><a href="#VideoNote">VideoNote</a></td><td><i>Optional.</i></td></tr><tr><td><code>sticker</code></td><td><a href="#Sticker">Sticker</a></td><td><i>Optional.</i></td></tr><tr><td><code>document</code></td><td><a href="#Document">Document</a></td><td><i>Optional.</i> Any other file.</td></tr><tr><td><code>reply_markup</code></td><td><a href="#InlineKeyboardMarkup">InlineKeyboardMarkup</a></td><td><i>Optional.</i> Inline buttons under the message.</td></tr></table><p class="ex-label"><b>Example</b></p><div class="tabs"><div class="tabbar"><button class=on>JSON</button><button class="copy">Copy</button></div><pre class=on>{
+  &quot;message_id&quot;: 3,
+  &quot;from&quot;: {
+    &quot;id&quot;: 8513445453,
+    &quot;is_bot&quot;: true,
+    &quot;first_name&quot;: &quot;My Shop&quot;,
+    &quot;username&quot;: &quot;myshop_bot&quot;
+  },
+  &quot;chat&quot;: {
+    &quot;id&quot;: 45957845239,
+    &quot;type&quot;: &quot;private&quot;,
+    &quot;first_name&quot;: &quot;Rezan&quot;,
+    &quot;username&quot;: &quot;rezan&quot;
+  },
+  &quot;date&quot;: 1794200943,
+  &quot;text&quot;: &quot;Pick something:&quot;,
+  &quot;reply_markup&quot;: {
+    &quot;inline_keyboard&quot;: [
+      [
+        {
+          &quot;text&quot;: &quot;🛒 Shop&quot;,
+          &quot;callback_data&quot;: &quot;shop&quot;
+        },
+        {
+          &quot;text&quot;: &quot;📦 Orders&quot;,
+          &quot;callback_data&quot;: &quot;orders&quot;
+        }
+      ],
+      [
+        {
+          &quot;text&quot;: &quot;🌐 Website&quot;,
+          &quot;url&quot;: &quot;https://example.com&quot;
+        }
+      ]
+    ]
+  }
+}</pre></div></section>
+<section id="sec-MessageEntity"><h3 id="MessageEntity">MessageEntity<a class="anchor" href="#MessageEntity" aria-label="Link to this section">#</a></h3><p>A special part of the text.</p><table><tr><th>Field</th><th>Type</th><th>Description</th></tr><tr><td><code>type</code></td><td>String</td><td><code>bot_command</code> for a leading <code>/command</code>.</td></tr><tr><td><code>offset</code></td><td>Integer</td><td>Start, in UTF-16 units.</td></tr><tr><td><code>length</code></td><td>Integer</td><td>Length, in UTF-16 units.</td></tr></table><p class="ex-label"><b>Example</b></p><div class="tabs"><div class="tabbar"><button class=on>JSON</button><button class="copy">Copy</button></div><pre class=on>{
+  &quot;type&quot;: &quot;bot_command&quot;,
+  &quot;offset&quot;: 0,
+  &quot;length&quot;: 6
+}</pre></div></section>
+<section id="sec-PhotoSize"><h3 id="PhotoSize">PhotoSize<a class="anchor" href="#PhotoSize" aria-label="Link to this section">#</a></h3><p>A photo. Sizes are reported as 0 because PassGram does not resize.</p><table><tr><th>Field</th><th>Type</th><th>Description</th></tr><tr><td><code>file_id</code></td><td>String</td><td>ID of this file.</td></tr><tr><td><code>file_unique_id</code></td><td>String</td><td>Stable short ID.</td></tr><tr><td><code>width</code></td><td>Integer</td><td>0</td></tr><tr><td><code>height</code></td><td>Integer</td><td>0</td></tr><tr><td><code>file_size</code></td><td>Integer</td><td><i>Optional.</i> Bytes, for uploads.</td></tr></table><p class="ex-label"><b>Example</b></p><div class="tabs"><div class="tabbar"><button class=on>JSON</button><button class="copy">Copy</button></div><pre class=on>{
+  &quot;file_id&quot;: &quot;u7a1c3e5b9d2f4a6c8e0b1d3f&quot;,
+  &quot;file_unique_id&quot;: &quot;u7a1c3e5b9d2f4a6&quot;,
+  &quot;width&quot;: 0,
+  &quot;height&quot;: 0
+}</pre></div></section>
 <section id="sec-Video"><h3 id="Video">Video<a class="anchor" href="#Video" aria-label="Link to this section">#</a></h3><p>A video. Has <code>file_id</code>, <code>file_unique_id</code>, <code>width</code>, <code>height</code>, <code>duration</code> (0 when unknown) and optional <code>file_name</code>, <code>mime_type</code>, <code>file_size</code>.</p></section>
 <section id="sec-Animation"><h3 id="Animation">Animation<a class="anchor" href="#Animation" aria-label="Link to this section">#</a></h3><p>A GIF or silent video. Same fields as <a href="#Video">Video</a>.</p></section>
 <section id="sec-Audio"><h3 id="Audio">Audio<a class="anchor" href="#Audio" aria-label="Link to this section">#</a></h3><p>Music or another sound file. <code>file_id</code>, <code>file_unique_id</code>, <code>duration</code>, optional <code>file_name</code>, <code>mime_type</code>, <code>file_size</code>.</p></section>
 <section id="sec-Voice"><h3 id="Voice">Voice<a class="anchor" href="#Voice" aria-label="Link to this section">#</a></h3><p>A voice message. <code>file_id</code>, <code>file_unique_id</code>, <code>duration</code>, optional <code>mime_type</code>, <code>file_size</code>.</p></section>
 <section id="sec-VideoNote"><h3 id="VideoNote">VideoNote<a class="anchor" href="#VideoNote" aria-label="Link to this section">#</a></h3><p>A round video message. <code>file_id</code>, <code>file_unique_id</code>, <code>length</code>, <code>duration</code>, optional <code>file_size</code>.</p></section>
 <section id="sec-Sticker"><h3 id="Sticker">Sticker<a class="anchor" href="#Sticker" aria-label="Link to this section">#</a></h3><p>A sticker. <code>file_id</code>, <code>file_unique_id</code>, <code>type</code> (<code>regular</code>), <code>width</code>, <code>height</code>, <code>is_animated</code>, <code>is_video</code>, optional <code>file_size</code>.</p></section>
-<section id="sec-Document"><h3 id="Document">Document<a class="anchor" href="#Document" aria-label="Link to this section">#</a></h3><p>Any file.</p><table><tr><th>Field</th><th>Type</th><th>Description</th></tr><tr><td><code>file_id</code></td><td>String</td><td>ID of this file.</td></tr><tr><td><code>file_unique_id</code></td><td>String</td><td>Stable short ID.</td></tr><tr><td><code>file_name</code></td><td>String</td><td><i>Optional.</i></td></tr><tr><td><code>mime_type</code></td><td>String</td><td><i>Optional.</i></td></tr><tr><td><code>file_size</code></td><td>Integer</td><td><i>Optional.</i></td></tr></table></section>
+<section id="sec-Document"><h3 id="Document">Document<a class="anchor" href="#Document" aria-label="Link to this section">#</a></h3><p>Any file.</p><table><tr><th>Field</th><th>Type</th><th>Description</th></tr><tr><td><code>file_id</code></td><td>String</td><td>ID of this file.</td></tr><tr><td><code>file_unique_id</code></td><td>String</td><td>Stable short ID.</td></tr><tr><td><code>file_name</code></td><td>String</td><td><i>Optional.</i></td></tr><tr><td><code>mime_type</code></td><td>String</td><td><i>Optional.</i></td></tr><tr><td><code>file_size</code></td><td>Integer</td><td><i>Optional.</i></td></tr></table><p class="ex-label"><b>Example</b></p><div class="tabs"><div class="tabbar"><button class=on>JSON</button><button class="copy">Copy</button></div><pre class=on>{
+  &quot;file_id&quot;: &quot;4f0c2a9b7e6d5c4b3a2f1e0d9c8b7a6f5e4d3c2b1a0f9e8d&quot;,
+  &quot;file_unique_id&quot;: &quot;4f0c2a9b7e6d5c4b&quot;,
+  &quot;file_name&quot;: &quot;menu.pdf&quot;,
+  &quot;mime_type&quot;: &quot;application/pdf&quot;,
+  &quot;file_size&quot;: 48213
+}</pre></div></section>
 <section id="sec-InputFile"><h3 id="InputFile">InputFile<a class="anchor" href="#InputFile" aria-label="Link to this section">#</a></h3><p>A file you upload in a <code>multipart/form-data</code> request, up to <b>20 MB</b>. Put it directly in the field, or put <code>attach://&lt;part&gt;</code> in the field and the file in that part. Instead of a file you can always pass an <code>https://</code> link to a file on your own server (any size).</p></section>
-<section id="sec-CallbackQuery"><h3 id="CallbackQuery">CallbackQuery<a class="anchor" href="#CallbackQuery" aria-label="Link to this section">#</a></h3><p>A press on an inline button.</p><table><tr><th>Field</th><th>Type</th><th>Description</th></tr><tr><td><code>id</code></td><td>String</td><td>Pass to <a href="#answerCallbackQuery">answerCallbackQuery</a>.</td></tr><tr><td><code>from</code></td><td><a href="#User">User</a></td><td>Who pressed.</td></tr><tr><td><code>message</code></td><td><a href="#Message">Message</a></td><td>The message the button belongs to.</td></tr><tr><td><code>chat_instance</code></td><td>String</td><td>Identifies the chat.</td></tr><tr><td><code>data</code></td><td>String</td><td>The button's <code>callback_data</code>.</td></tr></table></section>
-<section id="sec-InlineKeyboardMarkup"><h3 id="InlineKeyboardMarkup">InlineKeyboardMarkup<a class="anchor" href="#InlineKeyboardMarkup" aria-label="Link to this section">#</a></h3><p>Buttons under a message.</p><table><tr><th>Field</th><th>Type</th><th>Description</th></tr><tr><td><code>inline_keyboard</code></td><td>Array of Array of <a href="#InlineKeyboardButton">InlineKeyboardButton</a></td><td>Rows of buttons. Up to 10 rows, 4 per row, 30 in total.</td></tr></table></section>
-<section id="sec-InlineKeyboardButton"><h3 id="InlineKeyboardButton">InlineKeyboardButton<a class="anchor" href="#InlineKeyboardButton" aria-label="Link to this section">#</a></h3><p>Use exactly one of <code>callback_data</code> and <code>url</code>.</p><table><tr><th>Field</th><th>Type</th><th>Description</th></tr><tr><td><code>text</code></td><td>String</td><td>Label, 1–64 characters.</td></tr><tr><td><code>callback_data</code></td><td>String</td><td><i>Optional.</i> 1–64 bytes sent back in a <a href="#CallbackQuery">CallbackQuery</a>.</td></tr><tr><td><code>url</code></td><td>String</td><td><i>Optional.</i> An <code>https://</code> link to open.</td></tr></table></section>
-<section id="sec-ReplyKeyboardMarkup"><h3 id="ReplyKeyboardMarkup">ReplyKeyboardMarkup<a class="anchor" href="#ReplyKeyboardMarkup" aria-label="Link to this section">#</a></h3><p>Big answer buttons shown above the message box. A tap sends the label as a normal message.</p><table><tr><th>Field</th><th>Type</th><th>Description</th></tr><tr><td><code>keyboard</code></td><td>Array of Array of <a href="#KeyboardButton">KeyboardButton</a></td><td>Rows. Up to 12 rows, 8 per row, 100 in total.</td></tr><tr><td><code>one_time_keyboard</code></td><td>Boolean</td><td><i>Optional.</i> Hide it after the person answers.</td></tr><tr><td><code>resize_keyboard</code></td><td>Boolean</td><td><i>Optional.</i> Accepted.</td></tr><tr><td><code>is_persistent</code></td><td>Boolean</td><td><i>Optional.</i> Accepted.</td></tr><tr><td><code>input_field_placeholder</code></td><td>String</td><td><i>Optional.</i> Up to 64 characters.</td></tr></table></section>
+<section id="sec-CallbackQuery"><h3 id="CallbackQuery">CallbackQuery<a class="anchor" href="#CallbackQuery" aria-label="Link to this section">#</a></h3><p>A press on an inline button.</p><table><tr><th>Field</th><th>Type</th><th>Description</th></tr><tr><td><code>id</code></td><td>String</td><td>Pass to <a href="#answerCallbackQuery">answerCallbackQuery</a>.</td></tr><tr><td><code>from</code></td><td><a href="#User">User</a></td><td>Who pressed.</td></tr><tr><td><code>message</code></td><td><a href="#Message">Message</a></td><td>The message the button belongs to.</td></tr><tr><td><code>chat_instance</code></td><td>String</td><td>Identifies the chat.</td></tr><tr><td><code>data</code></td><td>String</td><td>The button's <code>callback_data</code>.</td></tr></table><p class="ex-label"><b>Example</b></p><div class="tabs"><div class="tabbar"><button class=on>JSON</button><button class="copy">Copy</button></div><pre class=on>{
+  &quot;id&quot;: &quot;5f1c0a9e2b7d4c3e8a6f1b2c&quot;,
+  &quot;from&quot;: {
+    &quot;id&quot;: 45957845239,
+    &quot;is_bot&quot;: false,
+    &quot;first_name&quot;: &quot;Rezan&quot;,
+    &quot;username&quot;: &quot;rezan&quot;,
+    &quot;language_code&quot;: &quot;tr&quot;
+  },
+  &quot;message&quot;: {
+    &quot;message_id&quot;: 2,
+    &quot;from&quot;: {
+      &quot;id&quot;: 8513445453,
+      &quot;is_bot&quot;: true,
+      &quot;first_name&quot;: &quot;My Shop&quot;,
+      &quot;username&quot;: &quot;myshop_bot&quot;
+    },
+    &quot;chat&quot;: {
+      &quot;id&quot;: 45957845239,
+      &quot;type&quot;: &quot;private&quot;,
+      &quot;first_name&quot;: &quot;Rezan&quot;,
+      &quot;username&quot;: &quot;rezan&quot;
+    },
+    &quot;date&quot;: 1794200943,
+    &quot;text&quot;: &quot;Pick something:&quot;,
+    &quot;reply_markup&quot;: {
+      &quot;inline_keyboard&quot;: [
+        [
+          {
+            &quot;text&quot;: &quot;🛒 Shop&quot;,
+            &quot;callback_data&quot;: &quot;shop&quot;
+          },
+          {
+            &quot;text&quot;: &quot;📦 Orders&quot;,
+            &quot;callback_data&quot;: &quot;orders&quot;
+          }
+        ],
+        [
+          {
+            &quot;text&quot;: &quot;🌐 Website&quot;,
+            &quot;url&quot;: &quot;https://example.com&quot;
+          }
+        ]
+      ]
+    }
+  },
+  &quot;chat_instance&quot;: &quot;45957845239&quot;,
+  &quot;data&quot;: &quot;shop&quot;
+}</pre></div></section>
+<section id="sec-InlineKeyboardMarkup"><h3 id="InlineKeyboardMarkup">InlineKeyboardMarkup<a class="anchor" href="#InlineKeyboardMarkup" aria-label="Link to this section">#</a></h3><p>Buttons under a message.</p><table><tr><th>Field</th><th>Type</th><th>Description</th></tr><tr><td><code>inline_keyboard</code></td><td>Array of Array of <a href="#InlineKeyboardButton">InlineKeyboardButton</a></td><td>Rows of buttons. Up to 10 rows, 4 per row, 30 in total.</td></tr></table><p class="ex-label"><b>Example</b></p><div class="tabs"><div class="tabbar"><button class=on>JSON</button><button class="copy">Copy</button></div><pre class=on>{
+  &quot;inline_keyboard&quot;: [
+    [
+      {
+        &quot;text&quot;: &quot;🛒 Shop&quot;,
+        &quot;callback_data&quot;: &quot;shop&quot;
+      },
+      {
+        &quot;text&quot;: &quot;📦 Orders&quot;,
+        &quot;callback_data&quot;: &quot;orders&quot;
+      }
+    ],
+    [
+      {
+        &quot;text&quot;: &quot;🌐 Website&quot;,
+        &quot;url&quot;: &quot;https://example.com&quot;
+      }
+    ]
+  ]
+}</pre></div></section>
+<section id="sec-InlineKeyboardButton"><h3 id="InlineKeyboardButton">InlineKeyboardButton<a class="anchor" href="#InlineKeyboardButton" aria-label="Link to this section">#</a></h3><p>Use exactly one of <code>callback_data</code> and <code>url</code>.</p><table><tr><th>Field</th><th>Type</th><th>Description</th></tr><tr><td><code>text</code></td><td>String</td><td>Label, 1–64 characters.</td></tr><tr><td><code>callback_data</code></td><td>String</td><td><i>Optional.</i> 1–64 bytes sent back in a <a href="#CallbackQuery">CallbackQuery</a>.</td></tr><tr><td><code>url</code></td><td>String</td><td><i>Optional.</i> An <code>https://</code> link to open.</td></tr></table><p class="ex-label"><b>Example</b></p><div class="tabs"><div class="tabbar"><button class=on>JSON</button><button class="copy">Copy</button></div><pre class=on>{
+  &quot;text&quot;: &quot;🛒 Shop&quot;,
+  &quot;callback_data&quot;: &quot;shop&quot;
+}</pre></div></section>
+<section id="sec-ReplyKeyboardMarkup"><h3 id="ReplyKeyboardMarkup">ReplyKeyboardMarkup<a class="anchor" href="#ReplyKeyboardMarkup" aria-label="Link to this section">#</a></h3><p>Big answer buttons shown above the message box. A tap sends the label as a normal message.</p><table><tr><th>Field</th><th>Type</th><th>Description</th></tr><tr><td><code>keyboard</code></td><td>Array of Array of <a href="#KeyboardButton">KeyboardButton</a></td><td>Rows. Up to 12 rows, 8 per row, 100 in total.</td></tr><tr><td><code>one_time_keyboard</code></td><td>Boolean</td><td><i>Optional.</i> Hide it after the person answers.</td></tr><tr><td><code>resize_keyboard</code></td><td>Boolean</td><td><i>Optional.</i> Accepted.</td></tr><tr><td><code>is_persistent</code></td><td>Boolean</td><td><i>Optional.</i> Accepted.</td></tr><tr><td><code>input_field_placeholder</code></td><td>String</td><td><i>Optional.</i> Up to 64 characters.</td></tr></table><p class="ex-label"><b>Example</b></p><div class="tabs"><div class="tabbar"><button class=on>JSON</button><button class="copy">Copy</button></div><pre class=on>{
+  &quot;keyboard&quot;: [
+    [
+      &quot;👍 Good&quot;,
+      &quot;👎 Bad&quot;
+    ],
+    [
+      {
+        &quot;text&quot;: &quot;❌ Close&quot;
+      }
+    ]
+  ],
+  &quot;one_time_keyboard&quot;: true,
+  &quot;resize_keyboard&quot;: true
+}</pre></div></section>
 <section id="sec-KeyboardButton"><h3 id="KeyboardButton">KeyboardButton<a class="anchor" href="#KeyboardButton" aria-label="Link to this section">#</a></h3><p>A reply keyboard button: an object with <code>text</code> (1–64 characters), or just the text as a string.</p></section>
-<section id="sec-ReplyKeyboardRemove"><h3 id="ReplyKeyboardRemove">ReplyKeyboardRemove<a class="anchor" href="#ReplyKeyboardRemove" aria-label="Link to this section">#</a></h3><p>Removes the reply keyboard.</p><table><tr><th>Field</th><th>Type</th><th>Description</th></tr><tr><td><code>remove_keyboard</code></td><td>True</td><td>Always <code>true</code>.</td></tr></table></section>
-<section id="sec-ForceReply"><h3 id="ForceReply">ForceReply<a class="anchor" href="#ForceReply" aria-label="Link to this section">#</a></h3><p>Asks the app to reply to this message.</p><table><tr><th>Field</th><th>Type</th><th>Description</th></tr><tr><td><code>force_reply</code></td><td>True</td><td>Always <code>true</code>.</td></tr><tr><td><code>input_field_placeholder</code></td><td>String</td><td><i>Optional.</i></td></tr></table></section>
-<section id="sec-ReplyParameters"><h3 id="ReplyParameters">ReplyParameters<a class="anchor" href="#ReplyParameters" aria-label="Link to this section">#</a></h3><p>Which message you answer.</p><table><tr><th>Field</th><th>Type</th><th>Description</th></tr><tr><td><code>message_id</code></td><td>Integer</td><td>A message in the same chat.</td></tr></table></section>
-<section id="sec-BotCommand"><h3 id="BotCommand">BotCommand<a class="anchor" href="#BotCommand" aria-label="Link to this section">#</a></h3><p>One entry of the command menu.</p><table><tr><th>Field</th><th>Type</th><th>Description</th></tr><tr><td><code>command</code></td><td>String</td><td>1–32 characters: lowercase letters, digits, <code>_</code>; starts with a letter.</td></tr><tr><td><code>description</code></td><td>String</td><td>1–100 characters.</td></tr></table></section>
-<section id="sec-MenuButton"><h3 id="MenuButton">MenuButton<a class="anchor" href="#MenuButton" aria-label="Link to this section">#</a></h3><p>The button next to the message box. One of:</p><table><tr><th>Field</th><th>Type</th><th>Description</th></tr><tr><td><code>type</code></td><td>String</td><td><code>commands</code> (default: opens the command menu), <code>web_app</code> (opens a mini app) or <code>default</code> (no button).</td></tr><tr><td><code>text</code></td><td>String</td><td><code>web_app</code> only: label, 1–32 characters.</td></tr><tr><td><code>web_app</code></td><td>Object</td><td><code>web_app</code> only: <code>{"url": "https://…"}</code>.</td></tr></table></section>
-<section id="sec-WebhookInfo"><h3 id="WebhookInfo">WebhookInfo<a class="anchor" href="#WebhookInfo" aria-label="Link to this section">#</a></h3><p>Current webhook status.</p><table><tr><th>Field</th><th>Type</th><th>Description</th></tr><tr><td><code>url</code></td><td>String</td><td>Webhook address, empty when not set.</td></tr><tr><td><code>has_custom_certificate</code></td><td>Boolean</td><td>Always <code>false</code>.</td></tr><tr><td><code>pending_update_count</code></td><td>Integer</td><td>Updates waiting to be delivered.</td></tr><tr><td><code>max_connections</code></td><td>Integer</td><td>40</td></tr><tr><td><code>last_error_date</code></td><td>Integer</td><td><i>Optional.</i> Unix seconds of the last failed delivery.</td></tr><tr><td><code>last_error_message</code></td><td>String</td><td><i>Optional.</i> Why it failed.</td></tr><tr><td><code>allowed_updates</code></td><td>Array of String</td><td><i>Optional.</i></td></tr></table></section>
-<section id="sec-BotName"><h3 id="BotName">BotName<a class="anchor" href="#BotName" aria-label="Link to this section">#</a></h3><table><tr><th>Field</th><th>Type</th><th>Description</th></tr><tr><td><code>name</code></td><td>String</td><td>The bot's name.</td></tr></table></section>
-<section id="sec-BotDescription"><h3 id="BotDescription">BotDescription<a class="anchor" href="#BotDescription" aria-label="Link to this section">#</a></h3><table><tr><th>Field</th><th>Type</th><th>Description</th></tr><tr><td><code>description</code></td><td>String</td><td>Text shown in an empty chat with the bot.</td></tr></table></section>
-<section id="sec-BotShortDescription"><h3 id="BotShortDescription">BotShortDescription<a class="anchor" href="#BotShortDescription" aria-label="Link to this section">#</a></h3><table><tr><th>Field</th><th>Type</th><th>Description</th></tr><tr><td><code>short_description</code></td><td>String</td><td>Text on the bot's profile.</td></tr></table></section>
-<section id="sec-ResponseParameters"><h3 id="ResponseParameters">ResponseParameters<a class="anchor" href="#ResponseParameters" aria-label="Link to this section">#</a></h3><p>Extra error details.</p><table><tr><th>Field</th><th>Type</th><th>Description</th></tr><tr><td><code>retry_after</code></td><td>Integer</td><td><i>Optional.</i> Seconds to wait after a <code>429</code>.</td></tr></table></section>
+<section id="sec-ReplyKeyboardRemove"><h3 id="ReplyKeyboardRemove">ReplyKeyboardRemove<a class="anchor" href="#ReplyKeyboardRemove" aria-label="Link to this section">#</a></h3><p>Removes the reply keyboard.</p><table><tr><th>Field</th><th>Type</th><th>Description</th></tr><tr><td><code>remove_keyboard</code></td><td>True</td><td>Always <code>true</code>.</td></tr></table><p class="ex-label"><b>Example</b></p><div class="tabs"><div class="tabbar"><button class=on>JSON</button><button class="copy">Copy</button></div><pre class=on>{
+  &quot;remove_keyboard&quot;: true
+}</pre></div></section>
+<section id="sec-ForceReply"><h3 id="ForceReply">ForceReply<a class="anchor" href="#ForceReply" aria-label="Link to this section">#</a></h3><p>Asks the app to reply to this message.</p><table><tr><th>Field</th><th>Type</th><th>Description</th></tr><tr><td><code>force_reply</code></td><td>True</td><td>Always <code>true</code>.</td></tr><tr><td><code>input_field_placeholder</code></td><td>String</td><td><i>Optional.</i></td></tr></table><p class="ex-label"><b>Example</b></p><div class="tabs"><div class="tabbar"><button class=on>JSON</button><button class="copy">Copy</button></div><pre class=on>{
+  &quot;force_reply&quot;: true,
+  &quot;input_field_placeholder&quot;: &quot;Your answer&quot;
+}</pre></div></section>
+<section id="sec-ReplyParameters"><h3 id="ReplyParameters">ReplyParameters<a class="anchor" href="#ReplyParameters" aria-label="Link to this section">#</a></h3><p>Which message you answer.</p><table><tr><th>Field</th><th>Type</th><th>Description</th></tr><tr><td><code>message_id</code></td><td>Integer</td><td>A message in the same chat.</td></tr></table><p class="ex-label"><b>Example</b></p><div class="tabs"><div class="tabbar"><button class=on>JSON</button><button class="copy">Copy</button></div><pre class=on>{
+  &quot;message_id&quot;: 12
+}</pre></div></section>
+<section id="sec-BotCommand"><h3 id="BotCommand">BotCommand<a class="anchor" href="#BotCommand" aria-label="Link to this section">#</a></h3><p>One entry of the command menu.</p><table><tr><th>Field</th><th>Type</th><th>Description</th></tr><tr><td><code>command</code></td><td>String</td><td>1–32 characters: lowercase letters, digits, <code>_</code>; starts with a letter.</td></tr><tr><td><code>description</code></td><td>String</td><td>1–100 characters.</td></tr></table><p class="ex-label"><b>Example</b></p><div class="tabs"><div class="tabbar"><button class=on>JSON</button><button class="copy">Copy</button></div><pre class=on>{
+  &quot;command&quot;: &quot;start&quot;,
+  &quot;description&quot;: &quot;Main menu&quot;
+}</pre></div></section>
+<section id="sec-MenuButton"><h3 id="MenuButton">MenuButton<a class="anchor" href="#MenuButton" aria-label="Link to this section">#</a></h3><p>The button next to the message box. One of:</p><table><tr><th>Field</th><th>Type</th><th>Description</th></tr><tr><td><code>type</code></td><td>String</td><td><code>commands</code> (default: opens the command menu), <code>web_app</code> (opens a mini app) or <code>default</code> (no button).</td></tr><tr><td><code>text</code></td><td>String</td><td><code>web_app</code> only: label, 1–32 characters.</td></tr><tr><td><code>web_app</code></td><td>Object</td><td><code>web_app</code> only: <code>{"url": "https://…"}</code>.</td></tr></table><p class="ex-label"><b>Example</b></p><div class="tabs"><div class="tabbar"><button class=on>JSON</button><button class="copy">Copy</button></div><pre class=on>{
+  &quot;type&quot;: &quot;web_app&quot;,
+  &quot;text&quot;: &quot;Open shop&quot;,
+  &quot;web_app&quot;: {
+    &quot;url&quot;: &quot;https://shop.example.com/app&quot;
+  }
+}</pre></div></section>
+<section id="sec-WebhookInfo"><h3 id="WebhookInfo">WebhookInfo<a class="anchor" href="#WebhookInfo" aria-label="Link to this section">#</a></h3><p>Current webhook status.</p><table><tr><th>Field</th><th>Type</th><th>Description</th></tr><tr><td><code>url</code></td><td>String</td><td>Webhook address, empty when not set.</td></tr><tr><td><code>has_custom_certificate</code></td><td>Boolean</td><td>Always <code>false</code>.</td></tr><tr><td><code>pending_update_count</code></td><td>Integer</td><td>Updates waiting to be delivered.</td></tr><tr><td><code>max_connections</code></td><td>Integer</td><td>40</td></tr><tr><td><code>last_error_date</code></td><td>Integer</td><td><i>Optional.</i> Unix seconds of the last failed delivery.</td></tr><tr><td><code>last_error_message</code></td><td>String</td><td><i>Optional.</i> Why it failed.</td></tr><tr><td><code>allowed_updates</code></td><td>Array of String</td><td><i>Optional.</i></td></tr></table><p class="ex-label"><b>Example</b></p><div class="tabs"><div class="tabbar"><button class=on>JSON</button><button class="copy">Copy</button></div><pre class=on>{
+  &quot;url&quot;: &quot;https://bot.example.com/passgram&quot;,
+  &quot;has_custom_certificate&quot;: false,
+  &quot;pending_update_count&quot;: 0,
+  &quot;max_connections&quot;: 40
+}</pre></div></section>
+<section id="sec-BotName"><h3 id="BotName">BotName<a class="anchor" href="#BotName" aria-label="Link to this section">#</a></h3><table><tr><th>Field</th><th>Type</th><th>Description</th></tr><tr><td><code>name</code></td><td>String</td><td>The bot's name.</td></tr></table><p class="ex-label"><b>Example</b></p><div class="tabs"><div class="tabbar"><button class=on>JSON</button><button class="copy">Copy</button></div><pre class=on>{
+  &quot;name&quot;: &quot;My Shop&quot;
+}</pre></div></section>
+<section id="sec-BotDescription"><h3 id="BotDescription">BotDescription<a class="anchor" href="#BotDescription" aria-label="Link to this section">#</a></h3><table><tr><th>Field</th><th>Type</th><th>Description</th></tr><tr><td><code>description</code></td><td>String</td><td>Text shown in an empty chat with the bot.</td></tr></table><p class="ex-label"><b>Example</b></p><div class="tabs"><div class="tabbar"><button class=on>JSON</button><button class="copy">Copy</button></div><pre class=on>{
+  &quot;description&quot;: &quot;Order coffee in 10 seconds. Press Start!&quot;
+}</pre></div></section>
+<section id="sec-BotShortDescription"><h3 id="BotShortDescription">BotShortDescription<a class="anchor" href="#BotShortDescription" aria-label="Link to this section">#</a></h3><table><tr><th>Field</th><th>Type</th><th>Description</th></tr><tr><td><code>short_description</code></td><td>String</td><td>Text on the bot's profile.</td></tr></table><p class="ex-label"><b>Example</b></p><div class="tabs"><div class="tabbar"><button class=on>JSON</button><button class="copy">Copy</button></div><pre class=on>{
+  &quot;short_description&quot;: &quot;Coffee to go ☕&quot;
+}</pre></div></section>
+<section id="sec-ResponseParameters"><h3 id="ResponseParameters">ResponseParameters<a class="anchor" href="#ResponseParameters" aria-label="Link to this section">#</a></h3><p>Extra error details.</p><table><tr><th>Field</th><th>Type</th><th>Description</th></tr><tr><td><code>retry_after</code></td><td>Integer</td><td><i>Optional.</i> Seconds to wait after a <code>429</code>.</td></tr></table><p class="ex-label"><b>Example</b></p><div class="tabs"><div class="tabbar"><button class=on>JSON</button><button class="copy">Copy</button></div><pre class=on>{
+  &quot;retry_after&quot;: 60
+}</pre></div></section>
 <section id="sec-changelog"><h2 id="changelog">Changelog<a class="anchor" href="#changelog" aria-label="Link to this section">#</a></h2><p>What changed in the PassGram Bot API, newest first.</p><h3 id="november-9-2026-bot-api-1-0">November 9, 2026 · Bot API 1.0<a class="anchor" href="#november-9-2026-bot-api-1-0" aria-label="Link to this section">#</a></h3><ul><li>The API now speaks the wire format common bot libraries expect. Tested with python-telegram-bot, aiogram, pyTelegramBotAPI, Telegraf, grammY and node-telegram-bot-api: change the server address and existing bot code works.</li><li>Numeric IDs: bots get a 10-digit ID (also the first part of new tokens); people are identified by their 11-digit Z Pass ID. Older tokens keep working.</li><li>New address <code>https://api.zpas.org/bot&lt;TOKEN&gt;/&lt;method&gt;</code>.</li><li>Webhooks: <a href="#setWebhook">setWebhook</a>, <a href="#deleteWebhook">deleteWebhook</a>, <a href="#getWebhookInfo">getWebhookInfo</a>, secret header, automatic retries, and answering with a method call.</li><li>Long polling with <code>timeout</code> in <a href="#getUpdates">getUpdates</a>; negative <code>offset</code>; confirmed updates are removed.</li><li>Photos, videos, GIFs, audio, voice, round videos, stickers and files, by link (any size) or upload (up to 20 MB, was 5 MB). Uploads also accept <code>attach://</code>.</li><li>Formatting with <code>parse_mode</code> (HTML, MarkdownV2, Markdown).</li><li>Reply keyboards, <code>remove_keyboard</code> and <code>force_reply</code>.</li><li><a href="#editMessageCaption">editMessageCaption</a>, <a href="#deleteMessage">deleteMessage</a>, <a href="#deleteMessages">deleteMessages</a>, <a href="#sendChatAction">sendChatAction</a>, <a href="#getChat">getChat</a>; edit methods now return the edited message.</li><li>Bot profile methods: name, description and short description.</li><li>Messages carry <code>entities</code> for a leading <code>/command</code>, and <code>language_code</code> for the person's app language.</li><li>Unknown methods return <code>404 Not Found</code>; method names are not case-sensitive.</li><li>Official PassGram Bot SDK 1.0 for Python and JavaScript (one file each, no dependencies).</li><li>Verify Bot: owners can apply for a blue check for their account or bot.</li></ul><h3 id="november-2026-bot-api-preview">November 2026 · Bot API preview<a class="anchor" href="#november-2026-bot-api-preview" aria-label="Link to this section">#</a></h3><ul><li>Inline keyboards, button presses (<code>answerCallbackQuery</code>), <code>editMessageText</code> and <code>editMessageReplyMarkup</code>.</li><li><code>sendDocument</code> with a one-time file relay (up to 5 MB).</li><li><code>getMe</code>, <code>getUpdates</code>, <code>sendMessage</code>, commands and the menu button.</li></ul></section>
 <div class="foot"><span>© 2026 PassGram by Zizo Software LLC · SDK: <a href="/bot#license">MIT License</a></span><span><a href="https://zpas.org/legal/terms">Terms</a> · <a href="https://zpas.org/legal/privacy">Privacy</a> · <a href="https://zpas.org/legal/security">Security</a></span></div>
 </main>
