@@ -1,22 +1,32 @@
 {
   "PLUS_MONTHLY": {
-    "price": 4.99,
+    "price": 3.99,
+    "charge": 3.99,
     "enabled": true,
-    "commitmentMonths": 0
+    "commitmentMonths": 0,
+    "interval": "month"
   },
   "PLUS_YEARLY": {
-    "price": 4.25,
+    "price": 2.99,
+    "listPrice": 3.99,
+    "charge": 35.88,
     "enabled": true,
-    "commitmentMonths": 12
+    "commitmentMonths": 12,
+    "interval": "year"
   },
   "PRO_MONTHLY": {
-    "price": 9,
+    "price": 6.99,
+    "charge": 6.99,
     "enabled": true,
-    "commitmentMonths": 0
+    "commitmentMonths": 0,
+    "interval": "month"
   },
   "PRO_YEARLY": {
-    "price": 7.5,
+    "price": 5.99,
+    "listPrice": 6.99,
+    "charge": 71.88,
     "enabled": true,
-    "commitmentMonths": 12
+    "commitmentMonths": 12,
+    "interval": "year"
   }
 }

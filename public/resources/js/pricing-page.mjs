@@ -1,4 +1,4 @@
-import { paymentPlans } from "/resources/js/payment-plans.mjs?v=2";
+import { paymentPlans } from "/resources/js/payment-plans.mjs?v=3";
 
 const money = new Intl.NumberFormat("en-US", { style: "currency", currency: "USD", maximumFractionDigits: 2 });
 let period = "MONTHLY";
@@ -26,10 +26,20 @@ function renderPrices() {
     const periodNode = document.querySelector(`[data-period-label="${tier}"]`);
     const billedNode = document.querySelector(`[data-billed="${tier}"]`);
     const checkoutNode = document.querySelector(`[data-checkout="${tier}"]`);
-    if (priceNode) renderPrice(priceNode, price);
+    const list = paymentPlans[tier].monthly.price, charge = paymentPlans[tier][key].charge ?? price;
+    if (priceNode) {
+      renderPrice(priceNode, price);
+      if (period === "YEARLY" && list > price) {
+        const struck = document.createElement("s");
+        struck.className = "pg-list-price";
+        struck.textContent = money.format(list);
+        priceNode.prepend(struck, " ");
+        priceNode.setAttribute("aria-label", `${money.format(price)} per month, was ${money.format(list)}`);
+      }
+    }
     if (periodNode) periodNode.textContent = "/ month";
-    if (billedNode) billedNode.textContent = period === "YEARLY" ? `Charged monthly for 12 months · ${money.format(price * 12)} total` : "Billed monthly";
-    if (checkoutNode) checkoutNode.href = `https://zpas.org/checkout.html?plan=${tier}&billing=${period}`;
+    if (billedNode) billedNode.textContent = period === "YEARLY" ? `${money.format(charge)} charged once a year` : "Billed monthly · turn off anytime";
+    if (checkoutNode) checkoutNode.href = `https://pay.zpas.org/?plan=${tier}&billing=${period}`;
   }
 }
 

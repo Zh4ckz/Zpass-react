@@ -22,12 +22,15 @@ function render(){
  $('pay-includes').replaceChildren(...features[plan].map(text=>{const li=document.createElement('li');li.textContent=text;return li}));
  const entry=config?.plans?.['zpass_'+plan.toLowerCase()+'_'+billing.toLowerCase()];
  const price=entry?.price;const valid=typeof price==='number'&&Number.isFinite(price)&&price>0;
- $('pay-amount').textContent=valid?money.format(price):'—';$('pay-subtotal').textContent=valid?money.format(price):'Unavailable';
- $('pay-interval').textContent=billing==='YEARLY'?'/ month':'/ month';$('pay-billing-label').textContent=billing==='YEARLY'?'12 monthly payments':'Monthly';
- $('pay-renewal').textContent=billing==='YEARLY'?`${money.format(valid?price:0)} charged now and monthly for 12 months. Total ${money.format(valid?price*12:0)}. Ends after 12 months.`:'Charged monthly automatically until cancelled.';
+ // Yearly: shown per month next to the struck-through monthly price, charged once for the whole year.
+ const charge=typeof entry?.charge==='number'?entry.charge:price,list=config?.plans?.['zpass_'+plan.toLowerCase()+'_monthly']?.price;
+ const amount=$('pay-amount');amount.replaceChildren();if(valid&&billing==='YEARLY'&&list>price){const s=document.createElement('s');s.className='pay-list-price';s.textContent=money.format(list);amount.append(s,' ')}amount.append(valid?money.format(price):'—');
+ $('pay-subtotal').textContent=valid?money.format(charge):'Unavailable';
+ $('pay-interval').textContent='/ month';$('pay-billing-label').textContent=billing==='YEARLY'?'Yearly, charged once':'Monthly';
+ $('pay-renewal').textContent=(billing==='YEARLY'?`${money.format(valid?charge:0)} charged today for 12 months (${money.format(valid?price:0)}/month). Renews once a year at ${money.format(valid?charge:0)} until you turn off auto-renew.`:`${money.format(valid?price:0)} charged today, then every month until you turn off auto-renew.`)+' Full refund if you ask within 24 hours of paying. After that you can turn off auto-renew at any time: access stays until the paid period ends, with no refund.';
  const monthly=config?.plans?.['zpass_'+plan.toLowerCase()+'_monthly']?.price;const yearly=config?.plans?.['zpass_'+plan.toLowerCase()+'_yearly']?.price;const savings=monthly>0&&yearly>0?Math.max(0,Math.round((1-yearly/monthly)*100)):0;
  $('pay-savings').hidden=!savings;$('pay-savings').textContent=savings?'Save '+savings+'%':'';
- const available=Boolean(valid&&entry.enabled!==false&&apiOrigin&&config?.available&&config?.billingModel==='monthly-v1');
+ const available=Boolean(valid&&entry.enabled!==false&&apiOrigin&&config?.available&&config?.billingModel==='v2-yearly-upfront');
  $('pay-submit').disabled=!available||!sessionValid()||busy||Boolean(pay&&(!pay.api||!pay.canConfirm||pay.confirming||pay.done||!validEmail($('pay-email')?.value||'')));
  $('pay-submit').textContent=pay?(pay.done?'Payment received ✓':pay.confirming?'Processing…':'Agree, Subscribe & Pay'):busy?'Opening secure payment…':available?'Continue to payment':'Checkout unavailable';
  if(pay?.total)$('pay-subtotal').textContent=pay.total;
@@ -84,7 +87,7 @@ $('pay-submit').addEventListener('click',async()=>{
 window.addEventListener('pageshow',()=>{if(busy){busy=false;render()}});
 try{
  const response=await fetch('/subdomain/pay/resources/data/pay-backend.json',{cache:'no-store',signal:AbortSignal.timeout(5000)});if(!response.ok)throw Error('No payment service');apiOrigin=backendOrigin(await response.json());if(!apiOrigin)throw Error('Payment service not current');
- const configResponse=await fetch(apiOrigin+'/checkout/pay-config',{credentials:'omit',cache:'no-store',signal:AbortSignal.timeout(5000)});if(!configResponse.ok)throw Error('Payment service unavailable');const live=await configResponse.json();if(live.billingModel!=='monthly-v1')throw Error('Payment backend requires update');config=live;
+ const configResponse=await fetch(apiOrigin+'/checkout/pay-config',{credentials:'omit',cache:'no-store',signal:AbortSignal.timeout(5000)});if(!configResponse.ok)throw Error('Payment service unavailable');const live=await configResponse.json();if(live.billingModel!=='v2-yearly-upfront')throw Error('Payment backend requires update');config=live;
  if(sessionKey){const response=await fetch(apiOrigin+'/checkout/pay-account',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({key:sessionKey}),signal:AbortSignal.timeout(10000)});if(response.ok)account=await response.json();}
 }catch{if(config)config.available=false}
 render();

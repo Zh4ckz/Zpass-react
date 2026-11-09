@@ -1,6 +1,6 @@
 {
   "schemaVersion": 1,
-  "updatedAt": "2026-10-26T00:00:00Z",
+  "updatedAt": "2026-11-09T00:00:00Z",
   "app": {
     "title": "PassGram",
     "checkoutTitle": "PassGram Secure Checkout"
@@ -10,7 +10,7 @@
     "PLUS_MONTHLY": {
       "id": "PLUS_MONTHLY",
       "title": "PassGram Plus Monthly",
-      "price": 4.99,
+      "price": 3.99,
       "period": "month",
       "stripeUrl": "",
       "cryptoUrl": "",
@@ -20,7 +20,7 @@
     "PLUS_YEARLY": {
       "id": "PLUS_YEARLY",
       "title": "PassGram Plus Yearly",
-      "price": 49.9,
+      "price": 35.88,
       "period": "year",
       "stripeUrl": "",
       "cryptoUrl": "",
@@ -30,7 +30,7 @@
     "PRO_MONTHLY": {
       "id": "PRO_MONTHLY",
       "title": "PassGram Pro Monthly",
-      "price": 9,
+      "price": 6.99,
       "period": "month",
       "stripeUrl": "",
       "cryptoUrl": "",
@@ -40,7 +40,7 @@
     "PRO_YEARLY": {
       "id": "PRO_YEARLY",
       "title": "PassGram Pro Yearly",
-      "price": 90,
+      "price": 71.88,
       "period": "year",
       "stripeUrl": "",
       "cryptoUrl": "",
@@ -62,7 +62,7 @@
       "label": "Other payment"
     }
   },
-  "revision": 3,
+  "revision": 4,
   "cacheSeconds": 900,
   "pages": [
     {

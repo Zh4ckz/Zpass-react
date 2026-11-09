@@ -5,7 +5,7 @@ import {createWorker,verifySignature,paymentSession} from '../src/index.js';
 import {PaymentService} from '../src/payments.js';
 import {Firestore,encodeFields,decodeFields,accessToken} from '../src/firestore.js';
 const now=Date.UTC(2026,10,3),anchor=now/1000,end1=Date.UTC(2026,11,3)/1000,end2=Date.UTC(2027,0,3)/1000;
-const payload={productId:'zpass_plus_yearly',zPassId:'ZP-ABCDEFGHIJ',requestId:'a'.repeat(32)};
+const payload={productId:'zpass_plus_monthly',zPassId:'ZP-ABCDEFGHIJ',requestId:'a'.repeat(32)};
 const jsonResponse=(body,status=200)=>new Response(JSON.stringify(body),{status,headers:{'Content-Type':'application/json'}});
 function fixture(){
  const rows=new Map(),calls=[];
@@ -13,20 +13,20 @@ function fixture(){
  let sub,first;
  const stripe=async(method,path,form,key)=>{calls.push({method,path,form,key});if(path==='checkout/sessions')return{id:'cs_fixture',url:'https://checkout.stripe.com/c/pay_fixture'};if(method==='POST'){sub={...sub,cancel_at:Number(form.cancel_at)};return sub}return path.startsWith('subscriptions/')?sub:first};
  const service=new PaymentService({db,stripe,now:()=>now});
- return{rows,calls,db,service,setup(order){sub={id:'sub_fixture',customer:'cus_fixture',status:'active',start_date:anchor,latest_invoice:'in_first',metadata:{pay_checkout:'passgram-org',pay_order_id:order.orderId,pay_uid:'fixture'},items:{data:[{quantity:1,price:{id:'price_fixture',unit_amount:425,currency:'usd',recurring:{interval:'month',interval_count:1}}}]}};first=this.invoice('in_first',anchor,end1);return{sub,first}},invoice(id,start,end){return{id,subscription:'sub_fixture',customer:'cus_fixture',status:'paid',amount_paid:425,currency:'usd',lines:{data:[{price:{id:'price_fixture'},quantity:1,amount:425,period:{start,end}}]}}}};
+ return{rows,calls,db,service,setup(order){this.amount=order.amountCents;sub={id:'sub_fixture',customer:'cus_fixture',status:'active',start_date:anchor,latest_invoice:'in_first',metadata:{pay_checkout:'passgram-org',pay_order_id:order.orderId,pay_uid:'fixture'},items:{data:[{quantity:1,price:{id:'price_fixture',unit_amount:order.amountCents,currency:'usd',recurring:{interval:order.interval||'month',interval_count:1}}}]}};first=this.invoice('in_first',anchor,end1);return{sub,first}},invoice(id,start,end){return{id,subscription:'sub_fixture',customer:'cus_fixture',status:'paid',amount_paid:this.amount,currency:'usd',lines:{data:[{price:{id:'price_fixture'},quantity:1,amount:this.amount,period:{start,end}}]}}}};
 }
 test('monthly terms, calendar boundaries and malicious client amounts',()=>{
- assert.deepEqual(terms('zpass_plus_yearly'),{amountCents:425,commitmentMonths:12});assert.equal(terms('zpass_plus_monthly').amountCents,499);assert.equal(terms('zpass_pro_yearly').amountCents,750);assert.equal(terms('arbitrary'),null);assert(validRequest(payload));assert(!validRequest({...payload,amount:1}));assert(!validRequest({...payload,zPassId:'../bad'}));assert.equal(commitmentEnd(Date.UTC(2024,1,29)/1000,12),Date.UTC(2025,1,28)/1000);
- const form=checkoutForm({orderId:'a'.repeat(64),uid:'fixture',productId:payload.productId,...terms(payload.productId)});assert.equal(form.mode,'subscription');assert.equal(form['line_items[0][price_data][unit_amount]'],'425');assert.equal(form['line_items[0][price_data][recurring][interval]'],'month');assert(form.success_url.startsWith('https://pay.zpas.org/'));
+ assert.deepEqual(terms('zpass_plus_yearly'),{amountCents:3588,commitmentMonths:12,interval:'year',monthlyCents:299,listMonthlyCents:399});assert.equal(terms('zpass_plus_monthly').amountCents,399);assert.equal(terms('zpass_pro_monthly').amountCents,699);assert.equal(terms('zpass_pro_yearly').amountCents,7188);assert.equal(terms('zpass_pro_yearly').interval,'year');assert.equal(terms('arbitrary'),null);assert(validRequest(payload));assert(!validRequest({...payload,amount:1}));assert(!validRequest({...payload,zPassId:'../bad'}));assert.equal(commitmentEnd(Date.UTC(2024,1,29)/1000,12),Date.UTC(2025,1,28)/1000);
+ const form=checkoutForm({orderId:'a'.repeat(64),uid:'fixture',productId:payload.productId,...terms(payload.productId)});assert.equal(form.mode,'subscription');assert.equal(form['line_items[0][price_data][unit_amount]'],'399');assert.equal(form['line_items[0][price_data][recurring][interval]'],'month');assert(form.success_url.startsWith('https://pay.zpas.org/'));
 });
 test('session creation is idempotent, rate limited, and cannot activate an account',async()=>{
- const f=fixture();await assert.rejects(f.service.create({...payload,amount:1}),/Choose a plan/);const result=await f.service.create(payload);assert.equal(result.checkoutUrl,'https://checkout.stripe.com/c/pay_fixture');assert(!f.rows.has('subscriptions/fixture'));assert.equal(f.calls[0].form['line_items[0][price_data][unit_amount]'],'425');assert(f.calls[0].key.startsWith('passgram-pay-'));await f.service.create(payload);assert.equal(f.calls.length,1);await assert.rejects(f.service.create({...payload,requestId:'b'.repeat(32)}),e=>e.status===429);
+ const f=fixture();await assert.rejects(f.service.create({...payload,amount:1}),/Choose a plan/);const result=await f.service.create(payload);assert.equal(result.checkoutUrl,'https://checkout.stripe.com/c/pay_fixture');assert(!f.rows.has('subscriptions/fixture'));assert.equal(f.calls[0].form['line_items[0][price_data][unit_amount]'],'399');assert(f.calls[0].key.startsWith('passgram-pay-'));await f.service.create(payload);assert.equal(f.calls.length,1);await assert.rejects(f.service.create({...payload,requestId:'b'.repeat(32)}),e=>e.status===429);
  const g=fixture();g.rows.set('subscriptions/fixture',{stripeSubscriptionId:'sub_existing',stripeStatus:'active'});await assert.rejects(g.service.create(payload),e=>e.status===409);assert.equal(g.calls.length,0);
 });
 test('paid invoices grant only a paid month, retries do not double grant, failures do not extend',async()=>{
  const f=fixture();await f.service.create(payload);const order=[...f.rows.values()].find(v=>v.orderId),{sub,first}=f.setup(order);
- const session={id:'cs_fixture',mode:'subscription',subscription:sub.id,payment_status:'paid',currency:'usd',amount_total:425,client_reference_id:'fixture',metadata:{pay_checkout:'passgram-org',pay_order_id:order.orderId}};
- await f.service.webhook({id:'evt_checkout',type:'checkout.session.completed',data:{object:session}});assert.equal(f.rows.get('subscriptions/fixture').expiresAt.getTime(),end1*1000);assert.equal(f.calls.find(c=>c.path==='subscriptions/sub_fixture'&&c.method==='POST').form.cancel_at,String(Date.UTC(2027,10,3)/1000));
+ const session={id:'cs_fixture',mode:'subscription',subscription:sub.id,payment_status:'paid',currency:'usd',amount_total:399,client_reference_id:'fixture',metadata:{pay_checkout:'passgram-org',pay_order_id:order.orderId}};
+ await f.service.webhook({id:'evt_checkout',type:'checkout.session.completed',data:{object:session}});assert.equal(f.rows.get('subscriptions/fixture').expiresAt.getTime(),end1*1000);assert(!f.calls.some(c=>c.path==='subscriptions/sub_fixture'&&c.form?.cancel_at),'monthly plans have no commitment end');assert.equal(f.rows.get('subscriptions/fixture').monthlyAmount,3.99);
  await f.service.webhook({id:'evt_duplicate',type:'invoice.paid',data:{object:first}});assert.equal(f.rows.get('subscriptions/fixture').expiresAt.getTime(),end1*1000);
  const second=f.invoice('in_second',end1,end2);await f.service.webhook({id:'evt_renewal',type:'invoice.paid',data:{object:second}});assert.equal(f.rows.get('subscriptions/fixture').expiresAt.getTime(),end2*1000);
  for(const change of [{amount_paid:1},{currency:'eur'}])await assert.rejects(f.service.webhook({id:'evt_bad',type:'invoice.paid',data:{object:{...second,id:'in_bad',...change}}}));
@@ -35,7 +35,7 @@ test('paid invoices grant only a paid month, retries do not double grant, failur
 });
 test('invoice can arrive before Checkout completion without granting twice',async()=>{
  const f=fixture();await f.service.create(payload);const order=[...f.rows.values()].find(v=>v.orderId),{sub,first}=f.setup(order);await f.service.webhook({id:'evt_first',type:'invoice.paid',data:{object:first}});
- await f.service.webhook({id:'evt_checkout',type:'checkout.session.completed',data:{object:{id:'cs_fixture',mode:'subscription',subscription:sub.id,payment_status:'paid',currency:'usd',amount_total:425,client_reference_id:'fixture',metadata:{pay_checkout:'passgram-org',pay_order_id:order.orderId}}}});assert.equal(f.rows.get('subscriptions/fixture').expiresAt.getTime(),end1*1000);assert.equal([...f.rows.keys()].filter(v=>v.startsWith('pay_stripe_invoices/')).length,1);
+ await f.service.webhook({id:'evt_checkout',type:'checkout.session.completed',data:{object:{id:'cs_fixture',mode:'subscription',subscription:sub.id,payment_status:'paid',currency:'usd',amount_total:399,client_reference_id:'fixture',metadata:{pay_checkout:'passgram-org',pay_order_id:order.orderId}}}});assert.equal(f.rows.get('subscriptions/fixture').expiresAt.getTime(),end1*1000);assert.equal([...f.rows.keys()].filter(v=>v.startsWith('pay_stripe_invoices/')).length,1);
 });
 async function sign(body,secret,time=Math.floor(now/1000)){const key=await crypto.subtle.importKey('raw',new TextEncoder().encode(secret),{name:'HMAC',hash:'SHA-256'},false,['sign']);const hash=await crypto.subtle.sign('HMAC',key,new TextEncoder().encode(time+'.'+body));return't='+time+',v1='+Array.from(new Uint8Array(hash),v=>v.toString(16).padStart(2,'0')).join('')}
 test('signature supports rotation and rejects forged or stale notifications',async()=>{
@@ -80,3 +80,67 @@ test('authenticated accounts can checkout without a legacy ZP identifier, with U
 test('accepts real-format Stripe IDs with a mode segment',async()=>{const {stripeId}=await import('../src/billing.js');assert.equal(stripeId('cs_live_b1Xy9KqZ','cs'),true);assert.equal(stripeId('cs_test_a1B2','cs'),true);assert.equal(stripeId('sub_1Abc','sub'),true);assert.equal(stripeId('cs_bad-id','cs'),false);assert.equal(stripeId('pi_live_1','cs'),false)});
 
 test('elements checkout returns a client secret, never a redirect URL, and stays idempotent',async()=>{const rows=new Map(),calls=[];const db={transaction:async fn=>fn({get:async p=>rows.get(p)||null,set:(p,d)=>rows.set(p,{...(rows.get(p)||{}),...d})}),patch:async(p,d)=>rows.set(p,{...rows.get(p),...d}),findRecipient:async()=>({uid:'fixture'})};const stripe=async(method,path,form,key)=>{calls.push({path,form,key});return{id:'cs_live_fixture1',client_secret:'cs_live_fixture1_secret_abc',url:null}};const service=new PaymentService({db,stripe});const payload={productId:'zpass_plus_monthly',requestId:'a'.repeat(32),zPassId:''};const r=await service.create(payload,'fixture',true);assert.equal(r.clientSecret,'cs_live_fixture1_secret_abc');assert.equal(r.checkoutUrl,undefined);assert.equal(calls[0].form.ui_mode,'elements');assert(calls[0].form.return_url.includes('{CHECKOUT_SESSION_ID}'));assert.equal(calls[0].form.redirect_on_completion,undefined);assert.equal(calls[0].form.success_url,undefined);assert(calls[0].form.return_url.startsWith('https://pay.zpas.org/'));assert(calls[0].key.startsWith('passgram-pay-elements-'));const again=await service.create(payload,'fixture',true);assert.equal(again.clientSecret,r.clientSecret);assert.equal(calls.length,1);const rows2=new Map();const forged=new PaymentService({db:{...db,transaction:async fn=>fn({get:async p=>rows2.get(p)||null,set:(p,d)=>rows2.set(p,d)}),patch:async()=>{}},stripe:async()=>({id:'cs_live_x',client_secret:'cs_live_other_secret',url:null})});await assert.rejects(forged.create(payload,'fixture',true),/Invalid provider session/)});
+
+test('android native subscription: same order + metadata, first invoice activates the plan through the normal webhook',async()=>{
+ const rows=new Map(),calls=[];
+ const db={get:async p=>rows.get(p)||null,transaction:async fn=>fn({get:async p=>rows.get(p)||null,set:(p,d)=>rows.set(p,{...(rows.get(p)||{}),...d})}),patch:async(p,d)=>rows.set(p,{...rows.get(p),...d}),findRecipient:async()=>({uid:'fixture'})};
+ const products=new Set();let sub=null;
+ const stripe=async(method,path,form,key)=>{calls.push({method,path,form,key});
+  if(method==='GET'&&path.startsWith('products/')){const id=path.slice(9);if(!products.has(id))throw Error('404');return{id}}
+  if(path==='products'){products.add(form.id);return{id:form.id}}
+  if(path==='customers')return{id:'cus_Native1'};
+  if(path==='subscriptions'){sub={id:'sub_Native1',customer:'cus_Native1',status:'incomplete',metadata:{pay_checkout:form['metadata[pay_checkout]'],pay_order_id:form['metadata[pay_order_id]'],pay_uid:form['metadata[pay_uid]']},items:{data:[{quantity:1,price:{id:'price_N1',unit_amount:Number(form['items[0][price_data][unit_amount]']),currency:'usd',recurring:{interval:form['items[0][price_data][recurring][interval]'],interval_count:1}}}]},latest_invoice:{id:'in_N1',confirmation_secret:{client_secret:'pi_N1_secret_abc'}},start_date:1790000000};return sub}
+  if(method==='GET'&&path==='subscriptions/sub_Native1')return{...sub,status:'active',latest_invoice:'in_N1'};
+  if(method==='POST'&&path==='subscriptions/sub_Native1')return{...sub,status:'active',cancel_at:form.cancel_at?Number(form.cancel_at):undefined};
+  throw Error('unexpected '+method+' '+path)};
+ const service=new PaymentService({db,stripe});
+ const payload={productId:'zpass_pro_yearly',requestId:'b'.repeat(32),zPassId:''};
+ const r=await service.create(payload,'fixture','native','a@b.c');
+ assert.equal(r.paymentIntentClientSecret,'pi_N1_secret_abc');
+ const subCall=calls.find(c=>c.path==='subscriptions');
+ assert.equal(subCall.form.payment_behavior,'default_incomplete');
+ assert.equal(subCall.form['items[0][price_data][unit_amount]'],'7188');assert.equal(subCall.form['items[0][price_data][recurring][interval]'],'year');
+ assert.equal(subCall.form['metadata[pay_uid]'],'fixture');
+ assert.equal(subCall.form['metadata[pay_checkout]'],'passgram-org');
+ // retry returns the same secret without a second subscription
+ const again=await service.create(payload,'fixture','native','a@b.c');
+ assert.equal(again.paymentIntentClientSecret,r.paymentIntentClientSecret);
+ assert.equal(calls.filter(c=>c.path==='subscriptions').length,1);
+ // first invoice paid -> plan active, 12-month term set, Stripe ids stored for cancel/resume/refund
+ const order=[...rows.values()].find(v=>v.orderId);
+ const end=1790000000+365*86400;
+ const invoice={id:'in_N1',customer:'cus_Native1',subscription:'sub_Native1',status:'paid',currency:'usd',amount_paid:7188,billing_reason:'subscription_create',created:1790000000,lines:{data:[{price:'price_N1',amount:7188,quantity:1,proration:false,period:{start:1790000000,end}}]}};
+ await service.webhook({id:'evt_native',type:'invoice.paid',data:{object:invoice}});
+ const account=rows.get('subscriptions/fixture');
+ assert.equal(account.status,'ACTIVE');
+ assert.equal(account.plan,'PRO');
+ assert.equal(account.stripeSubscriptionId,'sub_Native1');
+ assert.equal(account.stripeCustomerId,'cus_Native1');
+ assert.equal(account.commitmentMonths,12);
+ assert.equal(account.expiresAt.getTime(),end*1000);
+ assert(!calls.some(c=>c.path==='subscriptions/sub_Native1'&&c.form?.cancel_at),'yearly is one charge a year, not a 12-month term');
+ assert.equal(account.billingInterval,'year');assert.equal(account.chargeAmount,71.88);assert.equal(account.monthlyAmount,5.99);
+ assert.equal(order.channel,'android');
+});
+
+
+// Subscribers who joined under monthly-v1 (yearly = 12 monthly payments with a commitment end) keep renewing unchanged.
+test('legacy monthly-v1 yearly commitment orders still renew and keep their 12-month end',async()=>{
+ const f=fixture();await f.service.create(payload);const key=[...f.rows.keys()].find(k=>k.startsWith('pay_orders/'));
+ f.rows.set(key,{...f.rows.get(key),productId:'zpass_plus_yearly',amountCents:425,commitmentMonths:12,billingModel:'monthly-v1',interval:undefined,monthlyCents:undefined,listMonthlyCents:undefined});
+ const order=f.rows.get(key),{sub}=f.setup(order);
+ await f.service.webhook({id:'evt_legacy',type:'checkout.session.completed',data:{object:{id:'cs_fixture',mode:'subscription',subscription:sub.id,payment_status:'paid',currency:'usd',amount_total:425,client_reference_id:'fixture',metadata:{pay_checkout:'passgram-org',pay_order_id:order.orderId}}}});
+ assert.equal(f.rows.get('subscriptions/fixture').expiresAt.getTime(),end1*1000);
+ assert.equal(f.calls.find(c=>c.path==='subscriptions/sub_fixture'&&c.method==='POST').form.cancel_at,String(Date.UTC(2027,10,3)/1000));
+ assert.equal(f.rows.get('subscriptions/fixture').monthlyAmount,4.25);
+ await f.service.webhook({id:'evt_legacyrenew',type:'invoice.paid',data:{object:f.invoice('in_second',end1,end2)}});
+ assert.equal(f.rows.get('subscriptions/fixture').expiresAt.getTime(),end2*1000);
+});
+
+test('new prices: monthly $3.99 / $6.99, yearly charged once $35.88 / $71.88',()=>{
+ const form=checkoutForm({orderId:'b'.repeat(64),uid:'fixture',productId:'zpass_plus_yearly',...terms('zpass_plus_yearly')});
+ assert.equal(form['line_items[0][price_data][unit_amount]'],'3588');assert.equal(form['line_items[0][price_data][recurring][interval]'],'year');
+ assert.match(form['line_items[0][price_data][product_data][description]'],/once a year/);
+ const monthly=checkoutForm({orderId:'c'.repeat(64),uid:'fixture',productId:'zpass_pro_monthly',...terms('zpass_pro_monthly')});
+ assert.equal(monthly['line_items[0][price_data][unit_amount]'],'699');assert.equal(monthly['line_items[0][price_data][recurring][interval]'],'month');
+});

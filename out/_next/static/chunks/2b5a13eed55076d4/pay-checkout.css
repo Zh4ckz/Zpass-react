@@ -14,3 +14,5 @@
 .pay-email input{border:1px solid #d7deea;border-radius:12px;padding:12px 14px;font:inherit;font-size:15px;background:#fff;color:#0f172a}
 .pay-email input:focus{outline:none;border-color:#1769ff;box-shadow:0 0 0 2px rgba(23,105,255,.18)}
 .pay-or[hidden],.pay-express[hidden],.pay-pay-label[hidden]{display:none}
+
+.pay-list-price{font-size:.55em;font-weight:500;opacity:.55;text-decoration:line-through;margin-right:.15em;vertical-align:.25em}

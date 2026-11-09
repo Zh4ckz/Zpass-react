@@ -5,7 +5,7 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
 <title>PassGram Bot API Documentation</title>
-<meta name="description" content="Build bots for PassGram. Authentication, GET and POST requests, getMe, getUpdates, sendMessage, error codes, rate limits and best practices, with examples in cURL, JavaScript and Python.">
+<meta name="description" content="Build bots for PassGram. Works with the popular bot libraries for Python, JavaScript and PHP: messages, buttons, keyboards, media, webhooks and long polling.">
 <link rel="icon" type="image/png" href="/_next/static/chunks/f2b7dcccd2f2c296/zpass.png">
 <link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
@@ -19,385 +19,463 @@
 </header>
 <div class="layout">
 <aside class="side" id="side">
-  <h4>Start</h4><a href="#intro">Introduction</a><a href="#status">What is live</a><a href="#quickstart">Quick start</a>
-  <h4>Basics</h4><a href="#auth">Authentication</a><a href="#requests">GET and POST</a><a href="#responses">Responses</a><a href="#errors">Errors</a><a href="#limits">Rate limits</a>
-  <h4>Methods</h4><a href="#getMe">getMe</a><a href="#getUpdates">getUpdates</a><a href="#sendMessage">sendMessage</a><a href="#keyboards">Inline keyboards</a><a href="#callbacks">Button presses</a><a href="#editing">Edit messages</a><a href="#documents">Send documents</a><a href="#commands">Commands</a><a href="#menu-button">Menu button &amp; mini apps</a>
-  <h4>Coming soon</h4><a href="#users">Get user</a><a href="#webhooks">Webhooks</a>
-  <h4>Guides</h4><a href="#example-bot">Example: echo bot</a><a href="#security">Security</a>
-  <h4>Protocol</h4><a href="#mtproto">MTProto 2.0</a><a href="#tl-schema">TL schema</a><a href="#e2ee">End-to-end encryption</a>
+  <h4>Start</h4><a href="#intro">Introduction</a><a href="#status">What is live</a><a href="#quickstart">Quick start</a><a href="#libraries">Use your library</a>
+  <h4>Basics</h4><a href="#auth">Tokens &amp; addresses</a><a href="#ids">IDs</a><a href="#requests">Sending requests</a><a href="#responses">Responses</a><a href="#errors">Errors</a><a href="#limits">Limits</a>
+  <h4>Receiving</h4><a href="#getUpdates">getUpdates</a><a href="#webhooks">Webhooks</a><a href="#update">Update object</a>
+  <h4>Sending</h4><a href="#sendMessage">sendMessage</a><a href="#formatting">Formatting</a><a href="#keyboards">Inline buttons</a><a href="#callbacks">Button presses</a><a href="#reply-keyboards">Reply keyboards</a><a href="#media">Photos &amp; files</a><a href="#editing">Edit &amp; delete</a><a href="#actions">Typing status</a>
+  <h4>Bot profile</h4><a href="#getMe">getMe</a><a href="#getChat">getChat</a><a href="#commands">Commands</a><a href="#profile">Name &amp; description</a><a href="#menu-button">Menu button &amp; mini apps</a>
+  <h4>Guides</h4><a href="#example-bot">Example bot</a><a href="#not-supported">Not supported</a><a href="#security">Security</a><a href="#privacy">Privacy</a>
   <h4>More</h4><a href="#help">Help</a>
 </aside>
 <main>
 <div class="hero" id="intro">
-  <span class="pill">Bot API · v1 preview</span>
+  <span class="pill">Bot API · v1</span>
   <h1>Build bots for <em>PassGram.</em></h1>
-  <p>A bot is a small program that talks to PassGram users through a simple HTTPS API. You send a request, you receive JSON. This guide shows how to authenticate, read updates, send messages and what is coming next, with copy-ready examples.</p>
+  <p>A bot is a program that chats with PassGram users over a plain HTTPS API: you call a method, you get JSON back. The wire format follows the conventions most bot libraries already speak, so you can point an existing Python, JavaScript or PHP library at PassGram by changing one address.</p>
   <div class="cards">
-    <a class="card" href="#quickstart"><b>⚡ Quick start</b><span>Send your first message in under five minutes.</span></a>
-    <a class="card" href="#getUpdates"><b>📥 Read messages</b><span>Receive what users write to your bot.</span></a>
-    <a class="card" href="#keyboards"><b>⌨️ Inline keyboards</b><span>Buttons under messages, planned for a coming release.</span></a>
+    <a class="card" href="#libraries"><b>🧩 Use your library</b><span>python-telegram-bot, aiogram, Telegraf, grammY and more, tested.</span></a>
+    <a class="card" href="#webhooks"><b>⚡ Webhooks</b><span>Updates pushed to your server the moment they happen.</span></a>
+    <a class="card" href="#media"><b>🖼 Photos &amp; files</b><span>Send links from your own server, or small uploads.</span></a>
   </div>
 </div>
 
 <section id="status">
   <h2>What is live today</h2>
-  <p>This page is honest about the current state of the API so that you never build on something that is not there yet.</p>
-  <table><tr><th>Feature</th><th>Status</th><th>Notes</th></tr>
-  <tr><td><code>getMe</code></td><td><span class="tag live">LIVE</span></td><td>Check that your token works.</td></tr>
-  <tr><td><code>getUpdates</code></td><td><span class="tag live">LIVE</span></td><td>Poll for new messages, with <code>offset</code> and <code>limit</code>.</td></tr>
-  <tr><td><code>sendMessage</code></td><td><span class="tag live">LIVE</span></td><td>Text up to 4096 characters, optional inline keyboard. <code>chat_id</code> can be a user id or <code>@username</code>.</td></tr>
-  <tr><td><code>getMyCommands</code>, <code>setMyCommands</code>, <code>deleteMyCommands</code></td><td><span class="tag live">LIVE</span></td><td>The <code>/</code> command list users see in the chat.</td></tr>
-  <tr><td><code>getChatMenuButton</code>, <code>setChatMenuButton</code></td><td><span class="tag live">LIVE</span></td><td>Button next to the message box: command list or a mini app.</td></tr>
-  <tr><td>Inline keyboards (<code>reply_markup</code>)</td><td><span class="tag live">LIVE</span></td><td>Telegram format: <code>callback_data</code> and <code>url</code> buttons.</td></tr>
-  <tr><td><code>answerCallbackQuery</code>, <code>editMessageText</code>, <code>editMessageReplyMarkup</code></td><td><span class="tag live">LIVE</span></td><td>React to button presses and update the message.</td></tr>
-  <tr><td><code>sendDocument</code></td><td><span class="tag live">LIVE</span></td><td>Files up to 5 MB. Relayed only: deleted after the first download or 24 hours.</td></tr>
-  <tr><td><code>parse_mode</code> formatting</td><td><span class="tag soon">PLANNED</span></td><td>Currently returns <code>400</code>.</td></tr>
-  <tr><td>User lookup, webhooks</td><td><span class="tag soon">PLANNED</span></td><td>Described below so you can prepare. Calling them today returns <code>501</code>.</td></tr></table>
+  <p>Everything in this table works now. Anything else returns <code>404 Not Found</code>, so you never build on something that is not there.</p>
+  <table><tr><th>Area</th><th>Methods</th></tr>
+  <tr><td>Receive</td><td><code>getUpdates</code> (with long polling), <code>setWebhook</code>, <code>deleteWebhook</code>, <code>getWebhookInfo</code></td></tr>
+  <tr><td>Send</td><td><code>sendMessage</code>, <code>sendPhoto</code>, <code>sendVideo</code>, <code>sendAnimation</code>, <code>sendAudio</code>, <code>sendVoice</code>, <code>sendVideoNote</code>, <code>sendSticker</code>, <code>sendDocument</code>, <code>sendChatAction</code></td></tr>
+  <tr><td>Buttons</td><td>Inline buttons, reply keyboards, <code>remove_keyboard</code>, <code>force_reply</code>, <code>answerCallbackQuery</code></td></tr>
+  <tr><td>Change</td><td><code>editMessageText</code>, <code>editMessageCaption</code>, <code>editMessageReplyMarkup</code>, <code>deleteMessage</code>, <code>deleteMessages</code></td></tr>
+  <tr><td>Formatting</td><td><code>parse_mode</code>: <code>HTML</code>, <code>MarkdownV2</code>, <code>Markdown</code></td></tr>
+  <tr><td>Profile</td><td><code>getMe</code>, <code>getChat</code>, <code>get/set/deleteMyCommands</code>, <code>get/setMyName</code>, <code>get/setMyDescription</code>, <code>get/setMyShortDescription</code>, <code>get/setChatMenuButton</code>, <code>logOut</code>, <code>close</code></td></tr></table>
+  <p>Bots talk to people in private chats. Groups, channels, inline mode and payments are <a href="#not-supported">not available to bots yet</a>.</p>
 </section>
 
 <section id="quickstart">
   <h2>Quick start</h2>
   <ol>
-    <li><b>Create a bot</b> in the PassGram app. You receive a username and a private <b>token</b>.</li>
-    <li><b>Ask a user to open your bot</b> and press Start. A bot can only write to people who have started it.</li>
-    <li><b>Call the API</b> with your token, as shown below.</li>
+    <li><b>Create a bot</b> in the PassGram app: open <b>Zbot</b> and send <code>/newbot</code>. You get a username and a private <b>token</b>.</li>
+    <li><b>Open your bot</b> in PassGram and press <b>Start</b>. A bot can only write to people who started it.</li>
+    <li><b>Call the API</b> with your token.</li>
   </ol>
-  <div class="tabs"><div class="tabbar"><button class="on">cURL</button><button>JavaScript</button><button>Python</button><button class="copy">Copy</button></div>
-<pre class="on"><span class="c"># 1. Check the token</span>
-curl https://botapi.zpas.org/getMe \
-  -H <span class="s">"Authorization: Bearer $TOKEN"</span>
+  <div class="tabs"><div class="tabbar"><button class="on">cURL</button><button>JavaScript</button><button>Python</button><button>PHP</button><button class="copy">Copy</button></div>
+<pre class="on"><span class="c"># Who am I?</span>
+curl https://api.zpas.org/bot$TOKEN/getMe
 
-<span class="c"># 2. Send a message</span>
-curl -X POST https://botapi.zpas.org/sendMessage \
-  -H <span class="s">"Authorization: Bearer $TOKEN"</span> \
+<span class="c"># Read what people sent (waits up to 25 s for something new)</span>
+curl <span class="s">"https://api.zpas.org/bot$TOKEN/getUpdates?timeout=25"</span>
+
+<span class="c"># Answer, using chat.id from an update</span>
+curl -X POST https://api.zpas.org/bot$TOKEN/sendMessage \
   -H <span class="s">"Content-Type: application/json"</span> \
-  -d <span class="s">'{"chat_id":"USER_ID","text":"Hello from my bot!"}'</span></pre>
-<pre><span class="k">const</span> TOKEN = process.env.PASSGRAM_TOKEN;
-<span class="k">const</span> api = (method, body) =&gt; fetch(<span class="s">`https://botapi.zpas.org/${method}`</span>, {
-  method: <span class="s">'POST'</span>,
-  headers: { Authorization: <span class="s">`Bearer ${TOKEN}`</span>, <span class="s">'Content-Type'</span>: <span class="s">'application/json'</span> },
-  body: JSON.stringify(body || {})
-}).then(r =&gt; r.json());
+  -d <span class="s">'{"chat_id":45957845239,"text":"Hello from my bot!"}'</span></pre>
+<pre><span class="k">const</span> API = <span class="s">`https://api.zpas.org/bot${process.env.PASSGRAM_TOKEN}`</span>;
+<span class="k">const</span> call = (method, body = {}) =&gt; fetch(<span class="s">`${API}/${method}`</span>, {
+  method: <span class="s">'POST'</span>, headers: { <span class="s">'Content-Type'</span>: <span class="s">'application/json'</span> }, body: JSON.stringify(body),
+}).then((r) =&gt; r.json());
 
-<span class="k">const</span> me = <span class="k">await</span> api(<span class="s">'getMe'</span>);
-<span class="k">await</span> api(<span class="s">'sendMessage'</span>, { chat_id: <span class="s">'USER_ID'</span>, text: <span class="s">'Hello from my bot!'</span> });</pre>
+console.log(<span class="k">await</span> call(<span class="s">'getMe'</span>));
+<span class="k">await</span> call(<span class="s">'sendMessage'</span>, { chat_id: <span class="n">45957845239</span>, text: <span class="s">'Hello from my bot!'</span> });</pre>
 <pre><span class="k">import</span> os, requests
 
-TOKEN = os.environ[<span class="s">"PASSGRAM_TOKEN"</span>]
-BASE = <span class="s">"https://botapi.zpas.org"</span>
-HEAD = {<span class="s">"Authorization"</span>: f<span class="s">"Bearer {TOKEN}"</span>}
+API = f<span class="s">"https://api.zpas.org/bot{os.environ['PASSGRAM_TOKEN']}"</span>
+print(requests.get(f<span class="s">"{API}/getMe"</span>).json())
+requests.post(f<span class="s">"{API}/sendMessage"</span>, json={<span class="s">"chat_id"</span>: <span class="n">45957845239</span>, <span class="s">"text"</span>: <span class="s">"Hello from my bot!"</span>})</pre>
+<pre>&lt;?php
+$api = <span class="s">'https://api.zpas.org/bot'</span> . getenv(<span class="s">'PASSGRAM_TOKEN'</span>);
+<span class="k">function</span> call(<span class="k">string</span> $method, <span class="k">array</span> $params = []): <span class="k">array</span> {
+    <span class="k">global</span> $api;
+    $ch = curl_init(<span class="s">"$api/$method"</span>);
+    curl_setopt_array($ch, [CURLOPT_POST =&gt; <span class="k">true</span>, CURLOPT_RETURNTRANSFER =&gt; <span class="k">true</span>,
+        CURLOPT_HTTPHEADER =&gt; [<span class="s">'Content-Type: application/json'</span>], CURLOPT_POSTFIELDS =&gt; json_encode($params)]);
+    <span class="k">return</span> json_decode(curl_exec($ch), <span class="k">true</span>);
+}
+print_r(call(<span class="s">'getMe'</span>));
+call(<span class="s">'sendMessage'</span>, [<span class="s">'chat_id'</span> =&gt; <span class="n">45957845239</span>, <span class="s">'text'</span> =&gt; <span class="s">'Hello from my bot!'</span>]);</pre></div>
+</section>
 
-print(requests.get(f<span class="s">"{BASE}/getMe"</span>, headers=HEAD).json())
-requests.post(f<span class="s">"{BASE}/sendMessage"</span>, headers=HEAD,
-              json={<span class="s">"chat_id"</span>: <span class="s">"USER_ID"</span>, <span class="s">"text"</span>: <span class="s">"Hello from my bot!"</span>})</pre></div>
-  <div class="note info"><b>ℹ Note</b><span>Base address: <code>https://botapi.zpas.org</code>. It runs on Cloudflare, close to your users. The same API is also reachable at <code>https://zpass-zbot.rezanhassoun.workers.dev</code>.</span></div>
+<section id="libraries">
+  <h2>Use your library</h2>
+  <p>Most bot libraries let you change the server address. Set it to PassGram and keep the rest of your code. We run each library below against PassGram with the same test: a <code>/start</code> reply with a button, a button press answered and edited, a photo sent by link and a file upload.</p>
+  <table><tr><th>Library</th><th>Language</th><th>Tested</th><th>Setting</th></tr>
+  <tr><td>python-telegram-bot</td><td>Python</td><td><span class="tag live">WORKS</span></td><td><code>.base_url("https://api.zpas.org/bot")</code></td></tr>
+  <tr><td>aiogram 3</td><td>Python</td><td><span class="tag live">WORKS</span></td><td><code>TelegramAPIServer.from_base("https://api.zpas.org")</code></td></tr>
+  <tr><td>pyTelegramBotAPI</td><td>Python</td><td><span class="tag live">WORKS</span></td><td><code>apihelper.API_URL</code></td></tr>
+  <tr><td>Telegraf</td><td>JavaScript</td><td><span class="tag live">WORKS</span></td><td><code>telegram: { apiRoot }</code></td></tr>
+  <tr><td>grammY</td><td>JavaScript</td><td><span class="tag live">WORKS</span></td><td><code>client: { apiRoot }</code></td></tr>
+  <tr><td>node-telegram-bot-api 0.66</td><td>JavaScript</td><td><span class="tag live">WORKS</span></td><td><code>baseApiUrl</code></td></tr>
+  <tr><td>PHP</td><td>PHP</td><td>plain HTTP</td><td>Use the cURL helper from <a href="#quickstart">Quick start</a>, or any PHP library that accepts a custom base URL.</td></tr></table>
+  <div class="tabs"><div class="tabbar"><button class="on">python-telegram-bot</button><button>aiogram</button><button>pyTelegramBotAPI</button><button>Telegraf</button><button>grammY</button><button>node-telegram-bot-api</button><button class="copy">Copy</button></div>
+<pre class="on"><span class="k">from</span> telegram.ext <span class="k">import</span> Application, CommandHandler
+
+<span class="k">async def</span> start(update, context):
+    <span class="k">await</span> update.message.reply_text(f<span class="s">"Hello, {update.effective_user.first_name}!"</span>)
+
+app = (Application.builder().token(TOKEN)
+       .base_url(<span class="s">"https://api.zpas.org/bot"</span>).build())
+app.add_handler(CommandHandler(<span class="s">"start"</span>, start))
+app.run_polling()</pre>
+<pre><span class="k">from</span> aiogram <span class="k">import</span> Bot, Dispatcher
+<span class="k">from</span> aiogram.client.session.aiohttp <span class="k">import</span> AiohttpSession
+<span class="k">from</span> aiogram.client.telegram <span class="k">import</span> TelegramAPIServer
+
+session = AiohttpSession(api=TelegramAPIServer.from_base(<span class="s">"https://api.zpas.org"</span>))
+bot = Bot(TOKEN, session=session)
+dp = Dispatcher()
+<span class="c"># register your handlers on dp as usual, then:</span>
+<span class="c"># await dp.start_polling(bot)</span></pre>
+<pre><span class="k">import</span> telebot
+<span class="k">from</span> telebot <span class="k">import</span> apihelper
+
+apihelper.API_URL = <span class="s">"https://api.zpas.org/bot{0}/{1}"</span>
+bot = telebot.TeleBot(TOKEN)
+
+@bot.message_handler(commands=[<span class="s">"start"</span>])
+<span class="k">def</span> start(m):
+    bot.send_message(m.chat.id, <span class="s">"Hello!"</span>)
+
+bot.infinity_polling()</pre>
+<pre><span class="k">const</span> { Telegraf } = require(<span class="s">'telegraf'</span>);
+
+<span class="k">const</span> bot = <span class="k">new</span> Telegraf(TOKEN, { telegram: { apiRoot: <span class="s">'https://api.zpas.org'</span> } });
+bot.start((ctx) =&gt; ctx.reply(<span class="s">`Hello, ${ctx.from.first_name}!`</span>));
+bot.launch();</pre>
+<pre><span class="k">const</span> { Bot } = require(<span class="s">'grammy'</span>);
+
+<span class="k">const</span> bot = <span class="k">new</span> Bot(TOKEN, { client: { apiRoot: <span class="s">'https://api.zpas.org'</span> } });
+bot.command(<span class="s">'start'</span>, (ctx) =&gt; ctx.reply(<span class="s">'Hello!'</span>));
+bot.start();</pre>
+<pre><span class="k">const</span> TelegramBot = require(<span class="s">'node-telegram-bot-api'</span>);
+
+<span class="k">const</span> bot = <span class="k">new</span> TelegramBot(TOKEN, { polling: <span class="k">true</span>, baseApiUrl: <span class="s">'https://api.zpas.org'</span> });
+bot.onText(<span class="s">/^\/start/</span>, (m) =&gt; bot.sendMessage(m.chat.id, <span class="s">'Hello!'</span>));</pre></div>
+  <div class="note info"><b>ℹ Note</b><span>Libraries that work with file IDs from other platforms cannot reuse them here. Send the file again or pass an https link (see <a href="#media">Photos &amp; files</a>).</span></div>
 </section>
 
 <section id="auth">
-  <h2>Authentication</h2>
-  <p>Every request needs your bot token. It looks like <code>24 hex characters : 43 characters</code>. Whoever has the token controls the bot, so treat it like a password.</p>
-  <table><tr><th>Method</th><th>How</th><th>Recommended</th></tr>
-  <tr><td>Header</td><td><code>Authorization: Bearer &lt;TOKEN&gt;</code></td><td><span class="tag live">YES</span></td></tr>
-  <tr><td>URL path</td><td><code>/bot&lt;TOKEN&gt;/getMe</code></td><td>No. Tokens in URLs can end up in access logs.</td></tr></table>
-  <div class="note bad"><b>⚠ Never</b><span>put a token in a web page, a mobile app bundle or a public repository. If it leaks, rotate it immediately in the app.</span></div>
+  <h2>Tokens &amp; addresses</h2>
+  <p>A token looks like <code>8513445453:GQk3yXn2…</code>: your bot's number, a colon, then 43 secret characters. Whoever has it controls the bot, so treat it like a password. PassGram stores only a hash of it; if you lose it, make a new one with <code>/revoke</code> in Zbot.</p>
+  <table><tr><th>Address</th><th>Use</th></tr>
+  <tr><td><code>https://api.zpas.org/bot&lt;TOKEN&gt;/&lt;method&gt;</code></td><td>The standard form. This is what libraries use.</td></tr>
+  <tr><td><code>https://botapi.zpas.org/&lt;method&gt;</code> + header <code>Authorization: Bearer &lt;TOKEN&gt;</code></td><td>Same API with the token kept out of the URL. Handy for your own HTTP code.</td></tr></table>
+  <p>Method names are not case-sensitive. Tokens made before numeric IDs existed (24 hex characters before the colon) keep working; <code>/revoke</code> gives you a token in the new form.</p>
+</section>
+
+<section id="ids">
+  <h2>IDs</h2>
+  <table><tr><th>ID</th><th>Looks like</th><th>Notes</th></tr>
+  <tr><td>Bot ID</td><td>10 digits, for example <code>8513445453</code></td><td>The number before the colon in the token, also in <code>getMe</code>.</td></tr>
+  <tr><td>User / chat ID</td><td>11 digits, for example <code>45957845239</code></td><td>The person's <b>Z Pass Cloud ID</b>, the same number they see in the app. In a private chat, <code>chat.id</code> and <code>from.id</code> are equal.</td></tr>
+  <tr><td><code>message_id</code></td><td>1, 2, 3…</td><td>Counts up within each chat.</td></tr>
+  <tr><td><code>update_id</code></td><td>1, 2, 3…</td><td>Counts up per bot.</td></tr></table>
+  <p><code>chat_id</code> also accepts a person's <code>@username</code>, as long as they have started your bot.</p>
 </section>
 
 <section id="requests">
-  <h2>GET and POST</h2>
-  <p>Methods accept <b>GET</b> (parameters in the query string) or <b>POST</b> (JSON body). Use POST for anything that changes data, such as <code>sendMessage</code>, and GET for simple reads like <code>getMe</code>.</p>
-  <div class="method"><span class="tag get">GET</span><span class="url">https://botapi.zpas.org/getUpdates?offset=0&amp;limit=20</span></div>
-  <div class="method"><span class="tag post">POST</span><span class="url">https://botapi.zpas.org/sendMessage</span></div>
-  <p>Other HTTP methods return <code>405</code>. Send <code>Content-Type: application/json</code> with POST bodies.</p>
+  <h2>Sending requests</h2>
+  <p>Use <b>GET</b> with query parameters, or <b>POST</b> with a JSON body, a URL-encoded form, or <code>multipart/form-data</code> (needed for file uploads). In forms, send objects such as <code>reply_markup</code> as JSON text. JSON bodies can be up to 64 KB; uploads up to 20 MB.</p>
 </section>
 
 <section id="responses">
   <h2>Responses</h2>
-  <p>Every answer is JSON with an <code>ok</code> flag.</p>
-  <div class="tabs"><div class="tabbar"><button class="on">Success</button><button>Error</button><button class="copy">Copy</button></div>
-<pre class="on">{
-  <span class="s">"ok"</span>: <span class="k">true</span>,
-  <span class="s">"result"</span>: { <span class="c">/* method specific */</span> }
-}</pre>
-<pre>{
-  <span class="s">"ok"</span>: <span class="k">false</span>,
-  <span class="s">"error_code"</span>: <span class="n">401</span>,
-  <span class="s">"description"</span>: <span class="s">"Invalid token"</span>
-}</pre></div>
+  <p>Every answer is JSON with an <code>ok</code> flag. Successful calls carry <code>result</code>; failures carry <code>error_code</code> and a readable <code>description</code>.</p>
+  <div class="tabs"><div class="tabbar"><button class="on">Success</button><button>Error</button><button>Rate limited</button><button class="copy">Copy</button></div>
+<pre class="on">{ <span class="s">"ok"</span>: <span class="k">true</span>, <span class="s">"result"</span>: { <span class="c">/* depends on the method */</span> } }</pre>
+<pre>{ <span class="s">"ok"</span>: <span class="k">false</span>, <span class="s">"error_code"</span>: <span class="n">400</span>, <span class="s">"description"</span>: <span class="s">"Bad Request: chat not found"</span> }</pre>
+<pre>{ <span class="s">"ok"</span>: <span class="k">false</span>, <span class="s">"error_code"</span>: <span class="n">429</span>, <span class="s">"description"</span>: <span class="s">"Too Many Requests: retry after 60"</span>,
+  <span class="s">"parameters"</span>: { <span class="s">"retry_after"</span>: <span class="n">60</span> } }</pre></div>
 </section>
 
 <section id="errors">
   <h2>Errors</h2>
   <table><tr><th>Code</th><th>Meaning</th><th>What to do</th></tr>
-  <tr><td><code>400</code></td><td>Bad request: invalid chat, empty text, text over 4096 characters, bad <code>offset</code>/<code>limit</code>, or an unsupported field such as <code>reply_markup</code>.</td><td>Fix the parameters.</td></tr>
-  <tr><td><code>401</code></td><td>Invalid token.</td><td>Check or rotate the token.</td></tr>
-  <tr><td><code>403</code></td><td>The user has not started your bot, or the bot was disabled by Z Pass.</td><td>Ask the user to press Start. If the bot is disabled, contact support.</td></tr>
-  <tr><td><code>405</code></td><td>Only GET and POST are allowed.</td><td>Change the HTTP method.</td></tr>
-  <tr><td><code>429</code></td><td>Too many requests.</td><td>Wait one minute and retry.</td></tr>
-  <tr><td><code>501</code></td><td>Method not implemented yet.</td><td>See the planned features below.</td></tr>
-  <tr><td><code>500</code></td><td>Server error.</td><td>Retry with a short delay.</td></tr></table>
+  <tr><td><code>400</code></td><td>Something in the request is wrong: unknown chat, empty or too long text, bad button, unsupported value.</td><td>Read <code>description</code> and fix the parameters.</td></tr>
+  <tr><td><code>401</code></td><td>The token is wrong or was replaced.</td><td>Check the token, or make a new one.</td></tr>
+  <tr><td><code>403</code></td><td>The person has not started your bot, or PassGram disabled the bot.</td><td>Ask them to press Start. For a disabled bot, contact support.</td></tr>
+  <tr><td><code>404</code></td><td>The method does not exist here.</td><td>Check <a href="#status">what is live</a>.</td></tr>
+  <tr><td><code>409</code></td><td><code>getUpdates</code> was called while a webhook is set.</td><td>Use one or the other; <code>deleteWebhook</code> switches back to polling.</td></tr>
+  <tr><td><code>413</code></td><td>Upload over 20 MB.</td><td>Send an https link instead.</td></tr>
+  <tr><td><code>429</code></td><td>Too many requests.</td><td>Wait <code>retry_after</code> seconds.</td></tr>
+  <tr><td><code>5xx</code></td><td>Temporary server problem.</td><td>Retry after a short delay.</td></tr></table>
 </section>
 
 <section id="limits">
-  <h2>Rate limits</h2>
-  <p>Each bot can make up to <b>120 requests per minute</b>. Above that you receive <code>429</code> until the minute ends. Fetch updates in batches of up to 100, send only what is useful, and back off when you see a <code>429</code>.</p>
-</section>
-
-<section id="getMe">
-  <h2>getMe</h2>
-  <div class="method"><span class="tag get">GET</span><span class="tag post">POST</span><span class="url">/getMe</span><span class="tag live">LIVE</span></div>
-  <p>Returns basic information about your bot. Use it to confirm the token is valid.</p>
-  <div class="tabs"><div class="tabbar"><button class="on">Request</button><button>Response</button><button class="copy">Copy</button></div>
-<pre class="on">curl https://botapi.zpas.org/getMe -H <span class="s">"Authorization: Bearer $TOKEN"</span></pre>
-<pre>{ <span class="s">"ok"</span>: <span class="k">true</span>,
-  <span class="s">"result"</span>: { <span class="s">"id"</span>: <span class="s">"a1b2c3..."</span>, <span class="s">"is_bot"</span>: <span class="k">true</span>,
-              <span class="s">"first_name"</span>: <span class="s">"My Bot"</span>, <span class="s">"username"</span>: <span class="s">"my_bot"</span> } }</pre></div>
+  <h2>Limits</h2>
+  <table><tr><th>What</th><th>Limit</th></tr>
+  <tr><td>Requests per bot</td><td>120 per minute</td></tr>
+  <tr><td>Text</td><td>4096 characters; captions 1024</td></tr>
+  <tr><td>Upload through PassGram</td><td>20 MB per file. The file waits for the recipient up to 24 hours and is deleted after they download it once.</td></tr>
+  <tr><td>Files sent as links</td><td>No PassGram limit. They are served by your own server.</td></tr>
+  <tr><td>Undelivered updates</td><td>Kept 24 hours</td></tr>
+  <tr><td>Bots per account</td><td>20</td></tr></table>
 </section>
 
 <section id="getUpdates">
   <h2>getUpdates</h2>
   <div class="method"><span class="tag get">GET</span><span class="tag post">POST</span><span class="url">/getUpdates</span><span class="tag live">LIVE</span></div>
-  <p>Returns new messages and events that users sent to your bot, oldest first. Updates are kept for a limited time, so fetch them regularly.</p>
+  <p>Returns what happened since you last asked, oldest first. Pass <code>offset</code> = last <code>update_id</code> + 1 to confirm what you handled; confirmed updates are removed.</p>
   <table><tr><th>Parameter</th><th>Type</th><th>Description</th></tr>
-  <tr><td><code>offset</code></td><td>integer</td><td>Return updates with <code>update_id</code> greater than or equal to this value. Use the last <code>update_id + 1</code> to move past what you processed. Default 0.</td></tr>
-  <tr><td><code>limit</code></td><td>integer</td><td>1 to 100. Default 100.</td></tr></table>
-  <div class="tabs"><div class="tabbar"><button class="on">cURL</button><button>JavaScript</button><button>Python</button><button class="copy">Copy</button></div>
-<pre class="on">curl <span class="s">"https://botapi.zpas.org/getUpdates?offset=0&amp;limit=20"</span> \
-  -H <span class="s">"Authorization: Bearer $TOKEN"</span></pre>
-<pre><span class="k">const</span> r = <span class="k">await</span> fetch(<span class="s">'https://botapi.zpas.org/getUpdates?offset=0&amp;limit=20'</span>,
-  { headers: { Authorization: <span class="s">`Bearer ${TOKEN}`</span> } }).then(r =&gt; r.json());
-<span class="k">for</span> (<span class="k">const</span> u <span class="k">of</span> r.result) console.log(u.update_id, u.message?.text);</pre>
-<pre>r = requests.get(f<span class="s">"{BASE}/getUpdates"</span>, params={<span class="s">"offset"</span>: <span class="n">0</span>, <span class="s">"limit"</span>: <span class="n">20</span>}, headers=HEAD).json()
-<span class="k">for</span> u <span class="k">in</span> r[<span class="s">"result"</span>]:
-    print(u[<span class="s">"update_id"</span>], u.get(<span class="s">"message"</span>, {}).get(<span class="s">"text"</span>))</pre></div>
-  <h3>Update object</h3>
-  <table><tr><th>Field</th><th>Description</th></tr>
-  <tr><td><code>update_id</code></td><td>Increasing number. Use <code>update_id + 1</code> as your next <code>offset</code>.</td></tr>
-  <tr><td><code>message</code></td><td>The message, with <code>text</code>, <code>chat.id</code> and <code>message_id</code>. Fields can grow over time, so ignore ones you do not know.</td></tr></table>
+  <tr><td><code>offset</code></td><td>integer</td><td>First update to return. A negative value returns only the last few updates.</td></tr>
+  <tr><td><code>limit</code></td><td>integer</td><td>1–100, default 100.</td></tr>
+  <tr><td><code>timeout</code></td><td>integer</td><td>Seconds to wait when nothing is waiting (long polling). PassGram holds the request up to 25 seconds.</td></tr>
+  <tr><td><code>allowed_updates</code></td><td>array</td><td>Kinds you want, for example <code>["message","callback_query"]</code>. Remembered for later calls.</td></tr></table>
+  <div class="note info"><b>ℹ Tip</b><span>Long polling is fine for development. For a bot in production, <a href="#webhooks">webhooks</a> are faster and do no work while your bot is idle.</span></div>
+</section>
+
+<section id="webhooks">
+  <h2>Webhooks <span class="tag live">LIVE</span></h2>
+  <p>With a webhook, PassGram sends each update to your HTTPS address as a JSON <code>POST</code>, right when it happens. Answer with any <code>2xx</code> status to confirm it. If your server is down or answers with an error, the update waits and is sent again, in order, together with the next one (for up to 24 hours).</p>
+  <table><tr><th>Method</th><th>Parameters</th></tr>
+  <tr><td><code>setWebhook</code></td><td><code>url</code> (https), optional <code>secret_token</code> (1–256 of <code>A–Z a–z 0–9 _ -</code>), <code>allowed_updates</code>, <code>drop_pending_updates</code>. An empty <code>url</code> removes the webhook.</td></tr>
+  <tr><td><code>deleteWebhook</code></td><td>optional <code>drop_pending_updates</code></td></tr>
+  <tr><td><code>getWebhookInfo</code></td><td>Returns <code>url</code>, <code>pending_update_count</code> and the last delivery error, if any.</td></tr></table>
+  <p>When you set a <code>secret_token</code>, every delivery carries it in the <code>X-ZPass-Bot-Api-Secret-Token</code> header, and also in <code>X-Telegram-Bot-Api-Secret-Token</code>, the header name many libraries check. Reject requests where it does not match.</p>
+  <p>Your answer can also be one method call: reply with JSON such as <code>{"method":"sendMessage","chat_id":…,"text":"…"}</code> and PassGram runs it, which saves a request.</p>
+  <div class="tabs"><div class="tabbar"><button class="on">cURL</button><button>Node.js receiver</button><button class="copy">Copy</button></div>
+<pre class="on">curl -X POST https://api.zpas.org/bot$TOKEN/setWebhook \
+  -H <span class="s">"Content-Type: application/json"</span> \
+  -d <span class="s">'{"url":"https://bot.example.com/passgram","secret_token":"long-random-string"}'</span></pre>
+<pre><span class="k">const</span> http = require(<span class="s">'node:http'</span>);
+http.createServer(<span class="k">async</span> (req, res) =&gt; {
+  <span class="k">if</span> (req.headers[<span class="s">'x-zpass-bot-api-secret-token'</span>] !== process.env.HOOK_SECRET) { res.writeHead(<span class="n">401</span>).end(); <span class="k">return</span>; }
+  <span class="k">let</span> body = <span class="s">''</span>; <span class="k">for await</span> (<span class="k">const</span> c <span class="k">of</span> req) body += c;
+  <span class="k">const</span> update = JSON.parse(body);
+  <span class="k">const</span> m = update.message;
+  res.writeHead(<span class="n">200</span>, { <span class="s">'Content-Type'</span>: <span class="s">'application/json'</span> });
+  res.end(m ? JSON.stringify({ method: <span class="s">'sendMessage'</span>, chat_id: m.chat.id, text: <span class="s">`You said: ${m.text}`</span> }) : <span class="s">'{}'</span>);
+}).listen(<span class="n">8080</span>);</pre></div>
+</section>
+
+<section id="update">
+  <h2>Update object</h2>
+  <p>Each update has an <code>update_id</code> and one of these fields. New fields may appear over time; ignore what you do not know.</p>
+  <table><tr><th>Field</th><th>When</th></tr>
+  <tr><td><code>message</code></td><td>Someone wrote to your bot. Has <code>message_id</code>, <code>from</code>, <code>chat</code>, <code>date</code> (Unix seconds), <code>text</code>, and <code>entities</code> marking a leading <code>/command</code>.</td></tr>
+  <tr><td><code>callback_query</code></td><td>Someone pressed one of your inline buttons. See <a href="#callbacks">Button presses</a>.</td></tr></table>
+  <div class="tabs"><div class="tabbar"><button class="on">message</button><button class="copy">Copy</button></div>
+<pre class="on">{
+  <span class="s">"update_id"</span>: <span class="n">7</span>,
+  <span class="s">"message"</span>: {
+    <span class="s">"message_id"</span>: <span class="n">12</span>,
+    <span class="s">"from"</span>: { <span class="s">"id"</span>: <span class="n">45957845239</span>, <span class="s">"is_bot"</span>: <span class="k">false</span>, <span class="s">"first_name"</span>: <span class="s">"Rezan"</span>, <span class="s">"username"</span>: <span class="s">"rezan"</span>, <span class="s">"language_code"</span>: <span class="s">"tr"</span> },
+    <span class="s">"chat"</span>: { <span class="s">"id"</span>: <span class="n">45957845239</span>, <span class="s">"type"</span>: <span class="s">"private"</span>, <span class="s">"first_name"</span>: <span class="s">"Rezan"</span>, <span class="s">"username"</span>: <span class="s">"rezan"</span> },
+    <span class="s">"date"</span>: <span class="n">1794200943</span>,
+    <span class="s">"text"</span>: <span class="s">"/start welcome"</span>,
+    <span class="s">"entities"</span>: [ { <span class="s">"type"</span>: <span class="s">"bot_command"</span>, <span class="s">"offset"</span>: <span class="n">0</span>, <span class="s">"length"</span>: <span class="n">6</span> } ]
+  }
+}</pre></div>
 </section>
 
 <section id="sendMessage">
   <h2>sendMessage</h2>
   <div class="method"><span class="tag post">POST</span><span class="url">/sendMessage</span><span class="tag live">LIVE</span></div>
-  <p>Sends a text message to a user who has started your bot.</p>
-  <table><tr><th>Parameter</th><th>Type</th><th>Required</th><th>Description</th></tr>
-  <tr><td><code>chat_id</code></td><td>string</td><td>Yes</td><td>The user’s chat id from an update (<code>message.chat.id</code>), or their <code>@username</code>.</td></tr>
-  <tr><td><code>text</code></td><td>string</td><td>Yes</td><td>1 to 4096 characters.</td></tr>
-  <tr><td><code>parse_mode</code></td><td>string</td><td>No</td><td>Not available yet. Sending it returns <code>400</code>.</td></tr>
-  <tr><td><code>reply_markup</code></td><td>object</td><td>No</td><td>An <a href="#keyboards">inline keyboard</a>: buttons under the message.</td></tr></table>
-  <div class="tabs"><div class="tabbar"><button class="on">cURL</button><button>JavaScript</button><button>Python</button><button class="copy">Copy</button></div>
-<pre class="on">curl -X POST https://botapi.zpas.org/sendMessage \
-  -H <span class="s">"Authorization: Bearer $TOKEN"</span> -H <span class="s">"Content-Type: application/json"</span> \
-  -d <span class="s">'{"chat_id":"USER_ID","text":"Your order is ready."}'</span></pre>
-<pre><span class="k">await</span> api(<span class="s">'sendMessage'</span>, { chat_id: <span class="s">'USER_ID'</span>, text: <span class="s">'Your order is ready.'</span> });</pre>
-<pre>requests.post(f<span class="s">"{BASE}/sendMessage"</span>, headers=HEAD,
-              json={<span class="s">"chat_id"</span>: <span class="s">"USER_ID"</span>, <span class="s">"text"</span>: <span class="s">"Your order is ready."</span>})</pre></div>
-  <div class="note warn"><b>⚠ 403?</b><span>The user must open your bot and press Start first. Bots cannot message people who never contacted them.</span></div>
+  <table><tr><th>Parameter</th><th>Required</th><th>Description</th></tr>
+  <tr><td><code>chat_id</code></td><td>Yes</td><td>Chat ID from an update, or <code>@username</code>.</td></tr>
+  <tr><td><code>text</code></td><td>Yes</td><td>1–4096 characters.</td></tr>
+  <tr><td><code>parse_mode</code></td><td>No</td><td><code>HTML</code>, <code>MarkdownV2</code> or <code>Markdown</code>. See <a href="#formatting">Formatting</a>.</td></tr>
+  <tr><td><code>reply_markup</code></td><td>No</td><td><a href="#keyboards">Inline buttons</a>, a <a href="#reply-keyboards">reply keyboard</a>, <code>{"remove_keyboard":true}</code> or <code>{"force_reply":true}</code>.</td></tr>
+  <tr><td><code>reply_parameters</code></td><td>No</td><td><code>{"message_id": n}</code> to answer a specific message.</td></tr></table>
+  <p>Returns the sent message, with its <code>message_id</code>.</p>
+</section>
+
+<section id="formatting">
+  <h2>Formatting</h2>
+  <p>Set <code>parse_mode</code> and write styled text. The app shows bold, italic, underline, strikethrough, spoilers, inline code, code blocks, quotes and links.</p>
+  <table><tr><th>Style</th><th><code>HTML</code></th><th><code>MarkdownV2</code></th></tr>
+  <tr><td>Bold</td><td><code>&lt;b&gt;text&lt;/b&gt;</code></td><td><code>*text*</code></td></tr>
+  <tr><td>Italic</td><td><code>&lt;i&gt;text&lt;/i&gt;</code></td><td><code>_text_</code></td></tr>
+  <tr><td>Underline</td><td><code>&lt;u&gt;text&lt;/u&gt;</code></td><td><code>__text__</code></td></tr>
+  <tr><td>Strikethrough</td><td><code>&lt;s&gt;text&lt;/s&gt;</code></td><td><code>~text~</code></td></tr>
+  <tr><td>Spoiler</td><td><code>&lt;tg-spoiler&gt;text&lt;/tg-spoiler&gt;</code></td><td><code>||text||</code></td></tr>
+  <tr><td>Code</td><td><code>&lt;code&gt;x&lt;/code&gt;</code>, <code>&lt;pre&gt;block&lt;/pre&gt;</code></td><td><code>`x`</code>, <code>```block```</code></td></tr>
+  <tr><td>Link</td><td><code>&lt;a href="https://…"&gt;text&lt;/a&gt;</code></td><td><code>[text](https://…)</code></td></tr></table>
+  <p>In HTML, write <code>&amp;lt;</code>, <code>&amp;gt;</code> and <code>&amp;amp;</code> for literal characters. In MarkdownV2, put <code>\</code> before a symbol you want to show literally.</p>
+</section>
+
+<section id="keyboards">
+  <h2>Inline buttons</h2>
+  <p>Buttons that sit under a message. <code>reply_markup.inline_keyboard</code> is a list of <b>rows</b>; each row is a list of <b>buttons</b>. One button per row makes a list; two make a grid. Buttons in a row share the width.</p>
+  <div class="kb"><div class="msg">Hi! What would you like to do?</div><div class="row"><span>🛒 Shop</span><span>📦 My orders</span></div><div class="row"><span>❓ Help</span></div></div>
+  <table><tr><th>Button field</th><th>Description</th></tr>
+  <tr><td><code>text</code></td><td>Label, 1–64 characters. Emoji are fine.</td></tr>
+  <tr><td><code>callback_data</code></td><td>1–64 bytes sent back to your bot when pressed.</td></tr>
+  <tr><td><code>url</code></td><td>An <code>https://</code> link to open instead. Use exactly one of <code>callback_data</code> and <code>url</code>.</td></tr></table>
+  <p>Up to 10 rows, 4 buttons per row, 30 buttons per message.</p>
+  <div class="tabs"><div class="tabbar"><button class="on">JSON</button><button class="copy">Copy</button></div>
+<pre class="on">{
+  <span class="s">"chat_id"</span>: <span class="n">45957845239</span>,
+  <span class="s">"text"</span>: <span class="s">"What would you like to do?"</span>,
+  <span class="s">"reply_markup"</span>: { <span class="s">"inline_keyboard"</span>: [
+    [ { <span class="s">"text"</span>: <span class="s">"🛒 Shop"</span>, <span class="s">"callback_data"</span>: <span class="s">"shop"</span> }, { <span class="s">"text"</span>: <span class="s">"📦 My orders"</span>, <span class="s">"callback_data"</span>: <span class="s">"orders"</span> } ],
+    [ { <span class="s">"text"</span>: <span class="s">"❓ Help"</span>, <span class="s">"url"</span>: <span class="s">"https://example.com/help"</span> } ]
+  ] }
+}</pre></div>
+</section>
+
+<section id="callbacks">
+  <h2>Button presses</h2>
+  <p>A press on a <code>callback_data</code> button arrives as a <code>callback_query</code> update with <code>id</code>, <code>from</code>, <code>message</code> (the message the button belongs to), <code>chat_instance</code> and <code>data</code>. The button spins until you call <code>answerCallbackQuery</code>; do it within 10 seconds. Its optional <code>text</code> (up to 200 characters) shows as a short notice in the app.</p>
+  <div class="tabs"><div class="tabbar"><button class="on">Python (plain HTTP)</button><button class="copy">Copy</button></div>
+<pre class="on">cq = update.get(<span class="s">"callback_query"</span>)
+<span class="k">if</span> cq:
+    call(<span class="s">"answerCallbackQuery"</span>, callback_query_id=cq[<span class="s">"id"</span>], text=<span class="s">"Done ✅"</span>)
+    call(<span class="s">"editMessageText"</span>, chat_id=cq[<span class="s">"message"</span>][<span class="s">"chat"</span>][<span class="s">"id"</span>],
+         message_id=cq[<span class="s">"message"</span>][<span class="s">"message_id"</span>], text=<span class="s">"You picked "</span> + cq[<span class="s">"data"</span>])</pre></div>
+</section>
+
+<section id="reply-keyboards">
+  <h2>Reply keyboards</h2>
+  <p>A reply keyboard shows big answer buttons above the message box. A tap sends the button's text as a normal message from the person, so you handle it like any other text.</p>
+  <table><tr><th>Field</th><th>Description</th></tr>
+  <tr><td><code>keyboard</code></td><td>Rows of buttons. A button is a string or <code>{"text":"…"}</code>. Up to 12 rows, 8 per row, 100 in total.</td></tr>
+  <tr><td><code>one_time_keyboard</code></td><td>Hide the keyboard after the person answers.</td></tr>
+  <tr><td><code>resize_keyboard</code>, <code>is_persistent</code>, <code>input_field_placeholder</code></td><td>Accepted.</td></tr></table>
+  <p>Send <code>{"remove_keyboard": true}</code> to take it away.</p>
+  <div class="tabs"><div class="tabbar"><button class="on">JSON</button><button class="copy">Copy</button></div>
+<pre class="on">{ <span class="s">"chat_id"</span>: <span class="n">45957845239</span>, <span class="s">"text"</span>: <span class="s">"How was your order?"</span>,
+  <span class="s">"reply_markup"</span>: { <span class="s">"keyboard"</span>: [[<span class="s">"👍 Great"</span>, <span class="s">"👎 Not good"</span>]], <span class="s">"one_time_keyboard"</span>: <span class="k">true</span> } }</pre></div>
+</section>
+
+<section id="media">
+  <h2>Photos &amp; files</h2>
+  <div class="method"><span class="tag post">POST</span><span class="url">/sendPhoto · /sendVideo · /sendAnimation · /sendAudio · /sendVoice · /sendVideoNote · /sendSticker · /sendDocument</span><span class="tag live">LIVE</span></div>
+  <p>Pass the file in the field named after the method (<code>photo</code>, <code>video</code>, <code>document</code>…) with <code>chat_id</code>, and optionally <code>caption</code>, <code>parse_mode</code> and <code>reply_markup</code>. Two ways:</p>
+  <table><tr><th>Way</th><th>How</th><th>Best for</th></tr>
+  <tr><td><b>Link</b></td><td>An <code>https://</code> address of the file on your own server.</td><td>Any size. PassGram does not store the file; the app loads it from your server.</td></tr>
+  <tr><td><b>Upload</b></td><td>The file itself as <code>multipart/form-data</code> (also via <code>attach://name</code>).</td><td>Up to 20 MB. PassGram passes it on and deletes it after the person downloads it once, or after 24 hours.</td></tr></table>
+  <div class="tabs"><div class="tabbar"><button class="on">Link</button><button>Upload</button><button class="copy">Copy</button></div>
+<pre class="on">curl -X POST https://api.zpas.org/bot$TOKEN/sendPhoto \
+  -H <span class="s">"Content-Type: application/json"</span> \
+  -d <span class="s">'{"chat_id":45957845239,"photo":"https://cdn.example.com/cat.jpg","caption":"Today'"'"'s cat"}'</span></pre>
+<pre>curl -X POST https://api.zpas.org/bot$TOKEN/sendDocument \
+  -F chat_id=45957845239 -F document=@report.pdf -F caption=<span class="s">"Monthly report"</span></pre></div>
+  <div class="note warn"><b>⚠ File IDs</b><span>Because uploads are deleted after delivery, a <code>file_id</code> cannot be sent again. Upload the file again, or use a link.</span></div>
+</section>
+
+<section id="editing">
+  <h2>Edit &amp; delete</h2>
+  <table><tr><th>Method</th><th>Parameters</th><th>Result</th></tr>
+  <tr><td><code>editMessageText</code></td><td><code>chat_id</code>, <code>message_id</code>, <code>text</code>, optional <code>parse_mode</code>, <code>reply_markup</code></td><td>The edited message</td></tr>
+  <tr><td><code>editMessageCaption</code></td><td><code>chat_id</code>, <code>message_id</code>, <code>caption</code></td><td>The edited message</td></tr>
+  <tr><td><code>editMessageReplyMarkup</code></td><td><code>chat_id</code>, <code>message_id</code>, optional <code>reply_markup</code> (leave out to remove the buttons)</td><td>The edited message</td></tr>
+  <tr><td><code>deleteMessage</code></td><td><code>chat_id</code>, <code>message_id</code></td><td><code>true</code></td></tr>
+  <tr><td><code>deleteMessages</code></td><td><code>chat_id</code>, <code>message_ids</code> (1–100)</td><td><code>true</code></td></tr></table>
+  <p>A bot can edit only its own messages.</p>
+</section>
+
+<section id="actions">
+  <h2>Typing status</h2>
+  <div class="method"><span class="tag post">POST</span><span class="url">/sendChatAction</span><span class="tag live">LIVE</span></div>
+  <p>Shows “typing…” (or “sending a photo…”) under your bot's name for about 5 seconds, or until your next message. <code>action</code> is one of <code>typing</code>, <code>upload_photo</code>, <code>record_video</code>, <code>upload_video</code>, <code>record_voice</code>, <code>upload_voice</code>, <code>upload_document</code>, <code>choose_sticker</code>, <code>find_location</code>, <code>record_video_note</code>, <code>upload_video_note</code>.</p>
+</section>
+
+<section id="getMe">
+  <h2>getMe</h2>
+  <div class="method"><span class="tag get">GET</span><span class="tag post">POST</span><span class="url">/getMe</span><span class="tag live">LIVE</span></div>
+  <div class="tabs"><div class="tabbar"><button class="on">Response</button><button class="copy">Copy</button></div>
+<pre class="on">{ <span class="s">"ok"</span>: <span class="k">true</span>, <span class="s">"result"</span>: { <span class="s">"id"</span>: <span class="n">8513445453</span>, <span class="s">"is_bot"</span>: <span class="k">true</span>, <span class="s">"first_name"</span>: <span class="s">"My Shop"</span>, <span class="s">"username"</span>: <span class="s">"myshop_bot"</span>,
+  <span class="s">"can_join_groups"</span>: <span class="k">false</span>, <span class="s">"can_read_all_group_messages"</span>: <span class="k">false</span>, <span class="s">"supports_inline_queries"</span>: <span class="k">false</span> } }</pre></div>
+</section>
+
+<section id="getChat">
+  <h2>getChat</h2>
+  <div class="method"><span class="tag get">GET</span><span class="tag post">POST</span><span class="url">/getChat</span><span class="tag live">LIVE</span></div>
+  <p>For someone who started your bot: their chat <code>id</code>, <code>type</code> (<code>private</code>), <code>first_name</code> and, if they have one, <code>username</code>. That is all a bot can learn about a person.</p>
 </section>
 
 <section id="commands">
   <h2>Commands</h2>
-  <div class="method"><span class="tag post">POST</span><span class="url">/setMyCommands</span><span class="tag live">LIVE</span></div>
-  <div class="method"><span class="tag get">GET</span><span class="tag post">POST</span><span class="url">/getMyCommands</span><span class="tag live">LIVE</span></div>
-  <div class="method"><span class="tag post">POST</span><span class="url">/deleteMyCommands</span><span class="tag live">LIVE</span></div>
-  <p>Commands appear when a user types <code>/</code> in the chat with your bot. You can also manage them without code in the app: open <b>Zbot</b> and choose your bot.</p>
+  <div class="method"><span class="tag post">POST</span><span class="url">/setMyCommands · /getMyCommands · /deleteMyCommands</span><span class="tag live">LIVE</span></div>
+  <p>The list people see when they tap <b>Menu</b> or type <code>/</code>. You can also edit it in the app through Zbot.</p>
   <table><tr><th>Field</th><th>Rules</th></tr>
-  <tr><td><code>command</code></td><td>1 to 32 characters: lowercase letters, digits and <code>_</code>, starting with a letter. A leading <code>/</code> is removed.</td></tr>
-  <tr><td><code>description</code></td><td>1 to 100 characters.</td></tr>
-  <tr><td>List</td><td>Up to 100 commands, no duplicates. <code>setMyCommands</code> replaces the whole list.</td></tr></table>
-  <div class="tabs"><div class="tabbar"><button class="on">cURL</button><button>JavaScript</button><button>Response</button><button class="copy">Copy</button></div>
-<pre class="on">curl -X POST https://botapi.zpas.org/setMyCommands \
-  -H <span class="s">"Authorization: Bearer $TOKEN"</span> -H <span class="s">"Content-Type: application/json"</span> \
-  -d <span class="s">'{"commands":[{"command":"start","description":"Start the bot"},{"command":"help","description":"How it works"}]}'</span></pre>
-<pre><span class="k">await</span> api(<span class="s">'setMyCommands'</span>, { commands: [
-  { command: <span class="s">'start'</span>, description: <span class="s">'Start the bot'</span> },
-  { command: <span class="s">'help'</span>, description: <span class="s">'How it works'</span> },
-] });
-<span class="k">const</span> { result } = <span class="k">await</span> api(<span class="s">'getMyCommands'</span>);</pre>
-<pre>{ <span class="s">"ok"</span>: <span class="k">true</span>, <span class="s">"result"</span>: [ { <span class="s">"command"</span>: <span class="s">"start"</span>, <span class="s">"description"</span>: <span class="s">"Start the bot"</span> } ] }</pre></div>
+  <tr><td><code>command</code></td><td>1–32 characters: lowercase letters, digits and <code>_</code>, starting with a letter.</td></tr>
+  <tr><td><code>description</code></td><td>1–100 characters.</td></tr>
+  <tr><td>List</td><td>Up to 100, no duplicates. <code>setMyCommands</code> replaces the whole list.</td></tr></table>
+</section>
+
+<section id="profile">
+  <h2>Name &amp; description</h2>
+  <table><tr><th>Method</th><th>Field</th><th>Shown</th></tr>
+  <tr><td><code>setMyName</code> / <code>getMyName</code></td><td><code>name</code>, up to 64</td><td>Chat title and profile</td></tr>
+  <tr><td><code>setMyDescription</code> / <code>getMyDescription</code></td><td><code>description</code>, up to 512</td><td>Empty chat, before Start</td></tr>
+  <tr><td><code>setMyShortDescription</code> / <code>getMyShortDescription</code></td><td><code>short_description</code>, up to 120</td><td>Bot profile</td></tr></table>
+  <p>A verified badge stays when you rename the bot.</p>
 </section>
 
 <section id="menu-button">
   <h2>Menu button &amp; mini apps</h2>
-  <div class="method"><span class="tag post">POST</span><span class="url">/setChatMenuButton</span><span class="tag live">LIVE</span></div>
-  <div class="method"><span class="tag get">GET</span><span class="tag post">POST</span><span class="url">/getChatMenuButton</span><span class="tag live">LIVE</span></div>
-  <p>The menu button sits next to the message box. It can open the command list, open a <b>mini app</b> (a web page shown inside the chat), or be hidden.</p>
+  <div class="method"><span class="tag post">POST</span><span class="url">/setChatMenuButton · /getChatMenuButton</span><span class="tag live">LIVE</span></div>
+  <p>The button next to the message box can open your command list, open a <b>mini app</b> (your web page shown inside the chat), or be hidden.</p>
   <table><tr><th><code>menu_button.type</code></th><th>Extra fields</th><th>Result</th></tr>
-  <tr><td><code>commands</code></td><td>none</td><td>Opens the <code>/</code> command list. Default.</td></tr>
-  <tr><td><code>web_app</code></td><td><code>text</code> (1 to 32 characters), <code>web_app.url</code> (https only)</td><td>Opens your mini app.</td></tr>
+  <tr><td><code>commands</code></td><td>none</td><td>Opens the command list. Default.</td></tr>
+  <tr><td><code>web_app</code></td><td><code>text</code> (1–32), <code>web_app.url</code> (https)</td><td>Opens your mini app.</td></tr>
   <tr><td><code>default</code></td><td>none</td><td>No menu button.</td></tr></table>
-  <div class="tabs"><div class="tabbar"><button class="on">Mini app</button><button>Command list</button><button class="copy">Copy</button></div>
-<pre class="on">curl -X POST https://botapi.zpas.org/setChatMenuButton \
-  -H <span class="s">"Authorization: Bearer $TOKEN"</span> -H <span class="s">"Content-Type: application/json"</span> \
-  -d <span class="s">'{"menu_button":{"type":"web_app","text":"Open store","web_app":{"url":"https://shop.example.com/app"}}}'</span></pre>
-<pre>curl -X POST https://botapi.zpas.org/setChatMenuButton \
-  -H <span class="s">"Authorization: Bearer $TOKEN"</span> -H <span class="s">"Content-Type: application/json"</span> \
-  -d <span class="s">'{"menu_button":{"type":"commands"}}'</span></pre></div>
-  <div class="note info"><b>ℹ Mini apps</b><span>The page opens in a secure in-app browser. Use HTTPS, design for phone screens, and never ask users for their PassGram password or codes inside a mini app.</span></div>
-</section>
-
-<section id="keyboards">
-  <h2>Inline keyboards <span class="tag live">LIVE</span></h2>
-  <p>Put buttons directly under a message. The format is the same as Telegram’s, so existing Telegram bot code works. <code>reply_markup.inline_keyboard</code> is a list of <b>rows</b>; each row is a list of <b>buttons</b>. One button per row gives a vertical <b>list</b>; two per row gives a <b>2-column grid</b>. Buttons in a row share the width equally.</p>
-  <div class="kb"><div class="msg">Hi! I’m your helper bot. What would you like to do?</div><div class="row"><span>🤖 Create a bot</span><span>📋 My bots</span></div><div class="row"><span>❓ Help</span></div></div>
-  <table><tr><th>Button field</th><th>Description</th></tr>
-  <tr><td><code>text</code></td><td>Label, 1–64 characters. Emoji are fine.</td></tr>
-  <tr><td><code>callback_data</code></td><td>1–64 bytes sent back to your bot when the button is pressed (see <a href="#callbacks">button presses</a>).</td></tr>
-  <tr><td><code>url</code></td><td>Opens an <code>https://</code> link instead. Use exactly one of <code>callback_data</code> or <code>url</code>.</td></tr></table>
-  <p>Limits: up to 10 rows, 4 buttons per row and 30 buttons per message.</p>
-  <div class="tabs"><div class="tabbar"><button class="on">2 per row</button><button>List</button><button>Python</button><button class="copy">Copy</button></div>
-<pre class="on">{
-  <span class="s">"chat_id"</span>: <span class="s">"@rezan"</span>,
-  <span class="s">"text"</span>: <span class="s">"What would you like to do?"</span>,
-  <span class="s">"reply_markup"</span>: { <span class="s">"inline_keyboard"</span>: [
-    [ { <span class="s">"text"</span>: <span class="s">"🤖 Create a bot"</span>, <span class="s">"callback_data"</span>: <span class="s">"new"</span> },
-      { <span class="s">"text"</span>: <span class="s">"📋 My bots"</span>, <span class="s">"callback_data"</span>: <span class="s">"mine"</span> } ],
-    [ { <span class="s">"text"</span>: <span class="s">"❓ Help"</span>, <span class="s">"callback_data"</span>: <span class="s">"help"</span> } ]
-  ] }
-}</pre>
-<pre>{
-  <span class="s">"chat_id"</span>: <span class="s">"USER_ID"</span>,
-  <span class="s">"text"</span>: <span class="s">"Choose a plan"</span>,
-  <span class="s">"reply_markup"</span>: { <span class="s">"inline_keyboard"</span>: [
-    [ { <span class="s">"text"</span>: <span class="s">"Free"</span>, <span class="s">"callback_data"</span>: <span class="s">"plan_free"</span> } ],
-    [ { <span class="s">"text"</span>: <span class="s">"Plus"</span>, <span class="s">"callback_data"</span>: <span class="s">"plan_plus"</span> } ],
-    [ { <span class="s">"text"</span>: <span class="s">"Open website"</span>, <span class="s">"url"</span>: <span class="s">"https://zpas.org"</span> } ]
-  ] }
-}</pre>
-<pre><span class="c"># one button per row = list, two per row = grid</span>
-<span class="k">def</span> keyboard(buttons, per_row=<span class="n">2</span>):
-    rows = [buttons[i:i + per_row] <span class="k">for</span> i <span class="k">in</span> range(<span class="n">0</span>, len(buttons), per_row)]
-    <span class="k">return</span> {<span class="s">"inline_keyboard"</span>: rows}
-
-requests.post(f<span class="s">"{BASE}/sendMessage"</span>, headers=HEAD, json={
-    <span class="s">"chat_id"</span>: <span class="s">"@rezan"</span>, <span class="s">"text"</span>: <span class="s">"What would you like to do?"</span>,
-    <span class="s">"reply_markup"</span>: keyboard([
-        {<span class="s">"text"</span>: <span class="s">"🤖 Create a bot"</span>, <span class="s">"callback_data"</span>: <span class="s">"new"</span>},
-        {<span class="s">"text"</span>: <span class="s">"📋 My bots"</span>, <span class="s">"callback_data"</span>: <span class="s">"mine"</span>},
-        {<span class="s">"text"</span>: <span class="s">"❓ Help"</span>, <span class="s">"callback_data"</span>: <span class="s">"help"</span>},
-    ], per_row=<span class="n">2</span>)})</pre></div>
-  <div class="note"><b>Tip</b><span>When you post as a form instead of JSON, send <code>reply_markup</code> as a JSON string. Both work.</span></div>
-</section>
-
-<section id="callbacks">
-  <h2>Button presses <span class="tag live">LIVE</span></h2>
-  <p>When someone presses a <code>callback_data</code> button, your bot receives a <code>callback_query</code> in <a href="#getUpdates">getUpdates</a>. The button shows a spinner until you answer. Call <code>answerCallbackQuery</code> within 10 seconds; its optional <code>text</code> appears as a short toast in the app.</p>
-  <div class="method"><span class="tag post">POST</span><span class="url">/answerCallbackQuery</span><span class="tag live">LIVE</span></div>
-  <table><tr><th>Parameter</th><th>Required</th><th>Description</th></tr>
-  <tr><td><code>callback_query_id</code></td><td>Yes</td><td><code>callback_query.id</code> from the update.</td></tr>
-  <tr><td><code>text</code></td><td>No</td><td>Up to 200 characters shown to the user.</td></tr></table>
-  <div class="tabs"><div class="tabbar"><button class="on">Update</button><button>Python</button><button class="copy">Copy</button></div>
-<pre class="on">{
-  <span class="s">"update_id"</span>: <span class="n">42</span>,
-  <span class="s">"callback_query"</span>: {
-    <span class="s">"id"</span>: <span class="s">"5f1c…"</span>, <span class="s">"data"</span>: <span class="s">"mine"</span>,
-    <span class="s">"from"</span>: { <span class="s">"id"</span>: <span class="s">"USER_ID"</span> },
-    <span class="s">"message"</span>: { <span class="s">"message_id"</span>: <span class="s">"a91e…"</span>, <span class="s">"text"</span>: <span class="s">"What would you like to do?"</span>, <span class="s">"chat"</span>: { <span class="s">"id"</span>: <span class="s">"USER_ID"</span> } }
-  }
-}</pre>
-<pre><span class="k">for</span> update <span class="k">in</span> updates:
-    cq = update.get(<span class="s">"callback_query"</span>)
-    <span class="k">if</span> cq:
-        call(<span class="s">"answerCallbackQuery"</span>, callback_query_id=cq[<span class="s">"id"</span>], text=<span class="s">"Got it ✅"</span>)
-        <span class="k">if</span> cq[<span class="s">"data"</span>] == <span class="s">"mine"</span>:
-            call(<span class="s">"editMessageText"</span>, chat_id=cq[<span class="s">"from"</span>][<span class="s">"id"</span>],
-                 message_id=cq[<span class="s">"message"</span>][<span class="s">"message_id"</span>], text=<span class="s">"You have no bots yet."</span>)</pre></div>
-</section>
-
-<section id="editing">
-  <h2>Edit messages <span class="tag live">LIVE</span></h2>
-  <p>Change a message your bot sent earlier, for example after a button press.</p>
-  <table><tr><th>Method</th><th>Parameters</th><th>What it does</th></tr>
-  <tr><td><code>editMessageText</code></td><td><code>chat_id</code>, <code>message_id</code>, <code>text</code>, optional <code>reply_markup</code></td><td>Replaces the text, and the buttons when <code>reply_markup</code> is given.</td></tr>
-  <tr><td><code>editMessageReplyMarkup</code></td><td><code>chat_id</code>, <code>message_id</code>, optional <code>reply_markup</code></td><td>Replaces the buttons. Leave <code>reply_markup</code> out to remove them.</td></tr></table>
-</section>
-
-<section id="documents">
-  <h2>Send documents <span class="tag live">LIVE</span></h2>
-  <div class="method"><span class="tag post">POST</span><span class="url">/sendDocument</span><span class="tag live">LIVE</span></div>
-  <p>Send a file up to 5 MB as <code>multipart/form-data</code> with fields <code>chat_id</code>, <code>document</code> and an optional <code>caption</code>. Z Pass only <b>relays</b> the file: it waits for the recipient for at most 24 hours and is deleted right after they download it once. Only that person can download it.</p>
-<div class="tabs"><div class="tabbar"><button class="on">cURL</button><button class="copy">Copy</button></div>
-<pre class="on">curl -X POST https://botapi.zpas.org/sendDocument \
-  -H <span class="s">"Authorization: Bearer $TOKEN"</span> \
-  -F chat_id=@rezan -F document=@report.pdf -F caption=<span class="s">"Monthly report"</span></pre></div>
-</section>
-
-<section id="users">
-  <h2>Get user <span class="tag soon">PLANNED</span></h2>
-  <p>For privacy, bots will see only what a user has chosen to share with them: a chat id, a display name and a username. A <code>getChat</code> style method is planned to read that information for users who started your bot. Bots will never see passwords, keys or private vault content.</p>
-</section>
-
-<section id="webhooks">
-  <h2>Webhooks <span class="tag soon">PLANNED</span></h2>
-  <p>Today you fetch updates with <code>getUpdates</code>. Webhooks will let PassGram call your HTTPS server when something happens. When they arrive, verify the signature on every request, accept only HTTPS and answer within a few seconds.</p>
+  <div class="note info"><b>ℹ Mini apps</b><span>Use HTTPS, design for phone screens, and never ask people for their PassGram password or codes.</span></div>
 </section>
 
 <section id="example-bot">
-  <h2>Example: echo bot</h2>
-  <p>A complete bot that repeats every message back. It reads updates, remembers the last id, and replies.</p>
+  <h2>Example bot</h2>
+  <p>A complete echo bot with plain HTTP and long polling, no library needed.</p>
   <div class="tabs"><div class="tabbar"><button class="on">Node.js</button><button>Python</button><button class="copy">Copy</button></div>
-<pre class="on"><span class="k">const</span> TOKEN = process.env.PASSGRAM_TOKEN, BASE = <span class="s">'https://botapi.zpas.org'</span>;
-<span class="k">const</span> call = (m, body) =&gt; fetch(<span class="s">`${BASE}/${m}`</span>, { method: <span class="s">'POST'</span>,
-  headers: { Authorization: <span class="s">`Bearer ${TOKEN}`</span>, <span class="s">'Content-Type'</span>: <span class="s">'application/json'</span> },
-  body: JSON.stringify(body || {}) }).then(r =&gt; r.json());
+<pre class="on"><span class="k">const</span> API = <span class="s">`https://api.zpas.org/bot${process.env.PASSGRAM_TOKEN}`</span>;
+<span class="k">const</span> call = (m, body = {}) =&gt; fetch(<span class="s">`${API}/${m}`</span>, { method: <span class="s">'POST'</span>,
+  headers: { <span class="s">'Content-Type'</span>: <span class="s">'application/json'</span> }, body: JSON.stringify(body) }).then((r) =&gt; r.json());
 
 <span class="k">let</span> offset = <span class="n">0</span>;
-<span class="k">while</span> (<span class="k">true</span>) {
-  <span class="k">const</span> { ok, result } = <span class="k">await</span> call(<span class="s">'getUpdates'</span>, { offset, limit: <span class="n">50</span> });
-  <span class="k">if</span> (ok) <span class="k">for</span> (<span class="k">const</span> u <span class="k">of</span> result) {
+<span class="k">for</span> (;;) {
+  <span class="k">const</span> { ok, result } = <span class="k">await</span> call(<span class="s">'getUpdates'</span>, { offset, timeout: <span class="n">25</span> });
+  <span class="k">if</span> (!ok) { <span class="k">await new</span> Promise((r) =&gt; setTimeout(r, <span class="n">5000</span>)); <span class="k">continue</span>; }
+  <span class="k">for</span> (<span class="k">const</span> u <span class="k">of</span> result) {
     offset = u.update_id + <span class="n">1</span>;
     <span class="k">const</span> m = u.message;
     <span class="k">if</span> (m?.text) <span class="k">await</span> call(<span class="s">'sendMessage'</span>, { chat_id: m.chat.id, text: <span class="s">`You said: ${m.text}`</span> });
   }
-  <span class="k">await</span> <span class="k">new</span> Promise(r =&gt; setTimeout(r, <span class="n">2000</span>)); <span class="c">// stay under 120 requests/min</span>
 }</pre>
 <pre><span class="k">import</span> os, time, requests
-TOKEN, BASE = os.environ[<span class="s">"PASSGRAM_TOKEN"</span>], <span class="s">"https://botapi.zpas.org"</span>
-H = {<span class="s">"Authorization"</span>: f<span class="s">"Bearer {TOKEN}"</span>}
+API = f<span class="s">"https://api.zpas.org/bot{os.environ['PASSGRAM_TOKEN']}"</span>
 offset = <span class="n">0</span>
 <span class="k">while</span> True:
-    r = requests.post(f<span class="s">"{BASE}/getUpdates"</span>, headers=H, json={<span class="s">"offset"</span>: offset, <span class="s">"limit"</span>: <span class="n">50</span>}).json()
-    <span class="k">for</span> u <span class="k">in</span> r.get(<span class="s">"result"</span>, []):
+    r = requests.post(f<span class="s">"{API}/getUpdates"</span>, json={<span class="s">"offset"</span>: offset, <span class="s">"timeout"</span>: <span class="n">25</span>}, timeout=<span class="n">40</span>).json()
+    <span class="k">if not</span> r.get(<span class="s">"ok"</span>):
+        time.sleep(<span class="n">5</span>); <span class="k">continue</span>
+    <span class="k">for</span> u <span class="k">in</span> r[<span class="s">"result"</span>]:
         offset = u[<span class="s">"update_id"</span>] + <span class="n">1</span>
         m = u.get(<span class="s">"message"</span>)
         <span class="k">if</span> m <span class="k">and</span> m.get(<span class="s">"text"</span>):
-            requests.post(f<span class="s">"{BASE}/sendMessage"</span>, headers=H, json={<span class="s">"chat_id"</span>: m[<span class="s">"chat"</span>][<span class="s">"id"</span>], <span class="s">"text"</span>: <span class="s">"You said: "</span> + m[<span class="s">"text"</span>]})
-    time.sleep(<span class="n">2</span>)</pre></div>
+            requests.post(f<span class="s">"{API}/sendMessage"</span>, json={<span class="s">"chat_id"</span>: m[<span class="s">"chat"</span>][<span class="s">"id"</span>], <span class="s">"text"</span>: <span class="s">"You said: "</span> + m[<span class="s">"text"</span>]})</pre></div>
+</section>
+
+<section id="not-supported">
+  <h2>Not supported (yet)</h2>
+  <ul>
+    <li>Groups and channels: bots chat with people one to one.</li>
+    <li>Inline mode, games, payments and sticker sets.</li>
+    <li>Receiving files from people (<code>getFile</code>), forwarding and copying messages.</li>
+    <li>Reusing a <code>file_id</code> (see <a href="#media">Photos &amp; files</a>).</li>
+  </ul>
+  <p>Calling one of these returns <code>404 Not Found</code>.</p>
 </section>
 
 <section id="security">
-  <h2>Security best practices</h2>
-  <ul><li>Keep the token on a server, in an environment variable or secret manager.</li>
-  <li>Send it in the <code>Authorization</code> header, not in the URL.</li>
-  <li>Rotate it right away if it may have leaked.</li>
-  <li>Never ask users for passwords, recovery keys or one-time codes. PassGram never does either.</li>
-  <li>Treat everything users send as untrusted input. Validate and escape it before using it.</li>
-  <li>Handle <code>429</code> and <code>5xx</code> with a delay, not a tight retry loop.</li></ul>
+  <h2>Security</h2>
+  <ul><li>Keep the token on your server, in an environment variable or a secret manager. Never ship it in an app or a web page.</li>
+  <li>Make a new token at once if it may have leaked.</li>
+  <li>Use a <code>secret_token</code> with webhooks and check it on every request.</li>
+  <li>Never ask people for passwords, recovery keys or one-time codes. PassGram never does.</li>
+  <li>Treat everything people send as untrusted input.</li>
+  <li>On <code>429</code> or <code>5xx</code>, wait before retrying.</li></ul>
 </section>
 
-<section id="mtproto">
-  <h2>MTProto 2.0 protocol</h2>
-  <p>MTProto 2.0 provides high-speed binary serialization over TCP and HTTPS with Diffie-Hellman key exchange and AES-256-IGE payload encryption.</p>
-  <div class="tabs"><div class="tabbar"><button class="on">Frame</button><button class="copy">Copy</button></div>
-<pre class="on"><span class="c">// DH key exchange &amp; encrypted frame structure</span>
-auth_key_id:int64 msg_key:int128 encrypted_data:bytes</pre></div>
-</section>
-
-<section id="tl-schema">
-  <h2>Type Language (TL) schema</h2>
-  <p>Z Pass schemas are defined in Type Language syntax:</p>
-  <div class="tabs"><div class="tabbar"><button class="on">Schema</button><button class="copy">Copy</button></div>
-<pre class="on">user#2e2e12a id:long first_name:string username:string = User;
-message#8d8d21c id:long sender_id:long text:string date:int = Message;</pre></div>
-</section>
-
-<section id="e2ee">
-  <h2>End-to-end encryption</h2>
-  <p>Private chats are end-to-end encrypted and stay that way. <b>Bot conversations are different:</b> they are readable by the bot operator and by the Z Pass server, because the bot program has to read them to answer. Never send passwords, recovery keys or payment secrets to a bot.</p>
+<section id="privacy">
+  <h2>Privacy</h2>
+  <p>Private chats between people are end-to-end encrypted and bots cannot see them. <b>Chats with a bot are different:</b> the bot's operator reads them (the bot has to, to answer) and they pass through the PassGram server. The app tells people this in the bot chat. Bots never see phone numbers, email addresses, passwords or vault content.</p>
+  <p>PassGram can disable or remove bots that break the <a href="https://zpas.org/legal/terms">Terms</a>, for example after reports from users.</p>
 </section>
 
 <section id="help">
   <h2>Help</h2>
-  <p>Questions or ideas for the API? Message <a href="https://x.com/4rezan" target="_blank" rel="noopener">@4rezan on X</a> or use <b>Settings → Support</b> in the app. Read also the <a href="https://zpas.org/legal/privacy">Privacy Policy</a>, <a href="https://zpas.org/legal/terms">Terms</a> and <a href="https://zpas.org/legal/security">Security</a> pages.</p>
+  <p>Questions or ideas? Message <a href="https://x.com/4rezan" target="_blank" rel="noopener">@4rezan on X</a> or use <b>Settings → Support</b> in the app. See also the <a href="https://zpas.org/legal/privacy">Privacy Policy</a>, <a href="https://zpas.org/legal/terms">Terms</a> and <a href="https://zpas.org/legal/security">Security</a> pages.</p>
 </section>
 <div class="foot"><span>© 2026 PassGram</span><span><a href="https://zpas.org/legal/terms">Terms</a> · <a href="https://zpas.org/legal/privacy">Privacy</a> · <a href="https://zpas.org/legal/security">Security</a></span></div>
 </main>

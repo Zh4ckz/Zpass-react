@@ -1,7 +1,7 @@
 import {getApps,initializeApp} from 'https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js';
 import {getAuth,onAuthStateChanged} from 'https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js';
 import {firebaseConfig} from './firebase-config.mjs';
-import {paymentPlans} from './payment-plans.mjs';
+import {paymentPlans} from './payment-plans.mjs?v=3';
 import {billingRequest} from './billing-api.mjs?v=1';
 import {rollPrice} from './price-roller.mjs?v=1';
 import {elementsAvailable,loadStripe,mountElements,darkAppearance,validEmail} from './stripe-elements.mjs?v=2';
@@ -16,6 +16,9 @@ const $=id=>dialog.querySelector('#'+id);
 function upgrading(){return membership?.plan==='PLUS'&&plan==='PRO'}
 function validSession(){return session&&session.uid===user?.uid&&Date.parse(session.expiresAt)>Date.now()}
 function price(tier){if(tier==='FREE')return 0;return config?.plans?.['zpass_'+tier.toLowerCase()+'_'+billing.toLowerCase()]?.price??paymentPlans[tier][billing.toLowerCase()].price}
+// What is charged at once: the monthly price, or the whole year for yearly plans.
+function charge(tier){if(tier==='FREE')return 0;const live=config?.plans?.['zpass_'+tier.toLowerCase()+'_'+billing.toLowerCase()];return typeof live?.charge==='number'?live.charge:paymentPlans[tier][billing.toLowerCase()].charge}
+function listPrice(tier){return tier==='FREE'?0:config?.plans?.['zpass_'+tier.toLowerCase()+'_monthly']?.price??paymentPlans[tier].monthly.price}
 function render(){
  const currentPlan=membership?.plan||'FREE';
  $('pp-membership').textContent=checkingPlan?'Checking your current plan…':planError?'Your plan could not be verified. Open subscription management to retry.':membership?.scheduledPlan?'Pro is scheduled for '+new Date(membership.scheduledAt).toLocaleDateString():user?'Your current plan: '+currentPlan:'';
@@ -23,16 +26,16 @@ function render(){
  const freeButton=dialog.querySelector('[data-free]');freeButton.disabled=Boolean(user);freeButton.textContent=user?(currentPlan==='FREE'?'Your Free plan':'View only'):'Continue with Free';
  dialog.querySelectorAll('[data-period]').forEach(button=>button.disabled=currentPlan!=='FREE');
 
- for(const tier of ['FREE','PLUS','PRO']){const amount=price(tier);rollPrice(dialog.querySelector(`[data-price="${tier}"]`),amount,money);dialog.querySelector(`[data-commitment="${tier}"]`).textContent=tier==='FREE'?'No subscription or payment required.':billing==='YEARLY'?`${money(amount)} monthly for 12 months. ${money(amount*12)} total.`:'Billed monthly. Cancel anytime.';}
+ for(const tier of ['FREE','PLUS','PRO']){const amount=price(tier);rollPrice(dialog.querySelector(`[data-price="${tier}"]`),amount,money);dialog.querySelector(`[data-commitment="${tier}"]`).textContent=tier==='FREE'?'No subscription or payment required.':billing==='YEARLY'?`Was ${money(listPrice(tier))}/month. ${money(charge(tier))} charged once a year.`:'Billed monthly. Turn off auto-renew anytime.';}
  dialog.querySelectorAll('[data-period]').forEach(button=>button.setAttribute('aria-pressed',String(button.dataset.period===billing)));
- const amount=price(plan);rollPrice($('pp-total'),amount,money);$('pp-plan-name').textContent='PassGram '+(plan==='PRO'?'Pro':'Plus');$('pp-plan-price').textContent=money(amount)+'/month';$('pp-due').textContent=upgrading()?'$0.00 today':money(amount)+' + tax';$('pp-summary-period').textContent=billing==='YEARLY'?`12 monthly payments. ${money(amount*12)} total. Ends after 12 months.`:'Renews monthly until cancelled.';
+ const amount=price(plan);rollPrice($('pp-total'),amount,money);$('pp-plan-name').textContent='PassGram '+(plan==='PRO'?'Pro':'Plus');$('pp-plan-price').textContent=money(amount)+'/month'+(billing==='YEARLY'?` (${money(charge(plan))}/year)`:'');$('pp-due').textContent=upgrading()?'$0.00 today':money(charge(plan))+' + tax';$('pp-summary-period').textContent=(billing==='YEARLY'?`Charged once: ${money(charge(plan))} for 12 months. Renews yearly until you turn off auto-renew.`:'Renews monthly until you turn off auto-renew.')+' Full refund if you ask within 24 hours of paying. After that you can turn off auto-renew at any time: access stays until the paid period ends, with no refund.';
  $('pp-username').textContent=session?.username||membership?.username||user?.displayName||user?.email||'Sign in to your account';
  const entry=config?.plans?.['zpass_'+plan.toLowerCase()+'_'+billing.toLowerCase()];
- $('pp-continue').disabled=busy||(upgrading()?Boolean(membership?.scheduledPlan)||!membership?.managed||!membership?.autoRenew:!validSession())||!config?.available||config?.billingModel!=='monthly-v1'||entry?.enabled===false||!(entry?.price>0);
+ $('pp-continue').disabled=busy||(upgrading()?Boolean(membership?.scheduledPlan)||!membership?.managed||!membership?.autoRenew:!validSession())||!config?.available||config?.billingModel!=='v2-yearly-upfront'||entry?.enabled===false||!(entry?.price>0);
  if(pay){$('pp-continue').disabled=$('pp-continue').disabled||!pay.api||!pay.canConfirm||pay.confirming||pay.done||!validEmail($('pp-email')?.value||'');if(pay.total)$('pp-due').textContent=pay.total;}
  $('pp-continue').textContent=busy?'Preparing checkout…':upgrading()?'Schedule Pro at next renewal':pay?(pay.done?'Payment received ✓':pay.confirming?'Processing…':'Agree, Subscribe & Pay'):'Continue to payment';
  $('pp-renew').classList.toggle('pp-hidden',upgrading()||busy||Boolean(validSession()));
- $('pp-session').textContent=upgrading()?'Pro starts at your next renewal. Your existing commitment end date is preserved.':validSession()?'Session valid for '+Math.ceil((Date.parse(session.expiresAt)-Date.now())/60000)+' min.':session?'Session key expired. Create a new session to continue.':'';
+ $('pp-session').textContent=upgrading()?'Pro starts at your next renewal. Nothing is charged today.':validSession()?'Session valid for '+Math.ceil((Date.parse(session.expiresAt)-Date.now())/60000)+' min.':session?'Session key expired. Create a new session to continue.':'';
  dialog.querySelector('.pp-back').disabled=busy;
 }
 async function json(url,body){const response=await fetch(url,{...(body?{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(body)}:{}),cache:'no-store',signal:AbortSignal.timeout(20000)});const result=await response.json();if(!response.ok)throw Error(result.error||'Payment service unavailable.');return result}

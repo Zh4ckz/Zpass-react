@@ -3,7 +3,7 @@
   "main": "src/index.js",
   "compatibility_date": "2026-11-03",
   "workers_dev": true,
-  "routes": [{ "pattern": "botapi.zpas.org", "custom_domain": true }],
+  "routes": [{ "pattern": "botapi.zpas.org", "custom_domain": true }, { "pattern": "api.zpas.org", "custom_domain": true }],
   "vars": {
     "FIREBASE_PROJECT_ID": "passgram-org",
     "REQUIRE_APP_CHECK": "false"

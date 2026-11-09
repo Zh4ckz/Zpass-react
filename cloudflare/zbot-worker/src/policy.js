@@ -21,18 +21,38 @@ const b64url = (bytes) => btoa(String.fromCharCode(...bytes)).replace(/=/g, '').
 const sha256 = async (text) => hex(new Uint8Array(await crypto.subtle.digest('SHA-256', new TextEncoder().encode(text))));
 export const randomId = () => hex(crypto.getRandomValues(new Uint8Array(12)));
 
-// A bot token is "<24 hex id>:<43 random chars>". Only its SHA-256 is stored.
-export async function tokenPair(id = randomId()) {
-  if (!/^[a-f0-9]{24}$/.test(id)) throw Error('Invalid bot ID');
+// A bot token is "<bot number>:<43 random chars>" (older bots: "<24 hex id>:<43 chars>"). Only its SHA-256 is stored.
+// The number is the bot's public numeric ID, so standard bot libraries that read it from the token work unchanged.
+export const TOKEN = /^(?:[a-f0-9]{24}|[1-9]\d{8,11}):[A-Za-z0-9_-]{43}$/;
+export async function tokenPair(left = randomId()) {
+  const id = String(left);
+  if (!/^(?:[a-f0-9]{24}|[1-9]\d{8,11})$/.test(id)) throw Error('Invalid bot ID');
   const token = `${id}:${b64url(crypto.getRandomValues(new Uint8Array(32)))}`;
   return { id, token, hash: await sha256(token) };
 }
 export async function tokenMatches(token, hash) {
-  if (!/^[a-f0-9]{24}:[A-Za-z0-9_-]{43}$/.test(token) || !/^[a-f0-9]{64}$/.test(hash || '')) return false;
+  if (!TOKEN.test(token) || !/^[a-f0-9]{64}$/.test(hash || '')) return false;
   const actual = await sha256(token);
   let diff = 0;
   for (let i = 0; i < 64; i++) diff |= actual.charCodeAt(i) ^ hash.charCodeAt(i);
   return diff === 0;
+}
+
+// Bots get a random 10-digit number (6000000000–8999999999); people have 11 digits, so the two never overlap.
+export function randomBotNumber() {
+  const [a, b] = crypto.getRandomValues(new Uint32Array(2));
+  return 6_000_000_000 + Number(((BigInt(a) << 32n) | BigInt(b)) % 3_000_000_000n);
+}
+
+// A person's public numeric ID. Same formula as the app (generate11DigitNumericId), so the number a bot sees
+// is the "Z Pass Cloud ID" the person sees in the app.
+export async function userNumber(uid) {
+  if (!uid) return 10_000_000_000;
+  const d = new Uint8Array(await crypto.subtle.digest('SHA-256', new TextEncoder().encode('ZPASS_NUMERIC_ID_V1:' + uid)));
+  let n = 0n;
+  for (let i = 0; i < 8; i++) n = (n << 8n) | BigInt(d[i]);
+  n &= 0x7fffffffffffffffn;
+  return Number(10_000_000_000n + (n % 90_000_000_000n));
 }
 
 // Commands: [{ command, description }], at most 100. Also accepts "cmd - description" lines.

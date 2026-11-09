@@ -3,10 +3,10 @@
   const fallbackConfig = {
     currency: "USD",
     plans: {
-      PLUS_MONTHLY: { price: 4.99, enabled: true },
-      PLUS_YEARLY: { price: 49.9, enabled: true },
-      PRO_MONTHLY: { price: 9, enabled: true },
-      PRO_YEARLY: { price: 90, enabled: true }
+      PLUS_MONTHLY: { price: 3.99, enabled: true },
+      PLUS_YEARLY: { price: 35.88, enabled: true },
+      PRO_MONTHLY: { price: 6.99, enabled: true },
+      PRO_YEARLY: { price: 71.88, enabled: true }
     }
   };
   let config = fallbackConfig;

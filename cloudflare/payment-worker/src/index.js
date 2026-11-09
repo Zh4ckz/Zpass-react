@@ -34,7 +34,7 @@ export function createWorker({serviceFactory=env=>new PaymentService({db:new Fir
     const user=await authenticate(payload.idToken),account=accountFactory(env),action=url.pathname.slice('/billing/'.length);
     if(action==='overview')return reply(await account.overview(user.uid));
     if(action==='invoices')return reply(await account.invoices(user.uid,payload.cursor||''));
-    if(!['cancel','refund','upgrade'].includes(action))return reply({error:'Not found.'},404);
+    if(!['cancel','resume','refund','upgrade'].includes(action))return reply({error:'Not found.'},404);
     if(payload.confirm!==true)throw new HttpError(400,'Confirm this billing change before continuing.');
     return reply(await account[action](user.uid));
    }catch(error){return reply({error:error instanceof HttpError?error.message:'Billing service is temporarily unavailable.'},error instanceof HttpError?error.status:503)}
@@ -56,6 +56,16 @@ export function createWorker({serviceFactory=env=>new PaymentService({db:new Fir
     }
     const session=await paymentSession(db,payload.key);return reply({username:session.username,expiresAt:session.expiresAt.toISOString()});
    }catch(e){return reply({error:e instanceof HttpError?e.message:'Session could not be loaded.'},e instanceof HttpError?e.status:503)}
+  }
+  if(url.pathname==='/checkout/app-session'&&request.method==='POST'){
+   try{let payload;try{payload=JSON.parse(await limitedText(request,8192))}catch(e){if(e instanceof HttpError)throw e;throw new HttpError(400,'Invalid checkout request.')}
+    if(!payload||Object.keys(payload).some(k=>!['idToken','productId','requestId'].includes(k)))throw new HttpError(400,'Invalid checkout request.');
+    if(!configured(env))throw new HttpError(503,'Payments are not configured.');
+    const user=await authenticate(payload.idToken),db=new Firestore(env),profile=await db.get('users/'+user.uid);
+    const result=await serviceFactory(env).create({productId:payload.productId,requestId:payload.requestId,zPassId:String(profile?.zPassId||'')},user.uid,'native',typeof user.email==='string'?user.email:'');
+    const publishableKey=/^pk_(live|test)_[A-Za-z0-9]+$/.test(env.STRIPE_PUBLISHABLE_KEY||'')?env.STRIPE_PUBLISHABLE_KEY:null;if(!publishableKey)throw new HttpError(503,'Payments are not configured.');
+    return reply({...result,publishableKey,merchantName:'PassGram'});
+   }catch(e){if(!(e instanceof HttpError))console.error('app-session failed:',e?.stack||String(e));return reply({error:e instanceof HttpError?e.message:'Payment could not start. Try again shortly.'},e instanceof HttpError?e.status:503)}
   }
   if(url.pathname==='/checkout/pay-session'&&request.method==='POST'){
    if(!['https://pay.zpas.org','https://web.zpas.org'].includes(origin))return reply({error:'Open checkout at pay.zpas.org.'},403);if(!configured(env))return reply({error:'Checkout is not configured yet.'},503);
