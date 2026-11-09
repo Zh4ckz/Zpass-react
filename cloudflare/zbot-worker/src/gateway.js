@@ -234,6 +234,19 @@ export function createGateway({ db, files = null, verifyUser, verifyAppCheck, re
           return message;
         });
       }
+      case 'seen': {
+        // A device says "I'm here": record the address Cloudflare saw for this request (the app only calls this
+        // when the person allowed optional data). Written to their own device record and account summary.
+        const deviceId = String(body.deviceId || '');
+        if (!/^[A-Za-z0-9_-]{6,128}$/.test(deviceId)) fail(400, 'Invalid device');
+        const platform = ['ANDROID', 'WINDOWS', 'WEB'].includes(String(body.platform)) ? String(body.platform) : 'UNKNOWN';
+        const ip = String(request.headers.get('cf-connecting-ip') || '').slice(0, 64);
+        const cf = request.cf || {};
+        const seen = { lastIp: ip, lastCity: String(cf.city || '').slice(0, 80), countryCode: String(cf.country || '').slice(0, 2), lastIpAt: new Date() };
+        await db.update(`users/${owner}/devices/${deviceId}`, { ...seen, platform }).catch(() => fail(404, 'Unknown device'));
+        await db.update(`users/${owner}`, { lastIp: seen.lastIp, lastCity: seen.lastCity, lastCountry: seen.countryCode, lastIpAt: seen.lastIpAt, lastPlatform: platform }).catch(() => {});
+        return { recorded: true };
+      }
       case 'press': {
         const username = policy.username(body.username);
         const id = (await db.get(`chat_usernames/${username}`))?.botId;

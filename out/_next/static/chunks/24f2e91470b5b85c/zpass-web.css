@@ -605,3 +605,10 @@ body.dark-theme .ap-thread{background-image:radial-gradient(rgba(148,163,184,.10
   #ap-v-chats .ap-chat-list{background:var(--card);border-right:1px solid var(--line);backdrop-filter:blur(18px)}
   #ap-v-chats .ap-chat-items{flex:1;min-height:0;overflow-y:auto}
 }
+
+/* startup: thin bar that fills blue (grey track first), instead of a spinner */
+.splash-bar { width: 168px; height: 4px; border-radius: 99px; overflow: hidden; background: color-mix(in srgb, var(--muted) 22%, transparent); margin: 2px 0 2px; }
+.splash-bar span { display: block; height: 100%; width: 0; border-radius: inherit; background: linear-gradient(90deg, var(--acc), color-mix(in srgb, var(--acc) 70%, #8b5cf6)); animation: zw-splash-fill 2.4s cubic-bezier(.2,.75,.25,1) forwards; }
+@keyframes zw-splash-fill { 0% { width: 0; } 60% { width: 72%; } 100% { width: 94%; } }
+.startup-screen.done .splash-bar span { width: 100% !important; transition: width .2s; }
+@media (prefers-reduced-motion: reduce) { .splash-bar span { animation: none; width: 70%; } }

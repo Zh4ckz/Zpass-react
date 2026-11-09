@@ -217,7 +217,7 @@ export function startAdmin(render) {
     let claims = {};
     try { claims = (await user.getIdTokenResult(true)).claims; } catch {}
     if (!isAdminToken(claims)) {
-      if (wantsSignIn()) { await signOut(auth); signInView(auth, 'This account is not authorized.'); } else rawJson(FORBIDDEN);
+      if (wantsSignIn()) { const who = `${user.email || 'this account'} (ID ${user.uid.slice(0, 6)}…)`; await signOut(auth); signInView(auth, `${who} is not an administrator.`); } else rawJson(FORBIDDEN);
       return;
     }
     if (rendered) return;

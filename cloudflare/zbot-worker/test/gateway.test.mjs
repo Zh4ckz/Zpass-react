@@ -298,3 +298,16 @@ test('inline keyboard: send, press, getUpdates, answerCallbackQuery, edit', asyn
   assert.deepEqual(stored.reply_markup, { inline_keyboard: [] });
   assert.equal((await api('/manage/press', { username: 'keys_bot', message_id: mid, data: 'mine' }, 'owner')).status, 404, 'removed buttons cannot be pressed');
 });
+
+test('seen records the request address on the caller\'s own device only', async () => {
+  const db = memoryDb();
+  const handle = createGateway({ db, verifyUser: async (t) => { if (!USERS[t]) throw new HttpError(401, 'Sign in required'); return USERS[t]; }, verifyAppCheck: async (t) => t === 'check' });
+  db.data.set('users/owner', { email: 'o@x' });
+  db.data.set('users/owner/devices/dev123456', { deviceName: 'Pixel' });
+  const call = (body, token = 'owner') => handle(new Request('https://botapi.zpas.org/manage/seen', { method: 'POST', headers: { 'content-type': 'application/json', authorization: `Bearer ${token}`, 'x-firebase-appcheck': 'check', 'cf-connecting-ip': '1.2.3.4' }, body: JSON.stringify(body) })).then((r) => r.json().then((j) => ({ status: r.status, ...j })));
+  assert.equal((await call({ deviceId: 'dev123456', platform: 'ANDROID' })).ok, true);
+  assert.equal(db.data.get('users/owner/devices/dev123456').lastIp, '1.2.3.4');
+  assert.equal(db.data.get('users/owner').lastIp, '1.2.3.4');
+  assert.equal((await call({ deviceId: 'dev123456' }, 'attacker')).status, 404, 'cannot write someone else\'s device');
+  assert.equal((await call({ deviceId: '../x' })).status, 400);
+});

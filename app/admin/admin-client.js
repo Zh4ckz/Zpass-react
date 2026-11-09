@@ -73,6 +73,44 @@ const Icon = ({ name, size = 18 }) => (
   <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true"><path d={P[name]} /></svg>
 )
 
+/* ---------------- animated icons (useAnimations, MIT — same set as the Android app) ---------------- */
+let lottiePromise
+function lottie() {
+  if (typeof window === 'undefined') return Promise.reject(Error('ssr'))
+  if (window.lottie) return Promise.resolve(window.lottie)
+  lottiePromise ||= new Promise((resolve, reject) => {
+    const s = document.createElement('script')
+    s.src = '/resources/admin/lottie_light.min.js'; s.async = true
+    s.onload = () => (window.lottie ? resolve(window.lottie) : reject(Error('lottie')))
+    s.onerror = () => reject(Error('lottie'))
+    document.head.appendChild(s)
+  })
+  return lottiePromise
+}
+/** Animated line icon; plays once on hover, when `play` changes, and on first show. Falls back to the static icon. */
+function Anim({ name, fallback, size = 20, play }) {
+  const box = useRef(null)
+  const anim = useRef(null)
+  const [ready, setReady] = useState(false)
+  useEffect(() => {
+    let alive = true
+    if (window.matchMedia?.('(prefers-reduced-motion: reduce)').matches) return
+    lottie().then((l) => {
+      if (!alive || !box.current) return
+      anim.current = l.loadAnimation({ container: box.current, renderer: 'svg', loop: false, autoplay: false, path: `/resources/admin/anim/${name}.json` })
+      anim.current.addEventListener('DOMLoaded', () => { if (alive) { setReady(true); anim.current.goToAndPlay(0, true) } })
+    }).catch(() => {})
+    return () => { alive = false; anim.current?.destroy(); anim.current = null }
+  }, [name])
+  useEffect(() => { if (ready && play !== undefined) anim.current?.goToAndPlay(0, true) }, [play, ready])
+  return (
+    <span className="zpa-anim" style={{ width: size, height: size }} onMouseEnter={() => anim.current?.goToAndPlay(0, true)}>
+      <span ref={box} className="zpa-anim-box" style={{ display: ready ? 'block' : 'none' }} />
+      {!ready && fallback && <Icon name={fallback} size={size} />}
+    </span>
+  )
+}
+
 /* ---------------- data hook ---------------- */
 function useLoader(load, deps) {
   const [state, setState] = useState({ loading: true, data: null, error: '' })
@@ -178,70 +216,164 @@ function Dialog({ spec, onClose }) {
 
 /* ---------------- sections ---------------- */
 const NAV = [
-  { id: 'overview', label: 'Overview', icon: 'home' },
-  { id: 'requests', label: 'Payment requests', icon: 'inbox' },
-  { id: 'subscriptions', label: 'Subscriptions', icon: 'crown' },
-  { id: 'users', label: 'Users', icon: 'users' },
-  { id: 'moderation', label: 'Moderation', icon: 'shield' },
-  { id: 'payments', label: 'Payment history', icon: 'card' },
-  { id: 'releases', label: 'Updates & releases', icon: 'rocket' },
-  { id: 'paywall', label: 'Subscription pop-up', icon: 'crown' },
-  { id: 'errors', label: 'Error reports', icon: 'bug' },
+  { id: 'overview', label: 'Overview', icon: 'home', anim: 'home', group: 'General', hint: 'Today at a glance' },
+  { id: 'requests', label: 'Payment requests', icon: 'inbox', anim: 'mail', group: 'Money', hint: 'Crypto, PayPal and plan changes' },
+  { id: 'subscriptions', label: 'Subscriptions', icon: 'crown', anim: 'award', group: 'Money', hint: 'Grant, extend or revoke plans' },
+  { id: 'payments', label: 'Payment history', icon: 'card', anim: 'credit-card', group: 'Money', hint: 'Completed card and crypto payments' },
+  { id: 'paywall', label: 'Subscription pop-up', icon: 'crown', anim: 'star', group: 'Money', hint: 'X-style upgrade sheet in the app' },
+  { id: 'users', label: 'Users', icon: 'users', anim: 'users', group: 'People', hint: 'Accounts and PassGram IDs' },
+  { id: 'moderation', label: 'Moderation', icon: 'shield', anim: 'shield', group: 'People', hint: 'Ban people, close groups and channels' },
+  { id: 'releases', label: 'Updates & releases', icon: 'rocket', anim: 'upload-cloud', group: 'App', hint: 'Versions, maintenance, announcements' },
+  { id: 'errors', label: 'Error reports', icon: 'bug', anim: 'alert-triangle', group: 'App', hint: 'Crash and error codes from the apps' },
 ]
 const EXTERNAL = [
-  { href: 'https://bots.zpas.org/#signin', label: 'Bots panel', icon: 'bot' },
-  { href: 'https://core.zpas.org/#signin', label: 'Core overview', icon: 'core' },
-  { href: 'https://api.zpas.org/#signin', label: 'API & config', icon: 'api' },
+  { href: 'https://bots.zpas.org/#signin', label: 'Bots panel', icon: 'bot', anim: 'message-circle' },
+  { href: 'https://core.zpas.org/#signin', label: 'Core overview', icon: 'core', anim: 'database' },
+  { href: 'https://api.zpas.org/#signin', label: 'API & config', icon: 'api', anim: 'link' },
 ]
+const greeting = () => { const h = new Date().getHours(); return h < 5 ? 'Good night' : h < 12 ? 'Good morning' : h < 18 ? 'Good afternoon' : 'Good evening' }
+const dayKey = (d) => `${d.getFullYear()}-${d.getMonth()}-${d.getDate()}`
+function lastDays(n) { const out = []; const t = new Date(); t.setHours(0, 0, 0, 0); for (let i = n - 1; i >= 0; i--) { const d = new Date(t); d.setDate(t.getDate() - i); out.push(d) } return out }
 
-function Overview({ fb, go }) {
+/** Small bar chart (no library): one bar per day. */
+function Bars({ values, labels, format = (v) => v, tone = 'accent' }) {
+  const max = Math.max(1, ...values)
+  return (
+    <div className={`zpa-bars ${tone}`}>
+      {values.map((v, i) => (
+        <div key={i} className="zpa-bar" title={`${labels[i]}: ${format(v)}`}>
+          <span style={{ height: `${Math.max(4, (v / max) * 100)}%` }} className={v ? '' : 'zero'} />
+        </div>
+      ))}
+    </div>
+  )
+}
+
+/** Ctrl/Cmd+K quick jump between pages. */
+function Palette({ onGo, onClose }) {
+  const [q, setQ] = useState('')
+  const [i, setI] = useState(0)
+  const items = NAV.filter((n) => !q || (n.label + ' ' + n.hint).toLowerCase().includes(q.toLowerCase()))
+  useEffect(() => setI(0), [q])
+  const key = (e) => {
+    if (e.key === 'ArrowDown') { e.preventDefault(); setI((x) => Math.min(items.length - 1, x + 1)) }
+    else if (e.key === 'ArrowUp') { e.preventDefault(); setI((x) => Math.max(0, x - 1)) }
+    else if (e.key === 'Enter' && items[i]) { onGo(items[i].id); onClose() }
+    else if (e.key === 'Escape') onClose()
+  }
+  return (
+    <div className="zpa-modal top" onMouseDown={(e) => { if (e.target === e.currentTarget) onClose() }}>
+      <div className="zpa-palette">
+        <div className="zpa-palette-search"><Icon name="search" /><input autoFocus value={q} onChange={(e) => setQ(e.target.value)} onKeyDown={key} placeholder="Jump to…" /><kbd>Esc</kbd></div>
+        <div className="zpa-palette-list">
+          {items.map((n, k) => (
+            <button key={n.id} type="button" className={k === i ? 'on' : ''} onMouseEnter={() => setI(k)} onClick={() => { onGo(n.id); onClose() }}>
+              <span className="zpa-stat-icon"><Anim name={n.anim} fallback={n.icon} size={18} /></span>
+              <span><strong>{n.label}</strong><small>{n.hint}</small></span>
+            </button>
+          ))}
+          {!items.length && <div className="zpa-state">Nothing matches “{q}”.</div>}
+        </div>
+      </div>
+    </div>
+  )
+}
+
+function Overview({ fb, go, user }) {
   const { fs, db } = fb
   const count = async (name, ...where) => {
     try { return (await fs.getCountFromServer(fs.query(fs.collection(db, name), ...where))).data().count } catch { return null }
   }
+  const recent = async (name, n = 300) => {
+    try { return (await fs.getDocs(fs.query(fs.collection(db, name), fs.orderBy('createdAt', 'desc'), fs.limit(n)))).docs.map((d) => ({ id: d.id, ...d.data() })) } catch { return [] }
+  }
   const stats = useLoader(async () => {
-    const [crypto, changes, active, users, cfg] = await Promise.all([
+    const [crypto, changes, active, users, bans, cfg, pays, signups] = await Promise.all([
       count('crypto_payment_requests', fs.where('status', '==', 'PENDING')),
       count('subscription_change_requests', fs.where('status', '==', 'PENDING')),
       count('subscriptions', fs.where('status', '==', 'ACTIVE')),
       count('users'),
+      count('chat_bans'),
       fs.getDoc(fs.doc(db, 'app_config', 'public')).then((s) => s.data() || {}).catch(() => ({})),
+      recent('payment_records', 200),
+      recent('users', 300),
     ])
-    return { crypto, changes, active, users, cfg }
+    return { crypto, changes, active, users, bans, cfg, pays, signups }
   }, [])
   const d = stats.data || {}
+  const days = lastDays(14)
+  const labels = days.map((x) => x.toLocaleDateString(undefined, { day: 'numeric', month: 'short' }))
+  const bucket = (rows, value) => {
+    const m = new Map(days.map((x) => [dayKey(x), 0]))
+    for (const r of rows || []) { const t = r.createdAt?.toDate?.(); if (t) { const k = dayKey(t); if (m.has(k)) m.set(k, m.get(k) + value(r)) } }
+    return [...m.values()]
+  }
+  const revenue = bucket(d.pays, (r) => Number(r.amountUsd) || 0)
+  const signups = bucket(d.signups, () => 1)
+  const revenueTotal = revenue.reduce((x, y) => x + y, 0)
+  const signupTotal = signups.reduce((x, y) => x + y, 0)
+  const pending = (d.crypto || 0) + (d.changes || 0)
+  const name = (user?.displayName || user?.email?.split('@')[0] || 'Admin').split(' ')[0]
   const tiles = [
-    { label: 'Pending crypto', value: d.crypto, icon: 'inbox', to: 'requests', accent: d.crypto > 0 },
-    { label: 'Pending plan changes', value: d.changes, icon: 'inbox', to: 'requests', accent: d.changes > 0 },
-    { label: 'Active subscriptions', value: d.active, icon: 'crown', to: 'subscriptions' },
-    { label: 'Users', value: d.users, icon: 'users', to: 'users' },
+    { label: 'Pending requests', value: stats.loading ? null : pending, anim: 'mail', icon: 'inbox', to: 'requests', accent: pending > 0 },
+    { label: 'Active subscriptions', value: d.active, anim: 'award', icon: 'crown', to: 'subscriptions' },
+    { label: 'Users', value: d.users, anim: 'users', icon: 'users', to: 'users' },
+    { label: 'Active bans', value: d.bans, anim: 'shield', icon: 'shield', to: 'moderation' },
   ]
   const cfg = d.cfg || {}
   return (
     <>
+      <div className="zpa-hero">
+        <div className="zpa-hero-text">
+          <small>{new Date().toLocaleDateString(undefined, { weekday: 'long', day: 'numeric', month: 'long' })}</small>
+          <h2>{greeting()}, {name} 👋</h2>
+          <p>{pending > 0 ? `${pending} payment request${pending === 1 ? '' : 's'} waiting for you.` : 'Everything is calm. No requests are waiting.'}</p>
+          <div className="zpa-hero-actions">
+            <button className="zpa-btn primary" onClick={() => go(pending > 0 ? 'requests' : 'subscriptions')}><Anim name={pending > 0 ? 'mail' : 'award'} fallback="inbox" size={17} />{pending > 0 ? 'Review requests' : 'Manage plans'}</button>
+            <button className="zpa-btn glass" onClick={() => go('releases')}><Anim name="upload-cloud" fallback="rocket" size={17} />Publish update</button>
+          </div>
+        </div>
+        <div className="zpa-hero-art" aria-hidden="true"><img src="/resources/assets/app-logo/zpass.png" alt="" /></div>
+      </div>
+
       <div className="zpa-stats">
         {tiles.map((t) => (
           <button key={t.label} type="button" className={`zpa-stat ${t.accent ? 'accent' : ''}`} onClick={() => go(t.to)}>
-            <span className="zpa-stat-icon"><Icon name={t.icon} /></span>
-            <strong>{stats.loading ? '…' : t.value ?? '—'}</strong>
+            <span className="zpa-stat-icon"><Anim name={t.anim} fallback={t.icon} size={20} /></span>
+            <strong>{stats.loading ? <span className="zpa-skel" /> : t.value ?? '—'}</strong>
             <small>{t.label}</small>
           </button>
         ))}
       </div>
+
       <div className="zpa-grid2">
-        <Card title="Live app status" hint="Read from app_config/public." actions={<button className="zpa-btn ghost sm" onClick={() => go('releases')}>Edit</button>}>
+        <Card title="Revenue" hint="Completed payments, last 14 days." actions={<button className="zpa-btn ghost sm" onClick={() => go('payments')}>History</button>}>
+          <div className="zpa-metric"><strong>{money(revenueTotal)}</strong><small>{(d.pays || []).length ? `${(d.pays || []).filter((r) => r.createdAt?.toDate?.() >= days[0]).length} payments` : 'No payments yet'}</small></div>
+          <Bars values={revenue} labels={labels} format={money} />
+          <div className="zpa-bars-axis"><span>{labels[0]}</span><span>Today</span></div>
+        </Card>
+        <Card title="New accounts" hint="Sign-ups, last 14 days." actions={<button className="zpa-btn ghost sm" onClick={() => go('users')}>Users</button>}>
+          <div className="zpa-metric"><strong>{signupTotal}</strong><small>new accounts</small></div>
+          <Bars values={signups} labels={labels} tone="violet" />
+          <div className="zpa-bars-axis"><span>{labels[0]}</span><span>Today</span></div>
+        </Card>
+      </div>
+
+      <div className="zpa-grid2">
+        <Card title="Live app status" hint="What every app reads right now." actions={<button className="zpa-btn ghost sm" onClick={() => go('releases')}>Edit</button>}>
           <dl className="zpa-dl">
             <div><dt>Android</dt><dd>{cfg.latestVersionName || '—'} <span className="zpa-dim">({cfg.latestVersionCode || '—'})</span></dd></div>
             <div><dt>Minimum code</dt><dd>{cfg.minimumSupportedVersionCode || '—'}</dd></div>
             <div><dt>Windows</dt><dd>{cfg.windowsVersion || '—'}</dd></div>
-            <div><dt>Force update</dt><dd><Pill>{cfg.forceUpdate ? 'ON' : 'OFF'}</Pill></dd></div>
+            <div><dt>Force update</dt><dd><span className={`zpa-pill ${cfg.forceUpdate ? 'warn' : 'muted'}`}>{cfg.forceUpdate ? 'ON' : 'OFF'}</span></dd></div>
             <div><dt>Maintenance</dt><dd><span className={`zpa-pill ${cfg.maintenanceMode ? 'bad' : 'good'}`}>{cfg.maintenanceMode ? 'ON' : 'OFF'}</span></dd></div>
+            <div><dt>Subscription pop-up</dt><dd><span className={`zpa-pill ${cfg.paywallEnabled ? 'good' : 'muted'}`}>{cfg.paywallEnabled ? 'ON' : 'OFF'}</span></dd></div>
           </dl>
         </Card>
         <Card title="Other admin panels" hint="Same admin account, separate subdomains.">
           <div className="zpa-links">
             {EXTERNAL.map((l) => (
-              <a key={l.href} href={l.href} className="zpa-link"><span className="zpa-stat-icon"><Icon name={l.icon} /></span><span>{l.label}</span><small>{new URL(l.href).host}</small></a>
+              <a key={l.href} href={l.href} className="zpa-link"><span className="zpa-stat-icon"><Anim name={l.anim} fallback={l.icon} size={18} /></span><span>{l.label}</span><small>{new URL(l.href).host}</small></a>
             ))}
           </div>
         </Card>
@@ -416,26 +548,209 @@ function Subscriptions({ fb, ask, toast }) {
   )
 }
 
-function Users({ fb }) {
+const PLATFORM = {
+  ANDROID: { label: 'Android app', short: 'APK', anim: 'zap' },
+  WEB: { label: 'Website', short: 'Web', anim: 'link' },
+  WINDOWS: { label: 'Windows app', short: 'EXE', anim: 'database' },
+}
+const platformOf = (p) => PLATFORM[String(p || '').toUpperCase()] || { label: p || 'Unknown', short: p || '—', anim: 'activity' }
+const tsMs = (ts) => (ts?.toMillis ? ts.toMillis() : ts?.toDate ? ts.toDate().getTime() : 0)
+const ago = (ts) => {
+  const ms = tsMs(ts); if (!ms) return '—'
+  const m = Math.round((Date.now() - ms) / 60000)
+  return m < 1 ? 'just now' : m < 60 ? `${m} min ago` : m < 1440 ? `${Math.round(m / 60)} h ago` : `${Math.round(m / 1440)} d ago`
+}
+const planOf = (sub) => {
+  const active = sub?.status === 'ACTIVE' && tsMs(sub?.expiresAt) > Date.now()
+  if (!active) return 'FREE'
+  return /pro/i.test(sub.planId || '') || sub.plan === 'PRO' || sub.plan === 'FAMILY' ? 'PRO' : 'PLUS'
+}
+const country = (code) => { try { return code ? new Intl.DisplayNames(undefined, { type: 'region' }).of(code) : '' } catch { return code } }
+
+function Users({ fb, ask, toast }) {
   const { fs, db } = fb
   const [search, setSearch] = useState('')
+  const [open, setOpen] = useState(null)
   const users = useLoader(async () => {
-    const snap = await fs.getDocs(fs.query(fs.collection(db, 'users'), fs.limit(200)))
-    return snap.docs.map((d) => ({ id: d.id, ...d.data() }))
+    const [snap, subs] = await Promise.all([
+      fs.getDocs(fs.query(fs.collection(db, 'users'), fs.limit(300))),
+      fs.getDocs(fs.query(fs.collection(db, 'subscriptions'), fs.limit(500))).catch(() => ({ docs: [] })),
+    ])
+    const plan = new Map(subs.docs.map((d) => [d.id, planOf(d.data())]))
+    return snap.docs.map((d) => ({ id: d.id, ...d.data(), _plan: plan.get(d.id) || 'FREE' }))
+      .sort((x, y) => tsMs(y.lastSeenAt || y.createdAt) - tsMs(x.lastSeenAt || x.createdAt))
   }, [])
+  const dupes = useMemo(() => {
+    const m = new Map()
+    for (const u of users.data || []) { const e = String(u.email || '').toLowerCase(); if (e) m.set(e, (m.get(e) || 0) + 1) }
+    return m
+  }, [users.data])
+  const dupeCount = [...dupes.values()].filter((n) => n > 1).length
   const rows = useMemo(() => {
     const q = search.trim().toLowerCase()
     return (users.data || []).filter((u) => !q || [u.zPassId, u.displayName, u.name, u.email, u.id].some((v) => String(v || '').toLowerCase().includes(q)))
   }, [users.data, search])
   return (
-    <Card title="Users" hint="Latest 200 account records." actions={<button className="zpa-btn ghost sm" onClick={users.reload}><Icon name="refresh" size={15} />Refresh</button>}>
-      <label className="zpa-search"><Icon name="search" size={16} /><input type="search" value={search} onChange={(e) => setSearch(e.target.value)} placeholder="Search email, name or PassGram ID" /></label>
-      <Table rows={users.data ? rows : null} loading={users.loading} error={users.error} empty="No matching users."
-        columns={[
-          { label: 'PassGram ID', mono: true, render: (u) => u.zPassId || `ZP-${u.id.slice(0, 6).toUpperCase()}${u.id.slice(-4).toUpperCase()}` },
-          { label: 'Name', render: (u) => u.displayName || u.name || '—' }, { label: 'Email', key: 'email' }, { label: 'Created', render: (u) => fmtDate(u.createdAt) },
-        ]} />
-    </Card>
+    <>
+      <Card title="Users" hint="Tap a person to see devices, plan, payments and admin actions." actions={<button className="zpa-btn ghost sm" onClick={users.reload}><Icon name="refresh" size={15} />Refresh</button>}>
+        {dupeCount > 0 && <div className="zpa-alert"><Anim name="alert-triangle" fallback="bug" size={18} /><span><b>{dupeCount} email address{dupeCount === 1 ? ' has' : 'es have'} more than one account.</b> Turn on “Link accounts that use the same email” in Firebase Authentication settings so every email gets exactly one PassGram ID.</span></div>}
+        <label className="zpa-search"><Icon name="search" size={16} /><input type="search" value={search} onChange={(e) => setSearch(e.target.value)} placeholder="Search email, name, PassGram ID or uid" /></label>
+        {users.error ? <div className="zpa-state bad">{users.error}</div> : users.loading && !users.data ? <div className="zpa-state"><span className="zpa-spin" />Loading…</div> : !rows.length ? <div className="zpa-state">No matching users.</div> : (
+          <div className="zpa-people">
+            {rows.map((u) => (
+              <button key={u.id} type="button" className="zpa-person" onClick={() => setOpen(u)}>
+                {u.photoUrl ? <img src={u.photoUrl} alt="" referrerPolicy="no-referrer" /> : <span className="zpa-avatar">{(u.displayName || u.email || '?').charAt(0).toUpperCase()}</span>}
+                <span className="zpa-person-main"><strong>{u.displayName || u.name || '—'}</strong><small>{u.email || u.id}</small></span>
+                <span className="zpa-person-meta">
+                  <span className={`zpa-pill ${u._plan === 'FREE' ? 'muted' : 'good'}`}>{u._plan}</span>
+                  {u.platform && <span className="zpa-chip">{platformOf(u.platform).short}</span>}
+                  {dupes.get(String(u.email || '').toLowerCase()) > 1 && <span className="zpa-pill warn">DUPLICATE</span>}
+                  <small>{ago(u.lastSeenAt || u.lastLoginAt)}</small>
+                </span>
+              </button>
+            ))}
+          </div>
+        )}
+      </Card>
+      {open && <UserDrawer fb={fb} ask={ask} toast={toast} user={open} onClose={() => setOpen(null)} onChanged={users.reload} />}
+    </>
+  )
+}
+
+function UserDrawer({ fb, ask, toast, user, onClose, onChanged }) {
+  const { fs, db, auth, authSdk } = fb
+  const uid = user.id
+  const [busy, setBusy] = useState(false)
+  const info = useLoader(async () => {
+    const safe = (p) => p.catch(() => null)
+    const [sub, profile, devices, pays, crypto, ban] = await Promise.all([
+      safe(fs.getDoc(fs.doc(db, 'subscriptions', uid)).then((d) => d.data() || null)),
+      safe(fs.getDoc(fs.doc(db, 'chat_profiles', uid)).then((d) => d.data() || null)),
+      safe(fs.getDocs(fs.collection(db, 'users', uid, 'devices')).then((s) => s.docs.map((d) => ({ id: d.id, ...d.data() })))),
+      safe(fs.getDocs(fs.query(fs.collection(db, 'payment_records'), fs.where('uid', '==', uid), fs.limit(50))).then((s) => s.docs.map((d) => ({ id: d.id, ...d.data() })))),
+      safe(fs.getDocs(fs.query(fs.collection(db, 'crypto_payment_requests'), fs.where('uid', '==', uid), fs.limit(50))).then((s) => s.docs.map((d) => ({ id: d.id, ...d.data() })))),
+      safe(fs.getDoc(fs.doc(db, 'chat_bans', uid)).then((d) => (d.exists() ? d.data() : null))),
+    ])
+    return { sub, profile, devices: (devices || []).sort((a, b) => tsMs(b.lastSeenAt) - tsMs(a.lastSeenAt)), pays: pays || [], crypto: crypto || [], ban }
+  }, [uid])
+  useEffect(() => { const k = (e) => { if (e.key === 'Escape') onClose() }; window.addEventListener('keydown', k); return () => window.removeEventListener('keydown', k) }, [onClose])
+  const d = info.data || {}
+  const prof = d.profile || {}
+  const plan = planOf(d.sub)
+  const live = (d.devices || []).filter((x) => !x.revoked)
+  const run = async (fn) => { setBusy(true); try { await fn(); info.reload(); onChanged?.() } catch (error) { toast(errorText(error), 'bad') } finally { setBusy(false) } }
+
+  const grant = (tier) => run(async () => {
+    const v = await ask({ title: `Give ${tier}`, message: `${user.email || uid} gets PassGram ${tier}.`, fields: [{ name: 'months', label: 'Months', type: 'number', min: 1, value: '1' }], confirm: 'Grant' })
+    if (!v) return
+    const n = Math.max(1, Math.min(60, Number(v.months) || 1))
+    await fs.setDoc(fs.doc(db, 'subscriptions', uid), { zPassId: user.zPassId || '', plan: tier, planId: `zpass_${tier.toLowerCase()}_manual`, status: 'ACTIVE', expiresAt: monthsFromNow(fs, n), updatedAt: fs.serverTimestamp(), grantedManuallyBy: auth.currentUser.email }, { merge: true })
+    toast(`${tier} for ${n} month(s) granted.`)
+  })
+  const revoke = () => run(async () => {
+    if (!(await ask({ title: 'Remove the plan?', message: 'The account goes back to Free right away.', confirm: 'Remove', danger: true }))) return
+    await fs.setDoc(fs.doc(db, 'subscriptions', uid), { status: 'REVOKED', expiresAt: fs.Timestamp.now(), updatedAt: fs.serverTimestamp(), revokedBy: auth.currentUser.email }, { merge: true })
+    toast('Plan removed.')
+  })
+  const resetLink = () => run(async () => {
+    if (!user.email) throw Error('This account has no email address.')
+    if (!(await ask({ title: 'Send a password reset link?', message: `A reset link goes to ${user.email}. Their other devices are signed out after they reset.`, confirm: 'Send link' }))) return
+    await authSdk.sendPasswordResetEmail(auth, user.email)
+    toast(`Reset link sent to ${user.email}.`)
+  })
+  const setVerified = (on) => run(async () => {
+    await fs.updateDoc(fs.doc(db, 'chat_profiles', uid), { verified: on })
+    toast(on ? 'Verified badge added.' : 'Verified badge removed.')
+  })
+  const setCompany = () => run(async () => {
+    const v = await ask({ title: 'Company or label', message: 'Shown next to the name, like "Google", "Android" or "X". Leave empty to remove.', fields: [{ name: 'label', label: 'Label', value: prof.companyLabel || '', placeholder: 'Google' }], confirm: 'Save' })
+    if (!v) return
+    await fs.updateDoc(fs.doc(db, 'chat_profiles', uid), { companyLabel: String(v.label || '').trim().slice(0, 32) })
+    toast('Label saved.')
+  })
+  const setUsername = () => run(async () => {
+    const v = await ask({ title: 'Set username', message: 'Admins may give short names (1–4 characters, e.g. "npm") to companies. Letters, digits and _ only.', fields: [{ name: 'name', label: 'Username', value: prof.username || '', placeholder: 'npm' }], confirm: 'Save' })
+    if (!v) return
+    const name = String(v.name || '').trim().toLowerCase().replace(/^@/, '')
+    if (!/^[a-z0-9_]{1,32}$/.test(name)) throw Error('Use 1–32 letters, digits or _.')
+    const taken = await fs.getDoc(fs.doc(db, 'chat_usernames', name))
+    if (taken.exists() && taken.data().uid !== uid) throw Error(`@${name} is already used.`)
+    const batch = fs.writeBatch(db)
+    if (prof.username && prof.username !== name) batch.delete(fs.doc(db, 'chat_usernames', prof.username))
+    batch.set(fs.doc(db, 'chat_usernames', name), { uid })
+    batch.update(fs.doc(db, 'chat_profiles', uid), { username: name })
+    await batch.commit()
+    toast(`Username set to @${name}.`)
+  })
+
+  return (
+    <div className="zpa-drawer-wrap" onMouseDown={(e) => { if (e.target === e.currentTarget) onClose() }}>
+      <aside className="zpa-drawer">
+        <div className="zpa-drawer-head">
+          {user.photoUrl ? <img src={user.photoUrl} alt="" referrerPolicy="no-referrer" /> : <span className="zpa-avatar big">{(user.displayName || user.email || '?').charAt(0).toUpperCase()}</span>}
+          <div>
+            <h3>{user.displayName || '—'} {prof.verified && <span className="zpa-verified" title="Verified">✓</span>} {prof.companyLabel && <span className="zpa-chip">{prof.companyLabel}</span>}</h3>
+            <small>{prof.username ? `@${prof.username} · ` : ''}{user.email || 'no email'}</small>
+            <div className="zpa-drawer-tags">
+              <span className={`zpa-pill ${plan === 'FREE' ? 'muted' : 'good'}`}>{plan}</span>
+              <span className={`zpa-pill ${d.ban ? 'bad' : 'good'}`}>{d.ban ? 'BANNED' : (user.accountStatus || 'ACTIVE')}</span>
+              {user.emailVerified && <span className="zpa-pill good">Email verified</span>}
+            </div>
+          </div>
+          <button className="zpa-icon-btn" onClick={onClose} aria-label="Close"><Icon name="x" /></button>
+        </div>
+
+        {info.loading && !info.data ? <div className="zpa-state"><span className="zpa-spin" />Loading…</div> : (
+          <div className="zpa-drawer-body">
+            <div className="zpa-actions-grid">
+              <button className="zpa-btn" disabled={busy} onClick={() => grant('PLUS')}><Anim name="star" fallback="crown" size={16} />Give Plus</button>
+              <button className="zpa-btn primary" disabled={busy} onClick={() => grant('PRO')}><Anim name="award" fallback="crown" size={16} />Give Pro</button>
+              <button className="zpa-btn" disabled={busy} onClick={resetLink}><Anim name="mail" fallback="inbox" size={16} />Reset link</button>
+              <button className="zpa-btn" disabled={busy} onClick={() => setVerified(!prof.verified)}><Anim name="shield" fallback="check" size={16} />{prof.verified ? 'Unverify' : 'Verify'}</button>
+              <button className="zpa-btn" disabled={busy} onClick={setCompany}><Anim name="bookmark" fallback="check" size={16} />Label</button>
+              <button className="zpa-btn" disabled={busy} onClick={setUsername}><Anim name="link" fallback="api" size={16} />Username</button>
+              {plan !== 'FREE' && <button className="zpa-btn danger" disabled={busy} onClick={revoke}>Remove plan</button>}
+            </div>
+
+            <h4>Account</h4>
+            <dl className="zpa-dl">
+              <div><dt>PassGram ID</dt><dd className="mono">{user.zPassId || '—'}</dd></div>
+              <div><dt>User id</dt><dd className="mono">{uid}</dd></div>
+              <div><dt>Signed up</dt><dd>{fmtDate(user.createdAt)}</dd></div>
+              <div><dt>Last seen</dt><dd>{ago(user.lastSeenAt || user.lastLoginAt)}</dd></div>
+              <div><dt>Sign-in methods</dt><dd>{(user.providers || []).join(', ') || '—'}</dd></div>
+              <div><dt>Last IP</dt><dd className="mono">{user.lastIp ? `${user.lastIp}${user.lastCity ? ' · ' + user.lastCity : ''}${user.lastCountry ? ' · ' + country(user.lastCountry) : ''}` : '—'}</dd></div>
+              <div><dt>Plan expires</dt><dd>{plan === 'FREE' ? '—' : fmtDate(d.sub?.expiresAt)}</dd></div>
+            </dl>
+
+            <h4>Devices <span className="zpa-dim">· {live.length} active</span></h4>
+            {!d.devices?.length ? <div className="zpa-state">No devices recorded.</div> : (
+              <div className="zpa-devices">
+                {d.devices.map((x) => {
+                  const pf = platformOf(x.platform)
+                  return (
+                    <div key={x.id} className={`zpa-device ${x.revoked ? 'off' : ''}`}>
+                      <span className="zpa-stat-icon"><Anim name={pf.anim} fallback="core" size={18} /></span>
+                      <div><strong>{x.deviceName || pf.label}</strong><small>{pf.label}{x.appVersion ? ` · v${x.appVersion}` : ''}{x.lastCity ? ` · ${x.lastCity}` : ''}{x.countryCode ? ` · ${country(x.countryCode)}` : ''}</small>{x.lastIp && <small className="mono">IP {x.lastIp}</small>}</div>
+                      <small>{x.revoked ? 'signed out' : ago(x.lastSeenAt)}</small>
+                    </div>
+                  )
+                })}
+              </div>
+            )}
+            <p className="zpa-note">IP address, city and country are recorded by the server only when the person allowed optional data in the app.</p>
+
+            <h4>Payments</h4>
+            {!d.pays?.length && !d.crypto?.length ? <div className="zpa-state">No payments.</div> : (
+              <div className="zpa-devices">
+                {d.pays.map((r) => <div key={r.id} className="zpa-device"><span className="zpa-pill good">PAID</span><div><strong>{money(r.amountUsd)} · {r.plan || ''} {r.billing || ''}</strong><small>{r.provider || 'card'} · {fmtDate(r.createdAt)}</small></div></div>)}
+                {d.crypto.map((r) => <div key={r.id} className="zpa-device"><Pill>{r.status}</Pill><div><strong>${r.amountUsd} · {r.plan}</strong><small>{r.network} · {fmtDate(r.createdAt)}</small></div></div>)}
+              </div>
+            )}
+          </div>
+        )}
+      </aside>
+    </div>
   )
 }
 
@@ -470,15 +785,12 @@ function Releases({ fb, ask, toast }) {
     const min = Number(form.minimumSupportedVersionCode) || 1
     if (min > code) return toast('Minimum code cannot be higher than the latest code.', 'bad')
     for (const k of ['updateUrl', 'windowsUrl']) if (form[k] && !/^https:\/\//i.test(form[k].trim())) return toast('Download links must start with https://', 'bad')
-    if ((form.forceUpdate || form.maintenanceMode) && !(await ask({ title: 'Publish to every app?', message: `${form.forceUpdate ? 'Force update is ON. ' : ''}${form.maintenanceMode ? 'Maintenance mode is ON: users cannot open their vault. ' : ''}Apps pick this up right away.`, confirm: 'Publish', danger: true }))) return
-    const announcement = form.announcement.trim()
+    if (form.forceUpdate && !(await ask({ title: 'Force every Android app to update?', message: 'Force update is ON: older Android versions must update before they can be used.', confirm: 'Publish', danger: true }))) return
     setSaving(true)
     try {
       await fs.setDoc(ref, {
         latestVersionName: form.latestVersionName.trim(), latestVersionCode: code, minimumSupportedVersionCode: min,
-        updateUrl: form.updateUrl.trim(), forceUpdate: !!form.forceUpdate, maintenanceMode: !!form.maintenanceMode,
-        maintenanceMessage: form.maintenanceMessage.trim() || 'PassGram is temporarily under maintenance.',
-        announcement, announcementId: announcement === (cfg.data?.announcement || '').trim() ? cfg.data?.announcementId || '' : announcement ? 'a' + Date.now() : '',
+        updateUrl: form.updateUrl.trim(), forceUpdate: !!form.forceUpdate,
         windowsVersion: form.windowsVersion.trim(), windowsUrl: form.windowsUrl.trim(), windowsNotes: form.windowsNotes.trim(),
         updatedAt: fs.serverTimestamp(),
       }, { merge: true })
@@ -504,11 +816,9 @@ function Releases({ fb, ask, toast }) {
           <label className="zpa-field"><span>Release notes</span><textarea rows={4} value={form.windowsNotes} onChange={set('windowsNotes')} placeholder="What's new" /></label>
         </div>
         <div className="zpa-tile">
-          <h4>Announcement & status</h4>
-          <label className="zpa-field"><span>Announcement in the app</span><textarea rows={3} value={form.announcement} onChange={set('announcement')} placeholder="What's new in this version" /></label>
-          <label className="zpa-field"><span>Maintenance message</span><input value={form.maintenanceMessage} onChange={set('maintenanceMessage')} placeholder="PassGram is temporarily under maintenance." /></label>
+          <h4>Android update policy</h4>
           <label className="zpa-switch"><input type="checkbox" checked={!!form.forceUpdate} onChange={set('forceUpdate')} /><span />Force update</label>
-          <label className="zpa-switch"><input type="checkbox" checked={!!form.maintenanceMode} onChange={set('maintenanceMode')} /><span />Maintenance mode</label>
+          <p style={{ fontSize: 12, opacity: 0.7, margin: 0 }}>Announcements and maintenance are now per platform, in the card below.</p>
         </div>
       </div>
       <div className="zpa-form-row end">
@@ -518,167 +828,143 @@ function Releases({ fb, ask, toast }) {
   )
 }
 
-const EMPTY_PW = { paywallEnabled: false, paywallEveryHours: 72, paywallMaxShows: 3, paywallDelaySeconds: 20, paywallDefaultTier: 'pro', paywallTitle: '', paywallOffer: '', paywallOfferBilling: 'monthly', paywallCta: '' }
+const PW_FIELDS = { Enabled: false, EveryHours: 72, MaxShows: 3, DelaySeconds: 20, DefaultTier: 'pro', Title: '', Offer: '', OfferBilling: 'monthly', Cta: '', CampaignId: '' }
+// Android keeps the original field names (paywallEnabled…); website and Windows use their own (paywallWebEnabled…, paywallWinEnabled…).
+const PW_PLATFORMS = [
+  { value: 'android', label: 'Android app', prefix: 'paywall' },
+  { value: 'web', label: 'Website', prefix: 'paywallWeb' },
+  { value: 'win', label: 'Windows app', prefix: 'paywallWin' },
+]
 function Paywall({ fb, ask, toast }) {
   const { fs, db } = fb
   const ref = fs.doc(db, 'app_config', 'public')
-  const [form, setForm] = useState(EMPTY_PW)
+  const [platform, setPlatform] = useState('android')
+  const prefix = PW_PLATFORMS.find((x) => x.value === platform).prefix
+  const [form, setForm] = useState(PW_FIELDS)
   const [saving, setSaving] = useState(false)
   const cfg = useLoader(async () => (await fs.getDoc(ref)).data() || {}, [])
-  useEffect(() => { if (cfg.data) setForm({ ...EMPTY_PW, ...Object.fromEntries(Object.keys(EMPTY_PW).map((k) => [k, cfg.data[k] ?? EMPTY_PW[k]])) }) }, [cfg.data])
+  useEffect(() => {
+    if (cfg.data) setForm(Object.fromEntries(Object.keys(PW_FIELDS).map((k) => [k, cfg.data[prefix + k] ?? PW_FIELDS[k]])))
+  }, [cfg.data, prefix])
   const set = (k) => (e) => setForm({ ...form, [k]: e.target.type === 'checkbox' ? e.target.checked : e.target.value })
+  const label = PW_PLATFORMS.find((x) => x.value === platform).label
   const save = async (newCampaign) => {
-    const every = Number(form.paywallEveryHours), max = Number(form.paywallMaxShows), delay = Number(form.paywallDelaySeconds)
+    const every = Number(form.EveryHours), max = Number(form.MaxShows), delay = Number(form.DelaySeconds)
     if (!(every >= 0 && every <= 2160) || !(max >= 0 && max <= 1000) || !(delay >= 0 && delay <= 600)) return toast('Check the numbers: hours 0–2160, max 0–1000, delay 0–600 s.', 'bad')
-    if (newCampaign && !(await ask({ title: 'Show the pop-up again to everyone?', message: 'Starts a new campaign: every signed-in free user sees the subscription pop-up again on their next app open.', confirm: 'Start campaign' }))) return
+    if (newCampaign && !(await ask({ title: `Show the pop-up again on ${label}?`, message: `Starts a new ${label} campaign: every signed-in free user sees it again.`, confirm: 'Start campaign' }))) return
     setSaving(true)
     try {
-      const enabled = newCampaign ? true : !!form.paywallEnabled
-      await fs.setDoc(ref, {
-        paywallEnabled: enabled, paywallEveryHours: every, paywallMaxShows: max, paywallDelaySeconds: delay,
-        paywallDefaultTier: form.paywallDefaultTier === 'plus' ? 'plus' : 'pro',
-        paywallTitle: form.paywallTitle.trim().slice(0, 80), paywallOffer: form.paywallOffer.trim().slice(0, 80),
-        paywallOfferBilling: form.paywallOfferBilling === 'yearly' ? 'yearly' : 'monthly', paywallCta: form.paywallCta.trim().slice(0, 40),
-        paywallCampaignId: newCampaign || (enabled && !cfg.data?.paywallCampaignId) ? 'c' + Date.now() : cfg.data?.paywallCampaignId || '',
-        updatedAt: fs.serverTimestamp(),
-      }, { merge: true })
-      toast(newCampaign ? 'New campaign started. Apps pick it up live.' : 'Saved. Apps pick this up live.'); cfg.reload()
+      const enabled = newCampaign ? true : !!form.Enabled
+      const v = {
+        Enabled: enabled, EveryHours: every, MaxShows: max, DelaySeconds: delay,
+        DefaultTier: form.DefaultTier === 'plus' ? 'plus' : 'pro',
+        Title: String(form.Title).trim().slice(0, 80), Offer: String(form.Offer).trim().slice(0, 80),
+        OfferBilling: form.OfferBilling === 'yearly' ? 'yearly' : 'monthly', Cta: String(form.Cta).trim().slice(0, 40),
+        CampaignId: newCampaign || (enabled && !form.CampaignId) ? 'c' + Date.now() : form.CampaignId || '',
+      }
+      await fs.setDoc(ref, { ...Object.fromEntries(Object.entries(v).map(([k, x]) => [prefix + k, x])), updatedAt: fs.serverTimestamp() }, { merge: true })
+      toast(newCampaign ? `New ${label} campaign started.` : `${label} pop-up saved.`); cfg.reload()
     } catch (error) { toast(errorText(error), 'bad') } finally { setSaving(false) }
   }
   if (cfg.error) return <Card title="Subscription pop-up"><div className="zpa-state bad">{cfg.error}</div></Card>
   return (
-    <Card title="Subscription pop-up" hint="X-style upgrade sheet in the Android app. Only signed-in free users see it; closing it returns them where they were. Also controllable from the admin Telegram bot with /paywall."
+    <Card title="Subscription pop-up" hint="X-style upgrade sheet. Each platform has its own settings, so the app, the website and the Windows app can run different offers."
       actions={<button className="zpa-btn ghost sm" onClick={cfg.reload}><Icon name="refresh" size={15} />Reload</button>}>
+      <div className="zpa-toolbar"><Segmented value={platform} options={PW_PLATFORMS.map(({ value, label }) => ({ value, label }))} onChange={setPlatform} />
+        <span className={`zpa-pill ${form.Enabled ? 'good' : 'muted'}`}>{form.Enabled ? 'ON' : 'OFF'} on {label}</span></div>
       <div className="zpa-grid3">
         <div className="zpa-tile">
           <h4>When</h4>
-          <label className="zpa-switch"><input type="checkbox" checked={!!form.paywallEnabled} onChange={set('paywallEnabled')} /><span />Pop-up enabled</label>
-          <label className="zpa-field"><span>Minimum hours between pop-ups</span><input type="number" min="0" value={form.paywallEveryHours} onChange={set('paywallEveryHours')} /></label>
-          <label className="zpa-field"><span>Max per user per campaign (0 = no limit)</span><input type="number" min="0" value={form.paywallMaxShows} onChange={set('paywallMaxShows')} /></label>
-          <label className="zpa-field"><span>Delay after the app opens (seconds)</span><input type="number" min="0" value={form.paywallDelaySeconds} onChange={set('paywallDelaySeconds')} /></label>
+          <label className="zpa-switch"><input type="checkbox" checked={!!form.Enabled} onChange={set('Enabled')} /><span />Pop-up enabled</label>
+          <label className="zpa-field"><span>Minimum hours between pop-ups</span><input type="number" min="0" value={form.EveryHours} onChange={set('EveryHours')} /></label>
+          <label className="zpa-field"><span>Max per user per campaign (0 = no limit)</span><input type="number" min="0" value={form.MaxShows} onChange={set('MaxShows')} /></label>
+          <label className="zpa-field"><span>Delay after opening (seconds)</span><input type="number" min="0" value={form.DelaySeconds} onChange={set('DelaySeconds')} /></label>
         </div>
         <div className="zpa-tile">
           <h4>Content</h4>
-          <label className="zpa-field"><span>Headline (empty = default)</span><input value={form.paywallTitle} onChange={set('paywallTitle')} placeholder="One subscription. Everything protected." /></label>
-          <label className="zpa-field"><span>Button text (empty = “Upgrade to …”)</span><input value={form.paywallCta} onChange={set('paywallCta')} placeholder="Claim limited-time offer" /></label>
-          <label className="zpa-field"><span>Plan tab selected first</span><select value={form.paywallDefaultTier} onChange={set('paywallDefaultTier')}><option value="pro">Pro</option><option value="plus">Plus</option></select></label>
+          <label className="zpa-field"><span>Headline (empty = default)</span><input value={form.Title} onChange={set('Title')} placeholder="One subscription. Everything protected." /></label>
+          <label className="zpa-field"><span>Button text (empty = “Upgrade to …”)</span><input value={form.Cta} onChange={set('Cta')} placeholder="Claim limited-time offer" /></label>
+          <label className="zpa-field"><span>Plan tab selected first</span><select value={form.DefaultTier} onChange={set('DefaultTier')}><option value="pro">Pro</option><option value="plus">Plus</option></select></label>
         </div>
         <div className="zpa-tile">
           <h4>Offer</h4>
-          <label className="zpa-field"><span>Blue offer line (empty = none)</span><input value={form.paywallOffer} onChange={set('paywallOffer')} placeholder="50% off your first month" /></label>
-          <label className="zpa-field"><span>Show the offer on</span><select value={form.paywallOfferBilling} onChange={set('paywallOfferBilling')}><option value="monthly">Monthly</option><option value="yearly">Yearly</option></select></label>
-          <p style={{ fontSize: 12, opacity: 0.7, margin: "6px 0 0" }}>The offer line is display text only. Make sure the real discount exists in Stripe.</p>
+          <label className="zpa-field"><span>Blue offer line (empty = none)</span><input value={form.Offer} onChange={set('Offer')} placeholder="50% off your first month" /></label>
+          <label className="zpa-field"><span>Show the offer on</span><select value={form.OfferBilling} onChange={set('OfferBilling')}><option value="monthly">Monthly</option><option value="yearly">Yearly</option></select></label>
+          <p style={{ fontSize: 12, opacity: 0.7, margin: '6px 0 0' }}>The offer line is display text only. Make sure the real discount exists in Stripe.</p>
         </div>
       </div>
       <div className="zpa-form-row end">
-        <button className="zpa-btn ghost" disabled={saving || cfg.loading} onClick={() => save(true)}><Icon name="rocket" size={15} />Show again to everyone</button>
-        <button className="zpa-btn primary" disabled={saving || cfg.loading} onClick={() => save(false)}>{saving ? 'Saving…' : 'Save'}</button>
+        <button className="zpa-btn ghost" disabled={saving || cfg.loading} onClick={() => save(true)}><Anim name="refresh" fallback="rocket" size={15} />Show again to everyone</button>
+        <button className="zpa-btn primary" disabled={saving || cfg.loading} onClick={() => save(false)}>{saving ? 'Saving…' : `Save ${label}`}</button>
       </div>
     </Card>
   )
 }
 
-// ---------------- Moderation (Telegram style bans) ----------------
-// chat_bans/{uid} bans an account; chat_bans/group_{gid} closes a group or channel for everyone.
-// Firestore rules make the collection admin-only and refuse messages from banned accounts / in closed groups.
-function Moderation({ fb, ask, toast }) {
+// Android keeps the original names (announcement, maintenanceMode…); the website and Windows app use their own.
+const STATUS_PLATFORMS = [
+  { value: 'android', label: 'Android app', prefix: '' },
+  { value: 'web', label: 'Website', prefix: 'web' },
+  { value: 'win', label: 'Windows app', prefix: 'win' },
+]
+const statusKey = (prefix, name) => (prefix ? prefix + name.charAt(0).toUpperCase() + name.slice(1) : name)
+function PlatformStatus({ fb, ask, toast }) {
   const { fs, db } = fb
-  const [kind, setKind] = useState('user')
-  const [target, setTarget] = useState('')
-  const [reason, setReason] = useState('')
-  const [busy, setBusy] = useState(false)
-  const bans = useLoader(async () => {
-    const snap = await fs.getDocs(fs.query(fs.collection(db, 'chat_bans'), fs.orderBy('bannedAt', 'desc'), fs.limit(200)))
-    return snap.docs.map((d) => ({ id: d.id, ...d.data() }))
-  }, [])
-
-  // "@name", "zpas.org/name" or a raw id → { id, name } for a person or a group/channel
-  const resolve = async (raw, wantGroup) => {
-    const text = String(raw || '').trim().replace(/^https?:\/\/(www\.)?zpas\.org\//i, '').replace(/^zpas\.org\//i, '').replace(/^@/, '')
-    if (!text) throw Error('Enter a @username or an id.')
-    const handle = text.toLowerCase()
-    if (/^[a-z0-9_]{4,32}$/.test(handle)) {
-      const row = await fs.getDoc(fs.doc(db, 'chat_usernames', handle))
-      if (row.exists()) {
-        const d = row.data()
-        if (wantGroup) { if (!d.gid) throw Error(`@${handle} is not a group or channel.`); return { id: d.gid, name: '@' + handle } }
-        if (d.gid || d.botId) throw Error(`@${handle} is not a person. Use the Group / channel tab.`)
-        return { id: d.uid, name: '@' + handle }
+  const ref = fs.doc(db, 'app_config', 'public')
+  const [target, setTarget] = useState('all')
+  const [form, setForm] = useState({ announcement: '', maintenanceMode: false, maintenanceMessage: '' })
+  const [saving, setSaving] = useState(false)
+  const cfg = useLoader(async () => (await fs.getDoc(ref)).data() || {}, [])
+  const read = (prefix, data) => ({
+    announcement: data[statusKey(prefix, 'announcement')] || '',
+    maintenanceMode: !!data[statusKey(prefix, 'maintenanceMode')],
+    maintenanceMessage: data[statusKey(prefix, 'maintenanceMessage')] || '',
+  })
+  useEffect(() => { if (cfg.data) setForm(read(target === 'all' ? '' : STATUS_PLATFORMS.find((x) => x.value === target).prefix, cfg.data)) }, [cfg.data, target])
+  const set = (k) => (e) => setForm({ ...form, [k]: e.target.type === 'checkbox' ? e.target.checked : e.target.value })
+  const targets = target === 'all' ? STATUS_PLATFORMS : STATUS_PLATFORMS.filter((x) => x.value === target)
+  const names = targets.map((x) => x.label).join(', ')
+  const save = async () => {
+    if (form.maintenanceMode && !(await ask({ title: `Maintenance ON for ${names}?`, message: 'People on these platforms cannot use PassGram until you turn it off.', confirm: 'Turn on', danger: true }))) return
+    setSaving(true)
+    try {
+      const text = form.announcement.trim()
+      const update = { updatedAt: fs.serverTimestamp() }
+      for (const t of targets) {
+        const old = (cfg.data?.[statusKey(t.prefix, 'announcement')] || '').trim()
+        update[statusKey(t.prefix, 'announcement')] = text
+        update[statusKey(t.prefix, 'announcementId')] = text === old ? cfg.data?.[statusKey(t.prefix, 'announcementId')] || '' : text ? 'a' + Date.now() : ''
+        update[statusKey(t.prefix, 'maintenanceMode')] = !!form.maintenanceMode
+        update[statusKey(t.prefix, 'maintenanceMessage')] = form.maintenanceMessage.trim() || 'PassGram is temporarily under maintenance.'
       }
-    }
-    if (/^[A-Za-z0-9_-]{6,128}$/.test(text)) return { id: text, name: text }
-    throw Error('Not found: ' + raw)
+      await fs.setDoc(ref, update, { merge: true })
+      toast(`Published to ${names}.`); cfg.reload()
+    } catch (error) { toast(errorText(error), 'bad') } finally { setSaving(false) }
   }
-
-  const ban = async () => {
-    setBusy(true)
-    try {
-      const wantGroup = kind === 'group'
-      const { id, name } = await resolve(target, wantGroup)
-      const ok = await ask({
-        title: wantGroup ? `Close ${name}?` : `Ban ${name}?`,
-        message: wantGroup ? 'Every member sees "This channel can\'t be displayed … violates the Z Pass Terms of Service" and nobody can post.'
-          : 'The person sees "Your account was banned by Z Pass for violating the Z Pass Terms of Service" and can no longer send messages.',
-        confirm: wantGroup ? 'Close' : 'Ban', danger: true,
-      })
-      if (!ok) return
-      const docId = wantGroup ? 'group_' + id : id
-      await fs.setDoc(fs.doc(db, 'chat_bans', docId), {
-        banned: true, type: wantGroup ? 'group' : 'user', [wantGroup ? 'gid' : 'uid']: id, username: name,
-        reason: reason.trim().slice(0, 200), bannedAt: fs.serverTimestamp(), by: fb.auth?.currentUser?.uid || '',
-      })
-      toast(wantGroup ? `${name} closed.` : `${name} banned.`); setTarget(''); setReason(''); bans.reload()
-    } catch (error) { toast(errorText(error), 'bad') } finally { setBusy(false) }
-  }
-
-  const unban = async (row) => {
-    if (!(await ask({ title: `Lift the ban on ${row.username || row.id}?`, message: 'They can use chats again right away.', confirm: 'Lift ban' }))) return
-    try { await fs.deleteDoc(fs.doc(db, 'chat_bans', row.id)); toast('Ban lifted.'); bans.reload() } catch (error) { toast(errorText(error), 'bad') }
-  }
-
-  const deleteGroup = async (row) => {
-    const gid = row.gid || row.id.replace(/^group_/, '')
-    if (!(await ask({ title: `Delete ${row.username || gid} permanently?`, message: 'The group / channel is removed for every member. This cannot be undone.', confirm: 'Delete', danger: true }))) return
-    try {
-      await fs.deleteDoc(fs.doc(db, 'chat_groups', gid))
-      const handle = String(row.username || '').replace(/^@/, '')
-      if (handle) await fs.deleteDoc(fs.doc(db, 'chat_usernames', handle)).catch(() => {})
-      toast('Deleted.'); bans.reload()
-    } catch (error) { toast(errorText(error), 'bad') }
-  }
-
+  const live = (prefix) => cfg.data && !!cfg.data[statusKey(prefix, 'maintenanceMode')]
   return (
-    <>
-      <Card title="Ban or close" hint="Bans apply instantly in the app. Banned people keep their account but cannot use chats; closed groups and channels disappear for every member.">
-        <div className="zpa-form-row">
-          <label className="zpa-field"><span>Type</span>
-            <select value={kind} onChange={(e) => setKind(e.target.value)}><option value="user">Person</option><option value="group">Group / channel</option></select></label>
-          <label className="zpa-field" style={{ flex: 2 }}><span>{kind === 'user' ? '@username or user id' : '@username, zpas.org/link or group id'}</span>
-            <input value={target} onChange={(e) => setTarget(e.target.value)} placeholder={kind === 'user' ? '@username' : '@channel'} /></label>
-          <label className="zpa-field" style={{ flex: 2 }}><span>Reason (shown to them, optional)</span>
-            <input value={reason} onChange={(e) => setReason(e.target.value)} placeholder="Spam, scam, abuse…" maxLength={200} /></label>
+    <Card title="Announcements & maintenance" hint="Send a message or pause PassGram on one platform, or on all of them at once."
+      actions={<button className="zpa-btn ghost sm" onClick={cfg.reload}><Icon name="refresh" size={15} />Reload</button>}>
+      <div className="zpa-toolbar">
+        <Segmented value={target} options={[{ value: 'all', label: 'All platforms' }, ...STATUS_PLATFORMS.map(({ value, label }) => ({ value, label }))]} onChange={setTarget} />
+        <span style={{ display: 'flex', gap: 6, flexWrap: 'wrap' }}>{STATUS_PLATFORMS.map((x) => <span key={x.value} className={`zpa-pill ${live(x.prefix) ? 'bad' : 'good'}`}>{x.label}: {live(x.prefix) ? 'maintenance' : 'live'}</span>)}</span>
+      </div>
+      {target === 'all' && <p className="zpa-note" style={{ marginBottom: 10 }}>Shows the Android values. Saving writes the same announcement and status to all three platforms.</p>}
+      <div className="zpa-grid2">
+        <div className="zpa-tile">
+          <h4>Announcement</h4>
+          <label className="zpa-field"><span>Message shown once to everyone on {target === 'all' ? 'every platform' : names}</span><textarea rows={3} value={form.announcement} onChange={set('announcement')} placeholder="What's new" /></label>
         </div>
-        <div className="zpa-form-row end">
-          <button className="zpa-btn primary" disabled={busy || !target.trim()} onClick={ban}><Icon name="shield" size={15} />{busy ? 'Working…' : kind === 'user' ? 'Ban person' : 'Close group / channel'}</button>
+        <div className="zpa-tile">
+          <h4>Status</h4>
+          <label className="zpa-switch"><input type="checkbox" checked={!!form.maintenanceMode} onChange={set('maintenanceMode')} /><span />Maintenance mode</label>
+          <label className="zpa-field"><span>Maintenance message</span><input value={form.maintenanceMessage} onChange={set('maintenanceMessage')} placeholder="PassGram is temporarily under maintenance." /></label>
         </div>
-      </Card>
-      <Card title="Active bans" hint="Lift a ban, or delete a closed group / channel for good." actions={<button className="zpa-btn ghost sm" onClick={bans.reload}><Icon name="refresh" size={15} />Refresh</button>}>
-        <Table rows={bans.data} loading={bans.loading} error={bans.error} empty="Nobody is banned."
-          columns={[
-            { label: 'Type', render: (r) => (r.type === 'group' ? 'Group / channel' : 'Person') },
-            { label: 'Who', render: (r) => r.username || r.uid || r.gid || r.id },
-            { label: 'Id', mono: true, render: (r) => r.uid || r.gid || r.id },
-            { label: 'Reason', render: (r) => r.reason || '—' },
-            { label: 'When', render: (r) => fmtDate(r.bannedAt) },
-            { label: '', render: (r) => (
-              <span style={{ display: 'inline-flex', gap: 6 }}>
-                <button className="zpa-btn ghost sm" onClick={() => unban(r)}>Lift</button>
-                {r.type === 'group' && <button className="zpa-btn ghost sm" onClick={() => deleteGroup(r)}>Delete</button>}
-              </span>
-            ) },
-          ]} />
-      </Card>
-    </>
+      </div>
+      <div className="zpa-form-row end">
+        <button className="zpa-btn primary" disabled={saving || cfg.loading} onClick={save}><Anim name="upload-cloud" fallback="rocket" size={15} />{saving ? 'Publishing…' : `Publish to ${target === 'all' ? 'all platforms' : names}`}</button>
+      </div>
+    </Card>
   )
 }
 
@@ -715,7 +1001,7 @@ function SignIn({ fb, denied, user }) {
   return (
     <div className="zpa-auth">
       <div className="zpa-auth-card">
-        <div className="zpa-logo"><img src="/resources/assets/app-logo/zpass.png" alt="" width="40" height="40" /></div>
+        <div className="zpa-logo"><img src="/resources/assets/app-logo/zpass.png" alt="" width="44" height="44" /></div>
         <h1>PassGram Admin</h1>
         {denied ? (
           <>
@@ -750,6 +1036,17 @@ export default function AdminClient() {
   const [navOpen, setNavOpen] = useState(false)
   const [dialog, setDialog] = useState(null)
   const [toasts, setToasts] = useState([])
+  const [palette, setPalette] = useState(false)
+  // Like api / bots / core.zpas.org: signed-out visitors only see a plain 404; the sign-in form needs /admin#signin.
+  const [wantsSignIn, setWantsSignIn] = useState(false)
+  useEffect(() => {
+    const check = () => setWantsSignIn(location.hash === '#signin')
+    check(); window.addEventListener('hashchange', check); return () => window.removeEventListener('hashchange', check)
+  }, [])
+  useEffect(() => {
+    const key = (e) => { if ((e.ctrlKey || e.metaKey) && e.key.toLowerCase() === 'k') { e.preventDefault(); setPalette((p) => !p) } }
+    window.addEventListener('keydown', key); return () => window.removeEventListener('keydown', key)
+  }, [])
 
   useEffect(() => {
     try { const t = localStorage.getItem('zp-admin-theme'); if (t === 'light' || t === 'dark') setTheme(t) } catch {}
@@ -760,7 +1057,9 @@ export default function AdminClient() {
       unsub = f.authSdk.onAuthStateChanged(f.auth, async (user) => {
         if (!user) return setSession({ state: 'signin', user: null })
         const claims = (await user.getIdTokenResult().catch(() => null))?.claims
-        setSession({ state: isAdminUser(user, claims) ? 'admin' : 'denied', user })
+        const ok = isAdminUser(user, claims)
+        if (ok && location.hash === '#signin') history.replaceState(null, '', location.pathname)
+        setSession({ state: ok ? 'admin' : 'denied', user })
       })
     }).catch(() => setSession({ state: 'signin', user: null }))
     return () => unsub?.()
@@ -777,34 +1076,52 @@ export default function AdminClient() {
   const closeDialog = useCallback((value) => { setDialog((d) => { d?.resolve(value && (d.spec.fields ? value : true)); return null }) }, [])
 
   const current = NAV.find((n) => n.id === view) || NAV[0]
-  const props = { fb, ask, toast, go }
+  const props = { fb, ask, toast, go, user: session.user }
+  const groups = [...new Set(NAV.map((n) => n.group))]
 
   return (
     <div className="zpa" data-theme={theme}>
       {session.state === 'loading' && <div className="zpa-auth"><span className="zpa-spin big" /></div>}
-      {(session.state === 'signin' || session.state === 'denied') && <SignIn fb={fb} denied={session.state === 'denied'} user={session.user} />}
+      {(session.state === 'signin' || session.state === 'denied') && (wantsSignIn
+        ? <SignIn fb={fb} denied={session.state === 'denied'} user={session.user} />
+        : <pre className="zpa-decoy">{JSON.stringify(session.state === 'denied' ? { ok: false, error_code: 403, description: 'Forbidden' } : { ok: false, error_code: 404, description: 'Not Found' })}</pre>)}
       {session.state === 'admin' && fb && (
         <div className={`zpa-shell ${navOpen ? 'nav-open' : ''}`}>
           <aside className="zpa-side">
-            <div className="zpa-brand"><img src="/resources/assets/app-logo/zpass.png" alt="" width="30" height="30" /><div><strong>PassGram</strong><small>Admin</small></div></div>
+            <div className="zpa-brand"><img src="/resources/assets/app-logo/zpass.png" alt="" width="34" height="34" /><div><strong>PassGram</strong><small>Admin console</small></div></div>
+            <button type="button" className="zpa-jump" onClick={() => setPalette(true)}><Icon name="search" size={16} /><span>Jump to…</span><kbd>Ctrl K</kbd></button>
             <nav>
-              {NAV.map((n) => (
-                <button key={n.id} type="button" className={view === n.id ? 'on' : ''} onClick={() => go(n.id)}><Icon name={n.icon} />{n.label}</button>
+              {groups.map((g) => (
+                <div key={g} className="zpa-nav-group">
+                  <div className="zpa-side-label">{g}</div>
+                  {NAV.filter((n) => n.group === g).map((n) => (
+                    <button key={n.id} type="button" className={view === n.id ? 'on' : ''} onClick={() => go(n.id)}>
+                      <Anim name={n.anim} fallback={n.icon} size={19} play={view === n.id} />{n.label}
+                    </button>
+                  ))}
+                </div>
               ))}
-              <div className="zpa-side-label">Other panels</div>
-              {EXTERNAL.map((l) => <a key={l.href} href={l.href}><Icon name={l.icon} />{l.label}</a>)}
+              <div className="zpa-nav-group">
+                <div className="zpa-side-label">Other panels</div>
+                {EXTERNAL.map((l) => <a key={l.href} href={l.href}><Anim name={l.anim} fallback={l.icon} size={19} />{l.label}</a>)}
+              </div>
             </nav>
-            <div className="zpa-side-foot">
-              <div className="zpa-me"><span>{(session.user.email || '?').charAt(0).toUpperCase()}</span><small title={session.user.email}>{session.user.email}</small></div>
-              <button type="button" className="zpa-icon-btn" onClick={() => fb.authSdk.signOut(fb.auth)} aria-label="Sign out" title="Sign out"><Icon name="out" /></button>
+            <div className="zpa-profile">
+              {session.user.photoURL
+                ? <img src={session.user.photoURL} alt="" width="38" height="38" referrerPolicy="no-referrer" />
+                : <span className="zpa-avatar">{(session.user.displayName || session.user.email || '?').charAt(0).toUpperCase()}</span>}
+              <div><strong>{session.user.displayName || session.user.email?.split('@')[0]}</strong><small title={session.user.email}>{session.user.email}</small><em>Admin</em></div>
+              <button type="button" className="zpa-icon-btn" onClick={() => fb.authSdk.signOut(fb.auth)} aria-label="Sign out" title="Sign out"><Anim name="log-out" fallback="out" size={18} /></button>
             </div>
           </aside>
           <div className="zpa-scrim" onClick={() => setNavOpen(false)} />
           <div className="zpa-main">
             <div className="zpa-top">
               <button type="button" className="zpa-icon-btn zpa-menu" onClick={() => setNavOpen(true)} aria-label="Menu"><Icon name="menu" /></button>
-              <div><h1>{current.label}</h1><small>passgram-org · Firestore</small></div>
-              <button type="button" className="zpa-icon-btn" onClick={toggleTheme} aria-label="Toggle theme" title="Toggle theme"><Icon name={theme === 'dark' ? 'sun' : 'moon'} /></button>
+              <span className="zpa-top-icon"><Anim name={current.anim} fallback={current.icon} size={20} play={view} /></span>
+              <div><h1>{current.label}</h1><small>{current.hint}</small></div>
+              <button type="button" className="zpa-icon-btn" onClick={() => setPalette(true)} aria-label="Search" title="Jump to (Ctrl K)"><Icon name="search" /></button>
+              <button type="button" className="zpa-icon-btn" onClick={toggleTheme} aria-label="Toggle theme" title="Toggle theme"><Anim name={theme === 'dark' ? 'sun' : 'moon'} fallback={theme === 'dark' ? 'sun' : 'moon'} size={18} /></button>
             </div>
             <div className="zpa-content" key={view}>
               {view === 'overview' && <Overview {...props} />}
@@ -813,7 +1130,7 @@ export default function AdminClient() {
               {view === 'users' && <Users {...props} />}
               {view === 'moderation' && <Moderation {...props} />}
               {view === 'payments' && <Payments {...props} />}
-              {view === 'releases' && <Releases {...props} />}
+              {view === 'releases' && <><Releases {...props} /><PlatformStatus {...props} /></>}
               {view === 'paywall' && <Paywall {...props} />}
               {view === 'errors' && <Errors {...props} />}
             </div>
@@ -821,6 +1138,7 @@ export default function AdminClient() {
         </div>
       )}
       {dialog && <Dialog spec={dialog.spec} onClose={closeDialog} />}
+      {palette && session.state === 'admin' && <Palette onGo={go} onClose={() => setPalette(false)} />}
       <div className="zpa-toasts" aria-live="polite">{toasts.map((t) => <div key={t.id} className={`zpa-toast ${t.kind}`}>{t.text}</div>)}</div>
     </div>
   )
