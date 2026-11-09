@@ -1,0 +1,178 @@
+### how-bots-work | How bots work, step by step
+<p>Before writing code it helps to see the whole picture. A PassGram bot is made of three parts that talk to each other: the <b>PassGram app</b> on a person's phone or computer, the <b>PassGram servers</b>, and <b>your program</b>, which can run anywhere: your laptop, a small server, or a cloud function.</p>
+<p>Your program never talks to the person's app directly, and the app never talks to your program directly. Everything goes through PassGram. That is what keeps people's accounts safe: your bot never learns their phone number, email address or password, and you never have to open a port on your home computer.</p>
+<p>Here is the full journey of one message, from the moment someone types it to the moment they see your answer:</p>
+<ol>
+<li><b>The person writes.</b> In the chat with your bot they type <code>/start</code> and press send. The app sends it to PassGram, signed with their account.</li>
+<li><b>PassGram stores it as an update.</b> The message becomes an <a href="/bot/api#Update">Update</a> with a number (<code>update_id</code>) and waits in your bot's queue. It waits up to 24 hours.</li>
+<li><b>Your program receives it.</b> Either your program asks "anything new?" (<a href="/bot/api#getUpdates">long polling</a>), or PassGram pushes the update to your server the moment it arrives (<a href="/bot/api#webhooks">webhook</a>).</li>
+<li><b>Your code decides what to do.</b> With the SDK, the right handler runs: <code>@bot.command("start")</code> for commands, <code>@bot.button(...)</code> for button presses, <code>@bot.message()</code> for everything else.</li>
+<li><b>Your program answers.</b> It calls a method such as <a href="/bot/api#sendMessage">sendMessage</a> with the chat ID and the text. PassGram checks your token, checks that the person started your bot, and stores the message.</li>
+<li><b>The person sees it.</b> The app shows your answer instantly, with your buttons, formatting and pictures.</li>
+</ol>
+<p>The whole round trip usually takes well under a second. When the person presses one of your buttons, the same journey happens again, only the update is a <a href="/bot/api#CallbackQuery">CallbackQuery</a> instead of a message.</p>
+<p>Two consequences are worth remembering. First, <b>your bot only works while your program runs</b>: if you close it, messages wait in the queue and are delivered when it starts again (within 24 hours). Second, <b>PassGram never runs your code</b>; it only passes messages. That keeps you free to use any language, any server and any database.</p>
+
+### tokens-in-depth | Your token in depth
+<p>The token is the only thing that proves "this program is this bot". It looks like <code>8513445453:GQk3yXn2…</code>. The part before the colon is your bot's public ID; the 43 characters after it are a secret.</p>
+<p>PassGram stores only a fingerprint (a hash) of the token, never the token itself. That is why Zbot shows it only once, when the bot is created. If you lose it, nobody can show it to you again, not even PassGram: you create a new one with <code>/revoke</code>, and the old one stops working at that very moment.</p>
+<p><b>Where to keep it.</b> Treat it exactly like a password:</p>
+<ul>
+<li>Keep it in an environment variable (<code>PASSGRAM_BOT_TOKEN</code>) or a <code>.env</code> file that is never shared.</li>
+<li>Never put it in a GitHub repository, a screenshot, a chat, a web page or a mobile app. Code that runs on people's devices can always be read.</li>
+<li>If you share your code, share it without the token, and add <code>.env</code> to your <code>.gitignore</code>.</li>
+<li>If you even suspect it leaked, send <code>/revoke</code> to Zbot. It takes ten seconds and makes the old token worthless.</li>
+</ul>
+<p><b>What a leaked token allows.</b> Someone with your token can read the messages people send to your bot and answer as your bot. They cannot log in to your PassGram account, see your other chats or your vault: the token only controls the bot.</p>
+
+### updates-in-depth | Polling or webhook: which one to choose
+<p>Your program can receive updates in two ways. Both deliver exactly the same <a href="/bot/api#Update">Update</a> objects; the difference is who starts the conversation.</p>
+<p><b>Long polling</b> means your program asks PassGram "is there anything new for me?" and PassGram keeps the question open for up to 25 seconds until something arrives. As soon as a message comes in, the answer returns, your program handles it and asks again. This is what <code>bot.run()</code> does. Polling is perfect while you develop and for bots that run on your own computer, because it needs no public address, no certificate and no open port. It works behind any home router or company firewall.</p>
+<p><b>A webhook</b> turns it around: you give PassGram an <code>https://</code> address, and PassGram sends every update to it the moment it happens. Nothing runs while nobody writes to your bot, which makes webhooks ideal for servers and for cloud functions that only wake up when called. The price is that you need a public https address.</p>
+<table><tr><th></th><th>Long polling</th><th>Webhook</th></tr>
+<tr><td>Needs a public address</td><td>No</td><td>Yes (https)</td></tr>
+<tr><td>Works on a home PC</td><td>Yes</td><td>Only with a tunnel</td></tr>
+<tr><td>Delay</td><td>Under a second</td><td>Instant</td></tr>
+<tr><td>Work while idle</td><td>One small request every ~25 s</td><td>None</td></tr>
+<tr><td>Best for</td><td>Development, small bots</td><td>Production, serverless</td></tr></table>
+<p><b>Delivery is "at least once".</b> If your server crashes in the middle of handling an update, or answers with an error, PassGram sends that update again. Very rarely you might therefore see the same update twice. If an action must never happen twice (charging money, creating an order), remember the <code>update_id</code> or your own order ID and skip duplicates.</p>
+<p><b>Order is kept.</b> Updates for your bot are delivered in the order they happened. When a webhook delivery fails, later updates wait behind it, so a person's messages never arrive in the wrong order.</p>
+
+### designing-your-bot | Designing a good bot
+<p>The best bots feel like a helpful person, not like a form. These ten rules make the biggest difference:</p>
+<ol>
+<li><b>Say what you do in the first message.</b> When someone presses Start, tell them in one or two sentences what your bot does and show the two or three most important buttons. Nobody reads long welcome texts.</li>
+<li><b>Always answer.</b> Every message deserves a reaction, even if it is "I didn't understand that, here is what I can do". Silence makes people think the bot is broken.</li>
+<li><b>Answer fast, or show that you are working.</b> If something takes longer than a second, call <a href="/bot/api#sendChatAction">sendChatAction</a> so the person sees "typing…".</li>
+<li><b>Prefer buttons over typing.</b> Tapping is faster and leaves no room for typos. Use free text only where the answer is truly free (a name, a question).</li>
+<li><b>Edit instead of spamming.</b> When the person moves through a menu, edit the same message (<a href="/bot/api#editMessageText">editMessageText</a>) instead of sending a new one each time.</li>
+<li><b>Give a way back.</b> Every screen of a menu should have a "Back" or "Main menu" button, and every multi-step flow should accept <code>/cancel</code>.</li>
+<li><b>Remember context, but not forever.</b> Keep the state of a conversation (which step someone is on) and clear it when the task is finished.</li>
+<li><b>Speak the person's language.</b> Use <code>language_code</code> to answer in their language when you can.</li>
+<li><b>Be honest about what you are.</b> Never pretend to be a person, a PassGram employee or another company.</li>
+<li><b>Fail gracefully.</b> When something goes wrong, apologise briefly, say what the person can do, and log the details for yourself.</li>
+</ol>
+
+### writing-messages | Writing messages people read
+<p>Messages in a chat are read on a small screen, often in a hurry. Short, clear texts work best:</p>
+<ul>
+<li><b>One idea per message.</b> If you have three things to say, consider three short messages or one message with three short lines.</li>
+<li><b>Put the important part first.</b> "✅ Order #1042 is on its way" beats "We wanted to let you know that your order…".</li>
+<li><b>Use formatting sparingly.</b> Bold for the one thing that matters, <code>code</code> for things people copy (codes, IDs). A message where everything is bold has no emphasis left.</li>
+<li><b>Emoji are signposts, not decoration.</b> One emoji at the start of a line (📦, ✅, ⚠️) helps people scan; five in a row slows them down.</li>
+<li><b>Write buttons as actions.</b> "Pay $4.50" and "Show my orders" are clearer than "OK" and "Next".</li>
+<li><b>Escape user text.</b> When you include something people typed (their name, their message) in a formatted message, escape it, as shown in the <a href="/bot/examples#formatting">formatting example</a>.</li>
+</ul>
+
+### commands-guide | Choosing good commands
+<p>Commands are the shortcuts people see when they tap <b>Menu</b> or type <code>/</code>. A good command list is short and predictable.</p>
+<ul>
+<li><b><code>/start</code></b> is sent automatically when someone opens your bot for the first time. Make it useful every time, not only the first time: many people send it again to "reset" the bot.</li>
+<li><b><code>/help</code></b> should explain in a few lines what the bot does and list the main commands.</li>
+<li>Keep the list between three and seven commands. Rarely used features belong behind buttons.</li>
+<li>Use lowercase English words without spaces (<code>/orders</code>, <code>/settings</code>); the description next to each command can be in any language.</li>
+<li>Set the list with <a href="/bot/api#setMyCommands">setMyCommands</a> when your bot starts, so it is always in sync with your code.</li>
+</ul>
+
+### buttons-guide | Choosing the right buttons
+<p>PassGram bots have three kinds of buttons. Choosing the right one makes a bot feel natural.</p>
+<p><b>Inline buttons</b> sit under a message and belong to it. Use them for choices about that message: "Buy", "Next page", "Yes / No", "Show details". A press sends your bot a <a href="/bot/api#CallbackQuery">CallbackQuery</a> with the button's value, but does not post anything in the chat. That keeps the conversation clean. Up to 30 buttons per message, in rows of up to 4.</p>
+<p><b>Reply keyboards</b> replace the phone keyboard with big buttons. A tap sends the label as a normal message from the person, visible in the chat. Use them for quick answers to a question you just asked: sizes, ratings, yes/no. Add <code>one_time_keyboard</code> so it disappears after the answer, and remove it with <code>remove_keyboard</code> when you no longer need it.</p>
+<p><b>The menu button</b> next to the message box opens your command list, or a mini app (your own web page inside the chat).</p>
+<p><b>Designing button values.</b> The value of an inline button (<code>callback_data</code>) can hold up to 64 bytes. Use a short, structured format such as <code>order:1042</code> or <code>page:3</code>, so one handler can read what was pressed. Never put secrets or prices you trust in button values: treat them like any input that comes from the person.</p>
+
+### state-and-data | Remembering things and handling data
+<p>Many bots need to remember something: which step of a form someone is on, their settings, their orders. Where you keep that information matters.</p>
+<p><b>In memory</b> (a dictionary or a Map in your program) is the simplest and is fine for short conversations. Everything is lost when the program restarts, so use it only for things that are cheap to lose, like the step of a form.</p>
+<p><b>In a file or a database</b> for everything that must survive a restart. SQLite needs no server and is built into Python; for bigger bots, PostgreSQL or a hosted database. The <a href="/bot/examples#notes">notes example</a> shows both a database and a simple file.</p>
+<p><b>Keep only what you need.</b> The less you store, the less can leak. A bot that sends reminders needs the chat ID and the reminder text, not the person's name or anything else.</p>
+<p><b>Let people delete their data.</b> Offer a command such as <code>/deletemydata</code> that removes everything you stored about the person, and do it for real. In many countries this is also the law.</p>
+<p><b>Say what you store.</b> If your bot keeps data, explain in <code>/help</code> or in your description what you keep and why.</p>
+
+### security-checklist | Security checklist for bot builders
+<ul>
+<li>The token lives in an environment variable or a private <code>.env</code> file, never in code you share.</li>
+<li>Your repository's <code>.gitignore</code> lists <code>.env</code> and any database files.</li>
+<li>Webhook servers check the <code>X-ZPass-Bot-Api-Secret-Token</code> header on every request.</li>
+<li>All text from people is treated as untrusted: escaped before it goes into formatted messages, validated before it goes into a database, never executed.</li>
+<li>Database queries use parameters (<code>?</code> placeholders), never text glued together.</li>
+<li>Button values are checked: a person can send any value they like, so never trust a price or an ID just because it came from your own button.</li>
+<li>Admin commands check the sender's ID against a list you control.</li>
+<li>Your bot never asks for passwords, recovery keys, one-time codes or card numbers.</li>
+<li>Error messages to people are friendly and short; technical details go only to your own logs.</li>
+<li>Logs do not contain tokens or private message contents you do not need.</li>
+<li>Dependencies (if you use any) are kept up to date.</li>
+<li>You know how to <code>/revoke</code> the token, and you do it at once if it may have leaked.</li>
+</ul>
+
+### testing-guide | Testing your bot
+<p>Test like a stranger would use your bot, not like the person who wrote it:</p>
+<ol>
+<li><b>Start fresh.</b> Clear the chat with your bot and press Start again. Is the first message clear?</li>
+<li><b>Try the happy path.</b> Go through each feature the normal way.</li>
+<li><b>Try the unhappy paths.</b> Send text where the bot expects a button, press old buttons from earlier messages, send <code>/cancel</code> in the middle of a form, send an empty-looking message, send something very long.</li>
+<li><b>Restart the bot in the middle.</b> Stop your program while a form is half filled in, start it again, and see what happens.</li>
+<li><b>Use a second account.</b> Ask a friend, or use a second account, to check that one person's data never appears for another.</li>
+<li><b>Watch your logs.</b> Every error printed while testing is one your users would have hit.</li>
+</ol>
+<p>The SDK keeps running when a handler fails, so one bug never stops the whole bot, but it still deserves a fix.</p>
+
+### going-live | Going-live checklist
+<ul>
+<li>Name, description (<code>/setdescription</code>), short description (<code>/setabouttext</code>) and profile picture are set.</li>
+<li>The command list is set and matches what the bot really does.</li>
+<li><code>/start</code> and <code>/help</code> explain the bot in a few lines.</li>
+<li>The bot runs as a service that restarts after crashes and reboots (see <a href="/bot/examples#deploy">keeping your bot online</a>).</li>
+<li>For production, consider a webhook instead of polling.</li>
+<li>The token is stored safely and nobody else has it.</li>
+<li>You tested the unhappy paths above.</li>
+<li>If the bot stores data, <code>/help</code> says what and why, and people can delete it.</li>
+<li>You read the <a href="#rules-for-bots">rules for bots</a>. If your bot represents a company or a public figure, apply for the <a href="#verify-bot">blue check</a>.</li>
+</ul>
+
+### performance | Speed, limits and big audiences
+<p>Each bot can make 120 requests per minute. That is plenty for answering people one by one, because every answer is one request. It starts to matter when your bot writes to many people at once, for example an announcement.</p>
+<p><b>Do the math.</b> 1,000 people at 100 messages per minute takes 10 minutes. Send in a loop with a short pause (about 0.6 seconds) between messages, as in the <a href="/bot/examples#broadcast">announcements example</a>, and you will never hit the limit.</p>
+<p><b>If you get 429.</b> The answer contains <code>retry_after</code>: wait that many seconds, then continue. Never retry in a tight loop; that only extends the wait.</p>
+<p><b>Keep handlers fast.</b> With polling, the SDK handles updates one after another. If one handler waits 30 seconds for another service, everyone else waits too. For slow work, answer first ("Working on it…"), then do the work in the background (a thread in Python, a promise you don't await in JavaScript), or use a webhook server that handles requests in parallel.</p>
+<p><b>Files.</b> Sending a link to a file on your server costs PassGram nothing and has no size limit; uploading goes through PassGram and is limited to 20 MB. For big or popular files, links are faster for everyone.</p>
+
+### troubleshooting | Troubleshooting
+<table><tr><th>What you see</th><th>Why</th><th>What to do</th></tr>
+<tr><td><code>401 Unauthorized</code></td><td>The token is wrong, incomplete, or was replaced with <code>/revoke</code>.</td><td>Copy the token again (all of it, including the part before the colon). If lost, <code>/revoke</code>.</td></tr>
+<tr><td><code>403 Forbidden</code> when sending</td><td>The person has not pressed Start in your bot, or the bot was disabled.</td><td>Ask them to open the bot and press Start. If disabled, contact support.</td></tr>
+<tr><td><code>400 chat not found</code></td><td>Wrong chat ID, or an ID from another platform.</td><td>Use <code>message.chat.id</code> from an update.</td></tr>
+<tr><td><code>409 Conflict</code> on getUpdates</td><td>A webhook is set.</td><td>Call <a href="/bot/api#deleteWebhook">deleteWebhook</a>, or just use <code>bot.run()</code>, which does it for you.</td></tr>
+<tr><td><code>413</code> when sending a file</td><td>The upload is bigger than 20 MB.</td><td>Put the file on your server and send the https link.</td></tr>
+<tr><td><code>429 Too Many Requests</code></td><td>More than 120 requests in a minute.</td><td>Wait <code>retry_after</code> seconds; slow down broadcasts.</td></tr>
+<tr><td>The bot doesn't answer at all</td><td>Your program is not running, or another program uses the same token.</td><td>Start it; make sure only one copy runs.</td></tr>
+<tr><td>Buttons keep spinning</td><td>The press was never answered.</td><td>Call <code>press.answer()</code> (the SDK does it automatically when the handler ends).</td></tr>
+<tr><td>Formatting shows as raw <code>&lt;b&gt;</code></td><td><code>parse_mode</code> / <code>format</code> missing.</td><td>Pass <code>format="html"</code>.</td></tr>
+<tr><td><code>400</code> with formatting</td><td>Unescaped user text broke the markup.</td><td>Escape user text (see <a href="/bot/examples#formatting">example</a>).</td></tr>
+<tr><td>Old messages arrive after a restart</td><td>Updates wait up to 24 hours.</td><td>That is intended; ignore old ones by their <code>date</code> if needed.</td></tr>
+<tr><td>The same update twice</td><td>A delivery was retried after an error.</td><td>Skip repeated <code>update_id</code>s for actions that must happen once.</td></tr>
+<tr><td>Webhook never called</td><td>Address not https, not reachable, or wrong path.</td><td>Check <a href="/bot/api#getWebhookInfo">getWebhookInfo</a> for <code>last_error_message</code>.</td></tr>
+<tr><td>Photo by link not shown</td><td>The link needs a login, is not https, or does not point at the image itself.</td><td>Open the link in a private browser window; it must show the file directly.</td></tr>
+<tr><td><code>import passgram</code> fails</td><td><code>passgram.py</code> is not in the same folder as your bot.</td><td>Put both files in the same folder.</td></tr></table>
+
+### glossary | Glossary
+<table><tr><th>Word</th><th>Meaning</th></tr>
+<tr><td>Bot</td><td>A PassGram account run by a program.</td></tr>
+<tr><td>Token</td><td>The secret that lets your program control your bot.</td></tr>
+<tr><td>Update</td><td>One event for your bot: a message or a button press.</td></tr>
+<tr><td>Handler</td><td>A function in your code that runs for a certain kind of update.</td></tr>
+<tr><td>Chat ID</td><td>The number of a conversation; for people it equals their Z Pass ID.</td></tr>
+<tr><td>Z Pass ID</td><td>A person's public 11-digit number.</td></tr>
+<tr><td>Command</td><td>A message starting with <code>/</code>, such as <code>/start</code>.</td></tr>
+<tr><td>Inline button</td><td>A button under a message; pressing it sends a callback query.</td></tr>
+<tr><td>Callback query</td><td>The update your bot gets when an inline button is pressed.</td></tr>
+<tr><td>Reply keyboard</td><td>Big answer buttons that replace the phone keyboard.</td></tr>
+<tr><td>Long polling</td><td>Your program asks for updates and waits for new ones.</td></tr>
+<tr><td>Webhook</td><td>PassGram sends updates to your https address.</td></tr>
+<tr><td>Parse mode</td><td>How text is formatted: HTML, MarkdownV2 or Markdown.</td></tr>
+<tr><td>Rate limit</td><td>The maximum number of requests per minute (120).</td></tr>
+<tr><td>SDK</td><td>The official PassGram library (<code>passgram.py</code>, <code>passgram.js</code>).</td></tr>
+<tr><td>Mini app</td><td>Your web page opened inside the chat from the menu button.</td></tr>
+<tr><td>Blue check</td><td>Verification that an account or bot is the official one.</td></tr>
+<tr><td>Zbot</td><td>PassGram's bot for creating and managing bots.</td></tr>
+<tr><td>Verify Bot</td><td>PassGram's bot for blue check requests.</td></tr></table>

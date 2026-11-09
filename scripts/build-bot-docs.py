@@ -74,6 +74,7 @@ LINKS = {"<code>zpas.org/zbot</code>": '<a href="https://zpas.org/zbot"><code>zp
 def page(title, description, side, body, active):
     for plain, linked in LINKS.items():
         body = body.replace(plain, linked)
+    body = re.sub(r'<a href="(https://(?:www\.)?zpas\.org/[^"]*)"(?![^>]*target=)', r'<a href="\1" target="_blank" rel="noopener"', body)
     nav = "".join(f'<a href="{href}"{" class=on" if href == active else ""}>{label}</a>' for href, label in [("/", "Docs home"), ("/bot", "Bots"), ("/bot/examples", "Examples"), ("/bot/api", "Bot API reference")])
     side_html = "".join(f"<h4>{group}</h4>" + "".join(f'<a href="#{a}">{E(t)}</a>' for a, t in links) for group, links in side)
     return f"""<!doctype html>
@@ -473,10 +474,25 @@ def build_api():
     return page("Bot API reference — PassGram", "Every method, parameter and object of the PassGram Bot API, with a changelog.", side, "\n".join(b), "/bot/api")
 
 # ================================================================ BOTS ON PASSGRAM (guide)
+def parse_guide():
+    path = os.path.join(os.path.dirname(os.path.abspath(__file__)), "bot-guide.txt")
+    chapters = []
+    for block in open(path, encoding="utf-8").read().split("\n### "):
+        block = block.removeprefix("### ").strip()
+        if not block:
+            continue
+        head, _, body = block.partition("\n")
+        cid, title = [x.strip() for x in head.split("|", 1)]
+        chapters.append((cid, title, body.strip()))
+    return chapters
+
+
 def build_bot():
+    guide = parse_guide()
     side = [
         ("Start", [("what-is-a-bot", "What is a bot"), ("create-your-bot", "Create your bot"), ("zbot", "Zbot"), ("talk-to-your-bot", "Talk to your bot")]),
         ("Build", [("official-sdk", "Official SDK"), ("existing-libraries", "Existing libraries"), ("plain-http", "Plain HTTP"), ("run-your-bot", "Run your bot"), ("what-bots-can-do", "What bots can do"), ("files-and-media", "Files and media"), ("deep-links", "Links to your bot")]),
+        ("In depth", [(cid, title) for cid, title, _ in guide]),
         ("Trust", [("verify-bot", "Verify Bot"), ("blue-check", "The blue check"), ("company-names", "Company names"), ("remove-a-check", "Remove a check"), ("rules-for-bots", "Rules for bots"), ("privacy", "Privacy"), ("reports-and-bans", "Reports and bans")]),
         ("Tutorials", [("tutorial-first-bot", "Your first bot in 5 minutes"), ("tutorial-buttons", "Buttons and menus"), ("tutorial-shop", "A small shop bot"), ("tutorial-move", "Move an existing bot"), ("tutorial-24-7", "Run 24/7")]),
         ("Plans & payments", [("plans", "PassGram plans"), ("payment-terms", "Payment terms"), ("refunds", "24-hour refund"), ("auto-renew", "Auto-renew & cancelling"), ("bots-and-money", "Bots and money")]),
@@ -499,6 +515,8 @@ def build_bot():
             ["<code>/id</code>", "Your Z Pass ID, username and link."], ["<code>/cancel</code>", "Stop the current step."]])))
     b.append(section(2, "Talk to your bot", "talk-to-your-bot",
         "<p>Open your bot (search its username or open <code>zpas.org/yourbot</code>) and press <b>Start</b>. Your program receives that as <code>/start</code>. Everything people send arrives as updates; everything your bot sends shows up instantly in their app.</p>"))
+    for cid, title, body in guide:
+        b.append(section(2, title, cid, body))
     b.append(section(2, "Official SDK", "official-sdk",
         "<p>The PassGram Bot SDK is the easiest way to build a bot: one file for Python or JavaScript, nothing else to install.</p>" +
         table(["Language", "Download", "Needs"], [

@@ -12,6 +12,8 @@
   const normalized=name.toLowerCase().replace(/[-_]/g,'');
   if(services[normalized])return {redirect:services[normalized]+search};
   if(normalized==='dashboard')return {redirect:'https://web.zpas.org/web'+search};
+  // PassGram's own bots have public pages even though their names are reserved for everyone else.
+  if(['zbot','verifybot'].includes(name.toLowerCase())&&pathname.split('/').filter(Boolean).length===1)return host==='www.zpas.org'?{redirect:'https://zpas.org/'+name.toLowerCase()+search}:{handle:name.toLowerCase(),official:true};
   if(reserved.has(normalized)||! /^[A-Za-z0-9_]{3,32}$/.test(name)||pathname.split('/').filter(Boolean).length!==1)return{redirect:'https://zpas.org/404.html'};
   if(host==='www.zpas.org')return{redirect:'https://zpas.org/'+encodeURIComponent(name)+search};
   return{handle:name};
