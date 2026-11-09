@@ -269,6 +269,26 @@ export function createGateway({ db, files = null, verifyUser, verifyAppCheck, re
     return { deleted: true, username: bot.username };
   }
 
+  // "me" = the caller's own account; "@name" = one of the caller's bots. Nobody can apply for someone else.
+  async function verifyTarget(owner, value) {
+    const raw = String(value || '').trim();
+    if (!raw || raw.toLowerCase() === 'me') {
+      const profile = await db.get(`chat_profiles/${owner}`);
+      if (!profile?.username) fail(400, 'Set a username in your profile first');
+      return { key: owner, kind: 'account', username: profile.username };
+    }
+    const name = policy.username(raw);
+    const id = (await db.get(`chat_usernames/${name}`))?.botId;
+    const bot = id && await db.get(`zp_bots/${id}`);
+    if (!bot || bot.owner !== owner) fail(403, 'You can only apply for your own account or your own bots');
+    return { key: `bot_${id}`, kind: 'bot', username: bot.username };
+  }
+  function urlList(value, min, max, message) {
+    const list = [...new Set((Array.isArray(value) ? value : []).map((v) => String(v).trim()).filter(Boolean))];
+    if (list.length < min || list.length > max || list.some((u) => !/^https:\/\/[^\s]{4,300}$/.test(u))) fail(400, message);
+    return list;
+  }
+
   async function identity(request) {
     return verifyUser((request.headers.get('authorization') || '').replace(/^Bearer /, ''));
   }
@@ -491,6 +511,37 @@ export function createGateway({ db, files = null, verifyUser, verifyAppCheck, re
         });
         if (hook) later(flush(id));
         return result;
+      }
+      // ---- verification (blue check) requests: the owner applies, an administrator decides ----
+      case 'verifyApply': {
+        const target = await verifyTarget(owner, body.target);
+        const links = urlList(body.links, 2, 5, 'Send at least 2 links to official accounts (https://…)');
+        const press = urlList(body.press, 0, 3, 'Press links must be https:// addresses');
+        const note = String(body.note || '').trim().slice(0, 500);
+        const path = `zp_verify_requests/${target.key}`;
+        await db.transaction(async (tx) => {
+          const [profile, old] = await Promise.all([tx.get(`chat_profiles/${target.key}`), tx.get(path)]);
+          if (profile?.verified) fail(409, 'This account is already verified');
+          if (old?.status === 'pending') fail(409, 'A request for this account is already waiting for review');
+          tx.set(path, { uid: owner, target: target.key, kind: target.kind, username: target.username, links, press, note, status: 'pending', reason: '', createdAt: Date.now() });
+        });
+        return { status: 'pending', username: target.username };
+      }
+      case 'verifyStatus': {
+        const rows = await db.query('zp_verify_requests', { where: [['uid', '==', owner]], limit: 25 });
+        return rows.map(({ data: r }) => ({ username: r.username, kind: r.kind, status: r.status, reason: r.reason || '', createdAt: r.createdAt || 0 }))
+          .sort((a, b) => b.createdAt - a.createdAt);
+      }
+      case 'unverify': {
+        const target = await verifyTarget(owner, body.target);
+        const profilePath = `chat_profiles/${target.key}`;
+        await db.transaction(async (tx) => {
+          const [profile, request] = await Promise.all([tx.get(profilePath), tx.get(`zp_verify_requests/${target.key}`)]);
+          if (!profile?.verified) fail(409, 'This account is not verified');
+          tx.update(profilePath, { verified: false });
+          if (request) tx.update(`zp_verify_requests/${target.key}`, { status: 'removed', decidedAt: Date.now() });
+        });
+        return { verified: false, username: target.username };
       }
       case 'callback': {
         const cb = String(body.callback_query_id || '');

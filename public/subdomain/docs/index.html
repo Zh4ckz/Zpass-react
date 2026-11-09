@@ -19,7 +19,7 @@
 </header>
 <div class="layout">
 <aside class="side" id="side">
-  <h4>Start</h4><a href="#intro">Introduction</a><a href="#status">What is live</a><a href="#quickstart">Quick start</a><a href="#libraries">Use your library</a>
+  <h4>Start</h4><a href="#intro">Introduction</a><a href="#status">What is live</a><a href="#quickstart">Quick start</a><a href="#sdk">Official SDK</a><a href="#libraries">Use your library</a>
   <h4>Basics</h4><a href="#auth">Tokens &amp; addresses</a><a href="#ids">IDs</a><a href="#requests">Sending requests</a><a href="#responses">Responses</a><a href="#errors">Errors</a><a href="#limits">Limits</a>
   <h4>Receiving</h4><a href="#getUpdates">getUpdates</a><a href="#webhooks">Webhooks</a><a href="#update">Update object</a>
   <h4>Sending</h4><a href="#sendMessage">sendMessage</a><a href="#formatting">Formatting</a><a href="#keyboards">Inline buttons</a><a href="#callbacks">Button presses</a><a href="#reply-keyboards">Reply keyboards</a><a href="#media">Photos &amp; files</a><a href="#editing">Edit &amp; delete</a><a href="#actions">Typing status</a>
@@ -95,9 +95,65 @@ print_r(call(<span class="s">'getMe'</span>));
 call(<span class="s">'sendMessage'</span>, [<span class="s">'chat_id'</span> =&gt; <span class="n">45957845239</span>, <span class="s">'text'</span> =&gt; <span class="s">'Hello from my bot!'</span>]);</pre></div>
 </section>
 
+<section id="sdk">
+  <h2>Official SDK <span class="tag live">v1.0</span></h2>
+  <p>The PassGram Bot SDK is the easiest way to build a bot. It is one file for Python or JavaScript, with nothing else to install. Put it next to your bot and import it.</p>
+  <table><tr><th>Language</th><th>Download</th><th>Needs</th></tr>
+  <tr><td>Python</td><td><a href="/subdomain/docs/sdk/passgram.py" download>passgram.py</a></td><td>Python 3.8+</td></tr>
+  <tr><td>JavaScript</td><td><a href="/subdomain/docs/sdk/passgram.js" download>passgram.js</a></td><td>Node.js 18+</td></tr></table>
+  <div class="tabs"><div class="tabbar"><button class="on">Python</button><button>JavaScript</button><button class="copy">Copy</button></div>
+<pre class="on"><span class="k">from</span> passgram <span class="k">import</span> Bot, Buttons, Keyboard, File
+
+bot = Bot(<span class="s">"YOUR_TOKEN"</span>)
+
+@bot.command(<span class="s">"start"</span>)
+<span class="k">def</span> start(msg):
+    msg.reply(f<span class="s">"Hi &lt;b&gt;{msg.user.first_name}&lt;/b&gt;!"</span>, format=<span class="s">"html"</span>,
+              buttons=Buttons([(<span class="s">"📸 Photo"</span>, <span class="s">"photo"</span>), (<span class="s">"🌐 Website"</span>, <span class="s">"https://zpas.org"</span>)]))
+
+@bot.button(<span class="s">"photo"</span>)
+<span class="k">def</span> photo(press):
+    press.answer(<span class="s">"On its way"</span>)
+    bot.send_photo(press.chat_id, <span class="s">"https://example.com/cat.jpg"</span>, caption=<span class="s">"Cat"</span>)
+
+@bot.message()
+<span class="k">def</span> echo(msg):
+    msg.typing()
+    msg.reply(<span class="s">"You said: "</span> + msg.text)
+
+bot.run()</pre>
+<pre><span class="k">const</span> { Bot, Buttons, Keyboard, File } = require(<span class="s">'./passgram'</span>);
+
+<span class="k">const</span> bot = <span class="k">new</span> Bot(<span class="s">'YOUR_TOKEN'</span>);
+
+bot.command(<span class="s">'start'</span>, (msg) =&gt; msg.reply(<span class="s">`Hi &lt;b&gt;${msg.user.firstName}&lt;/b&gt;!`</span>, {
+  format: <span class="s">'html'</span>, buttons: <span class="k">new</span> Buttons([[<span class="s">'📸 Photo'</span>, <span class="s">'photo'</span>], [<span class="s">'🌐 Website'</span>, <span class="s">'https://zpas.org'</span>]]),
+}));
+
+bot.button(<span class="s">'photo'</span>, <span class="k">async</span> (press) =&gt; {
+  <span class="k">await</span> press.answer(<span class="s">'On its way'</span>);
+  <span class="k">await</span> bot.sendPhoto(press.chatId, <span class="s">'https://example.com/cat.jpg'</span>, { caption: <span class="s">'Cat'</span> });
+});
+
+bot.message(<span class="k">async</span> (msg) =&gt; { <span class="k">await</span> msg.typing(); <span class="k">await</span> msg.reply(<span class="s">'You said: '</span> + msg.text); });
+
+bot.run();</pre></div>
+  <table><tr><th>You want to…</th><th>Python</th><th>JavaScript</th></tr>
+  <tr><td>Answer a command</td><td><code>@bot.command("start")</code></td><td><code>bot.command('start', fn)</code></td></tr>
+  <tr><td>React to a button</td><td><code>@bot.button("value")</code></td><td><code>bot.button('value', fn)</code></td></tr>
+  <tr><td>Match exact text</td><td><code>@bot.text("Yes", "No")</code></td><td><code>bot.text(['Yes', 'No'], fn)</code></td></tr>
+  <tr><td>Any other message</td><td><code>@bot.message()</code></td><td><code>bot.message(fn)</code></td></tr>
+  <tr><td>Reply</td><td><code>msg.reply(text, buttons=…, keyboard=…, format="html")</code></td><td><code>msg.reply(text, { buttons, keyboard, format })</code></td></tr>
+  <tr><td>Photo / file</td><td><code>msg.reply_photo(url_or_file)</code>, <code>msg.reply_file(File(...))</code></td><td><code>msg.replyPhoto(…)</code>, <code>msg.replyFile(new File(…))</code></td></tr>
+  <tr><td>Edit after a press</td><td><code>press.edit(text, buttons=…)</code></td><td><code>press.edit(text, { buttons })</code></td></tr>
+  <tr><td>Reply keyboard</td><td><code>Keyboard(["Good", "Bad"])</code>, <code>Keyboard.remove()</code></td><td><code>new Keyboard(['Good', 'Bad'])</code>, <code>Keyboard.remove()</code></td></tr>
+  <tr><td>Anything else in this API</td><td><code>bot.call("methodName", {...})</code></td><td><code>bot.call('methodName', {...})</code></td></tr></table>
+  <p>The token can also come from the <code>PASSGRAM_BOT_TOKEN</code> environment variable. Unanswered button presses are answered for you, and a crash in one handler never stops the bot.</p>
+</section>
+
 <section id="libraries">
   <h2>Use your library</h2>
-  <p>Most bot libraries let you change the server address. Set it to PassGram and keep the rest of your code. We run each library below against PassGram with the same test: a <code>/start</code> reply with a button, a button press answered and edited, a photo sent by link and a file upload.</p>
+  <p>Already have a bot written with another library? Most bot libraries let you change the server address. Set it to PassGram and keep the rest of your code. We run each library below against PassGram with the same test: a <code>/start</code> reply with a button, a button press answered and edited, a photo sent by link and a file upload.</p>
   <table><tr><th>Library</th><th>Language</th><th>Tested</th><th>Setting</th></tr>
   <tr><td>python-telegram-bot</td><td>Python</td><td><span class="tag live">WORKS</span></td><td><code>.base_url("https://api.zpas.org/bot")</code></td></tr>
   <tr><td>aiogram 3</td><td>Python</td><td><span class="tag live">WORKS</span></td><td><code>TelegramAPIServer.from_base("https://api.zpas.org")</code></td></tr>

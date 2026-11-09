@@ -484,3 +484,34 @@ test('renaming a bot keeps its verified badge', async () => {
   assert.equal((await tg(bot.token, 'setMyShortDescription', { short_description: 'Short' })).ok, true);
   assert.equal((await tg(bot.token, 'getMyShortDescription')).result.short_description, 'Short');
 });
+
+// ---------- verification requests ----------
+test('verification: apply for own account or own bot only, one pending request, unverify', async () => {
+  const { call, data } = fixture();
+  const links = ['https://instagram.com/rezan', 'https://x.com/4rezan'];
+  assert.equal((await call('/manage/verifyApply', { target: 'me', links })).status, 400, 'needs a username first');
+  data.set('chat_profiles/owner', { username: 'rezan', displayName: 'Rezan' });
+  assert.equal((await call('/manage/verifyApply', { target: 'me', links: ['https://x.com/only-one'] })).status, 400);
+  assert.equal((await call('/manage/verifyApply', { target: 'me', links: ['http://x.com/a', 'https://y.com/b'] })).status, 400);
+  assert.equal((await call('/manage/verifyApply', { target: 'me', links: [links[0], links[0]] })).status, 400, 'duplicates do not count twice');
+  const ok = await call('/manage/verifyApply', { target: 'me', links, press: ['https://news.example/rezan'], note: 'Founder' });
+  assert.equal(ok.ok, true, ok.description);
+  const row = data.get('zp_verify_requests/owner');
+  assert.equal(row.status, 'pending'); assert.equal(row.kind, 'account'); assert.equal(row.username, 'rezan');
+  assert.equal((await call('/manage/verifyApply', { target: 'me', links })).status, 409, 'one waiting request at a time');
+  // bots: only your own
+  const { result: bot } = await call('/manage/create', { name: 'Shop', username: 'shop_bot' });
+  assert.equal((await call('/manage/verifyApply', { target: '@shop_bot', links }, 'attacker')).status, 403);
+  assert.equal((await call('/manage/verifyApply', { target: '@shop_bot', links })).ok, true);
+  assert.equal(data.get(`zp_verify_requests/bot_${bot.id}`).kind, 'bot');
+  const mine = (await call('/manage/verifyStatus')).result;
+  assert.deepEqual(mine.map((r) => r.username).sort(), ['rezan', 'shop_bot']);
+  assert.equal((await call('/manage/verifyStatus', {}, 'attacker')).result.length, 0);
+  // an administrator approves (admin panel writes these directly), then the owner removes the badge
+  data.set(`chat_profiles/bot_${bot.id}`, { ...data.get(`chat_profiles/bot_${bot.id}`), verified: true });
+  assert.equal((await call('/manage/verifyApply', { target: '@shop_bot', links })).status, 409, 'already verified');
+  assert.equal((await call('/manage/unverify', { target: '@shop_bot' }, 'attacker')).status, 403);
+  assert.equal((await call('/manage/unverify', { target: '@shop_bot' })).ok, true);
+  assert.equal(data.get(`chat_profiles/bot_${bot.id}`).verified, false);
+  assert.equal(data.get(`zp_verify_requests/bot_${bot.id}`).status, 'removed');
+});

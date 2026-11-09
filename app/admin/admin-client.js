@@ -223,6 +223,7 @@ const NAV = [
   { id: 'paywall', label: 'Subscription pop-up', icon: 'crown', anim: 'star', group: 'Money', hint: 'X-style upgrade sheet in the app' },
   { id: 'users', label: 'Users', icon: 'users', anim: 'users', group: 'People', hint: 'Accounts and PassGram IDs' },
   { id: 'moderation', label: 'Moderation', icon: 'shield', anim: 'shield', group: 'People', hint: 'Ban people, close groups and channels' },
+  { id: 'verification', label: 'Verification', icon: 'check', anim: 'award', group: 'People', hint: 'Blue check requests from Zbot /verify' },
   { id: 'releases', label: 'Updates & releases', icon: 'rocket', anim: 'upload-cloud', group: 'App', hint: 'Versions, maintenance, announcements' },
   { id: 'errors', label: 'Error reports', icon: 'bug', anim: 'alert-triangle', group: 'App', hint: 'Crash and error codes from the apps' },
 ]
@@ -968,6 +969,166 @@ function PlatformStatus({ fb, ask, toast }) {
   )
 }
 
+// ---------------- Moderation (Telegram style bans) ----------------
+// chat_bans/{uid} bans an account; chat_bans/group_{gid} closes a group or channel for everyone.
+// Firestore rules make the collection admin-only and refuse messages from banned accounts / in closed groups.
+function Moderation({ fb, ask, toast }) {
+  const { fs, db } = fb
+  const [kind, setKind] = useState('user')
+  const [target, setTarget] = useState('')
+  const [reason, setReason] = useState('')
+  const [busy, setBusy] = useState(false)
+  const bans = useLoader(async () => {
+    const snap = await fs.getDocs(fs.query(fs.collection(db, 'chat_bans'), fs.orderBy('bannedAt', 'desc'), fs.limit(200)))
+    return snap.docs.map((d) => ({ id: d.id, ...d.data() }))
+  }, [])
+
+  // "@name", "zpas.org/name" or a raw id → { id, name } for a person or a group/channel
+  const resolve = async (raw, wantGroup) => {
+    const text = String(raw || '').trim().replace(/^https?:\/\/(www\.)?zpas\.org\//i, '').replace(/^zpas\.org\//i, '').replace(/^@/, '')
+    if (!text) throw Error('Enter a @username or an id.')
+    const handle = text.toLowerCase()
+    if (/^[a-z0-9_]{4,32}$/.test(handle)) {
+      const row = await fs.getDoc(fs.doc(db, 'chat_usernames', handle))
+      if (row.exists()) {
+        const d = row.data()
+        if (wantGroup) { if (!d.gid) throw Error(`@${handle} is not a group or channel.`); return { id: d.gid, name: '@' + handle } }
+        if (d.gid || d.botId) throw Error(`@${handle} is not a person. Use the Group / channel tab.`)
+        return { id: d.uid, name: '@' + handle }
+      }
+    }
+    if (/^[A-Za-z0-9_-]{6,128}$/.test(text)) return { id: text, name: text }
+    throw Error('Not found: ' + raw)
+  }
+
+  const ban = async () => {
+    setBusy(true)
+    try {
+      const wantGroup = kind === 'group'
+      const { id, name } = await resolve(target, wantGroup)
+      const ok = await ask({
+        title: wantGroup ? `Close ${name}?` : `Ban ${name}?`,
+        message: wantGroup ? 'Every member sees "This channel can\'t be displayed … violates the Z Pass Terms of Service" and nobody can post.'
+          : 'The person sees "Your account was banned by Z Pass for violating the Z Pass Terms of Service" and can no longer send messages.',
+        confirm: wantGroup ? 'Close' : 'Ban', danger: true,
+      })
+      if (!ok) return
+      const docId = wantGroup ? 'group_' + id : id
+      await fs.setDoc(fs.doc(db, 'chat_bans', docId), {
+        banned: true, type: wantGroup ? 'group' : 'user', [wantGroup ? 'gid' : 'uid']: id, username: name,
+        reason: reason.trim().slice(0, 200), bannedAt: fs.serverTimestamp(), by: fb.auth?.currentUser?.uid || '',
+      })
+      toast(wantGroup ? `${name} closed.` : `${name} banned.`); setTarget(''); setReason(''); bans.reload()
+    } catch (error) { toast(errorText(error), 'bad') } finally { setBusy(false) }
+  }
+
+  const unban = async (row) => {
+    if (!(await ask({ title: `Lift the ban on ${row.username || row.id}?`, message: 'They can use chats again right away.', confirm: 'Lift ban' }))) return
+    try { await fs.deleteDoc(fs.doc(db, 'chat_bans', row.id)); toast('Ban lifted.'); bans.reload() } catch (error) { toast(errorText(error), 'bad') }
+  }
+
+  const deleteGroup = async (row) => {
+    const gid = row.gid || row.id.replace(/^group_/, '')
+    if (!(await ask({ title: `Delete ${row.username || gid} permanently?`, message: 'The group / channel is removed for every member. This cannot be undone.', confirm: 'Delete', danger: true }))) return
+    try {
+      await fs.deleteDoc(fs.doc(db, 'chat_groups', gid))
+      const handle = String(row.username || '').replace(/^@/, '')
+      if (handle) await fs.deleteDoc(fs.doc(db, 'chat_usernames', handle)).catch(() => {})
+      toast('Deleted.'); bans.reload()
+    } catch (error) { toast(errorText(error), 'bad') }
+  }
+
+  return (
+    <>
+      <Card title="Ban or close" hint="Bans apply instantly in the app. Banned people keep their account but cannot use chats; closed groups and channels disappear for every member.">
+        <div className="zpa-form-row">
+          <label className="zpa-field"><span>Type</span>
+            <select value={kind} onChange={(e) => setKind(e.target.value)}><option value="user">Person</option><option value="group">Group / channel</option></select></label>
+          <label className="zpa-field" style={{ flex: 2 }}><span>{kind === 'user' ? '@username or user id' : '@username, zpas.org/link or group id'}</span>
+            <input value={target} onChange={(e) => setTarget(e.target.value)} placeholder={kind === 'user' ? '@username' : '@channel'} /></label>
+          <label className="zpa-field" style={{ flex: 2 }}><span>Reason (shown to them, optional)</span>
+            <input value={reason} onChange={(e) => setReason(e.target.value)} placeholder="Spam, scam, abuse…" maxLength={200} /></label>
+        </div>
+        <div className="zpa-form-row end">
+          <button className="zpa-btn primary" disabled={busy || !target.trim()} onClick={ban}><Icon name="shield" size={15} />{busy ? 'Working…' : kind === 'user' ? 'Ban person' : 'Close group / channel'}</button>
+        </div>
+      </Card>
+      <Card title="Active bans" hint="Lift a ban, or delete a closed group / channel for good." actions={<button className="zpa-btn ghost sm" onClick={bans.reload}><Icon name="refresh" size={15} />Refresh</button>}>
+        <Table rows={bans.data} loading={bans.loading} error={bans.error} empty="Nobody is banned."
+          columns={[
+            { label: 'Type', render: (r) => (r.type === 'group' ? 'Group / channel' : 'Person') },
+            { label: 'Who', render: (r) => r.username || r.uid || r.gid || r.id },
+            { label: 'Id', mono: true, render: (r) => r.uid || r.gid || r.id },
+            { label: 'Reason', render: (r) => r.reason || '—' },
+            { label: 'When', render: (r) => fmtDate(r.bannedAt) },
+            { label: '', render: (r) => (
+              <span style={{ display: 'inline-flex', gap: 6 }}>
+                <button className="zpa-btn ghost sm" onClick={() => unban(r)}>Lift</button>
+                {r.type === 'group' && <button className="zpa-btn ghost sm" onClick={() => deleteGroup(r)}>Delete</button>}
+              </span>
+            ) },
+          ]} />
+      </Card>
+    </>
+  )
+}
+
+// ---------------- Verification (blue check requests from Zbot /verify) ----------------
+// People apply in the app (Zbot → /verify). The bot server checks they own the account or bot.
+// Approving sets chat_profiles/{id}.verified = true, which shows the blue check everywhere.
+const linkHost = (u) => { try { return new URL(u).hostname.replace(/^www\./, '') } catch { return u } }
+function Verification({ fb, ask, toast }) {
+  const { fs, db, auth } = fb
+  const [status, setStatus] = useState('pending')
+  const [busy, setBusy] = useState('')
+  const list = useLoader(async () => {
+    const q = fs.query(fs.collection(db, 'zp_verify_requests'), fs.where('status', '==', status), fs.limit(100))
+    const rows = (await fs.getDocs(q)).docs.map((d) => ({ id: d.id, ...d.data() }))
+    return rows.sort((a, b) => (b.createdAt || 0) - (a.createdAt || 0))
+  }, [status])
+  const decide = async (r, approve) => {
+    let reason = ''
+    if (!approve) {
+      reason = (window.prompt(`Why is @${r.username} rejected? They will see this in Zbot (/myverify).`, 'No zpas.org link on the official accounts.') || '').trim()
+      if (!reason) return
+    } else if (!(await ask({ title: `Verify @${r.username}?`, message: 'The blue check appears on this ' + (r.kind === 'bot' ? 'bot' : 'account') + ' everywhere in PassGram right away.', confirm: 'Verify' }))) return
+    setBusy(r.id)
+    try {
+      const batch = fs.writeBatch(db)
+      batch.update(fs.doc(db, 'zp_verify_requests', r.id), { status: approve ? 'approved' : 'rejected', reason, decidedAt: Date.now(), decidedBy: auth.currentUser?.uid || '' })
+      if (approve) batch.update(fs.doc(db, 'chat_profiles', r.id), { verified: true })
+      await batch.commit()
+      toast(approve ? `@${r.username} is verified.` : `@${r.username} was rejected.`)
+      list.reload()
+    } catch (error) { toast(errorText(error), 'bad') } finally { setBusy('') }
+  }
+  return (
+    <Card title="Blue check requests" hint="Applications from Zbot → /verify. Check that the official accounts are real and link back to zpas.org/username."
+      actions={<button className="zpa-btn ghost sm" onClick={list.reload}><Icon name="refresh" size={15} />Reload</button>}>
+      <div className="zpa-toolbar">
+        <Segmented value={status} onChange={setStatus} options={[
+          { value: 'pending', label: 'Waiting' }, { value: 'approved', label: 'Approved' },
+          { value: 'rejected', label: 'Rejected' }, { value: 'removed', label: 'Removed by owner' }]} />
+      </div>
+      <Table loading={list.loading} error={list.error} rows={list.data}
+        empty={status === 'pending' ? 'No requests waiting. 🎉' : 'Nothing here.'}
+        columns={[
+          { label: 'Who', render: (r) => <span><strong>@{r.username}</strong> <span className={`zpa-pill ${r.kind === 'bot' ? 'warn' : 'muted'}`}>{r.kind === 'bot' ? 'BOT' : 'ACCOUNT'}</span></span> },
+          { label: 'Official accounts', render: (r) => <span style={{ display: 'flex', flexDirection: 'column', gap: 2 }}>{(r.links || []).map((u) => <a key={u} href={u} target="_blank" rel="noopener noreferrer">{linkHost(u)} ↗</a>)}</span> },
+          { label: 'Press', render: (r) => (r.press || []).length ? <span style={{ display: 'flex', flexDirection: 'column', gap: 2 }}>{r.press.map((u) => <a key={u} href={u} target="_blank" rel="noopener noreferrer">{linkHost(u)} ↗</a>)}</span> : '—' },
+          { label: 'Note', render: (r) => r.note || '—' },
+          { label: 'Sent', render: (r) => (r.createdAt ? new Date(r.createdAt).toLocaleString() : '—') },
+          { label: status === 'pending' ? '' : 'Result', render: (r) => status === 'pending' ? (
+            <span style={{ display: 'inline-flex', gap: 6 }}>
+              <button className="zpa-btn primary sm" disabled={busy === r.id} onClick={() => decide(r, true)}><Icon name="check" size={14} />Verify</button>
+              <button className="zpa-btn ghost sm" disabled={busy === r.id} onClick={() => decide(r, false)}>Reject</button>
+            </span>
+          ) : (r.reason || (r.decidedAt ? new Date(r.decidedAt).toLocaleString() : '—')) },
+        ]} />
+    </Card>
+  )
+}
+
 function Errors({ fb }) {
   const { fs, db } = fb
   const list = useLoader(async () => {
@@ -1129,6 +1290,7 @@ export default function AdminClient() {
               {view === 'subscriptions' && <Subscriptions {...props} />}
               {view === 'users' && <Users {...props} />}
               {view === 'moderation' && <Moderation {...props} />}
+              {view === 'verification' && <Verification {...props} />}
               {view === 'payments' && <Payments {...props} />}
               {view === 'releases' && <><Releases {...props} /><PlatformStatus {...props} /></>}
               {view === 'paywall' && <Paywall {...props} />}
