@@ -36,46 +36,794 @@
 <section id="sec-formatting-options"><h2 id="formatting-options">Formatting options<a class="anchor" href="#formatting-options" aria-label="Link to this section">#</a></h2><p>Set <code>parse_mode</code> to style text.</p><table><tr><th>Style</th><th>HTML</th><th>MarkdownV2</th></tr><tr><td>Bold</td><td><code>&lt;b&gt;x&lt;/b&gt;</code></td><td><code>*x*</code></td></tr><tr><td>Italic</td><td><code>&lt;i&gt;x&lt;/i&gt;</code></td><td><code>_x_</code></td></tr><tr><td>Underline</td><td><code>&lt;u&gt;x&lt;/u&gt;</code></td><td><code>__x__</code></td></tr><tr><td>Strikethrough</td><td><code>&lt;s&gt;x&lt;/s&gt;</code></td><td><code>~x~</code></td></tr><tr><td>Spoiler</td><td><code>&lt;tg-spoiler&gt;x&lt;/tg-spoiler&gt;</code></td><td><code>||x||</code></td></tr><tr><td>Code</td><td><code>&lt;code&gt;x&lt;/code&gt;</code>, <code>&lt;pre&gt;x&lt;/pre&gt;</code></td><td><code>`x`</code>, <code>```x```</code></td></tr><tr><td>Link</td><td><code>&lt;a href="https://…"&gt;x&lt;/a&gt;</code></td><td><code>[x](https://…)</code></td></tr><tr><td>Quote</td><td><code>&lt;blockquote&gt;x&lt;/blockquote&gt;</code></td><td><code>&gt;x</code></td></tr></table><p>In HTML write <code>&amp;lt;</code> <code>&amp;gt;</code> <code>&amp;amp;</code> for literal characters. In MarkdownV2 put <code>\</code> before symbols you want to show as they are. <code>Markdown</code> (legacy) supports <code>*bold*</code>, <code>_italic_</code>, <code>`code`</code> and links.</p></section>
 <h2 id="available-methods">Available methods<a class="anchor" href="#available-methods">#</a></h2>
 <h2 id="getting-updates">Getting updates<a class="anchor" href="#getting-updates" aria-label="Link to this section">#</a></h2>
-<section id="sec-getUpdates"><h3 id="getUpdates">getUpdates<a class="anchor" href="#getUpdates" aria-label="Link to this section">#</a></h3><div class="method"><span class="tag post">POST</span><span class="url">/bot&lt;TOKEN&gt;/getUpdates</span><span class="tag live">LIVE</span></div><p>Returns new updates, oldest first, as an Array of <a href="#Update">Update</a>. Not available while a webhook is set (<code>409</code>).</p><table><tr><th>Parameter</th><th>Type</th><th>Required</th><th>Description</th></tr><tr><td><code>offset</code></td><td>Integer</td><td>Optional</td><td>First update to return. Updates before it are confirmed and removed. A negative value returns only the last few.</td></tr><tr><td><code>limit</code></td><td>Integer</td><td>Optional</td><td>1–100, default 100.</td></tr><tr><td><code>timeout</code></td><td>Integer</td><td>Optional</td><td>Seconds to wait when nothing is new (long polling). PassGram waits up to 25.</td></tr><tr><td><code>allowed_updates</code></td><td>Array of String</td><td>Optional</td><td><code>message</code>, <code>callback_query</code>. Remembered for later calls.</td></tr></table></section>
-<section id="sec-setWebhook"><h3 id="setWebhook">setWebhook<a class="anchor" href="#setWebhook" aria-label="Link to this section">#</a></h3><div class="method"><span class="tag post">POST</span><span class="url">/bot&lt;TOKEN&gt;/setWebhook</span><span class="tag live">LIVE</span></div><p>Sends every new update to your HTTPS address as a JSON <code>POST</code>. Returns <code>True</code>. See <a href="#webhooks">webhooks</a>.</p><table><tr><th>Parameter</th><th>Type</th><th>Required</th><th>Description</th></tr><tr><td><code>url</code></td><td>String</td><td>Yes</td><td>Your <code>https://</code> address. Empty removes the webhook.</td></tr><tr><td><code>secret_token</code></td><td>String</td><td>Optional</td><td>1–256 characters <code>A-Z a-z 0-9 _ -</code>, sent back in a header with every delivery.</td></tr><tr><td><code>allowed_updates</code></td><td>Array of String</td><td>Optional</td><td>Which kinds to deliver.</td></tr><tr><td><code>drop_pending_updates</code></td><td>Boolean</td><td>Optional</td><td>Forget updates waiting now.</td></tr></table></section>
-<section id="sec-deleteWebhook"><h3 id="deleteWebhook">deleteWebhook<a class="anchor" href="#deleteWebhook" aria-label="Link to this section">#</a></h3><div class="method"><span class="tag post">POST</span><span class="url">/bot&lt;TOKEN&gt;/deleteWebhook</span><span class="tag live">LIVE</span></div><p>Removes the webhook so you can use <a href="#getUpdates">getUpdates</a>. Returns <code>True</code>.</p><table><tr><th>Parameter</th><th>Type</th><th>Required</th><th>Description</th></tr><tr><td><code>drop_pending_updates</code></td><td>Boolean</td><td>Optional</td><td>Forget updates waiting now.</td></tr></table></section>
-<section id="sec-getWebhookInfo"><h3 id="getWebhookInfo">getWebhookInfo<a class="anchor" href="#getWebhookInfo" aria-label="Link to this section">#</a></h3><div class="method"><span class="tag post">POST</span><span class="url">/bot&lt;TOKEN&gt;/getWebhookInfo</span><span class="tag live">LIVE</span></div><p>Returns <a href="#WebhookInfo">WebhookInfo</a>. No parameters.</p><p><i>No parameters.</i></p></section>
+<section id="sec-getUpdates"><h3 id="getUpdates">getUpdates<a class="anchor" href="#getUpdates" aria-label="Link to this section">#</a></h3><div class="method"><span class="tag post">POST</span><span class="url">/bot&lt;TOKEN&gt;/getUpdates</span><span class="tag live">LIVE</span></div><p>Returns new updates, oldest first, as an Array of <a href="#Update">Update</a>. Not available while a webhook is set (<code>409</code>).</p><table><tr><th>Parameter</th><th>Type</th><th>Required</th><th>Description</th></tr><tr><td><code>offset</code></td><td>Integer</td><td>Optional</td><td>First update to return. Updates before it are confirmed and removed. A negative value returns only the last few.</td></tr><tr><td><code>limit</code></td><td>Integer</td><td>Optional</td><td>1–100, default 100.</td></tr><tr><td><code>timeout</code></td><td>Integer</td><td>Optional</td><td>Seconds to wait when nothing is new (long polling). PassGram waits up to 25.</td></tr><tr><td><code>allowed_updates</code></td><td>Array of String</td><td>Optional</td><td><code>message</code>, <code>callback_query</code>. Remembered for later calls.</td></tr></table><p class="ex-label"><b>Example</b></p><div class="tabs"><div class="tabbar"><button class=on>Python SDK</button><button>JavaScript SDK</button><button>cURL</button><button>Request JSON</button><button>Response</button><button class="copy">Copy</button></div><pre class=on># bot.run() calls getUpdates for you and sends each update to your handlers.
+updates = bot.call(&quot;getUpdates&quot;, {&quot;offset&quot;: 7, &quot;timeout&quot;: 25})</pre><pre>// bot.run() calls getUpdates for you and sends each update to your handlers.
+const updates = await bot.call(&#x27;getUpdates&#x27;, { offset: 7, timeout: 25 });</pre><pre>curl -X POST https://api.zpas.org/bot$TOKEN/getUpdates \
+  -H &quot;Content-Type: application/json&quot; \
+  -d &#x27;{&quot;offset&quot;: 7, &quot;timeout&quot;: 25}&#x27;</pre><pre>{
+  &quot;offset&quot;: 7,
+  &quot;timeout&quot;: 25
+}</pre><pre>{
+  &quot;ok&quot;: true,
+  &quot;result&quot;: [
+    {
+      &quot;update_id&quot;: 7,
+      &quot;message&quot;: {
+        &quot;message_id&quot;: 1,
+        &quot;from&quot;: {
+          &quot;id&quot;: 45957845239,
+          &quot;is_bot&quot;: false,
+          &quot;first_name&quot;: &quot;Rezan&quot;,
+          &quot;username&quot;: &quot;rezan&quot;,
+          &quot;language_code&quot;: &quot;tr&quot;
+        },
+        &quot;chat&quot;: {
+          &quot;id&quot;: 45957845239,
+          &quot;type&quot;: &quot;private&quot;,
+          &quot;first_name&quot;: &quot;Rezan&quot;,
+          &quot;username&quot;: &quot;rezan&quot;
+        },
+        &quot;date&quot;: 1794200943,
+        &quot;text&quot;: &quot;/start welcome&quot;,
+        &quot;entities&quot;: [
+          {
+            &quot;type&quot;: &quot;bot_command&quot;,
+            &quot;offset&quot;: 0,
+            &quot;length&quot;: 6
+          }
+        ]
+      }
+    },
+    {
+      &quot;update_id&quot;: 8,
+      &quot;callback_query&quot;: {
+        &quot;id&quot;: &quot;5f1c0a9e2b7d4c3e8a6f1b2c&quot;,
+        &quot;from&quot;: {
+          &quot;id&quot;: 45957845239,
+          &quot;is_bot&quot;: false,
+          &quot;first_name&quot;: &quot;Rezan&quot;,
+          &quot;username&quot;: &quot;rezan&quot;,
+          &quot;language_code&quot;: &quot;tr&quot;
+        },
+        &quot;message&quot;: {
+          &quot;message_id&quot;: 2,
+          &quot;from&quot;: {
+            &quot;id&quot;: 8513445453,
+            &quot;is_bot&quot;: true,
+            &quot;first_name&quot;: &quot;My Shop&quot;,
+            &quot;username&quot;: &quot;myshop_bot&quot;
+          },
+          &quot;chat&quot;: {
+            &quot;id&quot;: 45957845239,
+            &quot;type&quot;: &quot;private&quot;,
+            &quot;first_name&quot;: &quot;Rezan&quot;,
+            &quot;username&quot;: &quot;rezan&quot;
+          },
+          &quot;date&quot;: 1794200943,
+          &quot;text&quot;: &quot;Pick something:&quot;,
+          &quot;reply_markup&quot;: {
+            &quot;inline_keyboard&quot;: [
+              [
+                {
+                  &quot;text&quot;: &quot;🛒 Shop&quot;,
+                  &quot;callback_data&quot;: &quot;shop&quot;
+                },
+                {
+                  &quot;text&quot;: &quot;📦 Orders&quot;,
+                  &quot;callback_data&quot;: &quot;orders&quot;
+                }
+              ],
+              [
+                {
+                  &quot;text&quot;: &quot;🌐 Website&quot;,
+                  &quot;url&quot;: &quot;https://example.com&quot;
+                }
+              ]
+            ]
+          }
+        },
+        &quot;chat_instance&quot;: &quot;45957845239&quot;,
+        &quot;data&quot;: &quot;shop&quot;
+      }
+    }
+  ]
+}</pre></div><p class="ex-label"><b>Good to know</b></p><ul><li>Use the highest <code>update_id</code> you processed + 1 as the next <code>offset</code>. Updates before it are deleted.</li><li>With <code>timeout</code>, the request stays open until something arrives (or 25 seconds pass). Set your HTTP client's timeout a bit higher, e.g. 40 seconds.</li><li>Updates wait at most 24 hours. If your bot is off longer, older ones are gone.</li><li>Do not run two programs with the same token at the same time: they would steal each other's updates.</li></ul><p class="ex-label"><b>Common errors</b></p><table><tr><th>Code</th><th>When</th></tr><tr><td><code>409</code></td><td>A webhook is set. Call deleteWebhook first.</td></tr><tr><td><code>400</code></td><td><code>limit</code> outside 1–100, or bad <code>offset</code>.</td></tr></table></section>
+<section id="sec-setWebhook"><h3 id="setWebhook">setWebhook<a class="anchor" href="#setWebhook" aria-label="Link to this section">#</a></h3><div class="method"><span class="tag post">POST</span><span class="url">/bot&lt;TOKEN&gt;/setWebhook</span><span class="tag live">LIVE</span></div><p>Sends every new update to your HTTPS address as a JSON <code>POST</code>. Returns <code>True</code>. See <a href="#webhooks">webhooks</a>.</p><table><tr><th>Parameter</th><th>Type</th><th>Required</th><th>Description</th></tr><tr><td><code>url</code></td><td>String</td><td>Yes</td><td>Your <code>https://</code> address. Empty removes the webhook.</td></tr><tr><td><code>secret_token</code></td><td>String</td><td>Optional</td><td>1–256 characters <code>A-Z a-z 0-9 _ -</code>, sent back in a header with every delivery.</td></tr><tr><td><code>allowed_updates</code></td><td>Array of String</td><td>Optional</td><td>Which kinds to deliver.</td></tr><tr><td><code>drop_pending_updates</code></td><td>Boolean</td><td>Optional</td><td>Forget updates waiting now.</td></tr></table><p class="ex-label"><b>Example</b></p><div class="tabs"><div class="tabbar"><button class=on>Python SDK</button><button>JavaScript SDK</button><button>cURL</button><button>Request JSON</button><button>Response</button><button class="copy">Copy</button></div><pre class=on>bot.call(&quot;setWebhook&quot;, {&quot;url&quot;: &quot;https://bot.example.com/passgram&quot;, &quot;secret_token&quot;: &quot;k3y-Only-My-Server-Knows&quot;})</pre><pre>await bot.call(&#x27;setWebhook&#x27;, { url: &#x27;https://bot.example.com/passgram&#x27;, secret_token: &#x27;k3y-Only-My-Server-Knows&#x27; });</pre><pre>curl -X POST https://api.zpas.org/bot$TOKEN/setWebhook \
+  -H &quot;Content-Type: application/json&quot; \
+  -d &#x27;{&quot;url&quot;: &quot;https://bot.example.com/passgram&quot;, &quot;secret_token&quot;: &quot;k3y-Only-My-Server-Knows&quot;, &quot;drop_pending_updates&quot;: false}&#x27;</pre><pre>{
+  &quot;url&quot;: &quot;https://bot.example.com/passgram&quot;,
+  &quot;secret_token&quot;: &quot;k3y-Only-My-Server-Knows&quot;,
+  &quot;drop_pending_updates&quot;: false
+}</pre><pre>{
+  &quot;ok&quot;: true,
+  &quot;result&quot;: true
+}</pre></div><p class="ex-label"><b>Good to know</b></p><ul><li>Your address must be <code>https://</code> and reachable from the internet. Any port works.</li><li>Waiting updates are delivered right after you set it (unless you drop them).</li><li>Check <code>X-ZPass-Bot-Api-Secret-Token</code> on every request and reject the rest: anyone could guess your address.</li><li>Answer within 10 seconds with any 2xx status. Do slow work after answering.</li></ul><p class="ex-label"><b>Common errors</b></p><table><tr><th>Code</th><th>When</th></tr><tr><td><code>400</code></td><td>Not https, contains a username/password, or points at api.zpas.org itself.</td></tr><tr><td><code>400</code></td><td>Secret token with characters other than A–Z, a–z, 0–9, _ and -.</td></tr></table></section>
+<section id="sec-deleteWebhook"><h3 id="deleteWebhook">deleteWebhook<a class="anchor" href="#deleteWebhook" aria-label="Link to this section">#</a></h3><div class="method"><span class="tag post">POST</span><span class="url">/bot&lt;TOKEN&gt;/deleteWebhook</span><span class="tag live">LIVE</span></div><p>Removes the webhook so you can use <a href="#getUpdates">getUpdates</a>. Returns <code>True</code>.</p><table><tr><th>Parameter</th><th>Type</th><th>Required</th><th>Description</th></tr><tr><td><code>drop_pending_updates</code></td><td>Boolean</td><td>Optional</td><td>Forget updates waiting now.</td></tr></table><p class="ex-label"><b>Example</b></p><div class="tabs"><div class="tabbar"><button class=on>Python SDK</button><button>JavaScript SDK</button><button>cURL</button><button>Request JSON</button><button>Response</button><button class="copy">Copy</button></div><pre class=on>bot.call(&quot;deleteWebhook&quot;)</pre><pre>await bot.call(&#x27;deleteWebhook&#x27;);</pre><pre>curl -X POST https://api.zpas.org/bot$TOKEN/deleteWebhook \
+  -H &quot;Content-Type: application/json&quot; \
+  -d &#x27;{&quot;drop_pending_updates&quot;: false}&#x27;</pre><pre>{
+  &quot;drop_pending_updates&quot;: false
+}</pre><pre>{
+  &quot;ok&quot;: true,
+  &quot;result&quot;: true
+}</pre></div><p class="ex-label"><b>Good to know</b></p><ul><li>The SDK's <code>run()</code> calls this for you, so switching from webhook to polling is automatic.</li></ul></section>
+<section id="sec-getWebhookInfo"><h3 id="getWebhookInfo">getWebhookInfo<a class="anchor" href="#getWebhookInfo" aria-label="Link to this section">#</a></h3><div class="method"><span class="tag post">POST</span><span class="url">/bot&lt;TOKEN&gt;/getWebhookInfo</span><span class="tag live">LIVE</span></div><p>Returns <a href="#WebhookInfo">WebhookInfo</a>. No parameters.</p><p><i>No parameters.</i></p><p class="ex-label"><b>Example</b></p><div class="tabs"><div class="tabbar"><button class=on>Python SDK</button><button>JavaScript SDK</button><button>cURL</button><button>Response</button><button class="copy">Copy</button></div><pre class=on>info = bot.call(&quot;getWebhookInfo&quot;)
+print(info[&quot;pending_update_count&quot;], info.get(&quot;last_error_message&quot;))</pre><pre>const info = await bot.call(&#x27;getWebhookInfo&#x27;);
+console.log(info.pending_update_count, info.last_error_message);</pre><pre>curl https://api.zpas.org/bot$TOKEN/getWebhookInfo</pre><pre>{
+  &quot;ok&quot;: true,
+  &quot;result&quot;: {
+    &quot;url&quot;: &quot;https://bot.example.com/passgram&quot;,
+    &quot;has_custom_certificate&quot;: false,
+    &quot;pending_update_count&quot;: 1,
+    &quot;max_connections&quot;: 40,
+    &quot;last_error_date&quot;: 1794200943,
+    &quot;last_error_message&quot;: &quot;Wrong response from the webhook: 500&quot;
+  }
+}</pre></div><p class="ex-label"><b>Good to know</b></p><ul><li><code>pending_update_count</code> above 0 for a long time means your server is not answering with 2xx.</li></ul></section>
 <h2 id="bot-info">Bot info<a class="anchor" href="#bot-info" aria-label="Link to this section">#</a></h2>
-<section id="sec-getMe"><h3 id="getMe">getMe<a class="anchor" href="#getMe" aria-label="Link to this section">#</a></h3><div class="method"><span class="tag post">POST</span><span class="url">/bot&lt;TOKEN&gt;/getMe</span><span class="tag live">LIVE</span></div><p>Checks your token. Returns <a href="#BotUser">BotUser</a>. No parameters.</p><p><i>No parameters.</i></p></section>
-<section id="sec-logOut"><h3 id="logOut">logOut<a class="anchor" href="#logOut" aria-label="Link to this section">#</a></h3><div class="method"><span class="tag post">POST</span><span class="url">/bot&lt;TOKEN&gt;/logOut</span><span class="tag live">LIVE</span></div><p>Accepted for compatibility; nothing to do on PassGram. Returns <code>True</code>.</p><p><i>No parameters.</i></p></section>
-<section id="sec-close"><h3 id="close">close<a class="anchor" href="#close" aria-label="Link to this section">#</a></h3><div class="method"><span class="tag post">POST</span><span class="url">/bot&lt;TOKEN&gt;/close</span><span class="tag live">LIVE</span></div><p>Accepted for compatibility. Returns <code>True</code>.</p><p><i>No parameters.</i></p></section>
-<section id="sec-getChat"><h3 id="getChat">getChat<a class="anchor" href="#getChat" aria-label="Link to this section">#</a></h3><div class="method"><span class="tag post">POST</span><span class="url">/bot&lt;TOKEN&gt;/getChat</span><span class="tag live">LIVE</span></div><p>Returns <a href="#ChatFullInfo">ChatFullInfo</a> for someone who started your bot.</p><table><tr><th>Parameter</th><th>Type</th><th>Required</th><th>Description</th></tr><tr><td><code>chat_id</code></td><td>Integer or String</td><td>Yes</td><td>Chat ID from an update, or the person's <code>@username</code>.</td></tr></table></section>
+<section id="sec-getMe"><h3 id="getMe">getMe<a class="anchor" href="#getMe" aria-label="Link to this section">#</a></h3><div class="method"><span class="tag post">POST</span><span class="url">/bot&lt;TOKEN&gt;/getMe</span><span class="tag live">LIVE</span></div><p>Checks your token. Returns <a href="#BotUser">BotUser</a>. No parameters.</p><p><i>No parameters.</i></p><p class="ex-label"><b>Example</b></p><div class="tabs"><div class="tabbar"><button class=on>Python SDK</button><button>JavaScript SDK</button><button>cURL</button><button>Response</button><button class="copy">Copy</button></div><pre class=on>me = bot.me()
+print(me.id, me.username)</pre><pre>const me = await bot.me();
+console.log(me.id, me.username);</pre><pre>curl https://api.zpas.org/bot$TOKEN/getMe</pre><pre>{
+  &quot;ok&quot;: true,
+  &quot;result&quot;: {
+    &quot;id&quot;: 8513445453,
+    &quot;is_bot&quot;: true,
+    &quot;first_name&quot;: &quot;My Shop&quot;,
+    &quot;username&quot;: &quot;myshop_bot&quot;,
+    &quot;can_join_groups&quot;: false,
+    &quot;can_read_all_group_messages&quot;: false,
+    &quot;supports_inline_queries&quot;: false,
+    &quot;can_connect_to_business&quot;: false,
+    &quot;has_main_web_app&quot;: false
+  }
+}</pre></div><p class="ex-label"><b>Good to know</b></p><ul><li>A good first call: it proves the token works without changing anything.</li></ul><p class="ex-label"><b>Common errors</b></p><table><tr><th>Code</th><th>When</th></tr><tr><td><code>401</code></td><td>Wrong token, or it was replaced with /revoke.</td></tr></table></section>
+<section id="sec-logOut"><h3 id="logOut">logOut<a class="anchor" href="#logOut" aria-label="Link to this section">#</a></h3><div class="method"><span class="tag post">POST</span><span class="url">/bot&lt;TOKEN&gt;/logOut</span><span class="tag live">LIVE</span></div><p>Accepted for compatibility; nothing to do on PassGram. Returns <code>True</code>.</p><p><i>No parameters.</i></p><p class="ex-label"><b>Example</b></p><div class="tabs"><div class="tabbar"><button class=on>Python SDK</button><button>JavaScript SDK</button><button>cURL</button><button>Response</button><button class="copy">Copy</button></div><pre class=on>bot.call(&quot;logOut&quot;)</pre><pre>await bot.call(&#x27;logOut&#x27;);</pre><pre>curl https://api.zpas.org/bot$TOKEN/logOut</pre><pre>{
+  &quot;ok&quot;: true,
+  &quot;result&quot;: true
+}</pre></div><p class="ex-label"><b>Good to know</b></p><ul><li>Nothing to log out of on PassGram; exists so libraries that call it keep working.</li></ul></section>
+<section id="sec-close"><h3 id="close">close<a class="anchor" href="#close" aria-label="Link to this section">#</a></h3><div class="method"><span class="tag post">POST</span><span class="url">/bot&lt;TOKEN&gt;/close</span><span class="tag live">LIVE</span></div><p>Accepted for compatibility. Returns <code>True</code>.</p><p><i>No parameters.</i></p><p class="ex-label"><b>Example</b></p><div class="tabs"><div class="tabbar"><button class=on>Python SDK</button><button>JavaScript SDK</button><button>cURL</button><button>Response</button><button class="copy">Copy</button></div><pre class=on>bot.call(&quot;close&quot;)</pre><pre>await bot.call(&#x27;close&#x27;);</pre><pre>curl https://api.zpas.org/bot$TOKEN/close</pre><pre>{
+  &quot;ok&quot;: true,
+  &quot;result&quot;: true
+}</pre></div></section>
+<section id="sec-getChat"><h3 id="getChat">getChat<a class="anchor" href="#getChat" aria-label="Link to this section">#</a></h3><div class="method"><span class="tag post">POST</span><span class="url">/bot&lt;TOKEN&gt;/getChat</span><span class="tag live">LIVE</span></div><p>Returns <a href="#ChatFullInfo">ChatFullInfo</a> for someone who started your bot.</p><table><tr><th>Parameter</th><th>Type</th><th>Required</th><th>Description</th></tr><tr><td><code>chat_id</code></td><td>Integer or String</td><td>Yes</td><td>Chat ID from an update, or the person's <code>@username</code>.</td></tr></table><p class="ex-label"><b>Example</b></p><div class="tabs"><div class="tabbar"><button class=on>Python SDK</button><button>JavaScript SDK</button><button>cURL</button><button>Request JSON</button><button>Response</button><button class="copy">Copy</button></div><pre class=on>chat = bot.call(&quot;getChat&quot;, {&quot;chat_id&quot;: 45957845239})</pre><pre>const chat = await bot.call(&#x27;getChat&#x27;, { chat_id: 45957845239 });</pre><pre>curl -X POST https://api.zpas.org/bot$TOKEN/getChat \
+  -H &quot;Content-Type: application/json&quot; \
+  -d &#x27;{&quot;chat_id&quot;: 45957845239}&#x27;</pre><pre>{
+  &quot;chat_id&quot;: 45957845239
+}</pre><pre>{
+  &quot;ok&quot;: true,
+  &quot;result&quot;: {
+    &quot;id&quot;: 45957845239,
+    &quot;type&quot;: &quot;private&quot;,
+    &quot;first_name&quot;: &quot;Rezan&quot;,
+    &quot;username&quot;: &quot;rezan&quot;,
+    &quot;accent_color_id&quot;: 0,
+    &quot;max_reaction_count&quot;: 0
+  }
+}</pre></div><p class="ex-label"><b>Good to know</b></p><ul><li>Only works for people who started your bot.</li></ul><p class="ex-label"><b>Common errors</b></p><table><tr><th>Code</th><th>When</th></tr><tr><td><code>400</code></td><td>Chat not found: wrong ID, or the person never opened your bot.</td></tr></table></section>
 <h2 id="sending-messages">Sending messages<a class="anchor" href="#sending-messages" aria-label="Link to this section">#</a></h2>
-<section id="sec-sendMessage"><h3 id="sendMessage">sendMessage<a class="anchor" href="#sendMessage" aria-label="Link to this section">#</a></h3><div class="method"><span class="tag post">POST</span><span class="url">/bot&lt;TOKEN&gt;/sendMessage</span><span class="tag live">LIVE</span></div><p>Sends text. Returns the sent <a href="#Message">Message</a>.</p><table><tr><th>Parameter</th><th>Type</th><th>Required</th><th>Description</th></tr><tr><td><code>chat_id</code></td><td>Integer or String</td><td>Yes</td><td>Chat ID from an update, or the person's <code>@username</code>.</td></tr><tr><td><code>text</code></td><td>String</td><td>Yes</td><td>1–4096 characters.</td></tr><tr><td><code>parse_mode</code></td><td>String</td><td>Optional</td><td><code>HTML</code>, <code>MarkdownV2</code> or <code>Markdown</code>. See <a href="#formatting-options">formatting</a>.</td></tr><tr><td><code>reply_markup</code></td><td><a href="#InlineKeyboardMarkup">InlineKeyboardMarkup</a>, <a href="#ReplyKeyboardMarkup">ReplyKeyboardMarkup</a>, <a href="#ReplyKeyboardRemove">ReplyKeyboardRemove</a> or <a href="#ForceReply">ForceReply</a></td><td>Optional</td><td>Buttons or keyboard. In forms, send it as JSON text.</td></tr><tr><td><code>reply_parameters</code></td><td><a href="#ReplyParameters">ReplyParameters</a></td><td>Optional</td><td>Answer a specific message. <code>reply_to_message_id</code> also works.</td></tr></table></section>
-<section id="sec-sendPhoto"><h3 id="sendPhoto">sendPhoto<a class="anchor" href="#sendPhoto" aria-label="Link to this section">#</a></h3><div class="method"><span class="tag post">POST</span><span class="url">/bot&lt;TOKEN&gt;/sendPhoto</span><span class="tag live">LIVE</span></div><p>Sends a photo. Returns the sent <a href="#Message">Message</a>.</p><table><tr><th>Parameter</th><th>Type</th><th>Required</th><th>Description</th></tr><tr><td><code>chat_id</code></td><td>Integer or String</td><td>Yes</td><td>Chat ID from an update, or the person's <code>@username</code>.</td></tr><tr><td><code>photo</code></td><td><a href="#InputFile">InputFile</a> or String</td><td>Yes</td><td>Upload (up to 20 MB) or an <code>https://</code> link to the file on your server.</td></tr><tr><td><code>caption</code></td><td>String</td><td>Optional</td><td>0–1024 characters.</td></tr><tr><td><code>parse_mode</code></td><td>String</td><td>Optional</td><td><code>HTML</code>, <code>MarkdownV2</code> or <code>Markdown</code>. See <a href="#formatting-options">formatting</a>.</td></tr><tr><td><code>reply_markup</code></td><td><a href="#InlineKeyboardMarkup">InlineKeyboardMarkup</a>, <a href="#ReplyKeyboardMarkup">ReplyKeyboardMarkup</a>, <a href="#ReplyKeyboardRemove">ReplyKeyboardRemove</a> or <a href="#ForceReply">ForceReply</a></td><td>Optional</td><td>Buttons or keyboard. In forms, send it as JSON text.</td></tr><tr><td><code>reply_parameters</code></td><td><a href="#ReplyParameters">ReplyParameters</a></td><td>Optional</td><td>Answer a specific message. <code>reply_to_message_id</code> also works.</td></tr></table></section>
-<section id="sec-sendVideo"><h3 id="sendVideo">sendVideo<a class="anchor" href="#sendVideo" aria-label="Link to this section">#</a></h3><div class="method"><span class="tag post">POST</span><span class="url">/bot&lt;TOKEN&gt;/sendVideo</span><span class="tag live">LIVE</span></div><p>Sends a video. Returns the sent <a href="#Message">Message</a>.</p><table><tr><th>Parameter</th><th>Type</th><th>Required</th><th>Description</th></tr><tr><td><code>chat_id</code></td><td>Integer or String</td><td>Yes</td><td>Chat ID from an update, or the person's <code>@username</code>.</td></tr><tr><td><code>video</code></td><td><a href="#InputFile">InputFile</a> or String</td><td>Yes</td><td>Upload (up to 20 MB) or an <code>https://</code> link to the file on your server.</td></tr><tr><td><code>caption</code></td><td>String</td><td>Optional</td><td>0–1024 characters.</td></tr><tr><td><code>parse_mode</code></td><td>String</td><td>Optional</td><td><code>HTML</code>, <code>MarkdownV2</code> or <code>Markdown</code>. See <a href="#formatting-options">formatting</a>.</td></tr><tr><td><code>reply_markup</code></td><td><a href="#InlineKeyboardMarkup">InlineKeyboardMarkup</a>, <a href="#ReplyKeyboardMarkup">ReplyKeyboardMarkup</a>, <a href="#ReplyKeyboardRemove">ReplyKeyboardRemove</a> or <a href="#ForceReply">ForceReply</a></td><td>Optional</td><td>Buttons or keyboard. In forms, send it as JSON text.</td></tr><tr><td><code>reply_parameters</code></td><td><a href="#ReplyParameters">ReplyParameters</a></td><td>Optional</td><td>Answer a specific message. <code>reply_to_message_id</code> also works.</td></tr></table></section>
-<section id="sec-sendAnimation"><h3 id="sendAnimation">sendAnimation<a class="anchor" href="#sendAnimation" aria-label="Link to this section">#</a></h3><div class="method"><span class="tag post">POST</span><span class="url">/bot&lt;TOKEN&gt;/sendAnimation</span><span class="tag live">LIVE</span></div><p>Sends a GIF or silent video. Returns the sent <a href="#Message">Message</a>.</p><table><tr><th>Parameter</th><th>Type</th><th>Required</th><th>Description</th></tr><tr><td><code>chat_id</code></td><td>Integer or String</td><td>Yes</td><td>Chat ID from an update, or the person's <code>@username</code>.</td></tr><tr><td><code>animation</code></td><td><a href="#InputFile">InputFile</a> or String</td><td>Yes</td><td>Upload (up to 20 MB) or an <code>https://</code> link to the file on your server.</td></tr><tr><td><code>caption</code></td><td>String</td><td>Optional</td><td>0–1024 characters.</td></tr><tr><td><code>parse_mode</code></td><td>String</td><td>Optional</td><td><code>HTML</code>, <code>MarkdownV2</code> or <code>Markdown</code>. See <a href="#formatting-options">formatting</a>.</td></tr><tr><td><code>reply_markup</code></td><td><a href="#InlineKeyboardMarkup">InlineKeyboardMarkup</a>, <a href="#ReplyKeyboardMarkup">ReplyKeyboardMarkup</a>, <a href="#ReplyKeyboardRemove">ReplyKeyboardRemove</a> or <a href="#ForceReply">ForceReply</a></td><td>Optional</td><td>Buttons or keyboard. In forms, send it as JSON text.</td></tr><tr><td><code>reply_parameters</code></td><td><a href="#ReplyParameters">ReplyParameters</a></td><td>Optional</td><td>Answer a specific message. <code>reply_to_message_id</code> also works.</td></tr></table></section>
-<section id="sec-sendAudio"><h3 id="sendAudio">sendAudio<a class="anchor" href="#sendAudio" aria-label="Link to this section">#</a></h3><div class="method"><span class="tag post">POST</span><span class="url">/bot&lt;TOKEN&gt;/sendAudio</span><span class="tag live">LIVE</span></div><p>Sends an audio file. Returns the sent <a href="#Message">Message</a>.</p><table><tr><th>Parameter</th><th>Type</th><th>Required</th><th>Description</th></tr><tr><td><code>chat_id</code></td><td>Integer or String</td><td>Yes</td><td>Chat ID from an update, or the person's <code>@username</code>.</td></tr><tr><td><code>audio</code></td><td><a href="#InputFile">InputFile</a> or String</td><td>Yes</td><td>Upload (up to 20 MB) or an <code>https://</code> link to the file on your server.</td></tr><tr><td><code>caption</code></td><td>String</td><td>Optional</td><td>0–1024 characters.</td></tr><tr><td><code>parse_mode</code></td><td>String</td><td>Optional</td><td><code>HTML</code>, <code>MarkdownV2</code> or <code>Markdown</code>. See <a href="#formatting-options">formatting</a>.</td></tr><tr><td><code>reply_markup</code></td><td><a href="#InlineKeyboardMarkup">InlineKeyboardMarkup</a>, <a href="#ReplyKeyboardMarkup">ReplyKeyboardMarkup</a>, <a href="#ReplyKeyboardRemove">ReplyKeyboardRemove</a> or <a href="#ForceReply">ForceReply</a></td><td>Optional</td><td>Buttons or keyboard. In forms, send it as JSON text.</td></tr><tr><td><code>reply_parameters</code></td><td><a href="#ReplyParameters">ReplyParameters</a></td><td>Optional</td><td>Answer a specific message. <code>reply_to_message_id</code> also works.</td></tr></table></section>
-<section id="sec-sendVoice"><h3 id="sendVoice">sendVoice<a class="anchor" href="#sendVoice" aria-label="Link to this section">#</a></h3><div class="method"><span class="tag post">POST</span><span class="url">/bot&lt;TOKEN&gt;/sendVoice</span><span class="tag live">LIVE</span></div><p>Sends a voice message. Returns the sent <a href="#Message">Message</a>.</p><table><tr><th>Parameter</th><th>Type</th><th>Required</th><th>Description</th></tr><tr><td><code>chat_id</code></td><td>Integer or String</td><td>Yes</td><td>Chat ID from an update, or the person's <code>@username</code>.</td></tr><tr><td><code>voice</code></td><td><a href="#InputFile">InputFile</a> or String</td><td>Yes</td><td>Upload (up to 20 MB) or an <code>https://</code> link to the file on your server.</td></tr><tr><td><code>caption</code></td><td>String</td><td>Optional</td><td>0–1024 characters.</td></tr><tr><td><code>parse_mode</code></td><td>String</td><td>Optional</td><td><code>HTML</code>, <code>MarkdownV2</code> or <code>Markdown</code>. See <a href="#formatting-options">formatting</a>.</td></tr><tr><td><code>reply_markup</code></td><td><a href="#InlineKeyboardMarkup">InlineKeyboardMarkup</a>, <a href="#ReplyKeyboardMarkup">ReplyKeyboardMarkup</a>, <a href="#ReplyKeyboardRemove">ReplyKeyboardRemove</a> or <a href="#ForceReply">ForceReply</a></td><td>Optional</td><td>Buttons or keyboard. In forms, send it as JSON text.</td></tr><tr><td><code>reply_parameters</code></td><td><a href="#ReplyParameters">ReplyParameters</a></td><td>Optional</td><td>Answer a specific message. <code>reply_to_message_id</code> also works.</td></tr></table></section>
-<section id="sec-sendVideoNote"><h3 id="sendVideoNote">sendVideoNote<a class="anchor" href="#sendVideoNote" aria-label="Link to this section">#</a></h3><div class="method"><span class="tag post">POST</span><span class="url">/bot&lt;TOKEN&gt;/sendVideoNote</span><span class="tag live">LIVE</span></div><p>Sends a round video message. Returns the sent <a href="#Message">Message</a>.</p><table><tr><th>Parameter</th><th>Type</th><th>Required</th><th>Description</th></tr><tr><td><code>chat_id</code></td><td>Integer or String</td><td>Yes</td><td>Chat ID from an update, or the person's <code>@username</code>.</td></tr><tr><td><code>video_note</code></td><td><a href="#InputFile">InputFile</a> or String</td><td>Yes</td><td>Upload (up to 20 MB) or an <code>https://</code> link to the file on your server.</td></tr><tr><td><code>caption</code></td><td>String</td><td>Optional</td><td>0–1024 characters.</td></tr><tr><td><code>parse_mode</code></td><td>String</td><td>Optional</td><td><code>HTML</code>, <code>MarkdownV2</code> or <code>Markdown</code>. See <a href="#formatting-options">formatting</a>.</td></tr><tr><td><code>reply_markup</code></td><td><a href="#InlineKeyboardMarkup">InlineKeyboardMarkup</a>, <a href="#ReplyKeyboardMarkup">ReplyKeyboardMarkup</a>, <a href="#ReplyKeyboardRemove">ReplyKeyboardRemove</a> or <a href="#ForceReply">ForceReply</a></td><td>Optional</td><td>Buttons or keyboard. In forms, send it as JSON text.</td></tr><tr><td><code>reply_parameters</code></td><td><a href="#ReplyParameters">ReplyParameters</a></td><td>Optional</td><td>Answer a specific message. <code>reply_to_message_id</code> also works.</td></tr></table></section>
-<section id="sec-sendSticker"><h3 id="sendSticker">sendSticker<a class="anchor" href="#sendSticker" aria-label="Link to this section">#</a></h3><div class="method"><span class="tag post">POST</span><span class="url">/bot&lt;TOKEN&gt;/sendSticker</span><span class="tag live">LIVE</span></div><p>Sends a sticker. Returns the sent <a href="#Message">Message</a>.</p><table><tr><th>Parameter</th><th>Type</th><th>Required</th><th>Description</th></tr><tr><td><code>chat_id</code></td><td>Integer or String</td><td>Yes</td><td>Chat ID from an update, or the person's <code>@username</code>.</td></tr><tr><td><code>sticker</code></td><td><a href="#InputFile">InputFile</a> or String</td><td>Yes</td><td>Upload (up to 20 MB) or an <code>https://</code> link to the file on your server.</td></tr><tr><td><code>caption</code></td><td>String</td><td>Optional</td><td>0–1024 characters.</td></tr><tr><td><code>parse_mode</code></td><td>String</td><td>Optional</td><td><code>HTML</code>, <code>MarkdownV2</code> or <code>Markdown</code>. See <a href="#formatting-options">formatting</a>.</td></tr><tr><td><code>reply_markup</code></td><td><a href="#InlineKeyboardMarkup">InlineKeyboardMarkup</a>, <a href="#ReplyKeyboardMarkup">ReplyKeyboardMarkup</a>, <a href="#ReplyKeyboardRemove">ReplyKeyboardRemove</a> or <a href="#ForceReply">ForceReply</a></td><td>Optional</td><td>Buttons or keyboard. In forms, send it as JSON text.</td></tr><tr><td><code>reply_parameters</code></td><td><a href="#ReplyParameters">ReplyParameters</a></td><td>Optional</td><td>Answer a specific message. <code>reply_to_message_id</code> also works.</td></tr></table></section>
-<section id="sec-sendDocument"><h3 id="sendDocument">sendDocument<a class="anchor" href="#sendDocument" aria-label="Link to this section">#</a></h3><div class="method"><span class="tag post">POST</span><span class="url">/bot&lt;TOKEN&gt;/sendDocument</span><span class="tag live">LIVE</span></div><p>Sends any file. Returns the sent <a href="#Message">Message</a>.</p><table><tr><th>Parameter</th><th>Type</th><th>Required</th><th>Description</th></tr><tr><td><code>chat_id</code></td><td>Integer or String</td><td>Yes</td><td>Chat ID from an update, or the person's <code>@username</code>.</td></tr><tr><td><code>document</code></td><td><a href="#InputFile">InputFile</a> or String</td><td>Yes</td><td>Upload (up to 20 MB) or an <code>https://</code> link to the file on your server.</td></tr><tr><td><code>caption</code></td><td>String</td><td>Optional</td><td>0–1024 characters.</td></tr><tr><td><code>parse_mode</code></td><td>String</td><td>Optional</td><td><code>HTML</code>, <code>MarkdownV2</code> or <code>Markdown</code>. See <a href="#formatting-options">formatting</a>.</td></tr><tr><td><code>reply_markup</code></td><td><a href="#InlineKeyboardMarkup">InlineKeyboardMarkup</a>, <a href="#ReplyKeyboardMarkup">ReplyKeyboardMarkup</a>, <a href="#ReplyKeyboardRemove">ReplyKeyboardRemove</a> or <a href="#ForceReply">ForceReply</a></td><td>Optional</td><td>Buttons or keyboard. In forms, send it as JSON text.</td></tr><tr><td><code>reply_parameters</code></td><td><a href="#ReplyParameters">ReplyParameters</a></td><td>Optional</td><td>Answer a specific message. <code>reply_to_message_id</code> also works.</td></tr></table></section>
-<section id="sec-sendChatAction"><h3 id="sendChatAction">sendChatAction<a class="anchor" href="#sendChatAction" aria-label="Link to this section">#</a></h3><div class="method"><span class="tag post">POST</span><span class="url">/bot&lt;TOKEN&gt;/sendChatAction</span><span class="tag live">LIVE</span></div><p>Shows a status such as “typing…” under your bot's name for about 5 seconds, or until your next message. Returns <code>True</code>.</p><table><tr><th>Parameter</th><th>Type</th><th>Required</th><th>Description</th></tr><tr><td><code>chat_id</code></td><td>Integer or String</td><td>Yes</td><td>Chat ID from an update, or the person's <code>@username</code>.</td></tr><tr><td><code>action</code></td><td>String</td><td>Yes</td><td><code>typing</code>, <code>upload_photo</code>, <code>record_video</code>, <code>upload_video</code>, <code>record_voice</code>, <code>upload_voice</code>, <code>upload_document</code>, <code>choose_sticker</code>, <code>find_location</code>, <code>record_video_note</code>, <code>upload_video_note</code>.</td></tr></table></section>
+<section id="sec-sendMessage"><h3 id="sendMessage">sendMessage<a class="anchor" href="#sendMessage" aria-label="Link to this section">#</a></h3><div class="method"><span class="tag post">POST</span><span class="url">/bot&lt;TOKEN&gt;/sendMessage</span><span class="tag live">LIVE</span></div><p>Sends text. Returns the sent <a href="#Message">Message</a>.</p><table><tr><th>Parameter</th><th>Type</th><th>Required</th><th>Description</th></tr><tr><td><code>chat_id</code></td><td>Integer or String</td><td>Yes</td><td>Chat ID from an update, or the person's <code>@username</code>.</td></tr><tr><td><code>text</code></td><td>String</td><td>Yes</td><td>1–4096 characters.</td></tr><tr><td><code>parse_mode</code></td><td>String</td><td>Optional</td><td><code>HTML</code>, <code>MarkdownV2</code> or <code>Markdown</code>. See <a href="#formatting-options">formatting</a>.</td></tr><tr><td><code>reply_markup</code></td><td><a href="#InlineKeyboardMarkup">InlineKeyboardMarkup</a>, <a href="#ReplyKeyboardMarkup">ReplyKeyboardMarkup</a>, <a href="#ReplyKeyboardRemove">ReplyKeyboardRemove</a> or <a href="#ForceReply">ForceReply</a></td><td>Optional</td><td>Buttons or keyboard. In forms, send it as JSON text.</td></tr><tr><td><code>reply_parameters</code></td><td><a href="#ReplyParameters">ReplyParameters</a></td><td>Optional</td><td>Answer a specific message. <code>reply_to_message_id</code> also works.</td></tr></table><p class="ex-label"><b>Example</b></p><div class="tabs"><div class="tabbar"><button class=on>Python SDK</button><button>JavaScript SDK</button><button>cURL</button><button>Request JSON</button><button>Response</button><button class="copy">Copy</button></div><pre class=on>from passgram import Buttons
+
+bot.send(45957845239, &quot;&lt;b&gt;Welcome!&lt;/b&gt; What would you like to do?&quot;, format=&quot;html&quot;,
+         buttons=Buttons([(&quot;🛒 Shop&quot;, &quot;shop&quot;), (&quot;📦 Orders&quot;, &quot;orders&quot;)], [(&quot;🌐 Website&quot;, &quot;https://example.com&quot;)]))</pre><pre>const { Buttons } = require(&#x27;./passgram&#x27;);
+
+await bot.send(45957845239, &#x27;&lt;b&gt;Welcome!&lt;/b&gt; What would you like to do?&#x27;, {
+  format: &#x27;html&#x27;,
+  buttons: new Buttons([[&#x27;🛒 Shop&#x27;, &#x27;shop&#x27;], [&#x27;📦 Orders&#x27;, &#x27;orders&#x27;]], [[&#x27;🌐 Website&#x27;, &#x27;https://example.com&#x27;]]),
+});</pre><pre>curl -X POST https://api.zpas.org/bot$TOKEN/sendMessage \
+  -H &quot;Content-Type: application/json&quot; \
+  -d &#x27;{&quot;chat_id&quot;: 45957845239, &quot;text&quot;: &quot;&lt;b&gt;Welcome!&lt;/b&gt; What would you like to do?&quot;, &quot;parse_mode&quot;: &quot;HTML&quot;, &quot;reply_markup&quot;: {&quot;inline_keyboard&quot;: [[{&quot;text&quot;: &quot;🛒 Shop&quot;, &quot;callback_data&quot;: &quot;shop&quot;}, {&quot;text&quot;: &quot;📦 Orders&quot;, &quot;callback_data&quot;: &quot;orders&quot;}], [{&quot;text&quot;: &quot;🌐 Website&quot;, &quot;url&quot;: &quot;https://example.com&quot;}]]}}&#x27;</pre><pre>{
+  &quot;chat_id&quot;: 45957845239,
+  &quot;text&quot;: &quot;&lt;b&gt;Welcome!&lt;/b&gt; What would you like to do?&quot;,
+  &quot;parse_mode&quot;: &quot;HTML&quot;,
+  &quot;reply_markup&quot;: {
+    &quot;inline_keyboard&quot;: [
+      [
+        {
+          &quot;text&quot;: &quot;🛒 Shop&quot;,
+          &quot;callback_data&quot;: &quot;shop&quot;
+        },
+        {
+          &quot;text&quot;: &quot;📦 Orders&quot;,
+          &quot;callback_data&quot;: &quot;orders&quot;
+        }
+      ],
+      [
+        {
+          &quot;text&quot;: &quot;🌐 Website&quot;,
+          &quot;url&quot;: &quot;https://example.com&quot;
+        }
+      ]
+    ]
+  }
+}</pre><pre>{
+  &quot;ok&quot;: true,
+  &quot;result&quot;: {
+    &quot;message_id&quot;: 3,
+    &quot;from&quot;: {
+      &quot;id&quot;: 8513445453,
+      &quot;is_bot&quot;: true,
+      &quot;first_name&quot;: &quot;My Shop&quot;,
+      &quot;username&quot;: &quot;myshop_bot&quot;
+    },
+    &quot;chat&quot;: {
+      &quot;id&quot;: 45957845239,
+      &quot;type&quot;: &quot;private&quot;,
+      &quot;first_name&quot;: &quot;Rezan&quot;,
+      &quot;username&quot;: &quot;rezan&quot;
+    },
+    &quot;date&quot;: 1794200943,
+    &quot;text&quot;: &quot;&lt;b&gt;Welcome!&lt;/b&gt; What would you like to do?&quot;,
+    &quot;reply_markup&quot;: {
+      &quot;inline_keyboard&quot;: [
+        [
+          {
+            &quot;text&quot;: &quot;🛒 Shop&quot;,
+            &quot;callback_data&quot;: &quot;shop&quot;
+          },
+          {
+            &quot;text&quot;: &quot;📦 Orders&quot;,
+            &quot;callback_data&quot;: &quot;orders&quot;
+          }
+        ],
+        [
+          {
+            &quot;text&quot;: &quot;🌐 Website&quot;,
+            &quot;url&quot;: &quot;https://example.com&quot;
+          }
+        ]
+      ]
+    }
+  }
+}</pre></div><p class="ex-label"><b>Good to know</b></p><ul><li>In a handler, <code>msg.reply(...)</code> is the same as sending to <code>msg.chat_id</code>.</li><li>Leading and trailing spaces are trimmed; an empty text is rejected.</li><li>Up to 4096 characters. Split longer texts into several messages.</li></ul><p class="ex-label"><b>Common errors</b></p><table><tr><th>Code</th><th>When</th></tr><tr><td><code>403</code></td><td>The person has not pressed Start in your bot yet.</td></tr><tr><td><code>400</code></td><td>Empty or too long text, unknown parse_mode, or invalid buttons.</td></tr></table></section>
+<section id="sec-sendPhoto"><h3 id="sendPhoto">sendPhoto<a class="anchor" href="#sendPhoto" aria-label="Link to this section">#</a></h3><div class="method"><span class="tag post">POST</span><span class="url">/bot&lt;TOKEN&gt;/sendPhoto</span><span class="tag live">LIVE</span></div><p>Sends a photo. Returns the sent <a href="#Message">Message</a>.</p><table><tr><th>Parameter</th><th>Type</th><th>Required</th><th>Description</th></tr><tr><td><code>chat_id</code></td><td>Integer or String</td><td>Yes</td><td>Chat ID from an update, or the person's <code>@username</code>.</td></tr><tr><td><code>photo</code></td><td><a href="#InputFile">InputFile</a> or String</td><td>Yes</td><td>Upload (up to 20 MB) or an <code>https://</code> link to the file on your server.</td></tr><tr><td><code>caption</code></td><td>String</td><td>Optional</td><td>0–1024 characters.</td></tr><tr><td><code>parse_mode</code></td><td>String</td><td>Optional</td><td><code>HTML</code>, <code>MarkdownV2</code> or <code>Markdown</code>. See <a href="#formatting-options">formatting</a>.</td></tr><tr><td><code>reply_markup</code></td><td><a href="#InlineKeyboardMarkup">InlineKeyboardMarkup</a>, <a href="#ReplyKeyboardMarkup">ReplyKeyboardMarkup</a>, <a href="#ReplyKeyboardRemove">ReplyKeyboardRemove</a> or <a href="#ForceReply">ForceReply</a></td><td>Optional</td><td>Buttons or keyboard. In forms, send it as JSON text.</td></tr><tr><td><code>reply_parameters</code></td><td><a href="#ReplyParameters">ReplyParameters</a></td><td>Optional</td><td>Answer a specific message. <code>reply_to_message_id</code> also works.</td></tr></table><p class="ex-label"><b>Example</b></p><div class="tabs"><div class="tabbar"><button class=on>Python SDK</button><button>JavaScript SDK</button><button>cURL</button><button>Request JSON</button><button>Response</button><button class="copy">Copy</button></div><pre class=on># a link from your server (any size)
+bot.send_photo(45957845239, &quot;https://cdn.example.com/latte.jpg&quot;, caption=&quot;Special of the day ☕&quot;)
+
+# or upload a file (up to 20 MB)
+bot.send_photo(45957845239, File(&quot;latte.jpg&quot;))</pre><pre>// a link from your server (any size)
+await bot.sendPhoto(45957845239, &#x27;https://cdn.example.com/latte.jpg&#x27;, { caption: &#x27;Special of the day ☕&#x27; });
+
+// or upload a file (up to 20 MB)
+await bot.sendPhoto(45957845239, new File(&#x27;latte.jpg&#x27;));</pre><pre># by link
+curl -X POST https://api.zpas.org/bot$TOKEN/sendPhoto \
+  -H &quot;Content-Type: application/json&quot; \
+  -d &#x27;{&quot;chat_id&quot;: 45957845239, &quot;photo&quot;: &quot;https://cdn.example.com/latte.jpg&quot;, &quot;caption&quot;: &quot;Special of the day ☕&quot;}&#x27;
+
+# by upload (multipart, up to 20 MB)
+curl -X POST https://api.zpas.org/bot$TOKEN/sendPhoto \
+  -F chat_id=45957845239 -F photo=@./myfile</pre><pre>{
+  &quot;chat_id&quot;: 45957845239,
+  &quot;photo&quot;: &quot;https://cdn.example.com/latte.jpg&quot;,
+  &quot;caption&quot;: &quot;Special of the day ☕&quot;
+}</pre><pre>{
+  &quot;ok&quot;: true,
+  &quot;result&quot;: {
+    &quot;message_id&quot;: 5,
+    &quot;from&quot;: {
+      &quot;id&quot;: 8513445453,
+      &quot;is_bot&quot;: true,
+      &quot;first_name&quot;: &quot;My Shop&quot;,
+      &quot;username&quot;: &quot;myshop_bot&quot;
+    },
+    &quot;chat&quot;: {
+      &quot;id&quot;: 45957845239,
+      &quot;type&quot;: &quot;private&quot;,
+      &quot;first_name&quot;: &quot;Rezan&quot;,
+      &quot;username&quot;: &quot;rezan&quot;
+    },
+    &quot;date&quot;: 1794200943,
+    &quot;photo&quot;: [
+      {
+        &quot;file_id&quot;: &quot;u7a1c3e5b9d2f4a6c8e0b1d3f&quot;,
+        &quot;file_unique_id&quot;: &quot;u7a1c3e5b9d2f4a6&quot;,
+        &quot;width&quot;: 0,
+        &quot;height&quot;: 0
+      }
+    ],
+    &quot;caption&quot;: &quot;Special of the day ☕&quot;
+  }
+}</pre></div><p class="ex-label"><b>Good to know</b></p><ul><li><b>Link</b>: PassGram stores nothing, the app loads it from your server. Any size.</li><li><b>Upload</b>: up to 20 MB, kept until the person downloads it once (max 24 hours), then deleted.</li><li>A <code>file_id</code> cannot be sent again; upload again or use a link.</li></ul><p class="ex-label"><b>Common errors</b></p><table><tr><th>Code</th><th>When</th></tr><tr><td><code>413</code></td><td>Upload larger than 20 MB: use a link instead.</td></tr><tr><td><code>400</code></td><td>Field missing, http:// link, or a file_id from elsewhere.</td></tr></table></section>
+<section id="sec-sendVideo"><h3 id="sendVideo">sendVideo<a class="anchor" href="#sendVideo" aria-label="Link to this section">#</a></h3><div class="method"><span class="tag post">POST</span><span class="url">/bot&lt;TOKEN&gt;/sendVideo</span><span class="tag live">LIVE</span></div><p>Sends a video. Returns the sent <a href="#Message">Message</a>.</p><table><tr><th>Parameter</th><th>Type</th><th>Required</th><th>Description</th></tr><tr><td><code>chat_id</code></td><td>Integer or String</td><td>Yes</td><td>Chat ID from an update, or the person's <code>@username</code>.</td></tr><tr><td><code>video</code></td><td><a href="#InputFile">InputFile</a> or String</td><td>Yes</td><td>Upload (up to 20 MB) or an <code>https://</code> link to the file on your server.</td></tr><tr><td><code>caption</code></td><td>String</td><td>Optional</td><td>0–1024 characters.</td></tr><tr><td><code>parse_mode</code></td><td>String</td><td>Optional</td><td><code>HTML</code>, <code>MarkdownV2</code> or <code>Markdown</code>. See <a href="#formatting-options">formatting</a>.</td></tr><tr><td><code>reply_markup</code></td><td><a href="#InlineKeyboardMarkup">InlineKeyboardMarkup</a>, <a href="#ReplyKeyboardMarkup">ReplyKeyboardMarkup</a>, <a href="#ReplyKeyboardRemove">ReplyKeyboardRemove</a> or <a href="#ForceReply">ForceReply</a></td><td>Optional</td><td>Buttons or keyboard. In forms, send it as JSON text.</td></tr><tr><td><code>reply_parameters</code></td><td><a href="#ReplyParameters">ReplyParameters</a></td><td>Optional</td><td>Answer a specific message. <code>reply_to_message_id</code> also works.</td></tr></table><p class="ex-label"><b>Example</b></p><div class="tabs"><div class="tabbar"><button class=on>Python SDK</button><button>JavaScript SDK</button><button>cURL</button><button>Request JSON</button><button>Response</button><button class="copy">Copy</button></div><pre class=on># a link from your server (any size)
+bot.send_video(45957845239, &quot;https://cdn.example.com/how-we-roast.mp4&quot;, caption=&quot;How we roast&quot;)</pre><pre>// a link from your server (any size)
+await bot.sendVideo(45957845239, &#x27;https://cdn.example.com/how-we-roast.mp4&#x27;, { caption: &#x27;How we roast&#x27; });</pre><pre># by link
+curl -X POST https://api.zpas.org/bot$TOKEN/sendVideo \
+  -H &quot;Content-Type: application/json&quot; \
+  -d &#x27;{&quot;chat_id&quot;: 45957845239, &quot;video&quot;: &quot;https://cdn.example.com/how-we-roast.mp4&quot;, &quot;caption&quot;: &quot;How we roast&quot;}&#x27;
+
+# by upload (multipart, up to 20 MB)
+curl -X POST https://api.zpas.org/bot$TOKEN/sendVideo \
+  -F chat_id=45957845239 -F video=@./myfile</pre><pre>{
+  &quot;chat_id&quot;: 45957845239,
+  &quot;video&quot;: &quot;https://cdn.example.com/how-we-roast.mp4&quot;,
+  &quot;caption&quot;: &quot;How we roast&quot;
+}</pre><pre>{
+  &quot;ok&quot;: true,
+  &quot;result&quot;: {
+    &quot;message_id&quot;: 5,
+    &quot;from&quot;: {
+      &quot;id&quot;: 8513445453,
+      &quot;is_bot&quot;: true,
+      &quot;first_name&quot;: &quot;My Shop&quot;,
+      &quot;username&quot;: &quot;myshop_bot&quot;
+    },
+    &quot;chat&quot;: {
+      &quot;id&quot;: 45957845239,
+      &quot;type&quot;: &quot;private&quot;,
+      &quot;first_name&quot;: &quot;Rezan&quot;,
+      &quot;username&quot;: &quot;rezan&quot;
+    },
+    &quot;date&quot;: 1794200943,
+    &quot;video&quot;: {
+      &quot;file_id&quot;: &quot;u7a1c3e5b9d2f4a6c8e0b1d3f&quot;,
+      &quot;file_unique_id&quot;: &quot;u7a1c3e5b9d2f4a6&quot;,
+      &quot;file_name&quot;: &quot;how-we-roast.mp4&quot;,
+      &quot;width&quot;: 0,
+      &quot;height&quot;: 0,
+      &quot;duration&quot;: 0
+    },
+    &quot;caption&quot;: &quot;How we roast&quot;
+  }
+}</pre></div><p class="ex-label"><b>Good to know</b></p><ul><li><b>Link</b>: PassGram stores nothing, the app loads it from your server. Any size.</li><li><b>Upload</b>: up to 20 MB, kept until the person downloads it once (max 24 hours), then deleted.</li><li>A <code>file_id</code> cannot be sent again; upload again or use a link.</li></ul><p class="ex-label"><b>Common errors</b></p><table><tr><th>Code</th><th>When</th></tr><tr><td><code>413</code></td><td>Upload larger than 20 MB: use a link instead.</td></tr><tr><td><code>400</code></td><td>Field missing, http:// link, or a file_id from elsewhere.</td></tr></table></section>
+<section id="sec-sendAnimation"><h3 id="sendAnimation">sendAnimation<a class="anchor" href="#sendAnimation" aria-label="Link to this section">#</a></h3><div class="method"><span class="tag post">POST</span><span class="url">/bot&lt;TOKEN&gt;/sendAnimation</span><span class="tag live">LIVE</span></div><p>Sends a GIF or silent video. Returns the sent <a href="#Message">Message</a>.</p><table><tr><th>Parameter</th><th>Type</th><th>Required</th><th>Description</th></tr><tr><td><code>chat_id</code></td><td>Integer or String</td><td>Yes</td><td>Chat ID from an update, or the person's <code>@username</code>.</td></tr><tr><td><code>animation</code></td><td><a href="#InputFile">InputFile</a> or String</td><td>Yes</td><td>Upload (up to 20 MB) or an <code>https://</code> link to the file on your server.</td></tr><tr><td><code>caption</code></td><td>String</td><td>Optional</td><td>0–1024 characters.</td></tr><tr><td><code>parse_mode</code></td><td>String</td><td>Optional</td><td><code>HTML</code>, <code>MarkdownV2</code> or <code>Markdown</code>. See <a href="#formatting-options">formatting</a>.</td></tr><tr><td><code>reply_markup</code></td><td><a href="#InlineKeyboardMarkup">InlineKeyboardMarkup</a>, <a href="#ReplyKeyboardMarkup">ReplyKeyboardMarkup</a>, <a href="#ReplyKeyboardRemove">ReplyKeyboardRemove</a> or <a href="#ForceReply">ForceReply</a></td><td>Optional</td><td>Buttons or keyboard. In forms, send it as JSON text.</td></tr><tr><td><code>reply_parameters</code></td><td><a href="#ReplyParameters">ReplyParameters</a></td><td>Optional</td><td>Answer a specific message. <code>reply_to_message_id</code> also works.</td></tr></table><p class="ex-label"><b>Example</b></p><div class="tabs"><div class="tabbar"><button class=on>Python SDK</button><button>JavaScript SDK</button><button>cURL</button><button>Request JSON</button><button>Response</button><button class="copy">Copy</button></div><pre class=on>bot.call(&quot;sendAnimation&quot;, {&quot;chat_id&quot;: 45957845239, &quot;animation&quot;: &quot;https://cdn.example.com/steam.gif&quot;})</pre><pre>await bot.call(&#x27;sendAnimation&#x27;, {&quot;chat_id&quot;: 45957845239, &quot;animation&quot;: &quot;https://cdn.example.com/steam.gif&quot;});</pre><pre># by link
+curl -X POST https://api.zpas.org/bot$TOKEN/sendAnimation \
+  -H &quot;Content-Type: application/json&quot; \
+  -d &#x27;{&quot;chat_id&quot;: 45957845239, &quot;animation&quot;: &quot;https://cdn.example.com/steam.gif&quot;}&#x27;
+
+# by upload (multipart, up to 20 MB)
+curl -X POST https://api.zpas.org/bot$TOKEN/sendAnimation \
+  -F chat_id=45957845239 -F animation=@./myfile</pre><pre>{
+  &quot;chat_id&quot;: 45957845239,
+  &quot;animation&quot;: &quot;https://cdn.example.com/steam.gif&quot;
+}</pre><pre>{
+  &quot;ok&quot;: true,
+  &quot;result&quot;: {
+    &quot;message_id&quot;: 5,
+    &quot;from&quot;: {
+      &quot;id&quot;: 8513445453,
+      &quot;is_bot&quot;: true,
+      &quot;first_name&quot;: &quot;My Shop&quot;,
+      &quot;username&quot;: &quot;myshop_bot&quot;
+    },
+    &quot;chat&quot;: {
+      &quot;id&quot;: 45957845239,
+      &quot;type&quot;: &quot;private&quot;,
+      &quot;first_name&quot;: &quot;Rezan&quot;,
+      &quot;username&quot;: &quot;rezan&quot;
+    },
+    &quot;date&quot;: 1794200943,
+    &quot;animation&quot;: {
+      &quot;file_id&quot;: &quot;u7a1c3e5b9d2f4a6c8e0b1d3f&quot;,
+      &quot;file_unique_id&quot;: &quot;u7a1c3e5b9d2f4a6&quot;,
+      &quot;file_name&quot;: &quot;steam.gif&quot;,
+      &quot;width&quot;: 0,
+      &quot;height&quot;: 0,
+      &quot;duration&quot;: 0
+    }
+  }
+}</pre></div><p class="ex-label"><b>Good to know</b></p><ul><li><b>Link</b>: PassGram stores nothing, the app loads it from your server. Any size.</li><li><b>Upload</b>: up to 20 MB, kept until the person downloads it once (max 24 hours), then deleted.</li><li>A <code>file_id</code> cannot be sent again; upload again or use a link.</li></ul><p class="ex-label"><b>Common errors</b></p><table><tr><th>Code</th><th>When</th></tr><tr><td><code>413</code></td><td>Upload larger than 20 MB: use a link instead.</td></tr><tr><td><code>400</code></td><td>Field missing, http:// link, or a file_id from elsewhere.</td></tr></table></section>
+<section id="sec-sendAudio"><h3 id="sendAudio">sendAudio<a class="anchor" href="#sendAudio" aria-label="Link to this section">#</a></h3><div class="method"><span class="tag post">POST</span><span class="url">/bot&lt;TOKEN&gt;/sendAudio</span><span class="tag live">LIVE</span></div><p>Sends an audio file. Returns the sent <a href="#Message">Message</a>.</p><table><tr><th>Parameter</th><th>Type</th><th>Required</th><th>Description</th></tr><tr><td><code>chat_id</code></td><td>Integer or String</td><td>Yes</td><td>Chat ID from an update, or the person's <code>@username</code>.</td></tr><tr><td><code>audio</code></td><td><a href="#InputFile">InputFile</a> or String</td><td>Yes</td><td>Upload (up to 20 MB) or an <code>https://</code> link to the file on your server.</td></tr><tr><td><code>caption</code></td><td>String</td><td>Optional</td><td>0–1024 characters.</td></tr><tr><td><code>parse_mode</code></td><td>String</td><td>Optional</td><td><code>HTML</code>, <code>MarkdownV2</code> or <code>Markdown</code>. See <a href="#formatting-options">formatting</a>.</td></tr><tr><td><code>reply_markup</code></td><td><a href="#InlineKeyboardMarkup">InlineKeyboardMarkup</a>, <a href="#ReplyKeyboardMarkup">ReplyKeyboardMarkup</a>, <a href="#ReplyKeyboardRemove">ReplyKeyboardRemove</a> or <a href="#ForceReply">ForceReply</a></td><td>Optional</td><td>Buttons or keyboard. In forms, send it as JSON text.</td></tr><tr><td><code>reply_parameters</code></td><td><a href="#ReplyParameters">ReplyParameters</a></td><td>Optional</td><td>Answer a specific message. <code>reply_to_message_id</code> also works.</td></tr></table><p class="ex-label"><b>Example</b></p><div class="tabs"><div class="tabbar"><button class=on>Python SDK</button><button>JavaScript SDK</button><button>cURL</button><button>Request JSON</button><button>Response</button><button class="copy">Copy</button></div><pre class=on># a link from your server (any size)
+bot.send_audio(45957845239, &quot;https://cdn.example.com/jingle.mp3&quot;)</pre><pre>// a link from your server (any size)
+await bot.sendAudio(45957845239, &#x27;https://cdn.example.com/jingle.mp3&#x27;);</pre><pre># by link
+curl -X POST https://api.zpas.org/bot$TOKEN/sendAudio \
+  -H &quot;Content-Type: application/json&quot; \
+  -d &#x27;{&quot;chat_id&quot;: 45957845239, &quot;audio&quot;: &quot;https://cdn.example.com/jingle.mp3&quot;}&#x27;
+
+# by upload (multipart, up to 20 MB)
+curl -X POST https://api.zpas.org/bot$TOKEN/sendAudio \
+  -F chat_id=45957845239 -F audio=@./myfile</pre><pre>{
+  &quot;chat_id&quot;: 45957845239,
+  &quot;audio&quot;: &quot;https://cdn.example.com/jingle.mp3&quot;
+}</pre><pre>{
+  &quot;ok&quot;: true,
+  &quot;result&quot;: {
+    &quot;message_id&quot;: 5,
+    &quot;from&quot;: {
+      &quot;id&quot;: 8513445453,
+      &quot;is_bot&quot;: true,
+      &quot;first_name&quot;: &quot;My Shop&quot;,
+      &quot;username&quot;: &quot;myshop_bot&quot;
+    },
+    &quot;chat&quot;: {
+      &quot;id&quot;: 45957845239,
+      &quot;type&quot;: &quot;private&quot;,
+      &quot;first_name&quot;: &quot;Rezan&quot;,
+      &quot;username&quot;: &quot;rezan&quot;
+    },
+    &quot;date&quot;: 1794200943,
+    &quot;audio&quot;: {
+      &quot;file_id&quot;: &quot;u7a1c3e5b9d2f4a6c8e0b1d3f&quot;,
+      &quot;file_unique_id&quot;: &quot;u7a1c3e5b9d2f4a6&quot;,
+      &quot;file_name&quot;: &quot;jingle.mp3&quot;,
+      &quot;duration&quot;: 0
+    }
+  }
+}</pre></div><p class="ex-label"><b>Good to know</b></p><ul><li><b>Link</b>: PassGram stores nothing, the app loads it from your server. Any size.</li><li><b>Upload</b>: up to 20 MB, kept until the person downloads it once (max 24 hours), then deleted.</li><li>A <code>file_id</code> cannot be sent again; upload again or use a link.</li></ul><p class="ex-label"><b>Common errors</b></p><table><tr><th>Code</th><th>When</th></tr><tr><td><code>413</code></td><td>Upload larger than 20 MB: use a link instead.</td></tr><tr><td><code>400</code></td><td>Field missing, http:// link, or a file_id from elsewhere.</td></tr></table></section>
+<section id="sec-sendVoice"><h3 id="sendVoice">sendVoice<a class="anchor" href="#sendVoice" aria-label="Link to this section">#</a></h3><div class="method"><span class="tag post">POST</span><span class="url">/bot&lt;TOKEN&gt;/sendVoice</span><span class="tag live">LIVE</span></div><p>Sends a voice message. Returns the sent <a href="#Message">Message</a>.</p><table><tr><th>Parameter</th><th>Type</th><th>Required</th><th>Description</th></tr><tr><td><code>chat_id</code></td><td>Integer or String</td><td>Yes</td><td>Chat ID from an update, or the person's <code>@username</code>.</td></tr><tr><td><code>voice</code></td><td><a href="#InputFile">InputFile</a> or String</td><td>Yes</td><td>Upload (up to 20 MB) or an <code>https://</code> link to the file on your server.</td></tr><tr><td><code>caption</code></td><td>String</td><td>Optional</td><td>0–1024 characters.</td></tr><tr><td><code>parse_mode</code></td><td>String</td><td>Optional</td><td><code>HTML</code>, <code>MarkdownV2</code> or <code>Markdown</code>. See <a href="#formatting-options">formatting</a>.</td></tr><tr><td><code>reply_markup</code></td><td><a href="#InlineKeyboardMarkup">InlineKeyboardMarkup</a>, <a href="#ReplyKeyboardMarkup">ReplyKeyboardMarkup</a>, <a href="#ReplyKeyboardRemove">ReplyKeyboardRemove</a> or <a href="#ForceReply">ForceReply</a></td><td>Optional</td><td>Buttons or keyboard. In forms, send it as JSON text.</td></tr><tr><td><code>reply_parameters</code></td><td><a href="#ReplyParameters">ReplyParameters</a></td><td>Optional</td><td>Answer a specific message. <code>reply_to_message_id</code> also works.</td></tr></table><p class="ex-label"><b>Example</b></p><div class="tabs"><div class="tabbar"><button class=on>Python SDK</button><button>JavaScript SDK</button><button>cURL</button><button>Request JSON</button><button>Response</button><button class="copy">Copy</button></div><pre class=on>bot.call(&quot;sendVoice&quot;, {&quot;chat_id&quot;: 45957845239, &quot;voice&quot;: &quot;https://cdn.example.com/hello.ogg&quot;})</pre><pre>await bot.call(&#x27;sendVoice&#x27;, {&quot;chat_id&quot;: 45957845239, &quot;voice&quot;: &quot;https://cdn.example.com/hello.ogg&quot;});</pre><pre># by link
+curl -X POST https://api.zpas.org/bot$TOKEN/sendVoice \
+  -H &quot;Content-Type: application/json&quot; \
+  -d &#x27;{&quot;chat_id&quot;: 45957845239, &quot;voice&quot;: &quot;https://cdn.example.com/hello.ogg&quot;}&#x27;
+
+# by upload (multipart, up to 20 MB)
+curl -X POST https://api.zpas.org/bot$TOKEN/sendVoice \
+  -F chat_id=45957845239 -F voice=@./myfile</pre><pre>{
+  &quot;chat_id&quot;: 45957845239,
+  &quot;voice&quot;: &quot;https://cdn.example.com/hello.ogg&quot;
+}</pre><pre>{
+  &quot;ok&quot;: true,
+  &quot;result&quot;: {
+    &quot;message_id&quot;: 5,
+    &quot;from&quot;: {
+      &quot;id&quot;: 8513445453,
+      &quot;is_bot&quot;: true,
+      &quot;first_name&quot;: &quot;My Shop&quot;,
+      &quot;username&quot;: &quot;myshop_bot&quot;
+    },
+    &quot;chat&quot;: {
+      &quot;id&quot;: 45957845239,
+      &quot;type&quot;: &quot;private&quot;,
+      &quot;first_name&quot;: &quot;Rezan&quot;,
+      &quot;username&quot;: &quot;rezan&quot;
+    },
+    &quot;date&quot;: 1794200943,
+    &quot;voice&quot;: {
+      &quot;file_id&quot;: &quot;u7a1c3e5b9d2f4a6c8e0b1d3f&quot;,
+      &quot;file_unique_id&quot;: &quot;u7a1c3e5b9d2f4a6&quot;,
+      &quot;duration&quot;: 0
+    }
+  }
+}</pre></div><p class="ex-label"><b>Good to know</b></p><ul><li><b>Link</b>: PassGram stores nothing, the app loads it from your server. Any size.</li><li><b>Upload</b>: up to 20 MB, kept until the person downloads it once (max 24 hours), then deleted.</li><li>A <code>file_id</code> cannot be sent again; upload again or use a link.</li></ul><p class="ex-label"><b>Common errors</b></p><table><tr><th>Code</th><th>When</th></tr><tr><td><code>413</code></td><td>Upload larger than 20 MB: use a link instead.</td></tr><tr><td><code>400</code></td><td>Field missing, http:// link, or a file_id from elsewhere.</td></tr></table></section>
+<section id="sec-sendVideoNote"><h3 id="sendVideoNote">sendVideoNote<a class="anchor" href="#sendVideoNote" aria-label="Link to this section">#</a></h3><div class="method"><span class="tag post">POST</span><span class="url">/bot&lt;TOKEN&gt;/sendVideoNote</span><span class="tag live">LIVE</span></div><p>Sends a round video message. Returns the sent <a href="#Message">Message</a>.</p><table><tr><th>Parameter</th><th>Type</th><th>Required</th><th>Description</th></tr><tr><td><code>chat_id</code></td><td>Integer or String</td><td>Yes</td><td>Chat ID from an update, or the person's <code>@username</code>.</td></tr><tr><td><code>video_note</code></td><td><a href="#InputFile">InputFile</a> or String</td><td>Yes</td><td>Upload (up to 20 MB) or an <code>https://</code> link to the file on your server.</td></tr><tr><td><code>caption</code></td><td>String</td><td>Optional</td><td>0–1024 characters.</td></tr><tr><td><code>parse_mode</code></td><td>String</td><td>Optional</td><td><code>HTML</code>, <code>MarkdownV2</code> or <code>Markdown</code>. See <a href="#formatting-options">formatting</a>.</td></tr><tr><td><code>reply_markup</code></td><td><a href="#InlineKeyboardMarkup">InlineKeyboardMarkup</a>, <a href="#ReplyKeyboardMarkup">ReplyKeyboardMarkup</a>, <a href="#ReplyKeyboardRemove">ReplyKeyboardRemove</a> or <a href="#ForceReply">ForceReply</a></td><td>Optional</td><td>Buttons or keyboard. In forms, send it as JSON text.</td></tr><tr><td><code>reply_parameters</code></td><td><a href="#ReplyParameters">ReplyParameters</a></td><td>Optional</td><td>Answer a specific message. <code>reply_to_message_id</code> also works.</td></tr></table><p class="ex-label"><b>Example</b></p><div class="tabs"><div class="tabbar"><button class=on>Python SDK</button><button>JavaScript SDK</button><button>cURL</button><button>Request JSON</button><button>Response</button><button class="copy">Copy</button></div><pre class=on>bot.call(&quot;sendVideoNote&quot;, {&quot;chat_id&quot;: 45957845239, &quot;video_note&quot;: &quot;https://cdn.example.com/round.mp4&quot;})</pre><pre>await bot.call(&#x27;sendVideoNote&#x27;, {&quot;chat_id&quot;: 45957845239, &quot;video_note&quot;: &quot;https://cdn.example.com/round.mp4&quot;});</pre><pre># by link
+curl -X POST https://api.zpas.org/bot$TOKEN/sendVideoNote \
+  -H &quot;Content-Type: application/json&quot; \
+  -d &#x27;{&quot;chat_id&quot;: 45957845239, &quot;video_note&quot;: &quot;https://cdn.example.com/round.mp4&quot;}&#x27;
+
+# by upload (multipart, up to 20 MB)
+curl -X POST https://api.zpas.org/bot$TOKEN/sendVideoNote \
+  -F chat_id=45957845239 -F video_note=@./myfile</pre><pre>{
+  &quot;chat_id&quot;: 45957845239,
+  &quot;video_note&quot;: &quot;https://cdn.example.com/round.mp4&quot;
+}</pre><pre>{
+  &quot;ok&quot;: true,
+  &quot;result&quot;: {
+    &quot;message_id&quot;: 5,
+    &quot;from&quot;: {
+      &quot;id&quot;: 8513445453,
+      &quot;is_bot&quot;: true,
+      &quot;first_name&quot;: &quot;My Shop&quot;,
+      &quot;username&quot;: &quot;myshop_bot&quot;
+    },
+    &quot;chat&quot;: {
+      &quot;id&quot;: 45957845239,
+      &quot;type&quot;: &quot;private&quot;,
+      &quot;first_name&quot;: &quot;Rezan&quot;,
+      &quot;username&quot;: &quot;rezan&quot;
+    },
+    &quot;date&quot;: 1794200943,
+    &quot;video_note&quot;: {
+      &quot;file_id&quot;: &quot;u7a1c3e5b9d2f4a6c8e0b1d3f&quot;,
+      &quot;file_unique_id&quot;: &quot;u7a1c3e5b9d2f4a6&quot;,
+      &quot;length&quot;: 0,
+      &quot;duration&quot;: 0
+    }
+  }
+}</pre></div><p class="ex-label"><b>Good to know</b></p><ul><li><b>Link</b>: PassGram stores nothing, the app loads it from your server. Any size.</li><li><b>Upload</b>: up to 20 MB, kept until the person downloads it once (max 24 hours), then deleted.</li><li>A <code>file_id</code> cannot be sent again; upload again or use a link.</li></ul><p class="ex-label"><b>Common errors</b></p><table><tr><th>Code</th><th>When</th></tr><tr><td><code>413</code></td><td>Upload larger than 20 MB: use a link instead.</td></tr><tr><td><code>400</code></td><td>Field missing, http:// link, or a file_id from elsewhere.</td></tr></table></section>
+<section id="sec-sendSticker"><h3 id="sendSticker">sendSticker<a class="anchor" href="#sendSticker" aria-label="Link to this section">#</a></h3><div class="method"><span class="tag post">POST</span><span class="url">/bot&lt;TOKEN&gt;/sendSticker</span><span class="tag live">LIVE</span></div><p>Sends a sticker. Returns the sent <a href="#Message">Message</a>.</p><table><tr><th>Parameter</th><th>Type</th><th>Required</th><th>Description</th></tr><tr><td><code>chat_id</code></td><td>Integer or String</td><td>Yes</td><td>Chat ID from an update, or the person's <code>@username</code>.</td></tr><tr><td><code>sticker</code></td><td><a href="#InputFile">InputFile</a> or String</td><td>Yes</td><td>Upload (up to 20 MB) or an <code>https://</code> link to the file on your server.</td></tr><tr><td><code>caption</code></td><td>String</td><td>Optional</td><td>0–1024 characters.</td></tr><tr><td><code>parse_mode</code></td><td>String</td><td>Optional</td><td><code>HTML</code>, <code>MarkdownV2</code> or <code>Markdown</code>. See <a href="#formatting-options">formatting</a>.</td></tr><tr><td><code>reply_markup</code></td><td><a href="#InlineKeyboardMarkup">InlineKeyboardMarkup</a>, <a href="#ReplyKeyboardMarkup">ReplyKeyboardMarkup</a>, <a href="#ReplyKeyboardRemove">ReplyKeyboardRemove</a> or <a href="#ForceReply">ForceReply</a></td><td>Optional</td><td>Buttons or keyboard. In forms, send it as JSON text.</td></tr><tr><td><code>reply_parameters</code></td><td><a href="#ReplyParameters">ReplyParameters</a></td><td>Optional</td><td>Answer a specific message. <code>reply_to_message_id</code> also works.</td></tr></table><p class="ex-label"><b>Example</b></p><div class="tabs"><div class="tabbar"><button class=on>Python SDK</button><button>JavaScript SDK</button><button>cURL</button><button>Request JSON</button><button>Response</button><button class="copy">Copy</button></div><pre class=on>bot.call(&quot;sendSticker&quot;, {&quot;chat_id&quot;: 45957845239, &quot;sticker&quot;: &quot;https://cdn.example.com/cup.webp&quot;})</pre><pre>await bot.call(&#x27;sendSticker&#x27;, {&quot;chat_id&quot;: 45957845239, &quot;sticker&quot;: &quot;https://cdn.example.com/cup.webp&quot;});</pre><pre># by link
+curl -X POST https://api.zpas.org/bot$TOKEN/sendSticker \
+  -H &quot;Content-Type: application/json&quot; \
+  -d &#x27;{&quot;chat_id&quot;: 45957845239, &quot;sticker&quot;: &quot;https://cdn.example.com/cup.webp&quot;}&#x27;
+
+# by upload (multipart, up to 20 MB)
+curl -X POST https://api.zpas.org/bot$TOKEN/sendSticker \
+  -F chat_id=45957845239 -F sticker=@./myfile</pre><pre>{
+  &quot;chat_id&quot;: 45957845239,
+  &quot;sticker&quot;: &quot;https://cdn.example.com/cup.webp&quot;
+}</pre><pre>{
+  &quot;ok&quot;: true,
+  &quot;result&quot;: {
+    &quot;message_id&quot;: 5,
+    &quot;from&quot;: {
+      &quot;id&quot;: 8513445453,
+      &quot;is_bot&quot;: true,
+      &quot;first_name&quot;: &quot;My Shop&quot;,
+      &quot;username&quot;: &quot;myshop_bot&quot;
+    },
+    &quot;chat&quot;: {
+      &quot;id&quot;: 45957845239,
+      &quot;type&quot;: &quot;private&quot;,
+      &quot;first_name&quot;: &quot;Rezan&quot;,
+      &quot;username&quot;: &quot;rezan&quot;
+    },
+    &quot;date&quot;: 1794200943,
+    &quot;sticker&quot;: {
+      &quot;file_id&quot;: &quot;u7a1c3e5b9d2f4a6c8e0b1d3f&quot;,
+      &quot;file_unique_id&quot;: &quot;u7a1c3e5b9d2f4a6&quot;,
+      &quot;type&quot;: &quot;regular&quot;,
+      &quot;width&quot;: 0,
+      &quot;height&quot;: 0,
+      &quot;is_animated&quot;: false,
+      &quot;is_video&quot;: false
+    }
+  }
+}</pre></div><p class="ex-label"><b>Good to know</b></p><ul><li><b>Link</b>: PassGram stores nothing, the app loads it from your server. Any size.</li><li><b>Upload</b>: up to 20 MB, kept until the person downloads it once (max 24 hours), then deleted.</li><li>A <code>file_id</code> cannot be sent again; upload again or use a link.</li></ul><p class="ex-label"><b>Common errors</b></p><table><tr><th>Code</th><th>When</th></tr><tr><td><code>413</code></td><td>Upload larger than 20 MB: use a link instead.</td></tr><tr><td><code>400</code></td><td>Field missing, http:// link, or a file_id from elsewhere.</td></tr></table></section>
+<section id="sec-sendDocument"><h3 id="sendDocument">sendDocument<a class="anchor" href="#sendDocument" aria-label="Link to this section">#</a></h3><div class="method"><span class="tag post">POST</span><span class="url">/bot&lt;TOKEN&gt;/sendDocument</span><span class="tag live">LIVE</span></div><p>Sends any file. Returns the sent <a href="#Message">Message</a>.</p><table><tr><th>Parameter</th><th>Type</th><th>Required</th><th>Description</th></tr><tr><td><code>chat_id</code></td><td>Integer or String</td><td>Yes</td><td>Chat ID from an update, or the person's <code>@username</code>.</td></tr><tr><td><code>document</code></td><td><a href="#InputFile">InputFile</a> or String</td><td>Yes</td><td>Upload (up to 20 MB) or an <code>https://</code> link to the file on your server.</td></tr><tr><td><code>caption</code></td><td>String</td><td>Optional</td><td>0–1024 characters.</td></tr><tr><td><code>parse_mode</code></td><td>String</td><td>Optional</td><td><code>HTML</code>, <code>MarkdownV2</code> or <code>Markdown</code>. See <a href="#formatting-options">formatting</a>.</td></tr><tr><td><code>reply_markup</code></td><td><a href="#InlineKeyboardMarkup">InlineKeyboardMarkup</a>, <a href="#ReplyKeyboardMarkup">ReplyKeyboardMarkup</a>, <a href="#ReplyKeyboardRemove">ReplyKeyboardRemove</a> or <a href="#ForceReply">ForceReply</a></td><td>Optional</td><td>Buttons or keyboard. In forms, send it as JSON text.</td></tr><tr><td><code>reply_parameters</code></td><td><a href="#ReplyParameters">ReplyParameters</a></td><td>Optional</td><td>Answer a specific message. <code>reply_to_message_id</code> also works.</td></tr></table><p class="ex-label"><b>Example</b></p><div class="tabs"><div class="tabbar"><button class=on>Python SDK</button><button>JavaScript SDK</button><button>cURL</button><button>Request JSON</button><button>Response</button><button class="copy">Copy</button></div><pre class=on># a link from your server (any size)
+bot.send_file(45957845239, &quot;https://cdn.example.com/menu.pdf&quot;, caption=&quot;Our menu&quot;)
+
+# or upload a file (up to 20 MB)
+bot.send_file(45957845239, File(&quot;menu.pdf&quot;))</pre><pre>// a link from your server (any size)
+await bot.sendFile(45957845239, &#x27;https://cdn.example.com/menu.pdf&#x27;, { caption: &#x27;Our menu&#x27; });
+
+// or upload a file (up to 20 MB)
+await bot.sendFile(45957845239, new File(&#x27;menu.pdf&#x27;));</pre><pre># by link
+curl -X POST https://api.zpas.org/bot$TOKEN/sendDocument \
+  -H &quot;Content-Type: application/json&quot; \
+  -d &#x27;{&quot;chat_id&quot;: 45957845239, &quot;document&quot;: &quot;https://cdn.example.com/menu.pdf&quot;, &quot;caption&quot;: &quot;Our menu&quot;}&#x27;
+
+# by upload (multipart, up to 20 MB)
+curl -X POST https://api.zpas.org/bot$TOKEN/sendDocument \
+  -F chat_id=45957845239 -F document=@./myfile</pre><pre>{
+  &quot;chat_id&quot;: 45957845239,
+  &quot;document&quot;: &quot;https://cdn.example.com/menu.pdf&quot;,
+  &quot;caption&quot;: &quot;Our menu&quot;
+}</pre><pre>{
+  &quot;ok&quot;: true,
+  &quot;result&quot;: {
+    &quot;message_id&quot;: 5,
+    &quot;from&quot;: {
+      &quot;id&quot;: 8513445453,
+      &quot;is_bot&quot;: true,
+      &quot;first_name&quot;: &quot;My Shop&quot;,
+      &quot;username&quot;: &quot;myshop_bot&quot;
+    },
+    &quot;chat&quot;: {
+      &quot;id&quot;: 45957845239,
+      &quot;type&quot;: &quot;private&quot;,
+      &quot;first_name&quot;: &quot;Rezan&quot;,
+      &quot;username&quot;: &quot;rezan&quot;
+    },
+    &quot;date&quot;: 1794200943,
+    &quot;document&quot;: {
+      &quot;file_id&quot;: &quot;u7a1c3e5b9d2f4a6c8e0b1d3f&quot;,
+      &quot;file_unique_id&quot;: &quot;u7a1c3e5b9d2f4a6&quot;,
+      &quot;file_name&quot;: &quot;menu.pdf&quot;
+    },
+    &quot;caption&quot;: &quot;Our menu&quot;
+  }
+}</pre></div><p class="ex-label"><b>Good to know</b></p><ul><li><b>Link</b>: PassGram stores nothing, the app loads it from your server. Any size.</li><li><b>Upload</b>: up to 20 MB, kept until the person downloads it once (max 24 hours), then deleted.</li><li>A <code>file_id</code> cannot be sent again; upload again or use a link.</li></ul><p class="ex-label"><b>Common errors</b></p><table><tr><th>Code</th><th>When</th></tr><tr><td><code>413</code></td><td>Upload larger than 20 MB: use a link instead.</td></tr><tr><td><code>400</code></td><td>Field missing, http:// link, or a file_id from elsewhere.</td></tr></table></section>
+<section id="sec-sendChatAction"><h3 id="sendChatAction">sendChatAction<a class="anchor" href="#sendChatAction" aria-label="Link to this section">#</a></h3><div class="method"><span class="tag post">POST</span><span class="url">/bot&lt;TOKEN&gt;/sendChatAction</span><span class="tag live">LIVE</span></div><p>Shows a status such as “typing…” under your bot's name for about 5 seconds, or until your next message. Returns <code>True</code>.</p><table><tr><th>Parameter</th><th>Type</th><th>Required</th><th>Description</th></tr><tr><td><code>chat_id</code></td><td>Integer or String</td><td>Yes</td><td>Chat ID from an update, or the person's <code>@username</code>.</td></tr><tr><td><code>action</code></td><td>String</td><td>Yes</td><td><code>typing</code>, <code>upload_photo</code>, <code>record_video</code>, <code>upload_video</code>, <code>record_voice</code>, <code>upload_voice</code>, <code>upload_document</code>, <code>choose_sticker</code>, <code>find_location</code>, <code>record_video_note</code>, <code>upload_video_note</code>.</td></tr></table><p class="ex-label"><b>Example</b></p><div class="tabs"><div class="tabbar"><button class=on>Python SDK</button><button>JavaScript SDK</button><button>cURL</button><button>Request JSON</button><button>Response</button><button class="copy">Copy</button></div><pre class=on>msg.typing()               # in a handler
+bot.typing(45957845239, &quot;upload_photo&quot;)</pre><pre>await msg.typing();               // in a handler
+await bot.typing(45957845239, &#x27;upload_photo&#x27;);</pre><pre>curl -X POST https://api.zpas.org/bot$TOKEN/sendChatAction \
+  -H &quot;Content-Type: application/json&quot; \
+  -d &#x27;{&quot;chat_id&quot;: 45957845239, &quot;action&quot;: &quot;typing&quot;}&#x27;</pre><pre>{
+  &quot;chat_id&quot;: 45957845239,
+  &quot;action&quot;: &quot;typing&quot;
+}</pre><pre>{
+  &quot;ok&quot;: true,
+  &quot;result&quot;: true
+}</pre></div><p class="ex-label"><b>Good to know</b></p><ul><li>Send it right before slow work (an AI answer, a big file). It disappears when your message arrives.</li></ul></section>
 <h2 id="buttons">Buttons<a class="anchor" href="#buttons" aria-label="Link to this section">#</a></h2>
-<section id="sec-answerCallbackQuery"><h3 id="answerCallbackQuery">answerCallbackQuery<a class="anchor" href="#answerCallbackQuery" aria-label="Link to this section">#</a></h3><div class="method"><span class="tag post">POST</span><span class="url">/bot&lt;TOKEN&gt;/answerCallbackQuery</span><span class="tag live">LIVE</span></div><p>Answers a button press; the button stops spinning. Call it within 10 seconds. Returns <code>True</code>.</p><table><tr><th>Parameter</th><th>Type</th><th>Required</th><th>Description</th></tr><tr><td><code>callback_query_id</code></td><td>String</td><td>Yes</td><td>From the <a href="#CallbackQuery">CallbackQuery</a>.</td></tr><tr><td><code>text</code></td><td>String</td><td>Optional</td><td>Up to 200 characters shown as a short notice.</td></tr><tr><td><code>show_alert</code></td><td>Boolean</td><td>Optional</td><td>Show it as a dialog instead.</td></tr></table></section>
+<section id="sec-answerCallbackQuery"><h3 id="answerCallbackQuery">answerCallbackQuery<a class="anchor" href="#answerCallbackQuery" aria-label="Link to this section">#</a></h3><div class="method"><span class="tag post">POST</span><span class="url">/bot&lt;TOKEN&gt;/answerCallbackQuery</span><span class="tag live">LIVE</span></div><p>Answers a button press; the button stops spinning. Call it within 10 seconds. Returns <code>True</code>.</p><table><tr><th>Parameter</th><th>Type</th><th>Required</th><th>Description</th></tr><tr><td><code>callback_query_id</code></td><td>String</td><td>Yes</td><td>From the <a href="#CallbackQuery">CallbackQuery</a>.</td></tr><tr><td><code>text</code></td><td>String</td><td>Optional</td><td>Up to 200 characters shown as a short notice.</td></tr><tr><td><code>show_alert</code></td><td>Boolean</td><td>Optional</td><td>Show it as a dialog instead.</td></tr></table><p class="ex-label"><b>Example</b></p><div class="tabs"><div class="tabbar"><button class=on>Python SDK</button><button>JavaScript SDK</button><button>cURL</button><button>Request JSON</button><button>Response</button><button class="copy">Copy</button></div><pre class=on>@bot.button(&quot;shop&quot;)
+def shop(press):
+    press.answer(&quot;Added to cart ✅&quot;)</pre><pre>bot.button(&#x27;shop&#x27;, (press) =&gt; press.answer(&#x27;Added to cart ✅&#x27;));</pre><pre>curl -X POST https://api.zpas.org/bot$TOKEN/answerCallbackQuery \
+  -H &quot;Content-Type: application/json&quot; \
+  -d &#x27;{&quot;callback_query_id&quot;: &quot;5f1c0a9e2b7d4c3e8a6f1b2c&quot;, &quot;text&quot;: &quot;Added to cart ✅&quot;}&#x27;</pre><pre>{
+  &quot;callback_query_id&quot;: &quot;5f1c0a9e2b7d4c3e8a6f1b2c&quot;,
+  &quot;text&quot;: &quot;Added to cart ✅&quot;
+}</pre><pre>{
+  &quot;ok&quot;: true,
+  &quot;result&quot;: true
+}</pre></div><p class="ex-label"><b>Good to know</b></p><ul><li>The SDK answers automatically if your handler forgets, so the button never spins forever.</li><li>Each press can be answered once; the ID expires after an hour.</li></ul><p class="ex-label"><b>Common errors</b></p><table><tr><th>Code</th><th>When</th></tr><tr><td><code>400</code></td><td>Query is too old or the ID is invalid.</td></tr></table></section>
 <h2 id="changing-messages">Changing messages<a class="anchor" href="#changing-messages" aria-label="Link to this section">#</a></h2>
-<section id="sec-editMessageText"><h3 id="editMessageText">editMessageText<a class="anchor" href="#editMessageText" aria-label="Link to this section">#</a></h3><div class="method"><span class="tag post">POST</span><span class="url">/bot&lt;TOKEN&gt;/editMessageText</span><span class="tag live">LIVE</span></div><p>Changes the text of a message your bot sent. Returns the edited <a href="#Message">Message</a>.</p><table><tr><th>Parameter</th><th>Type</th><th>Required</th><th>Description</th></tr><tr><td><code>chat_id</code></td><td>Integer or String</td><td>Yes</td><td>Chat ID from an update, or the person's <code>@username</code>.</td></tr><tr><td><code>message_id</code></td><td>Integer</td><td>Yes</td><td>The message to change.</td></tr><tr><td><code>text</code></td><td>String</td><td>Yes</td><td>1–4096 characters.</td></tr><tr><td><code>parse_mode</code></td><td>String</td><td>Optional</td><td><code>HTML</code>, <code>MarkdownV2</code> or <code>Markdown</code>. See <a href="#formatting-options">formatting</a>.</td></tr><tr><td><code>reply_markup</code></td><td><a href="#InlineKeyboardMarkup">InlineKeyboardMarkup</a></td><td>Optional</td><td>New buttons. Leave it out to keep the current ones.</td></tr></table></section>
-<section id="sec-editMessageCaption"><h3 id="editMessageCaption">editMessageCaption<a class="anchor" href="#editMessageCaption" aria-label="Link to this section">#</a></h3><div class="method"><span class="tag post">POST</span><span class="url">/bot&lt;TOKEN&gt;/editMessageCaption</span><span class="tag live">LIVE</span></div><p>Changes the caption of a photo, video or file. Returns the edited <a href="#Message">Message</a>.</p><table><tr><th>Parameter</th><th>Type</th><th>Required</th><th>Description</th></tr><tr><td><code>chat_id</code></td><td>Integer or String</td><td>Yes</td><td>Chat ID from an update, or the person's <code>@username</code>.</td></tr><tr><td><code>message_id</code></td><td>Integer</td><td>Yes</td><td>—</td></tr><tr><td><code>caption</code></td><td>String</td><td>Optional</td><td>0–1024 characters.</td></tr><tr><td><code>parse_mode</code></td><td>String</td><td>Optional</td><td><code>HTML</code>, <code>MarkdownV2</code> or <code>Markdown</code>. See <a href="#formatting-options">formatting</a>.</td></tr><tr><td><code>reply_markup</code></td><td><a href="#InlineKeyboardMarkup">InlineKeyboardMarkup</a></td><td>Optional</td><td>—</td></tr></table></section>
-<section id="sec-editMessageReplyMarkup"><h3 id="editMessageReplyMarkup">editMessageReplyMarkup<a class="anchor" href="#editMessageReplyMarkup" aria-label="Link to this section">#</a></h3><div class="method"><span class="tag post">POST</span><span class="url">/bot&lt;TOKEN&gt;/editMessageReplyMarkup</span><span class="tag live">LIVE</span></div><p>Changes only the buttons. Returns the edited <a href="#Message">Message</a>.</p><table><tr><th>Parameter</th><th>Type</th><th>Required</th><th>Description</th></tr><tr><td><code>chat_id</code></td><td>Integer or String</td><td>Yes</td><td>Chat ID from an update, or the person's <code>@username</code>.</td></tr><tr><td><code>message_id</code></td><td>Integer</td><td>Yes</td><td>—</td></tr><tr><td><code>reply_markup</code></td><td><a href="#InlineKeyboardMarkup">InlineKeyboardMarkup</a></td><td>Optional</td><td>Leave it out to remove the buttons.</td></tr></table></section>
-<section id="sec-deleteMessage"><h3 id="deleteMessage">deleteMessage<a class="anchor" href="#deleteMessage" aria-label="Link to this section">#</a></h3><div class="method"><span class="tag post">POST</span><span class="url">/bot&lt;TOKEN&gt;/deleteMessage</span><span class="tag live">LIVE</span></div><p>Deletes a message in the chat. Returns <code>True</code>.</p><table><tr><th>Parameter</th><th>Type</th><th>Required</th><th>Description</th></tr><tr><td><code>chat_id</code></td><td>Integer or String</td><td>Yes</td><td>Chat ID from an update, or the person's <code>@username</code>.</td></tr><tr><td><code>message_id</code></td><td>Integer</td><td>Yes</td><td>—</td></tr></table></section>
-<section id="sec-deleteMessages"><h3 id="deleteMessages">deleteMessages<a class="anchor" href="#deleteMessages" aria-label="Link to this section">#</a></h3><div class="method"><span class="tag post">POST</span><span class="url">/bot&lt;TOKEN&gt;/deleteMessages</span><span class="tag live">LIVE</span></div><p>Deletes several messages; ones that no longer exist are skipped. Returns <code>True</code>.</p><table><tr><th>Parameter</th><th>Type</th><th>Required</th><th>Description</th></tr><tr><td><code>chat_id</code></td><td>Integer or String</td><td>Yes</td><td>Chat ID from an update, or the person's <code>@username</code>.</td></tr><tr><td><code>message_ids</code></td><td>Array of Integer</td><td>Yes</td><td>1–100 message IDs.</td></tr></table></section>
+<section id="sec-editMessageText"><h3 id="editMessageText">editMessageText<a class="anchor" href="#editMessageText" aria-label="Link to this section">#</a></h3><div class="method"><span class="tag post">POST</span><span class="url">/bot&lt;TOKEN&gt;/editMessageText</span><span class="tag live">LIVE</span></div><p>Changes the text of a message your bot sent. Returns the edited <a href="#Message">Message</a>.</p><table><tr><th>Parameter</th><th>Type</th><th>Required</th><th>Description</th></tr><tr><td><code>chat_id</code></td><td>Integer or String</td><td>Yes</td><td>Chat ID from an update, or the person's <code>@username</code>.</td></tr><tr><td><code>message_id</code></td><td>Integer</td><td>Yes</td><td>The message to change.</td></tr><tr><td><code>text</code></td><td>String</td><td>Yes</td><td>1–4096 characters.</td></tr><tr><td><code>parse_mode</code></td><td>String</td><td>Optional</td><td><code>HTML</code>, <code>MarkdownV2</code> or <code>Markdown</code>. See <a href="#formatting-options">formatting</a>.</td></tr><tr><td><code>reply_markup</code></td><td><a href="#InlineKeyboardMarkup">InlineKeyboardMarkup</a></td><td>Optional</td><td>New buttons. Leave it out to keep the current ones.</td></tr></table><p class="ex-label"><b>Example</b></p><div class="tabs"><div class="tabbar"><button class=on>Python SDK</button><button>JavaScript SDK</button><button>cURL</button><button>Request JSON</button><button>Response</button><button class="copy">Copy</button></div><pre class=on>@bot.button(&quot;buy&quot;)
+def buy(press):
+    press.answer()
+    press.edit(&quot;✅ Order placed!&quot;)</pre><pre>bot.button(&#x27;buy&#x27;, async (press) =&gt; {
+  await press.answer();
+  await press.edit(&#x27;✅ Order placed!&#x27;);
+});</pre><pre>curl -X POST https://api.zpas.org/bot$TOKEN/editMessageText \
+  -H &quot;Content-Type: application/json&quot; \
+  -d &#x27;{&quot;chat_id&quot;: 45957845239, &quot;message_id&quot;: 3, &quot;text&quot;: &quot;✅ Order placed!&quot;}&#x27;</pre><pre>{
+  &quot;chat_id&quot;: 45957845239,
+  &quot;message_id&quot;: 3,
+  &quot;text&quot;: &quot;✅ Order placed!&quot;
+}</pre><pre>{
+  &quot;ok&quot;: true,
+  &quot;result&quot;: {
+    &quot;message_id&quot;: 3,
+    &quot;from&quot;: {
+      &quot;id&quot;: 8513445453,
+      &quot;is_bot&quot;: true,
+      &quot;first_name&quot;: &quot;My Shop&quot;,
+      &quot;username&quot;: &quot;myshop_bot&quot;
+    },
+    &quot;chat&quot;: {
+      &quot;id&quot;: 45957845239,
+      &quot;type&quot;: &quot;private&quot;,
+      &quot;first_name&quot;: &quot;Rezan&quot;,
+      &quot;username&quot;: &quot;rezan&quot;
+    },
+    &quot;date&quot;: 1794200943,
+    &quot;text&quot;: &quot;✅ Order placed!&quot;,
+    &quot;edit_date&quot;: 1794200973
+  }
+}</pre></div><p class="ex-label"><b>Good to know</b></p><ul><li>Only your bot's own messages can be edited.</li><li>Without <code>reply_markup</code> the buttons stay; send an empty keyboard to remove them.</li></ul><p class="ex-label"><b>Common errors</b></p><table><tr><th>Code</th><th>When</th></tr><tr><td><code>400</code></td><td>Message to edit not found (wrong ID or not your message).</td></tr></table></section>
+<section id="sec-editMessageCaption"><h3 id="editMessageCaption">editMessageCaption<a class="anchor" href="#editMessageCaption" aria-label="Link to this section">#</a></h3><div class="method"><span class="tag post">POST</span><span class="url">/bot&lt;TOKEN&gt;/editMessageCaption</span><span class="tag live">LIVE</span></div><p>Changes the caption of a photo, video or file. Returns the edited <a href="#Message">Message</a>.</p><table><tr><th>Parameter</th><th>Type</th><th>Required</th><th>Description</th></tr><tr><td><code>chat_id</code></td><td>Integer or String</td><td>Yes</td><td>Chat ID from an update, or the person's <code>@username</code>.</td></tr><tr><td><code>message_id</code></td><td>Integer</td><td>Yes</td><td>—</td></tr><tr><td><code>caption</code></td><td>String</td><td>Optional</td><td>0–1024 characters.</td></tr><tr><td><code>parse_mode</code></td><td>String</td><td>Optional</td><td><code>HTML</code>, <code>MarkdownV2</code> or <code>Markdown</code>. See <a href="#formatting-options">formatting</a>.</td></tr><tr><td><code>reply_markup</code></td><td><a href="#InlineKeyboardMarkup">InlineKeyboardMarkup</a></td><td>Optional</td><td>—</td></tr></table><p class="ex-label"><b>Example</b></p><div class="tabs"><div class="tabbar"><button class=on>Python SDK</button><button>JavaScript SDK</button><button>cURL</button><button>Request JSON</button><button>Response</button><button class="copy">Copy</button></div><pre class=on>bot.call(&quot;editMessageCaption&quot;, {&quot;chat_id&quot;: 45957845239, &quot;message_id&quot;: 4, &quot;caption&quot;: &quot;Sold out&quot;})</pre><pre>await bot.call(&#x27;editMessageCaption&#x27;, { chat_id: 45957845239, message_id: 4, caption: &#x27;Sold out&#x27; });</pre><pre>curl -X POST https://api.zpas.org/bot$TOKEN/editMessageCaption \
+  -H &quot;Content-Type: application/json&quot; \
+  -d &#x27;{&quot;chat_id&quot;: 45957845239, &quot;message_id&quot;: 4, &quot;caption&quot;: &quot;Sold out&quot;}&#x27;</pre><pre>{
+  &quot;chat_id&quot;: 45957845239,
+  &quot;message_id&quot;: 4,
+  &quot;caption&quot;: &quot;Sold out&quot;
+}</pre><pre>{
+  &quot;ok&quot;: true,
+  &quot;result&quot;: {
+    &quot;message_id&quot;: 4,
+    &quot;from&quot;: {
+      &quot;id&quot;: 8513445453,
+      &quot;is_bot&quot;: true,
+      &quot;first_name&quot;: &quot;My Shop&quot;,
+      &quot;username&quot;: &quot;myshop_bot&quot;
+    },
+    &quot;chat&quot;: {
+      &quot;id&quot;: 45957845239,
+      &quot;type&quot;: &quot;private&quot;,
+      &quot;first_name&quot;: &quot;Rezan&quot;,
+      &quot;username&quot;: &quot;rezan&quot;
+    },
+    &quot;date&quot;: 1794200943,
+    &quot;caption&quot;: &quot;Sold out&quot;,
+    &quot;photo&quot;: [
+      {
+        &quot;file_id&quot;: &quot;u3f9b2c1d0e8a7b6c5d4e3f2a&quot;,
+        &quot;file_unique_id&quot;: &quot;u3f9b2c1d0e8a7b6&quot;,
+        &quot;width&quot;: 0,
+        &quot;height&quot;: 0
+      }
+    ],
+    &quot;edit_date&quot;: 1794201003
+  }
+}</pre></div></section>
+<section id="sec-editMessageReplyMarkup"><h3 id="editMessageReplyMarkup">editMessageReplyMarkup<a class="anchor" href="#editMessageReplyMarkup" aria-label="Link to this section">#</a></h3><div class="method"><span class="tag post">POST</span><span class="url">/bot&lt;TOKEN&gt;/editMessageReplyMarkup</span><span class="tag live">LIVE</span></div><p>Changes only the buttons. Returns the edited <a href="#Message">Message</a>.</p><table><tr><th>Parameter</th><th>Type</th><th>Required</th><th>Description</th></tr><tr><td><code>chat_id</code></td><td>Integer or String</td><td>Yes</td><td>Chat ID from an update, or the person's <code>@username</code>.</td></tr><tr><td><code>message_id</code></td><td>Integer</td><td>Yes</td><td>—</td></tr><tr><td><code>reply_markup</code></td><td><a href="#InlineKeyboardMarkup">InlineKeyboardMarkup</a></td><td>Optional</td><td>Leave it out to remove the buttons.</td></tr></table><p class="ex-label"><b>Example</b></p><div class="tabs"><div class="tabbar"><button class=on>Python SDK</button><button>JavaScript SDK</button><button>cURL</button><button>Request JSON</button><button>Response</button><button class="copy">Copy</button></div><pre class=on>bot.call(&quot;editMessageReplyMarkup&quot;, {&quot;chat_id&quot;: 45957845239, &quot;message_id&quot;: 3})  # removes the buttons</pre><pre>await bot.call(&#x27;editMessageReplyMarkup&#x27;, { chat_id: 45957845239, message_id: 3 }); // removes the buttons</pre><pre>curl -X POST https://api.zpas.org/bot$TOKEN/editMessageReplyMarkup \
+  -H &quot;Content-Type: application/json&quot; \
+  -d &#x27;{&quot;chat_id&quot;: 45957845239, &quot;message_id&quot;: 3}&#x27;</pre><pre>{
+  &quot;chat_id&quot;: 45957845239,
+  &quot;message_id&quot;: 3
+}</pre><pre>{
+  &quot;ok&quot;: true,
+  &quot;result&quot;: {
+    &quot;message_id&quot;: 3,
+    &quot;from&quot;: {
+      &quot;id&quot;: 8513445453,
+      &quot;is_bot&quot;: true,
+      &quot;first_name&quot;: &quot;My Shop&quot;,
+      &quot;username&quot;: &quot;myshop_bot&quot;
+    },
+    &quot;chat&quot;: {
+      &quot;id&quot;: 45957845239,
+      &quot;type&quot;: &quot;private&quot;,
+      &quot;first_name&quot;: &quot;Rezan&quot;,
+      &quot;username&quot;: &quot;rezan&quot;
+    },
+    &quot;date&quot;: 1794200943,
+    &quot;text&quot;: &quot;Pick something:&quot;
+  }
+}</pre></div><p class="ex-label"><b>Good to know</b></p><ul><li>Removing buttons after they are used stops people from pressing them twice.</li></ul></section>
+<section id="sec-deleteMessage"><h3 id="deleteMessage">deleteMessage<a class="anchor" href="#deleteMessage" aria-label="Link to this section">#</a></h3><div class="method"><span class="tag post">POST</span><span class="url">/bot&lt;TOKEN&gt;/deleteMessage</span><span class="tag live">LIVE</span></div><p>Deletes a message in the chat. Returns <code>True</code>.</p><table><tr><th>Parameter</th><th>Type</th><th>Required</th><th>Description</th></tr><tr><td><code>chat_id</code></td><td>Integer or String</td><td>Yes</td><td>Chat ID from an update, or the person's <code>@username</code>.</td></tr><tr><td><code>message_id</code></td><td>Integer</td><td>Yes</td><td>—</td></tr></table><p class="ex-label"><b>Example</b></p><div class="tabs"><div class="tabbar"><button class=on>Python SDK</button><button>JavaScript SDK</button><button>cURL</button><button>Request JSON</button><button>Response</button><button class="copy">Copy</button></div><pre class=on>msg.delete()</pre><pre>await msg.delete();</pre><pre>curl -X POST https://api.zpas.org/bot$TOKEN/deleteMessage \
+  -H &quot;Content-Type: application/json&quot; \
+  -d &#x27;{&quot;chat_id&quot;: 45957845239, &quot;message_id&quot;: 3}&#x27;</pre><pre>{
+  &quot;chat_id&quot;: 45957845239,
+  &quot;message_id&quot;: 3
+}</pre><pre>{
+  &quot;ok&quot;: true,
+  &quot;result&quot;: true
+}</pre></div><p class="ex-label"><b>Common errors</b></p><table><tr><th>Code</th><th>When</th></tr><tr><td><code>400</code></td><td>Message to delete not found.</td></tr></table></section>
+<section id="sec-deleteMessages"><h3 id="deleteMessages">deleteMessages<a class="anchor" href="#deleteMessages" aria-label="Link to this section">#</a></h3><div class="method"><span class="tag post">POST</span><span class="url">/bot&lt;TOKEN&gt;/deleteMessages</span><span class="tag live">LIVE</span></div><p>Deletes several messages; ones that no longer exist are skipped. Returns <code>True</code>.</p><table><tr><th>Parameter</th><th>Type</th><th>Required</th><th>Description</th></tr><tr><td><code>chat_id</code></td><td>Integer or String</td><td>Yes</td><td>Chat ID from an update, or the person's <code>@username</code>.</td></tr><tr><td><code>message_ids</code></td><td>Array of Integer</td><td>Yes</td><td>1–100 message IDs.</td></tr></table><p class="ex-label"><b>Example</b></p><div class="tabs"><div class="tabbar"><button class=on>Python SDK</button><button>JavaScript SDK</button><button>cURL</button><button>Request JSON</button><button>Response</button><button class="copy">Copy</button></div><pre class=on>bot.call(&quot;deleteMessages&quot;, {&quot;chat_id&quot;: 45957845239, &quot;message_ids&quot;: [3, 4, 5]})</pre><pre>await bot.call(&#x27;deleteMessages&#x27;, { chat_id: 45957845239, message_ids: [3, 4, 5] });</pre><pre>curl -X POST https://api.zpas.org/bot$TOKEN/deleteMessages \
+  -H &quot;Content-Type: application/json&quot; \
+  -d &#x27;{&quot;chat_id&quot;: 45957845239, &quot;message_ids&quot;: [3, 4, 5]}&#x27;</pre><pre>{
+  &quot;chat_id&quot;: 45957845239,
+  &quot;message_ids&quot;: [
+    3,
+    4,
+    5
+  ]
+}</pre><pre>{
+  &quot;ok&quot;: true,
+  &quot;result&quot;: true
+}</pre></div></section>
 <h2 id="bot-profile">Bot profile<a class="anchor" href="#bot-profile" aria-label="Link to this section">#</a></h2>
-<section id="sec-setMyCommands"><h3 id="setMyCommands">setMyCommands<a class="anchor" href="#setMyCommands" aria-label="Link to this section">#</a></h3><div class="method"><span class="tag post">POST</span><span class="url">/bot&lt;TOKEN&gt;/setMyCommands</span><span class="tag live">LIVE</span></div><p>Replaces the command menu. Returns <code>True</code>.</p><table><tr><th>Parameter</th><th>Type</th><th>Required</th><th>Description</th></tr><tr><td><code>commands</code></td><td>Array of <a href="#BotCommand">BotCommand</a></td><td>Yes</td><td>Up to 100, no duplicates.</td></tr></table></section>
-<section id="sec-getMyCommands"><h3 id="getMyCommands">getMyCommands<a class="anchor" href="#getMyCommands" aria-label="Link to this section">#</a></h3><div class="method"><span class="tag post">POST</span><span class="url">/bot&lt;TOKEN&gt;/getMyCommands</span><span class="tag live">LIVE</span></div><p>Returns Array of <a href="#BotCommand">BotCommand</a>.</p><p><i>No parameters.</i></p></section>
-<section id="sec-deleteMyCommands"><h3 id="deleteMyCommands">deleteMyCommands<a class="anchor" href="#deleteMyCommands" aria-label="Link to this section">#</a></h3><div class="method"><span class="tag post">POST</span><span class="url">/bot&lt;TOKEN&gt;/deleteMyCommands</span><span class="tag live">LIVE</span></div><p>Clears the command menu. Returns <code>True</code>.</p><p><i>No parameters.</i></p></section>
-<section id="sec-setMyName"><h3 id="setMyName">setMyName<a class="anchor" href="#setMyName" aria-label="Link to this section">#</a></h3><div class="method"><span class="tag post">POST</span><span class="url">/bot&lt;TOKEN&gt;/setMyName</span><span class="tag live">LIVE</span></div><p>Changes the bot's name; a verified badge stays. Returns <code>True</code>.</p><table><tr><th>Parameter</th><th>Type</th><th>Required</th><th>Description</th></tr><tr><td><code>name</code></td><td>String</td><td>Optional</td><td>Up to 64 characters. Empty keeps the current name.</td></tr></table></section>
-<section id="sec-getMyName"><h3 id="getMyName">getMyName<a class="anchor" href="#getMyName" aria-label="Link to this section">#</a></h3><div class="method"><span class="tag post">POST</span><span class="url">/bot&lt;TOKEN&gt;/getMyName</span><span class="tag live">LIVE</span></div><p>Returns <a href="#BotName">BotName</a>.</p><p><i>No parameters.</i></p></section>
-<section id="sec-setMyDescription"><h3 id="setMyDescription">setMyDescription<a class="anchor" href="#setMyDescription" aria-label="Link to this section">#</a></h3><div class="method"><span class="tag post">POST</span><span class="url">/bot&lt;TOKEN&gt;/setMyDescription</span><span class="tag live">LIVE</span></div><p>Text shown in an empty chat, before Start. Returns <code>True</code>.</p><table><tr><th>Parameter</th><th>Type</th><th>Required</th><th>Description</th></tr><tr><td><code>description</code></td><td>String</td><td>Optional</td><td>Up to 512 characters.</td></tr></table></section>
-<section id="sec-getMyDescription"><h3 id="getMyDescription">getMyDescription<a class="anchor" href="#getMyDescription" aria-label="Link to this section">#</a></h3><div class="method"><span class="tag post">POST</span><span class="url">/bot&lt;TOKEN&gt;/getMyDescription</span><span class="tag live">LIVE</span></div><p>Returns <a href="#BotDescription">BotDescription</a>.</p><p><i>No parameters.</i></p></section>
-<section id="sec-setMyShortDescription"><h3 id="setMyShortDescription">setMyShortDescription<a class="anchor" href="#setMyShortDescription" aria-label="Link to this section">#</a></h3><div class="method"><span class="tag post">POST</span><span class="url">/bot&lt;TOKEN&gt;/setMyShortDescription</span><span class="tag live">LIVE</span></div><p>Text on the bot's profile. Returns <code>True</code>.</p><table><tr><th>Parameter</th><th>Type</th><th>Required</th><th>Description</th></tr><tr><td><code>short_description</code></td><td>String</td><td>Optional</td><td>Up to 120 characters.</td></tr></table></section>
-<section id="sec-getMyShortDescription"><h3 id="getMyShortDescription">getMyShortDescription<a class="anchor" href="#getMyShortDescription" aria-label="Link to this section">#</a></h3><div class="method"><span class="tag post">POST</span><span class="url">/bot&lt;TOKEN&gt;/getMyShortDescription</span><span class="tag live">LIVE</span></div><p>Returns <a href="#BotShortDescription">BotShortDescription</a>.</p><p><i>No parameters.</i></p></section>
-<section id="sec-setChatMenuButton"><h3 id="setChatMenuButton">setChatMenuButton<a class="anchor" href="#setChatMenuButton" aria-label="Link to this section">#</a></h3><div class="method"><span class="tag post">POST</span><span class="url">/bot&lt;TOKEN&gt;/setChatMenuButton</span><span class="tag live">LIVE</span></div><p>Sets the button next to the message box. Returns <code>True</code>.</p><table><tr><th>Parameter</th><th>Type</th><th>Required</th><th>Description</th></tr><tr><td><code>menu_button</code></td><td><a href="#MenuButton">MenuButton</a></td><td>Optional</td><td>Leave it out for the default.</td></tr></table></section>
-<section id="sec-getChatMenuButton"><h3 id="getChatMenuButton">getChatMenuButton<a class="anchor" href="#getChatMenuButton" aria-label="Link to this section">#</a></h3><div class="method"><span class="tag post">POST</span><span class="url">/bot&lt;TOKEN&gt;/getChatMenuButton</span><span class="tag live">LIVE</span></div><p>Returns <a href="#MenuButton">MenuButton</a>.</p><p><i>No parameters.</i></p></section>
+<section id="sec-setMyCommands"><h3 id="setMyCommands">setMyCommands<a class="anchor" href="#setMyCommands" aria-label="Link to this section">#</a></h3><div class="method"><span class="tag post">POST</span><span class="url">/bot&lt;TOKEN&gt;/setMyCommands</span><span class="tag live">LIVE</span></div><p>Replaces the command menu. Returns <code>True</code>.</p><table><tr><th>Parameter</th><th>Type</th><th>Required</th><th>Description</th></tr><tr><td><code>commands</code></td><td>Array of <a href="#BotCommand">BotCommand</a></td><td>Yes</td><td>Up to 100, no duplicates.</td></tr></table><p class="ex-label"><b>Example</b></p><div class="tabs"><div class="tabbar"><button class=on>Python SDK</button><button>JavaScript SDK</button><button>cURL</button><button>Request JSON</button><button>Response</button><button class="copy">Copy</button></div><pre class=on>bot.set_commands({&quot;start&quot;: &quot;Main menu&quot;, &quot;orders&quot;: &quot;My orders&quot;})</pre><pre>await bot.setCommands({ start: &#x27;Main menu&#x27;, orders: &#x27;My orders&#x27; });</pre><pre>curl -X POST https://api.zpas.org/bot$TOKEN/setMyCommands \
+  -H &quot;Content-Type: application/json&quot; \
+  -d &#x27;{&quot;commands&quot;: [{&quot;command&quot;: &quot;start&quot;, &quot;description&quot;: &quot;Main menu&quot;}, {&quot;command&quot;: &quot;orders&quot;, &quot;description&quot;: &quot;My orders&quot;}]}&#x27;</pre><pre>{
+  &quot;commands&quot;: [
+    {
+      &quot;command&quot;: &quot;start&quot;,
+      &quot;description&quot;: &quot;Main menu&quot;
+    },
+    {
+      &quot;command&quot;: &quot;orders&quot;,
+      &quot;description&quot;: &quot;My orders&quot;
+    }
+  ]
+}</pre><pre>{
+  &quot;ok&quot;: true,
+  &quot;result&quot;: true
+}</pre></div><p class="ex-label"><b>Good to know</b></p><ul><li>People see this list when they tap <b>Menu</b> or type <code>/</code>.</li><li>It replaces the whole list each time.</li></ul><p class="ex-label"><b>Common errors</b></p><table><tr><th>Code</th><th>When</th></tr><tr><td><code>400</code></td><td>Bad command name, empty/too long description, duplicates, or more than 100.</td></tr></table></section>
+<section id="sec-getMyCommands"><h3 id="getMyCommands">getMyCommands<a class="anchor" href="#getMyCommands" aria-label="Link to this section">#</a></h3><div class="method"><span class="tag post">POST</span><span class="url">/bot&lt;TOKEN&gt;/getMyCommands</span><span class="tag live">LIVE</span></div><p>Returns Array of <a href="#BotCommand">BotCommand</a>.</p><p><i>No parameters.</i></p><p class="ex-label"><b>Example</b></p><div class="tabs"><div class="tabbar"><button class=on>Python SDK</button><button>JavaScript SDK</button><button>cURL</button><button>Response</button><button class="copy">Copy</button></div><pre class=on>bot.call(&quot;getMyCommands&quot;)</pre><pre>await bot.call(&#x27;getMyCommands&#x27;);</pre><pre>curl https://api.zpas.org/bot$TOKEN/getMyCommands</pre><pre>{
+  &quot;ok&quot;: true,
+  &quot;result&quot;: [
+    {
+      &quot;command&quot;: &quot;start&quot;,
+      &quot;description&quot;: &quot;Main menu&quot;
+    },
+    {
+      &quot;command&quot;: &quot;orders&quot;,
+      &quot;description&quot;: &quot;My orders&quot;
+    }
+  ]
+}</pre></div></section>
+<section id="sec-deleteMyCommands"><h3 id="deleteMyCommands">deleteMyCommands<a class="anchor" href="#deleteMyCommands" aria-label="Link to this section">#</a></h3><div class="method"><span class="tag post">POST</span><span class="url">/bot&lt;TOKEN&gt;/deleteMyCommands</span><span class="tag live">LIVE</span></div><p>Clears the command menu. Returns <code>True</code>.</p><p><i>No parameters.</i></p><p class="ex-label"><b>Example</b></p><div class="tabs"><div class="tabbar"><button class=on>Python SDK</button><button>JavaScript SDK</button><button>cURL</button><button>Response</button><button class="copy">Copy</button></div><pre class=on>bot.call(&quot;deleteMyCommands&quot;)</pre><pre>await bot.call(&#x27;deleteMyCommands&#x27;);</pre><pre>curl https://api.zpas.org/bot$TOKEN/deleteMyCommands</pre><pre>{
+  &quot;ok&quot;: true,
+  &quot;result&quot;: true
+}</pre></div></section>
+<section id="sec-setMyName"><h3 id="setMyName">setMyName<a class="anchor" href="#setMyName" aria-label="Link to this section">#</a></h3><div class="method"><span class="tag post">POST</span><span class="url">/bot&lt;TOKEN&gt;/setMyName</span><span class="tag live">LIVE</span></div><p>Changes the bot's name; a verified badge stays. Returns <code>True</code>.</p><table><tr><th>Parameter</th><th>Type</th><th>Required</th><th>Description</th></tr><tr><td><code>name</code></td><td>String</td><td>Optional</td><td>Up to 64 characters. Empty keeps the current name.</td></tr></table><p class="ex-label"><b>Example</b></p><div class="tabs"><div class="tabbar"><button class=on>Python SDK</button><button>JavaScript SDK</button><button>cURL</button><button>Request JSON</button><button>Response</button><button class="copy">Copy</button></div><pre class=on>bot.call(&quot;setMyName&quot;, {&quot;name&quot;: &quot;My Shop&quot;})</pre><pre>await bot.call(&#x27;setMyName&#x27;, { name: &#x27;My Shop&#x27; });</pre><pre>curl -X POST https://api.zpas.org/bot$TOKEN/setMyName \
+  -H &quot;Content-Type: application/json&quot; \
+  -d &#x27;{&quot;name&quot;: &quot;My Shop&quot;}&#x27;</pre><pre>{
+  &quot;name&quot;: &quot;My Shop&quot;
+}</pre><pre>{
+  &quot;ok&quot;: true,
+  &quot;result&quot;: true
+}</pre></div><p class="ex-label"><b>Good to know</b></p><ul><li>A verified bot keeps its blue check. Verified names should stay stable; see <a href="/bot#remove-a-check">verification</a>.</li></ul></section>
+<section id="sec-getMyName"><h3 id="getMyName">getMyName<a class="anchor" href="#getMyName" aria-label="Link to this section">#</a></h3><div class="method"><span class="tag post">POST</span><span class="url">/bot&lt;TOKEN&gt;/getMyName</span><span class="tag live">LIVE</span></div><p>Returns <a href="#BotName">BotName</a>.</p><p><i>No parameters.</i></p><p class="ex-label"><b>Example</b></p><div class="tabs"><div class="tabbar"><button class=on>Python SDK</button><button>JavaScript SDK</button><button>cURL</button><button>Response</button><button class="copy">Copy</button></div><pre class=on>bot.call(&quot;getMyName&quot;)</pre><pre>await bot.call(&#x27;getMyName&#x27;);</pre><pre>curl https://api.zpas.org/bot$TOKEN/getMyName</pre><pre>{
+  &quot;ok&quot;: true,
+  &quot;result&quot;: {
+    &quot;name&quot;: &quot;My Shop&quot;
+  }
+}</pre></div></section>
+<section id="sec-setMyDescription"><h3 id="setMyDescription">setMyDescription<a class="anchor" href="#setMyDescription" aria-label="Link to this section">#</a></h3><div class="method"><span class="tag post">POST</span><span class="url">/bot&lt;TOKEN&gt;/setMyDescription</span><span class="tag live">LIVE</span></div><p>Text shown in an empty chat, before Start. Returns <code>True</code>.</p><table><tr><th>Parameter</th><th>Type</th><th>Required</th><th>Description</th></tr><tr><td><code>description</code></td><td>String</td><td>Optional</td><td>Up to 512 characters.</td></tr></table><p class="ex-label"><b>Example</b></p><div class="tabs"><div class="tabbar"><button class=on>Python SDK</button><button>JavaScript SDK</button><button>cURL</button><button>Request JSON</button><button>Response</button><button class="copy">Copy</button></div><pre class=on>bot.call(&quot;setMyDescription&quot;, {&quot;description&quot;: &quot;Order coffee in 10 seconds. Press Start!&quot;})</pre><pre>await bot.call(&#x27;setMyDescription&#x27;, { description: &#x27;Order coffee in 10 seconds. Press Start!&#x27; });</pre><pre>curl -X POST https://api.zpas.org/bot$TOKEN/setMyDescription \
+  -H &quot;Content-Type: application/json&quot; \
+  -d &#x27;{&quot;description&quot;: &quot;Order coffee in 10 seconds. Press Start!&quot;}&#x27;</pre><pre>{
+  &quot;description&quot;: &quot;Order coffee in 10 seconds. Press Start!&quot;
+}</pre><pre>{
+  &quot;ok&quot;: true,
+  &quot;result&quot;: true
+}</pre></div></section>
+<section id="sec-getMyDescription"><h3 id="getMyDescription">getMyDescription<a class="anchor" href="#getMyDescription" aria-label="Link to this section">#</a></h3><div class="method"><span class="tag post">POST</span><span class="url">/bot&lt;TOKEN&gt;/getMyDescription</span><span class="tag live">LIVE</span></div><p>Returns <a href="#BotDescription">BotDescription</a>.</p><p><i>No parameters.</i></p><p class="ex-label"><b>Example</b></p><div class="tabs"><div class="tabbar"><button class=on>Python SDK</button><button>JavaScript SDK</button><button>cURL</button><button>Response</button><button class="copy">Copy</button></div><pre class=on>bot.call(&quot;getMyDescription&quot;)</pre><pre>await bot.call(&#x27;getMyDescription&#x27;);</pre><pre>curl https://api.zpas.org/bot$TOKEN/getMyDescription</pre><pre>{
+  &quot;ok&quot;: true,
+  &quot;result&quot;: {
+    &quot;description&quot;: &quot;Order coffee in 10 seconds. Press Start!&quot;
+  }
+}</pre></div></section>
+<section id="sec-setMyShortDescription"><h3 id="setMyShortDescription">setMyShortDescription<a class="anchor" href="#setMyShortDescription" aria-label="Link to this section">#</a></h3><div class="method"><span class="tag post">POST</span><span class="url">/bot&lt;TOKEN&gt;/setMyShortDescription</span><span class="tag live">LIVE</span></div><p>Text on the bot's profile. Returns <code>True</code>.</p><table><tr><th>Parameter</th><th>Type</th><th>Required</th><th>Description</th></tr><tr><td><code>short_description</code></td><td>String</td><td>Optional</td><td>Up to 120 characters.</td></tr></table><p class="ex-label"><b>Example</b></p><div class="tabs"><div class="tabbar"><button class=on>Python SDK</button><button>JavaScript SDK</button><button>cURL</button><button>Request JSON</button><button>Response</button><button class="copy">Copy</button></div><pre class=on>bot.call(&quot;setMyShortDescription&quot;, {&quot;short_description&quot;: &quot;Coffee to go ☕&quot;})</pre><pre>await bot.call(&#x27;setMyShortDescription&#x27;, { short_description: &#x27;Coffee to go ☕&#x27; });</pre><pre>curl -X POST https://api.zpas.org/bot$TOKEN/setMyShortDescription \
+  -H &quot;Content-Type: application/json&quot; \
+  -d &#x27;{&quot;short_description&quot;: &quot;Coffee to go ☕&quot;}&#x27;</pre><pre>{
+  &quot;short_description&quot;: &quot;Coffee to go ☕&quot;
+}</pre><pre>{
+  &quot;ok&quot;: true,
+  &quot;result&quot;: true
+}</pre></div></section>
+<section id="sec-getMyShortDescription"><h3 id="getMyShortDescription">getMyShortDescription<a class="anchor" href="#getMyShortDescription" aria-label="Link to this section">#</a></h3><div class="method"><span class="tag post">POST</span><span class="url">/bot&lt;TOKEN&gt;/getMyShortDescription</span><span class="tag live">LIVE</span></div><p>Returns <a href="#BotShortDescription">BotShortDescription</a>.</p><p><i>No parameters.</i></p><p class="ex-label"><b>Example</b></p><div class="tabs"><div class="tabbar"><button class=on>Python SDK</button><button>JavaScript SDK</button><button>cURL</button><button>Response</button><button class="copy">Copy</button></div><pre class=on>bot.call(&quot;getMyShortDescription&quot;)</pre><pre>await bot.call(&#x27;getMyShortDescription&#x27;);</pre><pre>curl https://api.zpas.org/bot$TOKEN/getMyShortDescription</pre><pre>{
+  &quot;ok&quot;: true,
+  &quot;result&quot;: {
+    &quot;short_description&quot;: &quot;Coffee to go ☕&quot;
+  }
+}</pre></div></section>
+<section id="sec-setChatMenuButton"><h3 id="setChatMenuButton">setChatMenuButton<a class="anchor" href="#setChatMenuButton" aria-label="Link to this section">#</a></h3><div class="method"><span class="tag post">POST</span><span class="url">/bot&lt;TOKEN&gt;/setChatMenuButton</span><span class="tag live">LIVE</span></div><p>Sets the button next to the message box. Returns <code>True</code>.</p><table><tr><th>Parameter</th><th>Type</th><th>Required</th><th>Description</th></tr><tr><td><code>menu_button</code></td><td><a href="#MenuButton">MenuButton</a></td><td>Optional</td><td>Leave it out for the default.</td></tr></table><p class="ex-label"><b>Example</b></p><div class="tabs"><div class="tabbar"><button class=on>Python SDK</button><button>JavaScript SDK</button><button>cURL</button><button>Request JSON</button><button>Response</button><button class="copy">Copy</button></div><pre class=on>bot.call(&quot;setChatMenuButton&quot;, {&quot;menu_button&quot;: {&quot;type&quot;: &quot;web_app&quot;, &quot;text&quot;: &quot;Open shop&quot;,
+                                    &quot;web_app&quot;: {&quot;url&quot;: &quot;https://shop.example.com/app&quot;}}})</pre><pre>await bot.call(&#x27;setChatMenuButton&#x27;, { menu_button: { type: &#x27;web_app&#x27;, text: &#x27;Open shop&#x27;, web_app: { url: &#x27;https://shop.example.com/app&#x27; } } });</pre><pre>curl -X POST https://api.zpas.org/bot$TOKEN/setChatMenuButton \
+  -H &quot;Content-Type: application/json&quot; \
+  -d &#x27;{&quot;menu_button&quot;: {&quot;type&quot;: &quot;web_app&quot;, &quot;text&quot;: &quot;Open shop&quot;, &quot;web_app&quot;: {&quot;url&quot;: &quot;https://shop.example.com/app&quot;}}}&#x27;</pre><pre>{
+  &quot;menu_button&quot;: {
+    &quot;type&quot;: &quot;web_app&quot;,
+    &quot;text&quot;: &quot;Open shop&quot;,
+    &quot;web_app&quot;: {
+      &quot;url&quot;: &quot;https://shop.example.com/app&quot;
+    }
+  }
+}</pre><pre>{
+  &quot;ok&quot;: true,
+  &quot;result&quot;: true
+}</pre></div><p class="ex-label"><b>Good to know</b></p><ul><li>A mini app is your own web page opened inside the chat. Design it for phones and never ask for PassGram passwords or codes.</li></ul></section>
+<section id="sec-getChatMenuButton"><h3 id="getChatMenuButton">getChatMenuButton<a class="anchor" href="#getChatMenuButton" aria-label="Link to this section">#</a></h3><div class="method"><span class="tag post">POST</span><span class="url">/bot&lt;TOKEN&gt;/getChatMenuButton</span><span class="tag live">LIVE</span></div><p>Returns <a href="#MenuButton">MenuButton</a>.</p><p><i>No parameters.</i></p><p class="ex-label"><b>Example</b></p><div class="tabs"><div class="tabbar"><button class=on>Python SDK</button><button>JavaScript SDK</button><button>cURL</button><button>Response</button><button class="copy">Copy</button></div><pre class=on>bot.call(&quot;getChatMenuButton&quot;)</pre><pre>await bot.call(&#x27;getChatMenuButton&#x27;);</pre><pre>curl https://api.zpas.org/bot$TOKEN/getChatMenuButton</pre><pre>{
+  &quot;ok&quot;: true,
+  &quot;result&quot;: {
+    &quot;type&quot;: &quot;commands&quot;
+  }
+}</pre></div></section>
 <h2 id="available-types">Available types<a class="anchor" href="#available-types">#</a></h2><p>All objects are JSON. Optional fields are left out when empty. New fields may be added; ignore ones you do not know.</p>
 <section id="sec-Update"><h3 id="Update">Update<a class="anchor" href="#Update" aria-label="Link to this section">#</a></h3><p>One event for your bot. Exactly one of the optional fields is present.</p><table><tr><th>Field</th><th>Type</th><th>Description</th></tr><tr><td><code>update_id</code></td><td>Integer</td><td>Increasing number. Send <code>update_id + 1</code> as <code>offset</code> to confirm it.</td></tr><tr><td><code>message</code></td><td><a href="#Message">Message</a></td><td><i>Optional.</i> A new message from a person.</td></tr><tr><td><code>callback_query</code></td><td><a href="#CallbackQuery">CallbackQuery</a></td><td><i>Optional.</i> A press on one of your inline buttons.</td></tr></table></section>
 <section id="sec-User"><h3 id="User">User<a class="anchor" href="#User" aria-label="Link to this section">#</a></h3><p>A person or a bot.</p><table><tr><th>Field</th><th>Type</th><th>Description</th></tr><tr><td><code>id</code></td><td>Integer</td><td>Unique ID. For people this is their <b>Z Pass ID</b> (11 digits); for bots, 10 digits.</td></tr><tr><td><code>is_bot</code></td><td>Boolean</td><td><code>true</code> for bots.</td></tr><tr><td><code>first_name</code></td><td>String</td><td>Display name.</td></tr><tr><td><code>username</code></td><td>String</td><td><i>Optional.</i> Username without <code>@</code>.</td></tr><tr><td><code>language_code</code></td><td>String</td><td><i>Optional.</i> The person's app language, e.g. <code>tr</code>, <code>en</code>.</td></tr></table></section>
@@ -109,7 +857,7 @@
 <section id="sec-BotShortDescription"><h3 id="BotShortDescription">BotShortDescription<a class="anchor" href="#BotShortDescription" aria-label="Link to this section">#</a></h3><table><tr><th>Field</th><th>Type</th><th>Description</th></tr><tr><td><code>short_description</code></td><td>String</td><td>Text on the bot's profile.</td></tr></table></section>
 <section id="sec-ResponseParameters"><h3 id="ResponseParameters">ResponseParameters<a class="anchor" href="#ResponseParameters" aria-label="Link to this section">#</a></h3><p>Extra error details.</p><table><tr><th>Field</th><th>Type</th><th>Description</th></tr><tr><td><code>retry_after</code></td><td>Integer</td><td><i>Optional.</i> Seconds to wait after a <code>429</code>.</td></tr></table></section>
 <section id="sec-changelog"><h2 id="changelog">Changelog<a class="anchor" href="#changelog" aria-label="Link to this section">#</a></h2><p>What changed in the PassGram Bot API, newest first.</p><h3 id="november-9-2026-bot-api-1-0">November 9, 2026 · Bot API 1.0<a class="anchor" href="#november-9-2026-bot-api-1-0" aria-label="Link to this section">#</a></h3><ul><li>The API now speaks the wire format common bot libraries expect. Tested with python-telegram-bot, aiogram, pyTelegramBotAPI, Telegraf, grammY and node-telegram-bot-api: change the server address and existing bot code works.</li><li>Numeric IDs: bots get a 10-digit ID (also the first part of new tokens); people are identified by their 11-digit Z Pass ID. Older tokens keep working.</li><li>New address <code>https://api.zpas.org/bot&lt;TOKEN&gt;/&lt;method&gt;</code>.</li><li>Webhooks: <a href="#setWebhook">setWebhook</a>, <a href="#deleteWebhook">deleteWebhook</a>, <a href="#getWebhookInfo">getWebhookInfo</a>, secret header, automatic retries, and answering with a method call.</li><li>Long polling with <code>timeout</code> in <a href="#getUpdates">getUpdates</a>; negative <code>offset</code>; confirmed updates are removed.</li><li>Photos, videos, GIFs, audio, voice, round videos, stickers and files, by link (any size) or upload (up to 20 MB, was 5 MB). Uploads also accept <code>attach://</code>.</li><li>Formatting with <code>parse_mode</code> (HTML, MarkdownV2, Markdown).</li><li>Reply keyboards, <code>remove_keyboard</code> and <code>force_reply</code>.</li><li><a href="#editMessageCaption">editMessageCaption</a>, <a href="#deleteMessage">deleteMessage</a>, <a href="#deleteMessages">deleteMessages</a>, <a href="#sendChatAction">sendChatAction</a>, <a href="#getChat">getChat</a>; edit methods now return the edited message.</li><li>Bot profile methods: name, description and short description.</li><li>Messages carry <code>entities</code> for a leading <code>/command</code>, and <code>language_code</code> for the person's app language.</li><li>Unknown methods return <code>404 Not Found</code>; method names are not case-sensitive.</li><li>Official PassGram Bot SDK 1.0 for Python and JavaScript (one file each, no dependencies).</li><li>Verify Bot: owners can apply for a blue check for their account or bot.</li></ul><h3 id="november-2026-bot-api-preview">November 2026 · Bot API preview<a class="anchor" href="#november-2026-bot-api-preview" aria-label="Link to this section">#</a></h3><ul><li>Inline keyboards, button presses (<code>answerCallbackQuery</code>), <code>editMessageText</code> and <code>editMessageReplyMarkup</code>.</li><li><code>sendDocument</code> with a one-time file relay (up to 5 MB).</li><li><code>getMe</code>, <code>getUpdates</code>, <code>sendMessage</code>, commands and the menu button.</li></ul></section>
-<div class="foot"><span>© 2026 PassGram</span><span><a href="https://zpas.org/legal/terms">Terms</a> · <a href="https://zpas.org/legal/privacy">Privacy</a> · <a href="https://zpas.org/legal/security">Security</a></span></div>
+<div class="foot"><span>© 2026 PassGram by Zizo Software LLC · SDK: <a href="/bot#license">MIT License</a></span><span><a href="https://zpas.org/legal/terms">Terms</a> · <a href="https://zpas.org/legal/privacy">Privacy</a> · <a href="https://zpas.org/legal/security">Security</a></span></div>
 </main>
 </div>
 <script src="/subdomain/docs/resources/js/nsnmi7dano.js" defer></script>

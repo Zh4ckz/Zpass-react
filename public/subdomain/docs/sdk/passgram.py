@@ -1,6 +1,9 @@
 """
 PassGram Bot SDK for Python (official).
 
+Copyright (c) 2026 PassGram by Zizo Software LLC
+Released under the MIT License: https://docs.zpas.org/bot#license
+
 One file, no dependencies, Python 3.8+.
 Docs: https://docs.zpas.org/#sdk
 
@@ -29,6 +32,8 @@ import urllib.request
 import uuid
 
 __version__ = "1.0.0"
+__license__ = "MIT"
+__copyright__ = "Copyright (c) 2026 PassGram by Zizo Software LLC"
 __all__ = ["Bot", "Buttons", "Keyboard", "File", "PassGramError", "Message", "Press", "User"]
 
 DEFAULT_API = "https://api.zpas.org"

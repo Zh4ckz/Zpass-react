@@ -8,8 +8,13 @@ Edit the data below and run:  python scripts/build-bot-docs.py
 All text is PassGram's own; keep it that way (do not paste other platforms' documentation).
 """
 import html
+import json
 import os
 import re
+import sys
+
+sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
+from bot_docs_examples import EXAMPLES  # noqa: E402
 
 ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 OUT = os.path.join(ROOT, "public", "subdomain", "docs")
@@ -62,7 +67,7 @@ def page(title, description, side, body, active):
 <aside class="side" id="side">{side_html}</aside>
 <main>
 {body}
-<div class="foot"><span>© 2026 PassGram</span><span><a href="https://zpas.org/legal/terms">Terms</a> · <a href="https://zpas.org/legal/privacy">Privacy</a> · <a href="https://zpas.org/legal/security">Security</a></span></div>
+<div class="foot"><span>© 2026 PassGram by Zizo Software LLC · SDK: <a href="/bot#license">MIT License</a></span><span><a href="https://zpas.org/legal/terms">Terms</a> · <a href="https://zpas.org/legal/privacy">Privacy</a> · <a href="https://zpas.org/legal/security">Security</a></span></div>
 </main>
 </div>
 <script src="/subdomain/docs/resources/js/nsnmi7dano.js" defer></script>
@@ -325,6 +330,34 @@ CHANGELOG = [
     ]),
 ]
 
+def method_extras(name):
+    ex = EXAMPLES.get(name)
+    if not ex:
+        return ""
+    out = ""
+    params = ex.get("params") or {}
+    req = json.dumps(params, ensure_ascii=False, indent=2)
+    res = json.dumps({"ok": True, "result": ex["result"]}, ensure_ascii=False, indent=2)
+    if ex.get("upload"):
+        field = ex["upload"]
+        curl = (f'# by link\ncurl -X POST https://api.zpas.org/bot$TOKEN/{name} \\\n  -H "Content-Type: application/json" \\\n  -d \'{json.dumps(params, ensure_ascii=False)}\'\n\n'
+                f'# by upload (multipart, up to 20 MB)\ncurl -X POST https://api.zpas.org/bot$TOKEN/{name} \\\n  -F chat_id=45957845239 -F {field}=@./myfile')
+    elif params:
+        curl = f'curl -X POST https://api.zpas.org/bot$TOKEN/{name} \\\n  -H "Content-Type: application/json" \\\n  -d \'{json.dumps(params, ensure_ascii=False)}\''
+    else:
+        curl = f"curl https://api.zpas.org/bot$TOKEN/{name}"
+    tabs = [("Python SDK", ex["py"]), ("JavaScript SDK", ex["js"]), ("cURL", curl)]
+    if params:
+        tabs.append(("Request JSON", req))
+    tabs.append(("Response", res))
+    out += '<p class="ex-label"><b>Example</b></p>' + code_tabs(tabs)
+    if ex.get("notes"):
+        out += '<p class="ex-label"><b>Good to know</b></p><ul>' + "".join(f"<li>{n}</li>" for n in ex["notes"]) + "</ul>"
+    if ex.get("errors"):
+        out += '<p class="ex-label"><b>Common errors</b></p>' + table(["Code", "When"], [[f"<code>{c}</code>", w] for c, w in ex["errors"]])
+    return out
+
+
 def build_api():
     side = [("Basics", [("introduction", "Introduction"), ("authorizing", "Your token"), ("making-requests", "Making requests"), ("responses", "Responses"), ("errors", "Errors"), ("limits", "Limits"), ("ids", "IDs"), ("webhooks", "Webhooks"), ("formatting-options", "Formatting options")])]
     for group, methods in METHOD_GROUPS:
@@ -391,6 +424,7 @@ def build_api():
                 inner += table(["Parameter", "Type", "Required", "Description"], [[f"<code>{p}</code>", t, r, d] for p, t, r, d in params])
             else:
                 inner += "<p><i>No parameters.</i></p>"
+            inner += method_extras(name)
             b.append(section(3, name, name, inner))
 
     b.append('<h2 id="available-types">Available types<a class="anchor" href="#available-types">#</a></h2><p>All objects are JSON. Optional fields are left out when empty. New fields may be added; ignore ones you do not know.</p>')
@@ -410,7 +444,9 @@ def build_bot():
         ("Start", [("what-is-a-bot", "What is a bot"), ("create-your-bot", "Create your bot"), ("zbot", "Zbot"), ("talk-to-your-bot", "Talk to your bot")]),
         ("Build", [("official-sdk", "Official SDK"), ("existing-libraries", "Existing libraries"), ("plain-http", "Plain HTTP"), ("run-your-bot", "Run your bot"), ("what-bots-can-do", "What bots can do"), ("files-and-media", "Files and media"), ("deep-links", "Links to your bot")]),
         ("Trust", [("verify-bot", "Verify Bot"), ("blue-check", "The blue check"), ("company-names", "Company names"), ("remove-a-check", "Remove a check"), ("rules-for-bots", "Rules for bots"), ("privacy", "Privacy"), ("reports-and-bans", "Reports and bans")]),
-        ("Reference", [("limits", "Limits"), ("faq", "FAQ")]),
+        ("Tutorials", [("tutorial-first-bot", "Your first bot in 5 minutes"), ("tutorial-buttons", "Buttons and menus"), ("tutorial-shop", "A small shop bot"), ("tutorial-move", "Move an existing bot"), ("tutorial-24-7", "Run 24/7")]),
+        ("Plans & payments", [("plans", "PassGram plans"), ("payment-terms", "Payment terms"), ("refunds", "24-hour refund"), ("auto-renew", "Auto-renew & cancelling"), ("bots-and-money", "Bots and money")]),
+        ("Reference", [("limits", "Limits"), ("license", "SDK license"), ("faq", "FAQ")]),
     ]
     b = []
     b.append('<div class="hero" id="top"><span class="pill">Bots</span><h1>Bots on <em>PassGram.</em></h1><p>Everything about bots: how to make one, how to run it, what it can do, how verification works, and the rules. Every title has its own link (<b>#</b>). The full method list is in the <a href="/bot/api">Bot API reference</a>.</p></div>')
@@ -452,7 +488,7 @@ const bot = new Bot('YOUR_TOKEN');
 bot.command('start', (msg) => msg.reply(`Hi ${msg.user.firstName}!`, { buttons: new Buttons([['Say hi', 'hi']]) }));
 bot.button('hi', (press) => press.answer('Hello!'));
 bot.run();''')]) +
-        "<p>More: <a href=\"/#sdk\">SDK cheat sheet</a>.</p>"))
+        "<p>More: <a href=\"/#sdk\">SDK cheat sheet</a>. Open source under the <a href=\"#license\">MIT License</a>.</p>"))
     b.append(section(2, "Existing libraries", "existing-libraries",
         "<p>Already have a bot? Popular libraries work by changing the server address to <code>https://api.zpas.org</code>.</p>" +
         table(["Library", "Setting"], [
@@ -496,6 +532,130 @@ bot.run();''')]) +
         "<p>Private chats between people are end-to-end encrypted; bots cannot see them. <b>Chats with a bot are different</b>: the bot's owner reads them (the bot must, to answer) and they pass through the PassGram server. Bots only learn a person's Z Pass ID, name, username and app language; never their phone, email, password or vault.</p>"))
     b.append(section(2, "Reports and bans", "reports-and-bans",
         "<p>People can report bots. PassGram sees the bot's owner and can disable or delete bots that break the rules. A disabled bot's API calls return <code>403</code>.</p>"))
+    b.append(section(2, "Tutorial: your first bot in 5 minutes", "tutorial-first-bot",
+        "<ol><li>In the app, open <a href=\"#zbot\">Zbot</a>, send <code>/newbot</code>, choose a name and a username. Copy the token.</li>"
+        "<li>Download <a href=\"/subdomain/docs/sdk/passgram.py\" download>passgram.py</a> into a new folder.</li>"
+        "<li>Next to it create <code>bot.py</code>:</li></ol>" +
+        code_tabs([("bot.py", '''from passgram import Bot
+
+bot = Bot("PASTE_YOUR_TOKEN_HERE")
+
+@bot.command("start")
+def start(msg):
+    msg.reply(f"Hello {msg.user.first_name}! Send me anything and I will repeat it.")
+
+@bot.message()
+def echo(msg):
+    msg.reply("You said: " + msg.text)
+
+bot.run()'''), ("bot.js (Node.js)", '''const { Bot } = require('./passgram');
+
+const bot = new Bot('PASTE_YOUR_TOKEN_HERE');
+bot.command('start', (msg) => msg.reply(`Hello ${msg.user.firstName}! Send me anything and I will repeat it.`));
+bot.message((msg) => msg.reply('You said: ' + msg.text));
+bot.run();''')]) +
+        "<ol start=\"4\"><li>Run it: <code>python bot.py</code> (or <code>node bot.js</code>). You will see <code>PassGram bot @yourbot is running</code>.</li>"
+        "<li>Open your bot in the app and press <b>Start</b>. That's it: your bot answers.</li></ol>" +
+        note("info", "ℹ Keep the window open", "The bot runs while your program runs. Close it and the bot goes quiet; see <a href=\"#tutorial-24-7\">Run 24/7</a>.")))
+    b.append(section(2, "Tutorial: buttons and menus", "tutorial-buttons",
+        "<p>Three kinds of buttons, each for a different job:</p>" +
+        table(["Kind", "Looks like", "Use it for"], [
+            ["<b>Inline buttons</b>", "Under a message", "Choices about that message: Buy, Next page, Yes/No."],
+            ["<b>Reply keyboard</b>", "Big buttons instead of the phone keyboard", "Quick answers: ratings, sizes, menus."],
+            ["<b>Command menu</b>", "The Menu button / typing <code>/</code>", "Your main commands, always reachable."]]) +
+        code_tabs([("Python SDK", '''from passgram import Bot, Buttons, Keyboard
+
+bot = Bot("TOKEN")
+bot.set_commands({"start": "Main menu", "help": "How it works"})
+
+MENU = Buttons([("☕ Coffee", "coffee"), ("🍰 Cake", "cake")], [("ℹ️ About", "about")])
+
+@bot.command("start")
+def start(msg):
+    msg.reply("What would you like?", buttons=MENU)
+
+@bot.button("coffee", "cake")
+def pick(press):
+    press.answer("Good choice!")
+    press.edit(f"You picked {press.data}. Which size?", buttons=None)
+    press.reply("Size?", keyboard=Keyboard(["Small", "Medium", "Large"], one_time=True))
+
+@bot.text("Small", "Medium", "Large")
+def size(msg):
+    msg.reply(f"{msg.text} it is! ✅", keyboard=Keyboard.remove())
+
+bot.run()''')])))
+    b.append(section(2, "Tutorial: a small shop bot", "tutorial-shop",
+        "<p>A shop shows products with photos, takes the order with buttons and confirms it. Payment happens on your own website (see <a href=\"#bots-and-money\">bots and money</a>).</p>" +
+        code_tabs([("Python SDK", '''from passgram import Bot, Buttons
+
+bot = Bot("TOKEN")
+PRODUCTS = {"latte": ("Latte", 4.50, "https://cdn.example.com/latte.jpg"),
+            "mocha": ("Mocha", 5.00, "https://cdn.example.com/mocha.jpg")}
+
+@bot.command("start")
+def start(msg):
+    for key, (name, price, photo) in PRODUCTS.items():
+        bot.send_photo(msg.chat_id, photo, caption=f"{name} — ${price:.2f}",
+                       buttons=Buttons([("🛒 Order", f"order:{key}")]))
+
+@bot.button()                      # every press comes here
+def order(press):
+    if not press.data.startswith("order:"):
+        return
+    name, price, _ = PRODUCTS[press.data.split(":")[1]]
+    press.answer("Added ✅")
+    press.reply(f"<b>{name}</b> ordered. Pay here:", format="html",
+                buttons=Buttons([("💳 Pay $%.2f" % price, "https://shop.example.com/pay?item=" + name)]))
+
+bot.run()''')])))
+    b.append(section(2, "Tutorial: move an existing bot", "tutorial-move",
+        "<ol><li>Create a bot in <a href=\"#zbot\">Zbot</a> and copy the new token.</li><li>In your code, replace the old token and set the server address to <code>https://api.zpas.org</code> (see <a href=\"#existing-libraries\">the setting for your library</a>).</li><li>Run it. Text, buttons, keyboards, photos, files, edits and webhooks work the same.</li><li>Check <a href=\"#what-bots-can-do\">what bots can do</a>: features like groups or payments are not available yet.</li></ol>" +
+        note("warn", "⚠ IDs are different", "People and chats have new IDs on PassGram. Do not reuse IDs saved from another platform.")))
+    b.append(section(2, "Tutorial: run your bot 24/7", "tutorial-24-7",
+        "<p>Your bot answers only while its program runs. For a bot that is always on:</p>" +
+        table(["Option", "How", "Cost"], [
+            ["A computer that stays on", "Run <code>start.bat</code> / <code>python bot.py</code> and keep it open.", "Free"],
+            ["A small server (VPS)", "Copy the folder, run it with a service manager (systemd, pm2) so it restarts after crashes and reboots.", "Low"],
+            ["A serverless platform", "Use a <a href=\"/bot/api#webhooks\">webhook</a>: PassGram calls your function only when something happens.", "Often free for small bots"]]) +
+        "<p>Keep the token in an environment variable (<code>PASSGRAM_BOT_TOKEN</code>), not in the code, when the code lives on a server or in a repository.</p>"))
+
+    # ---------------- plans & payments ----------------
+    b.append(section(2, "PassGram plans", "plans",
+        "<p>PassGram is free. Plus and Pro add more space and features for your own account. Bots and the Bot API are free on every plan.</p>" +
+        table(["Plan", "Monthly", "Yearly (charged once a year)"], [
+            ["Free", "$0", "$0"],
+            ["Plus", "$3.99 per month", "$35.88 per year = <b>$2.99</b> per month <s>$3.99</s>"],
+            ["Pro", "$6.99 per month", "$71.88 per year = <b>$5.99</b> per month <s>$6.99</s>"]]) +
+        "<p>The crossed-out price next to a yearly plan is the regular price of the monthly plan, so the saving is real. Taxes are added where the law requires and are shown before you pay. See <a href=\"https://zpas.org/about/pricing\">pricing</a> for what each plan includes.</p>"))
+    b.append(section(2, "Payment terms", "payment-terms",
+        "<p>In plain words:</p><ul>"
+        "<li><b>Monthly plans</b> are charged when you subscribe and then once every month.</li>"
+        "<li><b>Yearly plans</b> are charged once, in advance, for 12 months, and then once every year.</li>"
+        "<li>Payments are processed by our payment provider (Stripe). PassGram never sees your full card number, and nobody from PassGram will ever ask for it in a chat.</li>"
+        "<li>The same rules apply in the Android app, the Windows app and on the website.</li></ul>"
+        "<p>The binding text is in section 8 of the <a href=\"https://zpas.org/legal/terms#prices\">Terms</a>; this page explains it.</p>"))
+    b.append(section(2, "24-hour refund", "refunds",
+        "<ul><li>Changed your mind? Ask for a refund within <b>24 hours</b> of your first payment, in <b>Subscription &amp; billing</b> in the app or on the website. You get the full amount back (excluding tax) and the plan ends right away.</li>"
+        "<li>After 24 hours, payments are <b>not refunded</b>.</li>"
+        "<li>Opening invoices, downloading PDFs or signing out does not restart the 24 hours.</li>"
+        "<li>Your bank may take a few days to show the money back.</li>"
+        "<li>Rights you have under consumer law always apply.</li></ul>"))
+    b.append(section(2, "Auto-renew & cancelling", "auto-renew",
+        "<ul><li>Paid plans renew automatically until you turn <b>auto-renew</b> off.</li>"
+        "<li>You can turn it off <b>any time</b>, in a few taps, in Subscription &amp; billing. You keep your plan until the end of the period you already paid for, and you are not charged again.</li>"
+        "<li>Turning auto-renew off is not a refund: the current period is not paid back (except within the first 24 hours, see above).</li>"
+        "<li>Changed your mind again? Turn auto-renew back on before the period ends.</li>"
+        "<li>Upgrading from Plus to Pro starts at your next billing date, with no extra charge today.</li></ul>"))
+    b.append(section(2, "Bots and money", "bots-and-money",
+        "<p>Bots cannot charge people inside PassGram yet. If your bot sells something:</p><ul>"
+        "<li>Send people to <b>your own</b> checkout page with a link button. Your payment provider and your terms apply there, not PassGram's.</li>"
+        "<li><b>Never</b> ask for card numbers, bank logins, passwords or one-time codes in the chat.</li>"
+        "<li>Say clearly what you sell, the price, and how people get a refund from you.</li>"
+        "<li>You are responsible for your sales, taxes and customers. Bots that scam people are removed.</li></ul>"))
+    b.append(section(2, "SDK license", "license",
+        "<p>The official PassGram Bot SDK (<code>passgram.py</code> and <code>passgram.js</code>) is open source under the <b>MIT License</b>: you may use, copy, change and ship it in your own projects, also commercially, as long as you keep the copyright notice.</p>"
+        "<p><b>Copyright (c) 2026 PassGram by Zizo Software LLC.</b> Full text: <a href=\"/subdomain/docs/sdk/LICENSE.txt\">LICENSE</a>. The license covers the SDK code; the PassGram service, apps, name and logo are not covered and stay subject to the <a href=\"https://zpas.org/legal/terms\">Terms</a>.</p>"))
     b.append(section(2, "Limits", "limits", table(["What", "Limit"], [
         ["Bots per account", "20"], ["Requests per bot", "120 per minute"], ["Upload", "20 MB per file (links: no limit)"],
         ["Text", "4096 characters"], ["Commands", "100"]]) + "<p>All limits: <a href=\"/bot/api#limits\">Bot API reference</a>.</p>"))
@@ -505,6 +665,9 @@ bot.run();''')]) +
         ("Why does my bot get 403?", "The person has not pressed Start in your bot yet, or the bot was disabled."),
         ("Can I use code written for another platform?", "Usually yes. See <a href=\"#existing-libraries\">existing libraries</a>."),
         ("How do I get the blue check?", "Apply with <a href=\"#verify-bot\">Verify Bot</a>."),
+        ("Is the Bot API free?", "Yes, on every plan. Limits are in <a href=\"/bot/api#limits\">the reference</a>."),
+        ("Can I use the SDK in a commercial product?", "Yes. It is MIT licensed; keep the copyright notice. See <a href=\"#license\">license</a>."),
+        ("How do I get my money back for a plan?", "Within 24 hours of the first payment: Subscription &amp; billing → Refund. See <a href=\"#refunds\">24-hour refund</a>."),
     ]
     b.append(section(2, "FAQ", "faq", "".join(f"<details><summary>{q}</summary><p>{a}</p></details>" for q, a in faq)))
     return page("Bots on PassGram — Docs", "Everything about PassGram bots: Zbot, the SDK, libraries, Verify Bot and the blue check, rules, privacy and limits.", side, "\n".join(b), "/bot")

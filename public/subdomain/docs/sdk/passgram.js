@@ -1,6 +1,9 @@
 /**
  * PassGram Bot SDK for JavaScript (official).
  *
+ * Copyright (c) 2026 PassGram by Zizo Software LLC
+ * Released under the MIT License: https://docs.zpas.org/bot#license
+ *
  * One file, no dependencies, Node.js 18+.
  * Docs: https://docs.zpas.org/#sdk
  *
