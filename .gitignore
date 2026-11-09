@@ -37,3 +37,6 @@ out-pay/
 .wrangler/
 cloudflare/payment-worker/.wrangler/
 cloudflare/payment-worker/.dev.vars*
+
+# Next.js build cache (rebuilt on every deploy; was adding ~50 MB per commit)
+.next/
