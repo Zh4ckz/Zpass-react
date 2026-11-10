@@ -44,6 +44,8 @@
     .send svg{width:20px;height:20px}
     .hint{margin:20px 0 0;color:var(--muted);font-size:14.5px;line-height:1.6}
     .hint b{color:var(--text)}
+    .missing{margin:14px 0 0;padding:12px 14px;border-radius:14px;background:#2675f414;color:var(--text);font-size:14px;line-height:1.5}
+    .missing[hidden]{display:none}.missing a{color:var(--accent);font-weight:700}
     .skeleton{display:inline-block;min-width:150px;height:30px;border-radius:9px;background:linear-gradient(90deg,#94a3b822,#94a3b844,#94a3b822);background-size:200% 100%;animation:sk 1.1s infinite}
     @keyframes sk{to{background-position:-200% 0}}
   </style>
@@ -62,6 +64,7 @@
       <p id="about" class="about"></p>
       <a class="send" id="send" href="#"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M22 2 11 13"/><path d="M22 2 15 22l-4-9-9-4z"/></svg><span id="send-label">Send Message</span></a>
       <p class="hint" id="hint"></p>
+      <p class="missing" id="missing" hidden>Nothing opened? <a href="/apps/windows">Get Z Pass for Windows</a> — then press Send Message again.</p>
     </main>
   </div>
   <script>
@@ -73,14 +76,25 @@
       const esc = (s) => String(s).replace(/[&<>"']/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
       document.querySelector('main').hidden = false;
 
-      // Where "Send Message" goes: the PassGram app on Android, the web chat on computers (the Windows app has no chats yet).
+      // Where "Send Message" goes: straight into the PassGram app — the Android app, or Z Pass for Windows (zpass:// link).
       const ua = navigator.userAgent;
       const android = /android/i.test(ua);
+      const windows = !android && /windows/i.test(ua);
       const appUrl = 'zpass://resolve?domain=' + encodeURIComponent(handle);
       const target = android
         ? 'intent://resolve?domain=' + encodeURIComponent(handle) + '#Intent;scheme=zpass;package=com.zpass;S.browser_fallback_url=' + encodeURIComponent('https://zpas.org/apps/android') + ';end'
-        : 'https://web.zpas.org/web?profile=' + encodeURIComponent(handle);
+        : windows ? appUrl : 'https://web.zpas.org/web?profile=' + encodeURIComponent(handle);
       $('send').href = target;
+      // If Windows doesn't know zpass:// (Z Pass not installed), the page keeps focus: then offer the download.
+      if (windows) $('send').addEventListener('click', () => {
+        let left = false;
+        const away = () => { left = true; };
+        window.addEventListener('blur', away, { once: true });
+        setTimeout(() => {
+          window.removeEventListener('blur', away);
+          if (!left && document.hasFocus()) $('missing').hidden = false;
+        }, 1600);
+      });
       $('get-app').href = android ? '/apps/android' : /windows/i.test(ua) ? '/apps/windows' : '/apps';
 
       // The same blue check as in the app (Material "Verified", #38BDF8).
@@ -131,7 +145,6 @@
 
       // Like t.me: try to open the app right away on phones. On computers the button opens the web chat.
       if (android) setTimeout(() => { location.href = target; }, 120);
-      void appUrl;
     })();
   </script>
 </body>

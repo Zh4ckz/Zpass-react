@@ -11,6 +11,12 @@
 import * as policy from './policy.js';
 
 const { fail, HttpError } = policy;
+// api.zpas.org/api/<file>: the public JSON files the apps read. An admin can edit them in "API & config";
+// a saved version (Firestore config/api_<name>) is served instead of the file in the website, until it is reset.
+export const CONFIG_FILES = ['zpass-version.json', 'app-releases.json', 'payment-config.json', 'payment-target.json'];
+const configPath = (file) => `config/api_${file.replace(/\.json$/, '')}`;
+const MAX_CONFIG = 200 * 1024;
+
 const ADMIN_ORIGINS = new Set(['https://bots.zpas.org', 'https://core.zpas.org', 'https://api.zpas.org']);
 const BOT_ID = /^[a-f0-9]{24}$/;
 const MSG_DOC = /^(?:[a-f0-9]{24}|[1-9]\d{0,15})$/;
@@ -375,8 +381,48 @@ export function createGateway({ db, files = null, verifyUser, verifyAppCheck, re
       case 'setCommands': return setCommands(caller, body);
       case 'setMenu': return setMenu(caller, body);
       case 'delete': return deleteBot(caller, body);
+      case 'configList': return Promise.all(CONFIG_FILES.map(async (file) => {
+        const doc = await db.get(configPath(file));
+        return { file, saved: !!doc, updatedAt: doc?.updatedAt || 0, updatedBy: doc?.updatedBy || '', size: doc ? String(doc.json || '').length : 0 };
+      }));
+      case 'configGet': {
+        const file = configFile(body.file), doc = await db.get(configPath(file));
+        return { file, saved: !!doc, text: doc ? String(doc.json || '') : null, updatedAt: doc?.updatedAt || 0, updatedBy: doc?.updatedBy || '' };
+      }
+      case 'configSave': {
+        const file = configFile(body.file), text = String(body.text ?? '');
+        if (text.length > MAX_CONFIG) fail(400, 'The file is too large (max 200 KB)');
+        let parsed;
+        try { parsed = JSON.parse(text); } catch (e) { fail(400, 'Not valid JSON: ' + e.message); }
+        if (!parsed || typeof parsed !== 'object') fail(400, 'The file must be a JSON object or list');
+        const updatedAt = Date.now();
+        await db.transaction(async (tx) => { tx.set(configPath(file), { json: text, updatedAt, updatedBy: user.email || user.uid }); });
+        return { file, saved: true, updatedAt };
+      }
+      case 'configReset': {
+        const file = configFile(body.file);
+        await db.transaction(async (tx) => { tx.delete(configPath(file)); });
+        return { file, saved: false };
+      }
       default: fail(404, 'Unknown admin method');
     }
+  }
+
+  function configFile(value) {
+    const file = String(value || '');
+    if (!CONFIG_FILES.includes(file)) fail(404, 'Unknown config file');
+    return file;
+  }
+
+  // GET /config/<file>: the admin-saved version, or 404 so the caller serves the website's own file.
+  async function savedConfig(path, request) {
+    const headers = { 'Access-Control-Allow-Origin': '*', 'Cache-Control': 'public, max-age=30', 'X-Content-Type-Options': 'nosniff' };
+    const file = path[1] || '';
+    if (request.method !== 'GET' || !CONFIG_FILES.includes(file)) return new Response(null, { status: 404, headers });
+    const doc = await db.get(configPath(file));
+    const text = doc ? String(doc.json || '') : '';
+    try { JSON.parse(text); } catch { return new Response(null, { status: 404, headers }); }
+    return new Response(text, { status: 200, headers: { ...headers, 'Content-Type': 'application/json; charset=utf-8', 'X-Config-Source': 'admin' } });
   }
 
   // ---------- app users ----------
@@ -896,6 +942,7 @@ export function createGateway({ db, files = null, verifyUser, verifyAppCheck, re
     try {
       if (!path.length) return reply(200, { ok: true, result: { service: 'Z Pass Bot API', docs: 'https://docs.zpas.org/' } });
       if (path[0] === 'public') return await publicProfile(path, request);
+      if (path[0] === 'config') return await savedConfig(path, request);
       if (!['GET', 'POST'].includes(request.method)) fail(405, 'GET or POST required');
       const body = await readBody(request, url), method = path.at(-1);
       let result;

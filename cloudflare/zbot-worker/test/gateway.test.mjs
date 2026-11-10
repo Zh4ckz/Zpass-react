@@ -536,3 +536,23 @@ test('public profile: only public fields, photo only when everybody may see it',
   assert.equal((await get('/public/profile/rezan')).status, 404, 'banned accounts have no public page');
   assert.equal((await handle(new Request('https://botapi.zpas.org/public/profile/rezan', { method: 'POST' }))).status, 405);
 });
+
+test('admin can edit the app config files; the saved version is served until it is reset', async () => {
+  const { call, handle } = fixture();
+  const get = (file) => handle(new Request('https://botapi.zpas.org/config/' + file));
+  assert.equal((await get('zpass-version.json')).status, 404, 'nothing saved: the website file is used');
+  assert.equal((await call('/admin/configSave', { file: 'zpass-version.json', text: '{"latest":1}' }, 'owner', '')).status, 403, 'only admins');
+  assert.equal((await call('/admin/configSave', { file: '../secrets.json', text: '{}' }, 'boss', '')).status, 404, 'only the known files');
+  assert.match((await call('/admin/configSave', { file: 'zpass-version.json', text: '{"latest": 1,' }, 'boss', '')).description, /Not valid JSON/);
+  assert.equal((await call('/admin/configSave', { file: 'zpass-version.json', text: '{\n  "latest": 47\n}' }, 'boss', '')).ok, true);
+  const served = await get('zpass-version.json');
+  assert.equal(served.status, 200);
+  assert.equal(served.headers.get('access-control-allow-origin'), '*');
+  assert.equal(await served.text(), '{\n  "latest": 47\n}', 'served exactly as typed');
+  const list = (await call('/admin/configList', {}, 'boss', '')).result;
+  assert.equal(list.find((f) => f.file === 'zpass-version.json').saved, true);
+  assert.equal((await call('/admin/configGet', { file: 'zpass-version.json' }, 'boss', '')).result.text, '{\n  "latest": 47\n}');
+  assert.equal((await call('/admin/configReset', { file: 'zpass-version.json' }, 'boss', '')).ok, true);
+  assert.equal((await get('zpass-version.json')).status, 404, 'reset: back to the website file');
+  assert.equal((await get('secrets.json')).status, 404);
+});

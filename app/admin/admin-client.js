@@ -1,6 +1,7 @@
 'use client'
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
 import './admin.css'
+import { DEFAULT_TEXT, NAME, parseReserved } from './reserved-usernames'
 
 const FIREBASE = {
   apiKey: 'AIzaSyBvnc-swQuAx_Fe67TUY7TGoM4VdG89cI4',
@@ -68,6 +69,9 @@ const P = {
   search: 'M11 19a8 8 0 100-16 8 8 0 000 16zM21 21l-4.3-4.3',
   menu: 'M3 6h18M3 12h18M3 18h18',
   shield: 'M12 2l8 4v6c0 5-3.5 9-8 10-4.5-1-8-5-8-10V6z',
+  at: 'M16 12a4 4 0 10-8 0 4 4 0 008 0zM16 12v1.5a2.5 2.5 0 005 0V12a9 9 0 10-3.5 7.1',
+  save: 'M5 3h11l5 5v13H3V3zM7 3v6h9V3M7 21v-7h10v7',
+  braces: 'M8 3H7a2 2 0 00-2 2v5a2 2 0 01-2 2 2 2 0 012 2v5a2 2 0 002 2h1M16 3h1a2 2 0 012 2v5a2 2 0 002 2 2 2 0 00-2 2v5a2 2 0 01-2 2h-1',
 }
 const Icon = ({ name, size = 18 }) => (
   <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true"><path d={P[name]} /></svg>
@@ -223,6 +227,7 @@ const NAV = [
   { id: 'paywall', label: 'Subscription pop-up', icon: 'crown', anim: 'star', group: 'Money', hint: 'X-style upgrade sheet in the app' },
   { id: 'users', label: 'Users', icon: 'users', anim: 'users', group: 'People', hint: 'Accounts and PassGram IDs' },
   { id: 'moderation', label: 'Moderation', icon: 'shield', anim: 'shield', group: 'People', hint: 'Ban people, close groups and channels' },
+  { id: 'usernames', label: 'Usernames', icon: 'at', anim: 'link', group: 'People', hint: 'Reserved names, countries and deep links' },
   { id: 'verification', label: 'Verification', icon: 'check', anim: 'award', group: 'People', hint: 'Blue check requests from Verify Bot' },
   { id: 'releases', label: 'Updates & releases', icon: 'rocket', anim: 'upload-cloud', group: 'App', hint: 'Versions, maintenance, announcements' },
   { id: 'errors', label: 'Error reports', icon: 'bug', anim: 'alert-triangle', group: 'App', hint: 'Crash and error codes from the apps' },
@@ -1138,6 +1143,213 @@ function Verification({ fb, ask, toast }) {
   )
 }
 
+/* ---------------- usernames: reserved list (remote JSON) + give a username / deep link ---------------- */
+function Usernames({ fb, ask, toast }) {
+  const { fs, db, auth } = fb
+  const [text, setText] = useState('')
+  const [saved, setSaved] = useState(null) // the text as stored; null while loading
+  const [meta, setMeta] = useState({})
+  const [saving, setSaving] = useState(false)
+  const [loadError, setLoadError] = useState('')
+  const area = useRef(null)
+  const gutter = useRef(null)
+  const load = useCallback(async () => {
+    setLoadError('')
+    try {
+      const snap = await fs.getDoc(fs.doc(db, 'config', 'usernames'))
+      const stored = snap.exists() ? String(snap.data().json || '') : ''
+      setSaved(stored); setText(stored || DEFAULT_TEXT)
+      setMeta(snap.exists() ? { at: snap.data().updatedAt, by: snap.data().updatedBy, live: true } : { live: false })
+    } catch (error) { setLoadError(errorText(error)) }
+  }, [fs, db])
+  useEffect(() => { load() }, [load])
+  const check = useMemo(() => parseReserved(text), [text])
+  const dirty = saved !== null && text !== saved
+  const lines = useMemo(() => text.split('\n').length, [text])
+
+  const save = async () => {
+    if (!check.ok || saving) return
+    if (!(await ask({ title: 'Save reserved usernames?', message: `${check.total} names in ${check.lists.length} lists. From now on nobody can claim them; only you can give them out.`, confirm: 'Save' }))) return
+    setSaving(true)
+    try {
+      await fs.setDoc(fs.doc(db, 'config', 'usernames'), { json: text, names: check.names, count: check.total, updatedAt: fs.serverTimestamp(), updatedBy: auth.currentUser?.email || '' })
+      toast('Saved. The list is live in the apps.')
+      await load()
+    } catch (error) { toast(errorText(error), 'bad') } finally { setSaving(false) }
+  }
+  const format = () => { if (check.ok) setText(JSON.stringify(JSON.parse(text), null, 2)) }
+  const keys = (e) => {
+    if ((e.ctrlKey || e.metaKey) && e.key.toLowerCase() === 's') { e.preventDefault(); save() }
+    if (e.key === 'Tab') {
+      e.preventDefault()
+      const el = e.currentTarget, a = el.selectionStart, b = el.selectionEnd
+      setText(text.slice(0, a) + '  ' + text.slice(b))
+      requestAnimationFrame(() => { el.selectionStart = el.selectionEnd = a + 2 })
+    }
+  }
+  const jumpTo = (line) => {
+    const el = area.current
+    if (!el || !line) return
+    const all = text.split('\n')
+    const at = all.slice(0, line - 1).join('\n').length + (line > 1 ? 1 : 0)
+    el.focus(); el.selectionStart = at; el.selectionEnd = at + (all[line - 1] || '').length
+    el.scrollTop = Math.max(0, (line - 5) * 21)
+  }
+
+  return (
+    <>
+      <Card title="Reserved usernames"
+        hint="Nobody can claim these names or their links (zpas.org/name). Countries and government names go only to the real government, after you talk with them. Each top-level list is a group; text values are just notes."
+        actions={<>
+          <button className="zpa-btn ghost sm" onClick={format} disabled={!check.ok}><Icon name="braces" size={15} />Format</button>
+          <button className="zpa-btn ghost sm" onClick={() => setText(saved || DEFAULT_TEXT)} disabled={!dirty}><Icon name="refresh" size={15} />Revert</button>
+          <button className="zpa-btn primary sm" onClick={save} disabled={!check.ok || saving || (!dirty && meta.live)}><Icon name="save" size={15} />{saving ? 'Saving…' : 'Save'}</button>
+        </>}>
+        {loadError ? <div className="zpa-names-error">{loadError} <button className="zpa-btn ghost sm" onClick={load}>Retry</button></div> : saved === null ? <div className="zpa-code-loading">Loading…</div> : (
+          <>
+            <div className="zpa-names-stats">
+              <span className={`zpa-pill ${meta.live ? 'good' : 'warn'}`}>{meta.live ? 'Live' : 'Not saved yet — this is the starter list'}</span>
+              {check.ok && check.lists.map((l) => <span key={l.list} className="zpa-pill muted">{l.list} · {l.count}</span>)}
+              {meta.at && <span className="zpa-names-when">Saved {fmtDate(meta.at)}{meta.by ? ` by ${meta.by}` : ''}</span>}
+            </div>
+            <div className={`zpa-code ${check.ok ? '' : 'invalid'}`}>
+              <pre ref={gutter} className="zpa-code-gutter" aria-hidden="true">{Array.from({ length: lines }, (_, i) => i + 1).join('\n')}</pre>
+              <textarea ref={area} value={text} spellCheck={false} autoCapitalize="off" autoCorrect="off" wrap="off"
+                onChange={(e) => setText(e.target.value)} onKeyDown={keys}
+                onScroll={(e) => { if (gutter.current) gutter.current.scrollTop = e.currentTarget.scrollTop }} aria-label="Reserved usernames JSON" />
+            </div>
+            <div className={`zpa-code-status ${check.ok ? 'ok' : 'bad'}`}>
+              {check.ok
+                ? <><Icon name="check" size={14} />Valid · {check.total} names in {check.lists.length} lists{dirty ? ' · unsaved changes (Ctrl+S to save)' : ''}</>
+                : <><Icon name="x" size={14} />{check.error}{check.line ? <button type="button" className="zpa-linkbtn" onClick={() => jumpTo(check.line)}>Go to line {check.line}</button> : null}</>}
+            </div>
+          </>
+        )}
+      </Card>
+      <GiveUsername fb={fb} ask={ask} toast={toast} reserved={check.ok ? check.names : {}} />
+    </>
+  )
+}
+
+function GiveUsername({ fb, ask, toast, reserved }) {
+  const { fs, db } = fb
+  const [name, setName] = useState('')
+  const [who, setWho] = useState('')
+  const [busy, setBusy] = useState(false)
+  const [info, setInfo] = useState(null)
+  const clean = name.trim().toLowerCase().replace(/^(https?:\/\/)?(www\.)?zpas\.org\//, '').replace(/^@/, '')
+
+  // @username, PassGram ID or account id → account id
+  const findUid = async (value) => {
+    const v = value.trim().replace(/^(https?:\/\/)?(www\.)?zpas\.org\//, '')
+    if (!v) return null
+    if (/^\d{8,14}$/.test(v)) {
+      const snap = await fs.getDocs(fs.query(fs.collection(db, 'users'), fs.where('zPassId', '==', v), fs.limit(1)))
+      return snap.docs[0]?.id || null
+    }
+    if (v.startsWith('@') || /^[a-z0-9_]{1,32}$/i.test(v)) {
+      const handle = await fs.getDoc(fs.doc(db, 'chat_usernames', v.replace(/^@/, '').toLowerCase()))
+      if (handle.exists() && handle.data().uid && !handle.data().gid) return handle.data().uid
+      if (v.startsWith('@')) return null
+    }
+    return (await fs.getDoc(fs.doc(db, 'chat_profiles', v))).exists() ? v : null
+  }
+  const lookup = async () => {
+    if (!NAME.test(clean)) { setInfo({ bad: 'Usernames use a–z, 0–9 and _ (max 32).' }); return }
+    setBusy(true)
+    try {
+      const handle = await fs.getDoc(fs.doc(db, 'chat_usernames', clean))
+      let owner = null
+      if (handle.exists()) {
+        const d = handle.data()
+        if (d.gid) owner = { label: 'a group or channel', gid: d.gid }
+        else {
+          const p = await fs.getDoc(fs.doc(db, 'chat_profiles', d.uid))
+          owner = { uid: d.uid, label: p.exists() ? (p.data().displayName || p.data().firstName || d.uid) : d.uid }
+        }
+      }
+      setInfo({ name: clean, owner, list: reserved[clean] || reserved[clean.replace(/_/g, '')] || '' })
+    } catch (error) { toast(errorText(error), 'bad') } finally { setBusy(false) }
+  }
+  const give = async () => {
+    if (!NAME.test(clean)) { toast('Usernames use a–z, 0–9 and _ (max 32).', 'bad'); return }
+    setBusy(true)
+    try {
+      const uid = await findUid(who)
+      if (!uid) { toast('Person not found. Use their @username, PassGram ID or account id.', 'bad'); return }
+      const profile = await fs.getDoc(fs.doc(db, 'chat_profiles', uid))
+      if (!profile.exists()) { toast('This person has no PassGram chat profile yet (they must open Chats once).', 'bad'); return }
+      const person = profile.data().displayName || profile.data().firstName || uid
+      const old = String(profile.data().username || '')
+      if (old === clean) { toast(`${person} already has @${clean}.`); return }
+      const handle = await fs.getDoc(fs.doc(db, 'chat_usernames', clean))
+      const prev = handle.exists() ? handle.data() : null
+      if (prev?.gid) { toast(`@${clean} belongs to a group or channel. Release it first.`, 'bad'); return }
+      const takeOver = !!(prev && prev.uid !== uid)
+      const steps = [`${person} gets @${clean} and the link zpas.org/${clean}.`]
+      if (old) steps.push(`Their old username @${old} becomes free.`)
+      if (takeOver) steps.push('The current owner loses it.')
+      if (!(await ask({ title: `Give @${clean}?`, message: steps.join(' '), confirm: 'Give username', danger: takeOver }))) return
+      const batch = fs.writeBatch(db)
+      if (takeOver) {
+        batch.delete(fs.doc(db, 'chat_usernames', clean))
+        const prevProfile = await fs.getDoc(fs.doc(db, 'chat_profiles', prev.uid))
+        if (prevProfile.exists() && prevProfile.data().username === clean) batch.update(fs.doc(db, 'chat_profiles', prev.uid), { username: '' })
+      }
+      if (old) batch.delete(fs.doc(db, 'chat_usernames', old))
+      batch.set(fs.doc(db, 'chat_usernames', clean), { uid })
+      batch.update(fs.doc(db, 'chat_profiles', uid), { username: clean })
+      await batch.commit()
+      toast(`@${clean} now belongs to ${person}.`)
+      setWho('')
+      await lookup()
+    } catch (error) { toast(errorText(error), 'bad') } finally { setBusy(false) }
+  }
+  const release = async () => {
+    if (!info?.owner) return
+    if (!(await ask({ title: `Release @${info.name}?`, message: `${info.owner.label} loses @${info.name}. It stays reserved if it is on the list above.`, confirm: 'Release', danger: true }))) return
+    setBusy(true)
+    try {
+      const batch = fs.writeBatch(db)
+      batch.delete(fs.doc(db, 'chat_usernames', info.name))
+      if (info.owner.uid) {
+        const p = await fs.getDoc(fs.doc(db, 'chat_profiles', info.owner.uid))
+        if (p.exists() && p.data().username === info.name) batch.update(fs.doc(db, 'chat_profiles', info.owner.uid), { username: '' })
+      }
+      await batch.commit()
+      toast(`@${info.name} was released.`)
+      await lookup()
+    } catch (error) { toast(errorText(error), 'bad') } finally { setBusy(false) }
+  }
+  return (
+    <Card title="Give a username" hint="Give any name to a person, also reserved ones like a country or a 1–4 letter company name. Their link zpas.org/name works right away and opens their chat in the apps.">
+      <div className="zpa-give">
+        <label className="zpa-field grow"><span>Username / deep link</span>
+          <input value={name} onChange={(e) => { setName(e.target.value); setInfo(null) }} onKeyDown={(e) => { if (e.key === 'Enter') lookup() }} placeholder="turkey" autoCapitalize="off" spellCheck={false} /></label>
+        <label className="zpa-field grow"><span>Give to</span>
+          <input value={who} onChange={(e) => setWho(e.target.value)} onKeyDown={(e) => { if (e.key === 'Enter') give() }} placeholder="@username, PassGram ID or account id" autoCapitalize="off" spellCheck={false} /></label>
+        <div className="zpa-give-actions">
+          <button className="zpa-btn ghost" onClick={lookup} disabled={busy || !clean}><Icon name="search" size={15} />Check</button>
+          <button className="zpa-btn primary" onClick={give} disabled={busy || !clean || !who.trim()}><Icon name="at" size={15} />Give username</button>
+        </div>
+      </div>
+      {info && (
+        <div className="zpa-give-info">
+          {info.bad ? <span className="zpa-pill bad">{info.bad}</span> : (
+            <>
+              <a href={`https://zpas.org/${info.name}`} target="_blank" rel="noopener noreferrer" className="mono">zpas.org/{info.name} ↗</a>
+              {info.list ? <span className="zpa-pill warn">Reserved · {info.list}</span> : <span className="zpa-pill muted">Not reserved</span>}
+              {info.owner
+                ? <><span className="zpa-pill good">Owner: {info.owner.label}</span><button className="zpa-btn ghost sm" onClick={release} disabled={busy}>Release</button></>
+                : <span className="zpa-pill muted">Free</span>}
+            </>
+          )}
+        </div>
+      )}
+    </Card>
+  )
+}
+
 function Errors({ fb }) {
   const { fs, db } = fb
   const list = useLoader(async () => {
@@ -1299,6 +1511,7 @@ export default function AdminClient() {
               {view === 'subscriptions' && <Subscriptions {...props} />}
               {view === 'users' && <Users {...props} />}
               {view === 'moderation' && <Moderation {...props} />}
+              {view === 'usernames' && <Usernames {...props} />}
               {view === 'verification' && <Verification {...props} />}
               {view === 'payments' && <Payments {...props} />}
               {view === 'releases' && <><Releases {...props} /><PlatformStatus {...props} /></>}

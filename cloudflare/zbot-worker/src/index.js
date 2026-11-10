@@ -1,6 +1,6 @@
 import { Firestore } from './firestore.js';
 import { verifyIdToken, verifyAppCheck } from './auth.js';
-import { createGateway } from './gateway.js';
+import { createGateway, CONFIG_FILES } from './gateway.js';
 
 let cached;
 export default {
@@ -8,8 +8,8 @@ export default {
     // api.zpas.org: Telegram-style bot addresses (/bot<token>/<method>, /file/bot<token>/…) go to the bot API;
     // every other path is the existing website (API & config admin page), passed through to Firebase Hosting unchanged.
     const url = new URL(request.url);
-    if (url.hostname === 'api.zpas.org' && !/^\/(file\/)?bot[^/]+\//.test(url.pathname)) return passThrough(request, url);
-    if (!cached || cached.env !== env.FIREBASE_SERVICE_ACCOUNT_JSON) {
+    const gateway = () => {
+      if (!cached || cached.env !== env.FIREBASE_SERVICE_ACCOUNT_JSON) {
       cached = {
         env: env.FIREBASE_SERVICE_ACCOUNT_JSON,
         handle: createGateway({
@@ -20,8 +20,21 @@ export default {
           requireAppCheck: env.REQUIRE_APP_CHECK === 'true',
         }),
       };
+      }
+      return cached.handle;
+    };
+    if (url.hostname === 'api.zpas.org' && !/^\/(file\/)?bot[^/]+\//.test(url.pathname)) {
+      // App config files: the version saved in the admin panel wins; otherwise the website's file.
+      const file = /^\/api\/([a-z-]+\.json)$/.exec(url.pathname)?.[1];
+      if (file && CONFIG_FILES.includes(file) && request.method === 'GET') {
+        try {
+          const saved = await gateway()(new Request(new URL('/config/' + file, url), { method: 'GET' }), ctx);
+          if (saved.status === 200) return saved;
+        } catch { /* fall back to the website file */ }
+      }
+      return passThrough(request, url);
     }
-    return cached.handle(request, ctx);
+    return gateway()(request, ctx);
   },
 };
 

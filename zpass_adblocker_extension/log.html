@@ -1,0 +1,117 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>ZPass Filtering Log</title>
+  <link rel="stylesheet" href="log.css">
+</head>
+<body>
+  <div class="log-app">
+    <!-- Top Bar -->
+    <div class="log-topbar">
+      <div class="title-section">
+        <svg class="shield-ico" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#10B981" stroke-width="2.5">
+          <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/>
+          <path d="M9 12l2 2 4-4"/>
+        </svg>
+        <span class="log-title">Filtering log</span>
+      </div>
+
+      <!-- Controls -->
+      <div class="controls-section">
+        <select id="domainSelect" class="log-select">
+          <option value="ALL">All Tabs & Domains</option>
+          <option value="CURRENT" selected>Current Active Tab</option>
+        </select>
+
+        <button id="btnToggleRecording" class="tool-btn active" title="Canlı Kayıt">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <circle cx="12" cy="12" r="10"/>
+            <circle cx="12" cy="12" r="3" fill="currentColor"/>
+          </svg>
+        </button>
+
+        <button id="btnClearLog" class="tool-btn" title="Temizle">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <polyline points="3 6 5 6 21 6"/>
+            <path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"/>
+          </svg>
+        </button>
+
+        <button id="btnRefresh" class="tool-btn" title="Yenile">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <polyline points="23 4 23 10 17 10"/>
+            <polyline points="1 20 1 14 7 14"/>
+            <path d="M3.51 9a9 9 0 0 1 14.85-3.36L23 10M1 14l4.64 4.36A9 9 0 0 0 20.49 15"/>
+          </svg>
+          <span>Refresh</span>
+        </button>
+
+        <div class="search-box">
+          <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="#9E9E9E" stroke-width="2">
+            <circle cx="11" cy="11" r="8"/>
+            <line x1="21" y1="21" x2="16.65" y2="16.65"/>
+          </svg>
+          <input type="text" id="searchInput" placeholder="Search">
+        </div>
+      </div>
+    </div>
+
+    <!-- Filter Pills Row -->
+    <div class="filter-pills-bar">
+      <!-- 1P / 3P Group -->
+      <div class="pill-group" id="partyFilters">
+        <button class="pill active" data-party="all">All</button>
+        <button class="pill" data-party="1p">1P</button>
+        <button class="pill" data-party="3p">3P</button>
+      </div>
+
+      <!-- Action Status Group -->
+      <div class="pill-group" id="statusFilters">
+        <button class="pill active" data-status="all">All</button>
+        <button class="pill" data-status="regular">Regular</button>
+        <button class="pill" data-status="allowed">Allowed</button>
+        <button class="pill" data-status="blocked">Blocked</button>
+        <button class="pill" data-status="modified">Modified</button>
+        <button class="pill" data-status="user">User rules</button>
+      </div>
+
+      <!-- Content Type Group -->
+      <div class="pill-group" id="typeFilters">
+        <button class="pill active" data-type="all">All</button>
+        <button class="pill" data-type="html">HTML</button>
+        <button class="pill" data-type="css">CSS</button>
+        <button class="pill" data-type="js">JS</button>
+        <button class="pill" data-type="xhr">XHR</button>
+        <button class="pill" data-type="img">Img</button>
+        <button class="pill" data-type="media">Media</button>
+        <button class="pill" data-type="other">Other</button>
+      </div>
+    </div>
+
+    <!-- Log Table Header & Body -->
+    <div class="table-container">
+      <table class="log-table">
+        <thead>
+          <tr>
+            <th style="width: 200px;">Status</th>
+            <th>URL</th>
+            <th style="width: 80px;">Type</th>
+            <th style="width: 220px;">Filtering rule</th>
+            <th style="width: 140px;">Filter</th>
+          </tr>
+        </thead>
+        <tbody id="logTbody">
+          <!-- Populated by log.js -->
+        </tbody>
+      </table>
+      <div id="emptyLog" class="empty-state" style="display: none;">
+        <span>Filtreleme kriterlerine uygun istek bulunamadı.</span>
+      </div>
+    </div>
+  </div>
+
+  <script src="log.js"></script>
+</body>
+</html>

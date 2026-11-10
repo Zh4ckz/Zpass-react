@@ -6,6 +6,13 @@
                                       "downloadUrl":  "",
                                       "sha256":  "202e9bc0fc8855d032c80a2108e261c6a2bbc8dcd4061fccc09ee9646070cfd8",
                                       "sizeBytes":  111702262
+                                  },
+                      "windows":  {
+                                      "version":  "4.11.0",
+                                      "releasedAt":  "2026-11-10T16:17:37Z",
+                                      "downloadUrl":  "",
+                                      "sha256":  "ce3a49464ac4a16751dd038364042e2a6d8390d29ee64cf88b5ecf8ab701d3e6",
+                                      "sizeBytes":  144475367
                                   }
                   }
 }

@@ -1,0 +1,122 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>ZPass Settings</title>
+  <link rel="stylesheet" href="options.css">
+</head>
+<body>
+  <div class="settings-app">
+    <!-- Left Sidebar -->
+    <div class="sidebar">
+      <div class="sidebar-brand">
+        <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#10B981" stroke-width="2.5">
+          <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/>
+          <path d="M9 12l2 2 4-4"/>
+        </svg>
+        <span class="brand-text">zpass</span>
+      </div>
+
+      <nav class="sidebar-nav">
+        <a href="#general" class="nav-item active" data-target="section-general">General</a>
+        <a href="#filters" class="nav-item" data-target="section-filters">Filters</a>
+        <a href="#tracking" class="nav-item" data-target="section-tracking">Tracking protection</a>
+        <a href="#allowlist" class="nav-item" data-target="section-allowlist">Allowlist</a>
+        <a href="#user-rules" class="nav-item" data-target="section-rules">User rules</a>
+        <a href="#rule-limits" class="nav-item" data-target="section-limits">Rule limits</a>
+        <a href="#about" class="nav-item" data-target="section-about">About</a>
+      </nav>
+    </div>
+
+    <!-- Main Content Area -->
+    <div class="main-content">
+      <!-- Section: General -->
+      <section id="section-general" class="settings-section active">
+        <h1 class="section-title">General</h1>
+
+        <div class="setting-group">
+          <div class="setting-row">
+            <div class="setting-info">
+              <div class="setting-name">Theme</div>
+            </div>
+            <select id="themeSelect" class="form-select">
+              <option value="system">System default</option>
+              <option value="dark" selected>Dark</option>
+              <option value="light">Light</option>
+            </select>
+          </div>
+
+          <div class="setting-row">
+            <div class="setting-info">
+              <div class="setting-name">Block search ads and website self-promotion</div>
+              <div class="setting-desc">Blocks ads in search results and self-promotion banners of websites.</div>
+            </div>
+            <label class="switch">
+              <input type="checkbox" id="toggleSearchAds" checked>
+              <span class="slider"></span>
+            </label>
+          </div>
+
+          <div class="setting-row">
+            <div class="setting-info">
+              <div class="setting-name">Send anonymized extension usage data</div>
+              <div class="setting-desc">Sends zero data. ZPass operates completely local and offline for maximum privacy.</div>
+            </div>
+            <label class="switch">
+              <input type="checkbox" id="toggleTelemetry" disabled>
+              <span class="slider"></span>
+            </label>
+          </div>
+        </div>
+
+        <div class="link-actions">
+          <a href="#" id="btnExport" class="action-link">Export settings (JSON)</a>
+          <a href="#" id="btnImport" class="action-link">Import settings</a>
+          <a href="#" id="btnReportBug" class="action-link">Report a bug / issue</a>
+        </div>
+      </section>
+
+      <!-- Section: Allowlist -->
+      <section id="section-allowlist" class="settings-section">
+        <h1 class="section-title">Allowlist (İzin Verilen Siteler)</h1>
+        <p class="section-desc">Aşağıdaki sitelerde ZPass Shield reklam ve izleme koruması devre dışı bırakılır.</p>
+
+        <div class="input-add-row">
+          <input type="text" id="newWhitelistInput" placeholder="example.com">
+          <button id="btnAddWhitelist" class="btn-primary">Add Site</button>
+        </div>
+
+        <div id="allowlistContainer" class="items-list">
+          <!-- Populated by JS -->
+        </div>
+      </section>
+
+      <!-- Section: User Rules -->
+      <section id="section-rules" class="settings-section">
+        <h1 class="section-title">User rules (Kullanıcı Kuralları)</h1>
+        <p class="section-desc">Manuel olarak veya "Block ads manually" (Öğe Engelleyici) aracıyla seçtiğiniz kurallar burada saklanır.</p>
+
+        <textarea id="userRulesTextarea" class="rules-editor" placeholder="Örnek:&#10;youtube.com##.ytd-rich-item-renderer&#10;example.com##.ad-banner"></textarea>
+        <div style="margin-top: 12px;">
+          <button id="btnSaveRules" class="btn-primary">Save Rules</button>
+        </div>
+      </section>
+
+      <!-- Section: About -->
+      <section id="section-about" class="settings-section">
+        <h1 class="section-title">About ZPass Shield</h1>
+        <p class="section-desc">ZPass Ekosisteminin resmi reklam ve izleme kalkanı.</p>
+        <div class="about-card">
+          <p><strong>Sürüm:</strong> 1.1.0 (Manifest V3)</p>
+          <p><strong>Motor:</strong> Declarative Net Request + Cosmetic Shield</p>
+          <p><strong>Geliştirici:</strong> ZPass Security</p>
+          <p><strong>Raporlama Portali:</strong> <a href="https://reports.zpass.org/new_issue.html" target="_blank" style="color: #38BDF8;">reports.zpass.org</a></p>
+        </div>
+      </section>
+    </div>
+  </div>
+
+  <script src="options.js"></script>
+</body>
+</html>
