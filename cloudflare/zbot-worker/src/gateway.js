@@ -28,7 +28,7 @@ const UPDATE_TTL = 86400000;                 // undelivered updates are kept for
 const FILE_ID = /^[a-f0-9]{48}$/;
 const CALLBACK_ID = /^[a-f0-9]{24}$/;
 const PARSE_MODES = new Set(['HTML', 'Markdown', 'MarkdownV2']);
-const UPDATE_TYPES = new Set(['message', 'edited_message', 'callback_query']);
+const UPDATE_TYPES = new Set(['message', 'edited_message', 'callback_query', 'poll', 'poll_answer', 'message_reaction']);
 const CHAT_ACTIONS = new Set(['typing', 'upload_photo', 'record_video', 'upload_video', 'record_voice', 'upload_voice',
   'upload_document', 'choose_sticker', 'find_location', 'record_video_note', 'upload_video_note']);
 const MEDIA = { sendPhoto: 'photo', sendVideo: 'video', sendAudio: 'audio', sendVoice: 'voice', sendAnimation: 'animation',
@@ -39,7 +39,16 @@ const BOT_METHODS = ['getMe', 'logOut', 'close', 'getUpdates', 'setWebhook', 'de
   'sendMessage', ...Object.keys(MEDIA), 'sendChatAction', 'editMessageText', 'editMessageCaption', 'editMessageReplyMarkup',
   'deleteMessage', 'deleteMessages', 'answerCallbackQuery', 'getChat', 'getMyCommands', 'setMyCommands', 'deleteMyCommands',
   'getChatMenuButton', 'setChatMenuButton', 'getMyName', 'setMyName', 'getMyDescription', 'setMyDescription',
-  'getMyShortDescription', 'setMyShortDescription'];
+  'getMyShortDescription', 'setMyShortDescription',
+  // rich messages
+  'forwardMessage', 'forwardMessages', 'copyMessage', 'copyMessages', 'sendMediaGroup', 'sendLocation', 'sendVenue', 'sendContact',
+  'sendPoll', 'stopPoll', 'sendDice', 'setMessageReaction', 'editMessageMedia', 'editMessageLiveLocation', 'stopMessageLiveLocation',
+  // chat
+  'pinChatMessage', 'unpinChatMessage', 'unpinAllChatMessages', 'getChatMember', 'getChatMemberCount', 'getChatAdministrators', 'leaveChat'];
+// Dice: emoji → highest value (Telegram-compatible values)
+const DICE = { '🎲': 6, '🎯': 6, '🎳': 6, '🏀': 5, '⚽': 5, '🎰': 64 };
+const GROUP_KINDS = new Set(['photo', 'video', 'document', 'audio']);
+const LIVE_FOREVER = 0x7fffffff;
 // Method names are case-insensitive, as bot libraries sometimes send them lower-cased.
 const CANONICAL = new Map(BOT_METHODS.map((m) => [m.toLowerCase(), m]));
 
@@ -150,13 +159,44 @@ function mediaFields(media) {
   }
 }
 
+// A poll as bot libraries expect it (vote counts only; who voted for what is never exposed in anonymous polls).
+export function pollOf(p) {
+  const closed = !!p.closed || (p.closeAt && p.closeAt <= Date.now());
+  return {
+    id: p.id, question: p.question, options: (p.options || []).map((o) => ({ text: o.text, voter_count: o.count || 0 })),
+    total_voter_count: p.total || 0, is_closed: closed, is_anonymous: p.anonymous !== false, type: p.type || 'regular',
+    allows_multiple_answers: !!p.multiple,
+    ...(p.type === 'quiz' ? { correct_option_id: p.correct } : {}),
+    ...(p.explanation ? { explanation: p.explanation } : {}),
+    ...(p.openPeriod ? { open_period: p.openPeriod } : {}), ...(p.closeAt ? { close_date: seconds(p.closeAt) } : {}),
+  };
+}
+const locationOf = (l) => ({
+  latitude: l.lat, longitude: l.lng, ...(l.accuracy ? { horizontal_accuracy: l.accuracy } : {}),
+  ...(l.livePeriod ? { live_period: l.livePeriod } : {}), ...(l.heading ? { heading: l.heading } : {}),
+  ...(l.alertRadius ? { proximity_alert_radius: l.alertRadius } : {}),
+});
+
 // A stored message (as the app reads it) turned into the message object bot libraries expect.
 function tgMessage(m, bot, t) {
   const fromBot = String(m.sender || '').startsWith('bot_');
   const out = { message_id: m.message_id, from: fromBot ? botUser(bot) : personOf(t), chat: chatOf(t), date: seconds(m.createdAt) };
   if (m.editedAt) out.edit_date = seconds(m.editedAt);
+  if (m.forward) out.forward_origin = m.forward.type === 'user'
+    ? { type: 'user', date: m.forward.date, sender_user: m.forward.user }
+    : { type: 'hidden_user', date: m.forward.date, sender_user_name: m.forward.name || 'User' };
+  if (m.mediaGroupId) out.media_group_id = m.mediaGroupId;
+  if (m.replyTo) out.reply_to_message = { message_id: m.replyTo, chat: chatOf(t), date: seconds(m.createdAt) };
   const media = m.media || (m.document ? { type: 'document', ...m.document } : null);
-  if (media) { Object.assign(out, mediaFields(media)); if (m.text) out.caption = m.text; }
+  if (m.venue) Object.assign(out, { venue: { location: locationOf(m.venue), title: m.venue.title, address: m.venue.address,
+    ...(m.venue.foursquareId ? { foursquare_id: m.venue.foursquareId } : {}), ...(m.venue.googlePlaceId ? { google_place_id: m.venue.googlePlaceId } : {}) },
+    location: locationOf(m.venue) });
+  else if (m.location) out.location = locationOf(m.location);
+  else if (m.contact) out.contact = { phone_number: m.contact.phone, first_name: m.contact.first,
+    ...(m.contact.last ? { last_name: m.contact.last } : {}), ...(m.contact.vcard ? { vcard: m.contact.vcard } : {}) };
+  else if (m.poll) out.poll = pollOf(m.poll);
+  else if (m.dice) out.dice = { emoji: m.dice.emoji, value: m.dice.value };
+  else if (media) { Object.assign(out, mediaFields(media)); if (m.text) out.caption = m.text; }
   else {
     out.text = m.text || '';
     const cmd = /^\/[A-Za-z0-9_]{1,32}(?:@[A-Za-z0-9_]{1,32})?/.exec(out.text);
@@ -591,6 +631,43 @@ export function createGateway({ db, files = null, verifyUser, verifyAppCheck, re
         });
         return { verified: false, username: target.username };
       }
+      case 'vote': {
+        // The person answers a poll in a bot chat: counts change on the message, the bot gets poll / poll_answer updates.
+        const pollId = String(body.poll_id || '');
+        if (!CALLBACK_ID.test(pollId)) fail(400, 'Invalid poll');
+        const ref = await db.get(`zp_bot_polls/${pollId}`);
+        if (!ref || ref.thread !== `zp_bot_threads/${ref.botId}_${owner}`) fail(404, 'Poll not found');
+        const choice = Array.isArray(body.option_ids) ? body.option_ids.map(Number) : [];
+        let hook = false;
+        const id = ref.botId;
+        const result = await db.transaction(async (tx) => {
+          const bot = await tx.get(`zp_bots/${id}`), t = await tx.get(ref.thread);
+          const path = `${ref.thread}/messages/${ref.messageId}`, msg = ref.messageId ? await tx.get(path) : null;
+          if (!bot || !t || !msg?.poll || msg.poll.id !== pollId) fail(404, 'Poll not found');
+          const poll = { ...msg.poll, voters: { ...(msg.poll.voters || {}) } };
+          if (poll.closed || (poll.closeAt && poll.closeAt <= Date.now())) fail(409, 'This poll is closed');
+          const before = poll.voters[owner] || [];
+          if (poll.type === 'quiz' && before.length) fail(409, 'You already answered this quiz');
+          const unique = [...new Set(choice)];
+          if (unique.some((i) => !Number.isInteger(i) || i < 0 || i >= poll.options.length)) fail(400, 'Invalid option');
+          if (!poll.multiple && unique.length > 1) fail(400, 'Choose one option');
+          if (poll.type === 'quiz' && unique.length !== 1) fail(400, 'Choose one option');
+          poll.options = poll.options.map((o, i) => ({ ...o, count: Math.max(0, (o.count || 0) - (before.includes(i) ? 1 : 0) + (unique.includes(i) ? 1 : 0)) }));
+          poll.total = Math.max(0, (poll.total || 0) - (before.length ? 1 : 0) + (unique.length ? 1 : 0));
+          if (unique.length) poll.voters[owner] = unique; else delete poll.voters[owner];
+          tx.update(path, { poll });
+          const chat = { ...t, chatNum: t.chatNum || await policy.userNumber(owner) };
+          let sequence = bot.sequence || 0;
+          const now = Date.now();
+          const push = (update) => { sequence++; tx.create(`zp_bots/${id}/updates/${String(sequence).padStart(16, '0')}`, { update_id: sequence, json: JSON.stringify({ update_id: sequence, ...update }), expiresAt: new Date(now + UPDATE_TTL) }); };
+          if (wants(bot, 'poll')) push({ poll: pollOf(poll) });
+          if (!poll.anonymous && wants(bot, 'poll_answer')) push({ poll_answer: { poll_id: pollId, user: personOf(chat), option_ids: unique } });
+          if (sequence !== (bot.sequence || 0)) { tx.update(`zp_bots/${id}`, { sequence }); hook = !!bot.webhook?.url; }
+          return { poll: pollOf(poll), chosen: unique };
+        });
+        if (hook) later(flush(id));
+        return result;
+      }
       case 'callback': {
         const cb = String(body.callback_query_id || '');
         if (!CALLBACK_ID.test(cb)) fail(400, 'Invalid callback_query_id');
@@ -654,15 +731,10 @@ export function createGateway({ db, files = null, verifyUser, verifyAppCheck, re
     return Number.isSafeInteger(mid) && mid > 0 ? { replyTo: mid } : {};
   };
 
-  async function sendMedia(ctx, kind, body) {
+  // One file for a message: an upload (straight in the field or "attach://<part>") or an https link.
+  async function storeInput(ctx, kind, raw, body, resolved) {
     const { id } = ctx;
-    // Libraries upload either straight into the field or as "attach://<part>" pointing at another form part.
-    const raw = body[kind];
     const input = typeof raw === 'string' && raw.startsWith('attach://') ? body[raw.slice(9)] : raw;
-    const caption = String(body.caption || '').trim();
-    if (caption.length > 1024) fail(400, 'Bad Request: caption is too long');
-    const markup = markupOf(body.reply_markup), extra = { ...parseMode(body.parse_mode), ...replyTo(body) };
-    const resolved = await target(id, body.chat_id);
     let media, document = null;
     if (input && typeof input.arrayBuffer === 'function') {
       if (!files) fail(503, 'File relay unavailable');
@@ -682,7 +754,18 @@ export function createGateway({ db, files = null, verifyUser, verifyAppCheck, re
     } else if (typeof input === 'string' && input) {
       fail(400, 'Bad Request: file_id reuse is not supported; upload the file again or pass an https link');
     } else fail(400, `Bad Request: there is no ${kind} in the request`);
-    const preview = kind === 'document' ? `📄 ${media.file_name || 'File'}` : PREVIEW[kind];
+    return { media, document };
+  }
+  const previewOf = (kind, media) => (kind === 'document' ? `📄 ${media.file_name || 'File'}` : PREVIEW[kind]);
+
+  async function sendMedia(ctx, kind, body) {
+    const { id } = ctx;
+    const caption = String(body.caption || '').trim();
+    if (caption.length > 1024) fail(400, 'Bad Request: caption is too long');
+    const markup = markupOf(body.reply_markup), extra = { ...parseMode(body.parse_mode), ...replyTo(body) };
+    const resolved = await target(id, body.chat_id);
+    const { media, document } = await storeInput(ctx, kind, body[kind], body, resolved);
+    const preview = previewOf(kind, media);
     try {
       return await post(ctx, body.chat_id, { text: caption, media, ...(document ? { document } : {}), ...extra }, caption ? `${preview} · ${caption}` : preview, markup, resolved);
     } catch (e) { if (document) await files.delete(document.file_id); throw e; }
@@ -843,9 +926,247 @@ export function createGateway({ db, files = null, verifyUser, verifyAppCheck, re
         const { thread } = await target(id, body.chat_id);
         const t = await db.get(thread);
         if (!t) fail(400, 'Bad Request: chat not found');
-        const chat = chatOf({ ...t, chatNum: t.chatNum || await policy.userNumber(t.owner) });
-        return { ...chat, accent_color_id: 0, max_reaction_count: 0 };
+        const full = { ...t, chatNum: t.chatNum || await policy.userNumber(t.owner) };
+        const out = { ...chatOf(full), accent_color_id: 0, max_reaction_count: 1 };
+        if (t.pinned) { const found = await findMessage(thread, String(t.pinned)); if (found) out.pinned_message = tgMessage(found.msg, bot, full); }
+        return out;
       }
+      default: return runRich(ctx, method, body);
+    }
+  }
+
+  // ---------- rich messages, polls, pins and chat members ----------
+  const number = (v, min, max, what) => {
+    const n = Number(v);
+    if (!Number.isFinite(n) || n < min || n > max) fail(400, `Bad Request: ${what} must be between ${min} and ${max}`);
+    return n;
+  };
+  const optional = (v, min, max, what) => (v == null || v === '' ? 0 : number(v, min, max, what));
+  const coords = (body) => ({ lat: number(body.latitude, -90, 90, 'latitude'), lng: number(body.longitude, -180, 180, 'longitude') });
+  const randomInt = (max) => { const b = new Uint32Array(1); crypto.getRandomValues(b); return (b[0] % max) + 1; };
+  const sendBase = (body) => ({ markup: markupOf(body.reply_markup), extra: { ...replyTo(body) } });
+
+  // Content of an existing message, ready to be posted again (forward / copy).
+  function contentOf(msg, { keepForward }) {
+    if (msg.document) fail(400, 'Bad Request: this file was relayed once and cannot be sent again; upload it again or use a link');
+    const out = {};
+    for (const k of ['text', 'parse_mode', 'media', 'location', 'venue', 'contact', 'dice']) if (msg[k] != null) out[k] = msg[k];
+    if (msg.poll) out.poll = { ...msg.poll, id: policy.randomId(), options: msg.poll.options.map((o) => ({ text: o.text, count: 0 })), total: 0, voters: {}, closed: false };
+    if (keepForward && msg.forward) out.forward = msg.forward;
+    return out;
+  }
+  const previewOfMessage = (m) => (m.poll ? `📊 ${m.poll.question}` : m.dice ? m.dice.emoji : m.contact ? `👤 ${m.contact.first}`
+    : m.venue ? `📍 ${m.venue.title}` : m.location ? '📍 Location' : m.media ? previewOf(m.media.type, m.media) + (m.text ? ` · ${m.text}` : '') : String(m.text || ''));
+
+  async function forwardOrCopy(ctx, method, body) {
+    const { id, bot } = ctx;
+    const copy = method.startsWith('copy');
+    const from = await target(id, body.from_chat_id);
+    const to = await target(id, body.chat_id);
+    const many = method.endsWith('s');
+    const ids = many ? parseJson(body.message_ids ?? [], 'message_ids') : [body.message_id];
+    if (!Array.isArray(ids) || !ids.length || ids.length > 100) fail(400, 'Bad Request: message_ids must list 1–100 messages');
+    const fromThread = await db.get(from.thread);
+    const out = [];
+    for (const raw of ids.map(String).sort((a, b) => Number(a) - Number(b))) {
+      const found = await findMessage(from.thread, messageId(raw));
+      if (!found) { if (many) continue; fail(400, 'Bad Request: message to forward not found'); }
+      const msg = found.msg;
+      const fields = contentOf(msg, { keepForward: !copy });
+      if (!copy && !msg.forward) {
+        const byBot = String(msg.sender || '').startsWith('bot_');
+        fields.forward = byBot
+          ? { type: 'user', date: seconds(msg.createdAt), user: botUser(bot) }
+          : { type: 'user', date: seconds(msg.createdAt), user: personOf({ ...fromThread, chatNum: fromThread.chatNum || await policy.userNumber(fromThread.owner) }) };
+      }
+      if (copy && !many && body.caption != null) { fields.text = String(body.caption).trim().slice(0, 1024); Object.assign(fields, parseMode(body.parse_mode)); }
+      if (fields.poll) await db.transaction(async (tx) => { tx.set(`zp_bot_polls/${fields.poll.id}`, { botId: id, thread: to.thread, createdAt: Date.now() }); });
+      const markup = copy && !many ? markupOf(body.reply_markup) : {};
+      const sent = await post(ctx, body.chat_id, { ...fields, ...(copy && !many ? replyTo(body) : {}) }, previewOfMessage(fields), markup, to);
+      if (fields.poll) await db.update(`zp_bot_polls/${fields.poll.id}`, { messageId: sent.message_id });
+      out.push(copy ? { message_id: sent.message_id } : sent);
+    }
+    if (!many) return out[0];
+    return out.map((m) => ({ message_id: m.message_id }));
+  }
+
+  async function runRich(ctx, method, body) {
+    const { id, bot } = ctx;
+    switch (method) {
+      case 'forwardMessage': case 'forwardMessages': case 'copyMessage': case 'copyMessages':
+        return forwardOrCopy(ctx, method, body);
+
+      case 'sendLocation': {
+        const { markup, extra } = sendBase(body);
+        const live = body.live_period == null || body.live_period === '' ? 0 : Number(body.live_period);
+        if (live && live !== LIVE_FOREVER && (live < 60 || live > 86400)) fail(400, 'Bad Request: live_period must be 60–86400 seconds or 2147483647');
+        const location = {
+          ...coords(body), accuracy: optional(body.horizontal_accuracy, 0, 1500, 'horizontal_accuracy'),
+          heading: optional(body.heading, 1, 360, 'heading'), alertRadius: optional(body.proximity_alert_radius, 1, 100000, 'proximity_alert_radius'),
+          ...(live ? { livePeriod: live, liveUntil: live === LIVE_FOREVER ? 0 : Date.now() + live * 1000 } : {}),
+        };
+        return post(ctx, body.chat_id, { location, ...extra }, live ? '📍 Live location' : '📍 Location', markup);
+      }
+      case 'sendVenue': {
+        const { markup, extra } = sendBase(body);
+        const title = String(body.title || '').trim(), address = String(body.address || '').trim();
+        if (!title || title.length > 256) fail(400, 'Bad Request: title must be 1–256 characters');
+        if (!address || address.length > 256) fail(400, 'Bad Request: address must be 1–256 characters');
+        const venue = { ...coords(body), title, address,
+          ...(body.foursquare_id ? { foursquareId: String(body.foursquare_id).slice(0, 64) } : {}),
+          ...(body.google_place_id ? { googlePlaceId: String(body.google_place_id).slice(0, 128) } : {}) };
+        return post(ctx, body.chat_id, { venue, ...extra }, `📍 ${title}`, markup);
+      }
+      case 'sendContact': {
+        const { markup, extra } = sendBase(body);
+        const phone = String(body.phone_number || '').trim(), first = String(body.first_name || '').trim();
+        if (!/^\+?[0-9 ()-]{3,32}$/.test(phone)) fail(400, 'Bad Request: invalid phone_number');
+        if (!first || first.length > 64) fail(400, 'Bad Request: first_name must be 1–64 characters');
+        const contact = { phone, first, last: String(body.last_name || '').trim().slice(0, 64), vcard: String(body.vcard || '').slice(0, 2048) };
+        return post(ctx, body.chat_id, { contact, ...extra }, `👤 ${first}`, markup);
+      }
+      case 'sendDice': {
+        const { markup, extra } = sendBase(body);
+        const emoji = String(body.emoji || '🎲');
+        if (!DICE[emoji]) fail(400, 'Bad Request: emoji must be one of 🎲 🎯 🏀 ⚽ 🎳 🎰');
+        return post(ctx, body.chat_id, { dice: { emoji, value: randomInt(DICE[emoji]) }, ...extra }, emoji, markup);
+      }
+      case 'sendPoll': {
+        const { markup, extra } = sendBase(body);
+        const question = String(body.question || '').trim();
+        if (!question || question.length > 300) fail(400, 'Bad Request: question must be 1–300 characters');
+        const raw = parseJson(body.options ?? [], 'options');
+        if (!Array.isArray(raw) || raw.length < 2 || raw.length > 12) fail(400, 'Bad Request: a poll needs 2–12 options');
+        const options = raw.map((o) => {
+          const text = String(typeof o === 'string' ? o : o?.text ?? '').trim();
+          if (!text || text.length > 100) fail(400, 'Bad Request: each option must be 1–100 characters');
+          return { text, count: 0 };
+        });
+        const type = String(body.type || 'regular');
+        if (!['regular', 'quiz'].includes(type)) fail(400, 'Bad Request: type must be regular or quiz');
+        const poll = { id: policy.randomId(), question, options, total: 0, voters: {}, type,
+          anonymous: body.is_anonymous == null ? true : flag(body.is_anonymous), multiple: type === 'regular' && flag(body.allows_multiple_answers),
+          closed: flag(body.is_closed) };
+        if (type === 'quiz') {
+          poll.correct = number(body.correct_option_id, 0, options.length - 1, 'correct_option_id');
+          const explanation = String(body.explanation || '').trim();
+          if (explanation.length > 200) fail(400, 'Bad Request: explanation must be at most 200 characters');
+          if (explanation) poll.explanation = explanation;
+        }
+        if (body.open_period != null && body.open_period !== '') {
+          poll.openPeriod = number(body.open_period, 5, 600, 'open_period'); poll.closeAt = Date.now() + poll.openPeriod * 1000;
+        } else if (body.close_date != null && body.close_date !== '') {
+          const at = Number(body.close_date) * 1000;
+          if (!(at > Date.now() + 5000 && at < Date.now() + 600000)) fail(400, 'Bad Request: close_date must be 5–600 seconds in the future');
+          poll.closeAt = at;
+        }
+        const to = await target(id, body.chat_id);
+        await db.transaction(async (tx) => { tx.set(`zp_bot_polls/${poll.id}`, { botId: id, thread: to.thread, createdAt: Date.now() }); });
+        const sent = await post(ctx, body.chat_id, { poll, ...extra }, `📊 ${question}`, markup, to);
+        await db.update(`zp_bot_polls/${poll.id}`, { messageId: sent.message_id });
+        return sent;
+      }
+      case 'stopPoll': {
+        const { thread } = await target(id, body.chat_id);
+        const found = await findMessage(thread, messageId(body.message_id));
+        if (!found?.msg.poll || found.msg.sender !== `bot_${id}`) fail(400, 'Bad Request: message with poll to stop not found');
+        if (found.msg.poll.closed) fail(400, 'Bad Request: poll has already been closed');
+        const poll = { ...found.msg.poll, closed: true };
+        const update = { poll, ...(body.reply_markup !== undefined ? { reply_markup: storedInline(inlineKeyboard(body.reply_markup)) || { inline_keyboard: [] } } : {}) };
+        await db.update(found.path, update);
+        return pollOf(poll);
+      }
+
+      case 'sendMediaGroup': {
+        const items = parseJson(body.media ?? [], 'media');
+        if (!Array.isArray(items) || items.length < 2 || items.length > 10) fail(400, 'Bad Request: media must contain 2–10 items');
+        const kinds = items.map((m) => String(m?.type || ''));
+        if (kinds.some((k) => !GROUP_KINDS.has(k))) fail(400, 'Bad Request: media items must be photo, video, document or audio');
+        const set = new Set(kinds);
+        if ((set.has('document') || set.has('audio')) && set.size > 1) fail(400, 'Bad Request: documents and audio can only be grouped with their own kind');
+        const resolved = await target(id, body.chat_id);
+        const group = policy.randomId(), extra = replyTo(body), sent = [];
+        const stored = [];
+        for (const item of items) {
+          const caption = String(item.caption || '').trim();
+          if (caption.length > 1024) fail(400, 'Bad Request: caption is too long');
+          stored.push({ kind: item.type, caption, parse: parseMode(item.parse_mode), ...(await storeInput(ctx, item.type, item.media, body, resolved)) });
+        }
+        for (const [i, it] of stored.entries()) {
+          sent.push(await post(ctx, body.chat_id, { text: it.caption, media: it.media, ...(it.document ? { document: it.document } : {}), mediaGroupId: group, ...it.parse, ...(i === 0 ? extra : {}) },
+            it.caption ? `${previewOf(it.kind, it.media)} · ${it.caption}` : previewOf(it.kind, it.media), {}, resolved));
+        }
+        return sent;
+      }
+      case 'editMessageMedia': {
+        if (body.inline_message_id) fail(400, 'Bad Request: inline messages are not supported');
+        const resolved = await target(id, body.chat_id);
+        const found = await findMessage(resolved.thread, messageId(body.message_id));
+        if (!found || found.msg.sender !== `bot_${id}` || !(found.msg.media || found.msg.document)) fail(400, 'Bad Request: message to edit not found');
+        const item = parseJson(body.media, 'media');
+        const kind = String(item?.type || '');
+        if (!MEDIA[`send${kind.charAt(0).toUpperCase()}${kind.slice(1)}`] || kind === 'sticker' || kind === 'video_note' || kind === 'voice') fail(400, 'Bad Request: media type must be photo, video, animation, audio or document');
+        const { media, document } = await storeInput(ctx, kind, item.media, body, resolved);
+        const caption = String(item.caption || '').trim().slice(0, 1024);
+        const update = { media, document: document || null, text: caption, editedAt: Date.now(), ...parseMode(item.parse_mode),
+          ...(body.reply_markup !== undefined ? { reply_markup: storedInline(inlineKeyboard(body.reply_markup)) || { inline_keyboard: [] } } : {}) };
+        await db.update(found.path, update);
+        const t = await db.get(resolved.thread);
+        return tgMessage({ ...found.msg, ...update }, bot, { ...t, chatNum: t.chatNum || await policy.userNumber(t.owner) });
+      }
+      case 'editMessageLiveLocation': case 'stopMessageLiveLocation': {
+        if (body.inline_message_id) fail(400, 'Bad Request: inline messages are not supported');
+        const { thread } = await target(id, body.chat_id);
+        const found = await findMessage(thread, messageId(body.message_id));
+        const loc = found?.msg.location;
+        if (!loc?.livePeriod || found.msg.sender !== `bot_${id}`) fail(400, 'Bad Request: message with live location to edit not found');
+        if (loc.stopped || (loc.liveUntil && loc.liveUntil <= Date.now())) fail(400, 'Bad Request: message can\'t be edited (live location expired)');
+        const location = method === 'stopMessageLiveLocation'
+          ? { ...loc, liveUntil: Date.now(), stopped: true }
+          : { ...loc, ...coords(body), accuracy: optional(body.horizontal_accuracy, 0, 1500, 'horizontal_accuracy'), heading: optional(body.heading, 1, 360, 'heading') };
+        const update = { location, editedAt: Date.now(), ...(body.reply_markup !== undefined ? { reply_markup: storedInline(inlineKeyboard(body.reply_markup)) || { inline_keyboard: [] } } : {}) };
+        await db.update(found.path, update);
+        const t = await db.get(thread);
+        return tgMessage({ ...found.msg, ...update }, bot, { ...t, chatNum: t.chatNum || await policy.userNumber(t.owner) });
+      }
+      case 'setMessageReaction': {
+        const { thread } = await target(id, body.chat_id);
+        const found = await findMessage(thread, messageId(body.message_id));
+        if (!found) fail(400, 'Bad Request: message to react not found');
+        const list = parseJson(body.reaction ?? [], 'reaction');
+        if (!Array.isArray(list) || list.length > 1) fail(400, 'Bad Request: bots can set at most one reaction');
+        const r = list[0];
+        if (r && (r.type !== 'emoji' || !r.emoji || String(r.emoji).length > 8)) fail(400, 'Bad Request: only emoji reactions are supported');
+        await db.update(found.path, { botReaction: r ? String(r.emoji) : null, botReactionBig: !!r && flag(body.is_big) });
+        return true;
+      }
+
+      case 'pinChatMessage': {
+        const { thread } = await target(id, body.chat_id);
+        const mid = messageId(body.message_id);
+        if (!(await findMessage(thread, mid))) fail(400, 'Bad Request: message to pin not found');
+        await db.update(thread, { pinned: Number(mid) || mid });
+        return true;
+      }
+      case 'unpinChatMessage': case 'unpinAllChatMessages': {
+        const { thread } = await target(id, body.chat_id);
+        const t = await db.get(thread);
+        if (method === 'unpinChatMessage' && body.message_id != null && String(t?.pinned) !== String(body.message_id)) return true;
+        await db.update(thread, { pinned: null });
+        return true;
+      }
+      case 'getChatMember': {
+        const { thread } = await target(id, body.chat_id);
+        const t = await db.get(thread);
+        const full = { ...t, chatNum: t.chatNum || await policy.userNumber(t.owner) };
+        const user = String(body.user_id ?? '');
+        if (user === String(full.chatNum)) return { status: 'member', user: personOf(full) };
+        if (user === String(bot.num)) return { status: 'member', user: botUser(bot) };
+        fail(400, 'Bad Request: user not found');
+      }
+      case 'getChatMemberCount': { await target(id, body.chat_id); return 2; }
+      case 'getChatAdministrators': { await target(id, body.chat_id); fail(400, 'Bad Request: there are no administrators in the private chat'); }
+      case 'leaveChat': { await target(id, body.chat_id); fail(400, "Bad Request: chat member status can't be changed in private chats"); }
       default: fail(404, 'Not Found');
     }
   }

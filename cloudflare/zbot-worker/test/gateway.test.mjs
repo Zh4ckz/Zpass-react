@@ -122,7 +122,7 @@ test('bots are isolated; unknown methods are explicit', async () => {
   await call('/manage/send', { username: a.username, text: 'hello', requestId: REQ });
   assert.equal((await call('/getUpdates', {}, b.token)).result.length, 0);
   assert.equal((await call('/sendMessage', { chat_id: 'owner', text: 'Hello' }, b.token)).status, 403);
-  assert.equal((await call('/sendDice', {}, a.token)).status, 404);
+  assert.equal((await call('/sendGame', {}, a.token)).status, 404);
   assert.equal((await call('/getme', {}, a.token)).ok, true, 'method names are case-insensitive');
 });
 
@@ -555,4 +555,98 @@ test('admin can edit the app config files; the saved version is served until it 
   assert.equal((await call('/admin/configReset', { file: 'zpass-version.json' }, 'boss', '')).ok, true);
   assert.equal((await get('zpass-version.json')).status, 404, 'reset: back to the website file');
   assert.equal((await get('secrets.json')).status, 404);
+});
+
+test('rich messages: location, venue, contact, dice, poll with votes and updates', async () => {
+  const { db, api, tg } = compat();
+  const bot = (await api('/manage/create', { name: 'Rich', username: 'rich_bot' }, 'owner')).result;
+  await api('/manage/send', { username: 'rich_bot', text: '/start', requestId: REQ }, 'owner');
+  const me = await userNumber('owner');
+  const loc = await tg(bot.token, 'sendLocation', { chat_id: me, latitude: 41.0082, longitude: 28.9784, live_period: 600 });
+  assert.equal(loc.ok, true, loc.description);
+  assert.deepEqual(loc.result.location, { latitude: 41.0082, longitude: 28.9784, live_period: 600 });
+  assert.equal((await tg(bot.token, 'sendLocation', { chat_id: me, latitude: 91, longitude: 0 })).status, 400);
+  const moved = await tg(bot.token, 'editMessageLiveLocation', { chat_id: me, message_id: loc.result.message_id, latitude: 41.01, longitude: 28.98 });
+  assert.equal(moved.result.location.latitude, 41.01);
+  assert.equal((await tg(bot.token, 'stopMessageLiveLocation', { chat_id: me, message_id: loc.result.message_id })).ok, true);
+  assert.equal((await tg(bot.token, 'editMessageLiveLocation', { chat_id: me, message_id: loc.result.message_id, latitude: 1, longitude: 1 })).status, 400, 'stopped');
+
+  const venue = await tg(bot.token, 'sendVenue', { chat_id: me, latitude: 1, longitude: 2, title: 'Cafe', address: 'Main St 1' });
+  assert.equal(venue.result.venue.title, 'Cafe');
+  assert.equal(venue.result.location.longitude, 2);
+  const contact = await tg(bot.token, 'sendContact', { chat_id: me, phone_number: '+90 555 000 00 00', first_name: 'Zizo' });
+  assert.equal(contact.result.contact.first_name, 'Zizo');
+  const dice = await tg(bot.token, 'sendDice', { chat_id: me, emoji: '🏀' });
+  assert.ok(dice.result.dice.value >= 1 && dice.result.dice.value <= 5);
+  assert.equal((await tg(bot.token, 'sendDice', { chat_id: me, emoji: '🍕' })).status, 400);
+
+  const poll = await tg(bot.token, 'sendPoll', { chat_id: me, question: 'Tea or coffee?', options: JSON.stringify(['Tea', { text: 'Coffee' }]), is_anonymous: false });
+  assert.equal(poll.ok, true, poll.description);
+  assert.equal(poll.result.poll.options.length, 2);
+  assert.equal(poll.result.poll.is_anonymous, false);
+  const pollId = poll.result.poll.id;
+  const vote = await api('/manage/vote', { poll_id: pollId, option_ids: [1] }, 'owner');
+  assert.equal(vote.ok, true, vote.description);
+  assert.equal(vote.result.poll.options[1].voter_count, 1);
+  const changed = await api('/manage/vote', { poll_id: pollId, option_ids: [0] }, 'owner');
+  assert.deepEqual(changed.result.poll.options.map((o) => o.voter_count), [1, 0], 'changing the vote moves it');
+  assert.equal(changed.result.poll.total_voter_count, 1);
+  assert.equal((await api('/manage/vote', { poll_id: pollId, option_ids: [0] }, 'attacker')).status, 404, 'only the chat owner votes');
+  const updates = (await tg(bot.token, 'getUpdates', {})).result;
+  assert.ok(updates.some((u) => u.poll_answer?.option_ids?.[0] === 1 && u.poll_answer.user.id === me));
+  assert.ok(updates.some((u) => u.poll?.id === pollId));
+  const stopped = await tg(bot.token, 'stopPoll', { chat_id: me, message_id: poll.result.message_id });
+  assert.equal(stopped.result.is_closed, true);
+  assert.equal((await api('/manage/vote', { poll_id: pollId, option_ids: [1] }, 'owner')).status, 409);
+
+  const quiz = await tg(bot.token, 'sendPoll', { chat_id: me, question: '2+2?', options: '["3","4"]', type: 'quiz', correct_option_id: 1, explanation: 'Basic math' });
+  assert.equal(quiz.result.poll.correct_option_id, 1);
+  await api('/manage/vote', { poll_id: quiz.result.poll.id, option_ids: [0] }, 'owner');
+  assert.equal((await api('/manage/vote', { poll_id: quiz.result.poll.id, option_ids: [1] }, 'owner')).status, 409, 'a quiz is answered once');
+  const stored = db.data.get(`zp_bot_threads/${bot.id}_owner/messages/${quiz.result.message_id}`);
+  assert.deepEqual(stored.poll.voters.owner, [0]);
+  assert.equal(JSON.stringify(quiz.result).includes('voters'), false, 'who voted is never sent to the bot');
+});
+
+test('forward, copy, media groups, reactions, pins and chat members', async () => {
+  const { db, api, tg } = compat();
+  const bot = (await api('/manage/create', { name: 'Fwd', username: 'fwd_bot' }, 'owner')).result;
+  await api('/manage/send', { username: 'fwd_bot', text: '/start', requestId: REQ }, 'owner');
+  const me = await userNumber('owner');
+  const a = await tg(bot.token, 'sendMessage', { chat_id: me, text: 'original' });
+  const fwd = await tg(bot.token, 'forwardMessage', { chat_id: me, from_chat_id: me, message_id: a.result.message_id });
+  assert.equal(fwd.ok, true, fwd.description);
+  assert.equal(fwd.result.text, 'original');
+  assert.equal(fwd.result.forward_origin.type, 'user');
+  assert.equal(fwd.result.forward_origin.sender_user.is_bot, true);
+  const copy = await tg(bot.token, 'copyMessage', { chat_id: me, from_chat_id: me, message_id: a.result.message_id });
+  assert.equal(copy.ok, true, copy.description);
+  assert.ok(copy.result.message_id > fwd.result.message_id, 'copy returns only the new id');
+  const copied = db.data.get(`zp_bot_threads/${bot.id}_owner/messages/${copy.result.message_id}`);
+  assert.equal(copied.forward, undefined, 'a copy has no forward header');
+  const many = await tg(bot.token, 'forwardMessages', { chat_id: me, from_chat_id: me, message_ids: JSON.stringify([a.result.message_id, 999]) });
+  assert.equal(many.result.length, 1, 'missing messages are skipped');
+
+  const group = await tg(bot.token, 'sendMediaGroup', { chat_id: me, media: JSON.stringify([
+    { type: 'photo', media: 'https://example.com/1.jpg', caption: 'One' }, { type: 'photo', media: 'https://example.com/2.jpg' }]) });
+  assert.equal(group.ok, true, group.description);
+  assert.equal(group.result.length, 2);
+  assert.equal(group.result[0].media_group_id, group.result[1].media_group_id);
+  assert.equal((await tg(bot.token, 'sendMediaGroup', { chat_id: me, media: JSON.stringify([{ type: 'photo', media: 'https://e.com/1.jpg' }, { type: 'document', media: 'https://e.com/a.pdf' }]) })).status, 400);
+  const edited = await tg(bot.token, 'editMessageMedia', { chat_id: me, message_id: group.result[0].message_id, media: JSON.stringify({ type: 'video', media: 'https://example.com/v.mp4', caption: 'Now a video' }) });
+  assert.equal(edited.ok, true, edited.description);
+  assert.equal(edited.result.caption, 'Now a video');
+  assert.ok(edited.result.video);
+
+  assert.equal((await tg(bot.token, 'setMessageReaction', { chat_id: me, message_id: a.result.message_id, reaction: JSON.stringify([{ type: 'emoji', emoji: '👍' }]) })).ok, true);
+  assert.equal((await tg(bot.token, 'setMessageReaction', { chat_id: me, message_id: a.result.message_id, reaction: JSON.stringify([{ type: 'emoji', emoji: '👍' }, { type: 'emoji', emoji: '🔥' }]) })).status, 400);
+
+  assert.equal((await tg(bot.token, 'pinChatMessage', { chat_id: me, message_id: a.result.message_id })).ok, true);
+  assert.equal((await tg(bot.token, 'getChat', { chat_id: me })).result.pinned_message.text, 'original');
+  await tg(bot.token, 'unpinAllChatMessages', { chat_id: me });
+  assert.equal((await tg(bot.token, 'getChat', { chat_id: me })).result.pinned_message, undefined);
+
+  assert.equal((await tg(bot.token, 'getChatMember', { chat_id: me, user_id: me })).result.status, 'member');
+  assert.equal((await tg(bot.token, 'getChatMemberCount', { chat_id: me })).result, 2);
+  assert.equal((await tg(bot.token, 'getChatAdministrators', { chat_id: me })).status, 400);
 });
