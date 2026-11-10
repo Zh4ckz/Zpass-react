@@ -515,3 +515,24 @@ test('verification: apply for own account or own bot only, one pending request, 
   assert.equal(data.get(`chat_profiles/bot_${bot.id}`).verified, false);
   assert.equal(data.get(`zp_verify_requests/bot_${bot.id}`).status, 'removed');
 });
+
+test('public profile: only public fields, photo only when everybody may see it', async () => {
+  const { handle, data } = fixture();
+  data.set('chat_usernames/rezan', { uid: 'owner' });
+  data.set('chat_profiles/owner', { username: 'rezan', displayName: 'Rezan', verified: true, companyLabel: 'Zizo', bio: 'Builder', email: 'secret@x.com', phone: '+90' });
+  data.set('chat_media_profiles/owner', { photo: { bytes: btoa('JPEGDATA') } });
+  const get = (p) => handle(new Request('https://botapi.zpas.org' + p));
+  const r = await (await get('/public/profile/Rezan')).json();
+  assert.deepEqual(r.result, { username: 'rezan', name: 'Rezan', verified: true, company: 'Zizo', bot: false, about: 'Builder', photo: '/public/photo/rezan' });
+  assert.equal(JSON.stringify(r).includes('secret'), false);
+  const photo = await get('/public/photo/rezan');
+  assert.equal(photo.headers.get('content-type'), 'image/jpeg');
+  assert.equal(await photo.text(), 'JPEGDATA');
+  data.set('chat_profiles/owner', { ...data.get('chat_profiles/owner'), privacy: { photo: 'contacts' } });
+  assert.equal((await get('/public/photo/rezan')).status, 404, 'private photo stays private');
+  assert.equal((await (await get('/public/profile/rezan')).json()).result.photo, null);
+  assert.equal((await get('/public/profile/nobody_here')).status, 404);
+  data.set('chat_bans/owner', { banned: true });
+  assert.equal((await get('/public/profile/rezan')).status, 404, 'banned accounts have no public page');
+  assert.equal((await handle(new Request('https://botapi.zpas.org/public/profile/rezan', { method: 'POST' }))).status, 405);
+});

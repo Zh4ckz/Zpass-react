@@ -822,6 +822,45 @@ export function createGateway({ db, files = null, verifyUser, verifyAppCheck, re
     } });
   }
 
+  // ---------- public profile pages (zpas.org/<username>) ----------
+  // Read-only and anonymous: only what a profile already shows to everybody in the app. Never e-mail, phone or account ids.
+  // The photo is served only when the person's photo privacy is "everybody" (the app's default).
+  async function publicProfile(path, request) {
+    const headers = { 'Access-Control-Allow-Origin': '*', 'Cache-Control': 'public, max-age=300', 'X-Content-Type-Options': 'nosniff' };
+    const json = (status, data) => new Response(JSON.stringify(data), { status, headers: { ...headers, 'Content-Type': 'application/json; charset=utf-8' } });
+    if (request.method !== 'GET') return json(405, { ok: false });
+    const [, kind, raw] = path;
+    const name = String(raw || '').toLowerCase().replace(/^@/, '');
+    if (!['profile', 'photo'].includes(kind) || !/^[a-z0-9_]{3,32}$/.test(name)) return json(404, { ok: false });
+    rateLimit('public_' + (request.headers.get('cf-connecting-ip') || 'x'), 120);
+    const handle = await db.get(`chat_usernames/${name}`);
+    if (!handle || handle.gid) return json(404, { ok: false });
+    const key = handle.botId ? `bot_${handle.botId}` : handle.uid;
+    if (!/^[A-Za-z0-9_-]{1,128}$/.test(key || '')) return json(404, { ok: false });
+    const profile = await db.get(`chat_profiles/${key}`);
+    const privacy = profile?.privacy || {};
+    if (!profile || privacy.banned === 'true' || privacy.banned === '1' || (await db.get(`chat_bans/${key}`))?.banned) return json(404, { ok: false });
+    const photoVisible = (privacy.photo || 'everybody') === 'everybody';
+    if (kind === 'photo') {
+      const media = photoVisible ? await db.get(`chat_media_profiles/${key}`) : null;
+      if (!media?.photo?.bytes) return new Response(null, { status: 404, headers });
+      const bytes = Uint8Array.from(atob(media.photo.bytes), (c) => c.charCodeAt(0));
+      return new Response(bytes, { status: 200, headers: { ...headers, 'Content-Type': 'image/jpeg' } });
+    }
+    let about = String(profile.bio || '');
+    if (handle.botId) about = String((await db.get(`zp_bots/${handle.botId}`))?.about || '') || about;
+    const media = photoVisible ? await db.get(`chat_media_profiles/${key}`) : null;
+    return json(200, { ok: true, result: {
+      username: profile.username || name,
+      name: String(profile.displayName || profile.firstName || name).slice(0, 64),
+      verified: profile.verified === true,
+      company: String(profile.companyLabel || '').slice(0, 32),
+      bot: !!handle.botId,
+      about: about.slice(0, 300),
+      photo: media?.photo?.bytes ? `/public/photo/${name}` : null,
+    } });
+  }
+
   async function readBody(request, url) {
     const query = Object.fromEntries(url.searchParams);
     if (request.method === 'GET') return query;
@@ -856,6 +895,7 @@ export function createGateway({ db, files = null, verifyUser, verifyAppCheck, re
     };
     try {
       if (!path.length) return reply(200, { ok: true, result: { service: 'Z Pass Bot API', docs: 'https://docs.zpas.org/' } });
+      if (path[0] === 'public') return await publicProfile(path, request);
       if (!['GET', 'POST'].includes(request.method)) fail(405, 'GET or POST required');
       const body = await readBody(request, url), method = path.at(-1);
       let result;

@@ -35,6 +35,7 @@ export function decodeValue(v) {
   if ('booleanValue' in v) return v.booleanValue;
   if ('timestampValue' in v) return new Date(v.timestampValue);
   if ('arrayValue' in v) return (v.arrayValue.values || []).map(decodeValue);
+  if ('bytesValue' in v) return { bytes: v.bytesValue }; // base64, e.g. profile photos
   if ('mapValue' in v) return decodeFields(v.mapValue.fields || {});
   return undefined;
 }
